@@ -1,0 +1,97 @@
+import type { RequestHandler } from "express";
+import crypto from "node:crypto";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { connectDb } from "../DB/poolConnexion/poolConnexion.ts";
+import { createUser } from "../DB/queriesSQL/queriesSQL.ts";
+import {signAccessToken, signRefreshToken, setCookieOptionsObject} from "../function/createToken.ts"
+
+function hashOtp(code: string, salt: Buffer): Buffer {
+  return crypto.scryptSync(code, salt, 64);
+}
+
+const createNewAccountUser: RequestHandler = async (req, res) => {
+  try {
+    const ctx = (req as any).userValidated || {};
+    const email = String(ctx.email || "")
+      .trim()
+      .toLowerCase();
+    // accept several possible keys due to earlier naming typos
+    const code = String(
+      ctx.codeOtp || ctx.codeOdt || ctx.odt || ctx.otp || ""
+    ).trim();
+
+    if (!email || !code) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Missing email or code" });
+    }
+
+    const pool = await connectDb();
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      `SELECT id, code_hash, salt, password_hash, expires_at, attempts
+       FROM EmailVerification
+       WHERE email = ? AND active = 1
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [email]
+    );
+
+    const record = rows[0];
+    if (!record) {
+      return res.status(400).json({ error: true, message: "No active code" });
+    }
+
+    //controle de l' expiration de code OTP
+    const now = new Date();
+    if (new Date(record.expires_at) < now) {
+      await pool.execute<ResultSetHeader>(
+        `UPDATE EmailVerification SET active = 0 WHERE id = ?`,
+        [record.id]
+      );
+      return res.status(400).json({ error: true, message: "Code expired" });
+    }
+
+    const salt: Buffer = record.salt as Buffer;
+    const expected = hashOtp(code, salt);
+    const stored: Buffer = record.code_hash as Buffer;
+    const match =
+      stored.length === expected.length &&
+      crypto.timingSafeEqual(stored, expected);
+
+    if (!match) {
+      await pool.execute<ResultSetHeader>(
+        `UPDATE EmailVerification SET attempts = attempts + 1, WHERE id = ?`,
+        [record.id]
+      );
+      return res.status(400).json({ error: true, message: "Invalid code" });
+    }
+
+    // Create user with stored password_hash if not exists (ignore unique conflict)
+    try {
+      await createUser(email, record.password_hash as string);
+    } catch (userErr: any) {
+      // likely duplicate: ignore to keep idempotent
+    }
+
+    await pool.execute<ResultSetHeader>(
+      `UPDATE EmailVerification SET active = 0, consumed_at = NOW(), account = 1 WHERE id = ?`,
+      [record.id]
+    );
+    //attribution d' un token a l' utilisateur
+
+    const accessToken = signAccessToken(record.id);
+    const refreshToken = signRefreshToken(record.id);
+    const options = setCookieOptionsObject();
+    res.cookie("tokenRefresh", refreshToken, options);
+    res.status(200).json({
+      status: "success",
+      token:accessToken
+      
+    });
+  } catch (err: any) {
+    console.error("createNewAccountUser error:", err?.message || err);
+    return res.status(500).json({ error: true, message: "Server error" });
+  }
+  
+}
+export { createNewAccountUser }

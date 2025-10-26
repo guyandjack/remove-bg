@@ -1,0 +1,70 @@
+{
+  "navBar": {
+    "home": "Home",
+    "upload": "Upload",
+    "pricing": "Pricing",
+    "contact": "Contact",
+    "auth": "Signup"
+  },
+  "footer": {
+    "legal": "Légal notices",
+    "privacy": "Privacy policy",
+
+    "cookie": "Cookie",
+    "services": "Services",
+    "company": "Company"
+  },
+  "auth": {
+    "signup": "Sign up",
+    "signin": "Sign in"
+  },
+  "formContact": {
+    "lastName": "Name",
+    "firstName": "Firstname",
+    "subject": "Subject",
+    "email": "Email",
+    "message": "Message",
+    "privacy": "By selecting this, you agree to ",
+    "link": "our policy",
+    "required": "Field required.",
+    "minLength": "Lack caracters.",
+    "maxLength": "To many caracteres.",
+    "pattern": "Invalid format",
+    "button": "Submit",
+    "submit": "is submiting",
+    "textSuccess": "Message sended",
+    "textError": "Error message no sended!"
+  },
+  "otpInput":{
+    "title": "Enter the code you received by email.",
+    "question": "Haven't you received anything?",
+    "btnResend": "Resend a code",
+    "errorRequire": "Field required",
+    "errorPattern": "Invalid format",
+    "textSuccess": "Account creation successful",
+    "textError": "Unable to create account"
+  },
+  "formSignUp": {
+    "title": "Create your account",
+    "email": "Email",
+    "password": "Password",
+    "passwordConfirm": "Confirm password",
+    "pattern":"Invalid format",
+    "btnSubmit": "Create your account",
+    "btnGoogle": "Continue with Google",
+    "passwordError": "Weak password",
+    "textSuccess": "A confirmation email has been sent",
+    "textError": "An error has occurred"
+  },
+  "formSignIn": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "btnSubmit": "Login",
+    "btnGoogle": "Continuer with Google",
+    "forgot": "Forgot password"
+  },
+  "loader": {
+    "formContact": "loading..."
+  }
+}

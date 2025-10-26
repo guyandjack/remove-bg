@@ -1,0 +1,73 @@
+{
+  "navBar": {
+    "home": "Accueil",
+    "upload": "Upload",
+    "pricing": "Prix",
+    "contact": "Contact",
+    "auth": "Connexion"
+    
+  },
+  "footer":{
+    "legal": "Mentions légales",
+    "privacy": "Politique de confidentialité",
+    "cookie": "Cookie",
+    "services": "Services",
+    "company": "Entreprise"
+    
+  },
+  
+  "formContact":{
+    "lastName": "Nom",
+    "firstName": "Prénom",
+    "subject": "Objet",
+    "email": "Email",
+    "message": "Message",
+    "privacy": "En validant, vous acceptez ",
+    "link": "notre politique de confidencialitée",
+    "required": "Ce champs est requis.",
+    "minLength": "Nombre de caractères insufisant.",
+    "maxLength": "Nombre de caractères trop grand",
+    "pattern": "Format non valide",
+    "button": "Envoyer",
+    "submit": "En cours...",
+    "textSuccess": "Message transmis",
+    "textError": "Message non transmis!"
+  },
+  "formSignUp":{
+    "title": "Créer votre compte",
+    "email": "Email",
+    "password":"Mot de passe",
+    "passwordConfirm":"Confimation du mot de passe",
+    "pattern":"Format non valide",
+    "btnSubmit":"Créer votre compte",
+    "btnGoogle":"Continuer avec Google",
+    "passwordError": "Mot de passe trop faible",
+    "textSuccess": "Un mail de confirmation a été envoyé",
+    "textError": "Une erreure c'est produite"
+
+
+  },
+  "otpInput":{
+    "title":"Entrez votre code reçu par email.",
+    "question":"Vous n’avez rien reçu ?",
+    "btnResend":"Renvoyer un code",
+    "errorRequire":"Champs requis",
+    "errorPattern":"Format invalide",
+    "textSuccess":"Création du compte reussi",
+    "textError":"Impossible de créer le compte"
+  },
+  "formSignIn":{
+    "title": "Connection à votre espace",
+    "email": "Email",
+    "password":"Mot de passe",
+    "btnSubmit":"Créer",
+    "btnGoogle":"Continuer avec Google",
+    "forgot": "Mot de passe oublié"
+
+
+  },
+  "loader":{
+    "formContact":"loading..."
+  }
+  
+}

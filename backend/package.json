@@ -1,0 +1,44 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "server.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --watch backend --ext js,ts,tsx --exec tsx backend/server.ts",
+    "start": "tsx backend/server.ts"
+  },
+  "keywords": [],
+  "author": "helveclick",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express-fileupload": "^1.5.1",
+    "bcryptjs": "^3.0.2",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-fileupload": "^1.5.2",
+    "express-rate-limit": "^8.1.0",
+    "express-session": "^1.18.2",
+    "handlebars": "^4.7.8",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mjml": "^4.16.1",
+    "morgan": "^1.10.1",
+    "mysql2": "^3.15.2",
+    "nodemailer": "^7.0.9",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "winston": "^3.18.3",
+    "winston-daily-rotate-file": "^5.0.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "nodemon": "^3.1.10",
+    "tsx": "^4.20.6"
+  }
+}
