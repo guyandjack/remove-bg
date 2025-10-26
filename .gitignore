@@ -13,6 +13,7 @@ dist-ssr
 *.local
 backend/private.key
 backend/public.key
+.env
 
 # Editor directories and files
 .vscode/*
