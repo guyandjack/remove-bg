@@ -63,3 +63,19 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`EmailVerification` (
   UNIQUE KEY uniq_email_active (email, active)
 ) ENGINE=InnoDB;
 
+
+CREATE TABLE IF NOT EXISTS `remove_bg`.`customer` (
+  id           VARCHAR(36)  NOT NULL PRIMARY KEY,
+  plan_id       VARCHAR(36) NOT NULL,
+  user_id       VARCHAR(36) NOT NULL,
+  email        VARCHAR(255) NOT NULL,
+  last_name     VARCHAR(36)  NOT NULL,
+  first_name    VARCHAR(36)  NOT NULL,
+  adress        VARCHAR(128)  NOT NULL,
+  postal_code   VARCHAR(36)  NOT NULL,
+  town          VARCHAR(36)  NOT NULL,
+  INDEX idx_email (email),
+  INDEX idx_expires (expires_at),
+  UNIQUE KEY uniq_email_active (email, active)
+) ENGINE=InnoDB;
+

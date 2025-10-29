@@ -22,8 +22,7 @@ import { logger, httpLoggerStream, requestIdMiddleware } from "./logger.ts";
 import contactRoute from "./routes/contact.route.ts";
 import signupRoute from "./routes/signUp.route.ts";
 import loginRoute from "./routes/login.route.ts";
-import verifyEmailRoute from "./routes/verifyEmail.route.ts";
-import verifyEmailCodeRoute from "./routes/verifyEmail.route.ts";
+import logOutRoute from "./routes/logOut.routes.ts";
 //import verifyEmailCodeController from "./routes/verifyOpt.route.ts";
 
 import type { Request, Response, NextFunction, RequestHandler } from "express";
@@ -122,9 +121,8 @@ app.get("/test", (req, res) => {
  app.use("/api/login", loginRoute);
  app.use("/api/signup", signupRoute);
  app.use("/api/contact", contactRoute);
-// app.use("/api/check/email", verifyEmailRoute);
-// app.use("/api/check/otp", verifyEmailCodeRoute);
-// etc.
+ app.use("/api/logout", logOutRoute);
+
 
 // ----------------------------------------------------
 // ⚠️ 6️⃣ Middleware de gestion d’erreurs global

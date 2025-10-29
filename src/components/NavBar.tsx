@@ -1,8 +1,9 @@
 // Component navBar
-
+//import des librairies
+import axios from "axios"
 //import des hooks
 import { useTranslation } from "react-i18next";
-//import {useState} from "preact/hooks"
+import {useState} from "preact/hooks"
 
 //import des composants enfants
 import { SelectLanguage } from "./LangSwitcher";
@@ -13,17 +14,38 @@ import { ThemeControler } from "./themeControler/ThemeControler";
 //import des data
 import { navBarContent } from "@/data/content/components/nav/navBarContent";
 
+//import des functions
+import { localOrProd } from "@/utils/localOrProd";
+const { urlApi } = localOrProd();
+
 
 //fonction
-const isUserLogin = () => {
-  //get info fron local storage
+const isAuthentified = async() => {
+  try {
+    const response = await axios.post(`${urlApi}/api/auth/me`, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      timeout: 10000,
+    });
+
+      return response.data
+  } catch (error) {
+    throw Error("une erreur est survenu lors de la requete:" + error)
+    
+    
+  }
 }
 
 
 
 function NavBar() {
   //state qui gere l' affichage du profileDropdown
-  //const [isDisplay, setIsDisplay] = useState(false);
+  const [isDisplay, setIsDisplay] = useState(false);
+
+  const data = isAuthentified();
+
     const { t } = useTranslation();
   return (
     <div className="navbar bg-base-100 shadow-sm">

@@ -4,6 +4,20 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import jwt from "jsonwebtoken";
 
+type Payload = {
+  email: string;
+  firstname?: string;
+
+}
+
+type Option = {
+  domain?: string;
+  httpOnly: boolean;
+  secure: boolean;
+  maxAge: number;
+sameSite?: string;
+}
+
 // Load environment from the backend/.env regardless of process cwd
 (() => {
   try {
@@ -20,13 +34,13 @@ import jwt from "jsonwebtoken";
 /**
  * Sign JWT accesstoken
  */
-const signAccessToken = (id: string) => {
+const signAccessToken = (payload : Payload) => {
   const envDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../");
   const keyPath = process.env.PRIVATE_KEY_PATH;
   if (!keyPath) throw new Error("PRIVATE_KEY_PATH is not defined");
   const resolvedKey = path.isAbsolute(keyPath) ? keyPath : path.resolve(envDir, keyPath);
   const privateKey = fs.readFileSync(resolvedKey, "utf8");
-  return jwt.sign({ id }, privateKey, {
+  return jwt.sign({ payload }, privateKey, {
     expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
     algorithm: "RS256",
   });
@@ -57,9 +71,9 @@ const setCookieOptionsObject = () => {
         domain: "background.ch",
         httpOnly: true,
         secure: true,
-        maxAge: 60 * 60 * 1000,
+        maxAge: 15 * 60 * 1000,
         sameSite: "none",
-      };
+      } as Option;
 
     case "development":
       return {
@@ -68,7 +82,7 @@ const setCookieOptionsObject = () => {
         secure: false,
         maxAge: 60 * 60 * 1000,
         //samesite: "none",
-      };
+      } as Option;
 
     default:
       return {};

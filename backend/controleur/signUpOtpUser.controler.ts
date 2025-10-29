@@ -23,7 +23,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
     if (!email || !code) {
       return res
         .status(400)
-        .json({ error: true, message: "Missing email or code" });
+        .json({ status: "error", message: "Missing email or code", errorCode: "otp1" });
     }
 
     const pool = await connectDb();
@@ -38,7 +38,13 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
 
     const record = rows[0];
     if (!record) {
-      return res.status(400).json({ error: true, message: "No active code" });
+      return res
+        .status(400)
+        .json({
+          status: "error",
+          message: "No active code",
+          errorCode: "otp2",
+        });
     }
 
     //controle de l' expiration de code OTP
@@ -48,7 +54,9 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         `UPDATE EmailVerification SET active = 0 WHERE id = ?`,
         [record.id]
       );
-      return res.status(400).json({ error: true, message: "Code expired" });
+      return res
+        .status(400)
+        .json({ status: "error", message: "Code expired", errorCode: "otp3" });
     }
 
     const salt: Buffer = record.salt as Buffer;
@@ -63,34 +71,48 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         `UPDATE EmailVerification SET attempts = attempts + 1, WHERE id = ?`,
         [record.id]
       );
-      return res.status(400).json({ error: true, message: "Invalid code" });
+      return res
+        .status(400)
+        .json({ status: "error", message: "Invalid code", errorCode: "otp4" });
     }
 
     // Create user with stored password_hash if not exists (ignore unique conflict)
     try {
       await createUser(email, record.password_hash as string);
     } catch (userErr: any) {
-      // likely duplicate: ignore to keep idempotent
+      return res
+        .status(400)
+        .json({ status: "error", message: "Impossible to record", errorCode: "otp5" });
     }
 
     await pool.execute<ResultSetHeader>(
       `UPDATE EmailVerification SET active = 0, consumed_at = NOW(), account = 1 WHERE id = ?`,
       [record.id]
     );
-    //attribution d' un token a l' utilisateur
 
-    const accessToken = signAccessToken(record.id);
-    const refreshToken = signRefreshToken(record.id);
+    //attribution du plan free
+    await pool.execute<ResultSetHeader>(
+      `UPDATE EmailVerification SET active = 0, consumed_at = NOW(), account = 1 WHERE id = ?`,
+      [record.id]
+    );
+
+    //attribution d'un token a l' utilisateur
+
+    const accessToken = signAccessToken(record.email);
+    const refreshToken = signRefreshToken(record.email);
     const options = setCookieOptionsObject();
     res.cookie("tokenRefresh", refreshToken, options);
     res.status(200).json({
       status: "success",
-      token:accessToken
-      
+      email: record.email,
+      token: accessToken,
+      credit: 10,
+      authentified: true
+           
     });
   } catch (err: any) {
     console.error("createNewAccountUser error:", err?.message || err);
-    return res.status(500).json({ error: true, message: "Server error" });
+    return res.status(500).json({ status: "error", message: err || err.message, errorCode: "otp6" });
   }
   
 }
