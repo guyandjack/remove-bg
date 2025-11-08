@@ -10,11 +10,11 @@ type NavLink = {
 //declaration des data
 
 const footerContent: NavLink[] = [
-  { key: "legal", href: "/legal" },
-  { key: "privacy", href: "/src/pages/privacy.tsx" },
-  { key: "cookie", href: "/src/pages/cookie.tsx" },
-  { key: "contact", href: "/src/pages/contactPage.tsx" },
-  { key: "auth", href: "/src/pages/authPage.tsx" },
+  { key: "terms", href: "/cgu" },
+  { key: "privacy", href: "/privacy" },
+  { key: "cookie", href: "/cookie" },
+  { key: "contact", href: "/contactPage" },
+  { key: "auth", href: "/authPage" },
 ];
 
 

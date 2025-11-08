@@ -7,9 +7,9 @@
     "auth": "Signup"
   },
   "footer": {
-    "legal": "Légal notices",
+    "legal": "Legal",
+    "terms": "Terms of Service (ToS)",
     "privacy": "Privacy policy",
-
     "cookie": "Cookie",
     "services": "Services",
     "company": "Company"
@@ -35,7 +35,7 @@
     "textSuccess": "Message sended",
     "textError": "Error message no sended!"
   },
-  "otpInput":{
+  "otpInput": {
     "title": "Enter the code you received by email.",
     "question": "Haven't you received anything?",
     "btnResend": "Resend a code",
@@ -49,7 +49,7 @@
     "email": "Email",
     "password": "Password",
     "passwordConfirm": "Confirm password",
-    "pattern":"Invalid format",
+    "pattern": "Invalid format",
     "btnSubmit": "Create your account",
     "btnGoogle": "Continue with Google",
     "passwordError": "Weak password",
@@ -66,5 +66,44 @@
   },
   "loader": {
     "formContact": "loading..."
+  },
+  "terms": {
+    "title": "Terms of Service (ToS)",
+    "intro": "These Terms of Service (hereinafter referred to as 'ToS') govern access to and use of the website and the progressive web application (PWA) for background removal (hereinafter referred to as 'the Service'), operated by the Provider. By accessing or using the Service, the user acknowledges having read, understood, and accepted these terms without reservation.",
+
+    "article1_title": "1. Purpose of the Service",
+    "article1_text": "The Service allows users to upload images to automatically remove their background using an image-processing algorithm. The Service is accessible via a progressive web application (PWA) and may include additional features available through paid subscription plans.",
+
+    "article2_title": "2. Access to the Service",
+    "article2_text": "Access to the Service is open to any person of legal age or with the legal authorization of their guardian. Some features may require the creation of a user account and/or the purchase of a paid subscription. The user agrees to provide accurate information during registration and to keep it up to date.",
+
+    "article3_title": "3. User Content and Responsibility",
+    "article3_text": "The user is solely responsible for the content (images, text, metadata) they upload, transfer, or process via the Service. The user is strictly prohibited from uploading any content that:\n- is pedopornographic, violent, hateful, defamatory, obscene, or otherwise offensive,\n- infringes any image rights, copyrights, or intellectual property rights,\n- violates the laws and regulations in force in Switzerland, the European Union, or the user’s country.\n\nThe Provider reserves the right to suspend or delete, without prior notice, any account or content suspected of violating these terms or applicable laws, and to report any illegal activity to the competent authorities. The Provider declines any liability for content processed by users.",
+
+    "article4_title": "4. Use of the Service and Limitations",
+    "article4_text": "The user agrees to use the Service only for lawful and personal purposes. The Service may not be used for fraud, spamming, AI model training without written authorization, or any unauthorized commercial exploitation. The Provider may limit or suspend access to the Service for maintenance, security, or in cases of detected abuse.",
+
+    "article5_title": "5. Subscriptions and Payment",
+    "article5_text": "Certain Service features are available through paid subscriptions. Prices, durations, and conditions are clearly displayed before any purchase. Payments are processed securely through a third-party provider. Refunds are only issued in case of an error attributable to the Provider or in accordance with applicable consumer protection laws.",
+
+    "article6_title": "6. Personal Data Protection",
+    "article6_text": "The data collected (account information, billing data, uploaded images) are processed in accordance with the General Data Protection Regulation (GDPR) and the Swiss Federal Data Protection Act (FADP). Uploaded images are temporarily stored for processing and automatically deleted after a reasonable period. The user retains full ownership of their files.",
+
+    "article7_title": "7. Intellectual Property",
+    "article7_text": "The Service, its interface, algorithms, and trademarks are the exclusive property of the Provider. Any unauthorized reproduction, modification, or exploitation is strictly prohibited. The user retains intellectual property rights over the images they upload.",
+
+    "article8_title": "8. Liability and Warranties",
+    "article8_text": "The Provider makes every effort to ensure the reliability and availability of the Service but does not guarantee uninterrupted or error-free operation. The Provider shall not be held liable for any direct or indirect damages resulting from the use of the Service, including data loss, except in cases of proven gross negligence.",
+
+    "article9_title": "9. Suspension and Termination",
+    "article9_text": "The Provider reserves the right to suspend or terminate a user account in case of violation of these ToS, suspected illegal activity, or abuse of the Service. In case of termination, no partial refund of a subscription will be granted.",
+
+    "article10_title": "10. Governing Law and Jurisdiction",
+    "article10_text": "These Terms are governed by Swiss law. In the event of a dispute, and unless otherwise required by mandatory legal provisions, the competent courts of the Canton of Vaud shall have exclusive jurisdiction.",
+
+    "article11_title": "11. Amendments to the Terms",
+    "article11_text": "The Provider reserves the right to modify these ToS at any time. Any modification becomes effective upon publication on the website. It is the user’s responsibility to regularly review the latest version of the Terms in force.",
+
+    "conclusion": "By using the Service, the user acknowledges having read and accepted these Terms of Service without reservation."
   }
 }

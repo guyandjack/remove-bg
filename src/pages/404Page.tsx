@@ -1,5 +1,5 @@
 const Page404 = () => {
-    export default function Example() {
+    
       return (
         <>
           {/*
@@ -36,4 +36,4 @@ const Page404 = () => {
       );
     }
 
-}
+export {Page404}

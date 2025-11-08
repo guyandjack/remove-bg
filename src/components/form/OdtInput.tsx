@@ -1,9 +1,10 @@
 // OtpInput.tsx (ou .jsx)
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 //import des librairies
 import axios from "axios";
 import { FormSubmitHandler, useForm } from "react-hook-form";
+import { signal, computed, effect } from "@preact/signals";
 
 //import des composnta enfants
 import { Loader } from "@/components/loader/Loader";
@@ -19,6 +20,18 @@ type callback = {
   lang: string;
   id?: string;
 }
+
+
+//Création d'un signal global pour être importé dans n'importe quel composant
+const user = signal(false);
+const isSignUp = computed(() => user.value === true);
+
+const tokenAcces = signal(null);
+const tokenAccesComputed = computed(() => tokenAcces.value);
+
+
+
+
 
 
 type OtpInputProps = {
@@ -82,6 +95,7 @@ function OtpInput({
   // Initialise le tableau de refs
   const slots = useMemo(() => Array.from({ length }, (_, i) => i), [length]);
 
+  
   useEffect(() => {
     if (autoFocus && inputsRef.current[0]) {
       inputsRef.current[0].focus();
@@ -214,9 +228,15 @@ function OtpInput({
         headers: { "Content-Type": "application/json" },
         timeout: 10000,
       });
-      if (response.data.status === "success") {
+
+      const result = response.data;
+      if (result.status === "success") {
+        //modifie la valeur du signal et stockage du token
+        tokenAcces.value = result.token
+        console.log("tokenAcces Values dans response odtinputs: ", tokenAcces.value);
         setIsLoader(false);
         setStatus("success");
+        user.value = true;
         setTimeout(() => {
           
           window.location.href = "/upload";
@@ -335,5 +355,5 @@ function OtpInput({
   );
 }
 
-export { OtpInput };
+export { OtpInput, isSignUp, tokenAccesComputed };
 

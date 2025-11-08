@@ -97,16 +97,17 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
     );
 
     //attribution d'un token a l' utilisateur
-
-    const accessToken = signAccessToken(record.email);
-    const refreshToken = signRefreshToken(record.email);
+    // Utilise l'email validé (variable locale) et le format d'objet attendu
+    const accessToken = signAccessToken({ email });
+    const refreshToken = signRefreshToken(email);
     const options = setCookieOptionsObject();
+    console.log("acccess token dans le controleur signup: ", accessToken);
     res.cookie("tokenRefresh", refreshToken, options);
     res.status(200).json({
       status: "success",
-      email: record.email,
+      email: email,
       token: accessToken,
-      credit: 10,
+      credit: 5,
       authentified: true
            
     });

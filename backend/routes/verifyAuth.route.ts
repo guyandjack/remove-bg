@@ -1,8 +1,9 @@
 import express from "express";
-import { verifyAuth } from "../controleur/verifyAuth";
+import { verifyAuth } from "../middelware/verifAuth/verifyAuth";
+import {authMe} from "../controleur/authMe"
 
 const router = express.Router();
 
-router.get("/auth/me", verifyAuth);
+router.post("", verifyAuth, authMe);
 
 export default router;

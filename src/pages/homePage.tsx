@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 //import de compoants enfants
 import { Hero } from "@/components/hero/hero";
+import { Example } from "../components/example/Example";
 
 function HomePage() {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ function HomePage() {
       <div className={"w-200 h-200 overflow-hidden border-with-2 "}>
         <Hero />
       </div>
+      <Example />
     </div>
   );
 }

@@ -7,7 +7,7 @@ const logOut = (req: Request, res: Response) => {
   const options = setCookieOptionsObject();
 
   try {
-    res.clearCookie("refresh_token", options);
+    res.clearCookie("tokenRefresh", options);
   } catch {
     res
       .status(500)

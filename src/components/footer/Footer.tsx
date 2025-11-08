@@ -7,6 +7,9 @@ import { FooterBottom } from "./FooterBottom";
 //import des data
 import { navBarContent } from "@/data/content/components/nav/navBarContent";
 
+//import des fonctions
+import { setActiveLink } from "@/utils/setActiveLink";
+
 const Footer = () => {
   const { t } = useTranslation();
 
@@ -15,12 +18,13 @@ const Footer = () => {
   const company = t(`footer.company`);
   const legal = t(`footer.legal`);
 
+  const terms = t("footer.terms")
   const privacy = t(`footer.privacy`);
   const cookie = t(`footer.cookie`);
 
   return (
     <div>
-      <div className="footer md:footer-horizontal bg-base-200 p-10">
+      <nav className="footer md:footer-horizontal bg-base-200 p-10">
         <aside>
           <svg
             width="50"
@@ -39,57 +43,99 @@ const Footer = () => {
             Providing reliable tech since 1992
           </p>
         </aside>
-        <nav>
-          <h6 className="text-lg footer-title opacity-100 text-secondary">{services}</h6>
+        <div>
+          <h6 className="text-lg footer-title opacity-100 text-secondary">
+            {services}
+          </h6>
           <ul>
             {navBarContent.map((link) => {
               const label = t(`navBar.${link.key}`);
               return link.key !== "contact" && link.key !== "aboutus" ? (
                 <li key={link.href}>
-                  <a className="pb-[5px] text-lg hover:text-primary" href={link.href}>
+                  <a
+                    data-id={link.href}
+                    className="pb-[5px] text-lg hover:text-primary"
+                    href={link.href}
+                    onClick={(e) => {
+                      setActiveLink(e);
+                    }}
+                  >
                     {label}
                   </a>
                 </li>
               ) : null;
             })}
           </ul>
-        </nav>
-        <nav>
-          <h6 className="text-lg footer-title opacity-100 text-secondary">{company}</h6>
+        </div>
+        <div>
+          <h6 className="text-lg footer-title opacity-100 text-secondary">
+            {company}
+          </h6>
           <ul>
             {navBarContent.map((link) => {
               const label = t(`navBar.${link.key}`);
               return link.key === "contact" || link.key === "aboutus" ? (
                 <li key={link.href}>
-                  <a className="py-[5] text-lg hover:text-primary" href={link.href}>
+                  <a
+                    data-id={link.href}
+                    className="py-[5] text-lg hover:text-primary"
+                    href={link.href}
+                    onClick={(e) => {
+                      setActiveLink(e);
+                    }}
+                  >
                     {label}
                   </a>
                 </li>
               ) : null;
             })}
           </ul>
-        </nav>
-        <nav>
-          <h6 className="text-lg footer-title opacity-100 text-secondary">{legal}</h6>
+        </div>
+
+        <div>
+          <h6 className="text-lg footer-title opacity-100 text-secondary">
+            {legal}
+          </h6>
           <ul>
             <li>
-              <a className="py-[5] text-lg hover:text-primary" href="#">
-                {legal}
+              <a
+                data-id="#"
+                className="py-[5] text-lg hover:text-primary"
+                href="/cgu"
+                onClick={(e) => {
+                  setActiveLink(e);
+                }}
+              >
+                {terms}
               </a>
             </li>
             <li>
-              <a className="py-[5] text-lg hover:text-primary" href="#">
+              <a
+                data-id="#"
+                className="py-[5] text-lg hover:text-primary"
+                href="/privacy"
+                onClick={(e) => {
+                  setActiveLink(e);
+                }}
+              >
                 {privacy}
               </a>
             </li>
             <li>
-              <a className="py-[5] text-lg hover:text-primary" href="#">
+              <a
+                data-id="#"
+                className="py-[5] text-lg hover:text-primary"
+                href="/privacy"
+                onClick={(e) => {
+                  setActiveLink(e);
+                }}
+              >
                 {cookie}
               </a>
             </li>
           </ul>
-        </nav>
-      </div>
+        </div>
+      </nav>
       <FooterBottom />
     </div>
   );

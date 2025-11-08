@@ -23,6 +23,8 @@ import contactRoute from "./routes/contact.route.ts";
 import signupRoute from "./routes/signUp.route.ts";
 import loginRoute from "./routes/login.route.ts";
 import logOutRoute from "./routes/logOut.routes.ts";
+import verifyRoute from "./routes/verifyAuth.route.ts";
+
 //import verifyEmailCodeController from "./routes/verifyOpt.route.ts";
 
 import type { Request, Response, NextFunction, RequestHandler } from "express";
@@ -122,6 +124,7 @@ app.get("/test", (req, res) => {
  app.use("/api/signup", signupRoute);
  app.use("/api/contact", contactRoute);
  app.use("/api/logout", logOutRoute);
+ app.use("/api/auth/me", verifyRoute );
 
 
 // ----------------------------------------------------
