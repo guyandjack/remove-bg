@@ -11,8 +11,9 @@ import { UploadPage } from "./src/pages/uploadPage";
 import { AuthPage } from "./src/pages/authPage";
 import { PricePage } from "./src/pages/pricePage";
 import { ContactPage} from "./src/pages/contactPage";
-import { CguPage} from "./src/pages/cguPage";
+import { TermsPage} from "./src/pages/termsPage";
 import { PrivacyPage} from "./src/pages/privacyPage";
+import { LegalPage} from "./src/pages/LegalPage";
 import { Page404} from "./src/pages/404Page";
 
 //import des composants
@@ -38,8 +39,9 @@ export function App() {
               <Route path="/pricing" component={PricePage} />
               <Route path="/auth" component={AuthPage} />
               <Route path="/contact" component={ContactPage} />
-              <Route path="/cgu" component={CguPage} />
+              <Route path="/cgu" component={TermsPage} />
               <Route path="/privacy" component={PrivacyPage} />
+              <Route path="/legal" component={LegalPage} />
               <Route path="*/*" component={Page404} />
             </Router>
           </ErrorBoundary>

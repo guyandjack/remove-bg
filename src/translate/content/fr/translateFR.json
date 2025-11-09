@@ -71,6 +71,60 @@
   "loader":{
     "formContact":"loading..."
   },
+
+  "diff":{
+    "friend_label": "Amis",
+    "vehicule_label": "Vehicule",
+    "sport_label": "Sport",
+    "logo_label": "Logo",
+    "pet_label": "Animaux"
+  },
+
+  "priceCard":{
+    "free_plan":{
+      "tag": "",
+      "title": "Gratuit",
+      "price": "0/mois",
+      "bg": "Supression de l'arrière plan",
+      "resolution": "Basse résolution",
+      "format": "Format: png",
+      "credit": "2 credits/jour",
+      "subscribe": "Je choisi ce plan",
+      "bill":"Pas de numéro de carte demandé."
+    },
+    "hobby_plan":{
+      "tag": "Best seller",
+      "title": "Hobby",
+      "price": "5/mois",
+      "bg": "Supression de l'arrière plan",
+      "resolution": "Haute résolution",
+      "format": "Format: png, jpg, jpeg, webp",
+      "credit": "8 credits/jour",
+      "tool_1": "Choix d'un nouveau arrière plan",
+      "tool_2": "",
+      "subscribe": "Je choisi ce plan",
+      "bill":"Une facture annuelle de"
+    },
+    "pro_plan":{
+      "tag": "",
+      "title": "Pro",
+      "price": "15/mois",
+      "bg": "Supression de l'arriere plan",
+      "resolution": "Haute résolution",
+      "format": "Format: png, jpg, jpeg, webp",
+      "credit": "20 credits/jour",
+      "tool_1": "Choix d'un nouveau arrière plan",
+      "tool_2": "Outils de retouche disponible",
+      "subscribe":"Je choisi ce plan",
+      "bill":"Une facture annuelle de"
+    }
+  },
+
+  "pricing":{
+    "title_h1": "Des plans adaptés à chaque contexte de travail.",
+    "title_h2": "Changez d’abonnement en fonction de vos attentes.",
+    "intro": "Choisissez un forfait abordable qui comprend les meilleures fonctionnalités pour vos besoins."
+  },
   
   "terms": {
     "title": "Conditions Générales d’Utilisation (CGU)",
@@ -120,13 +174,13 @@
     "article1_text": "Le responsable du traitement des données personnelles est l’éditeur du Service (ci-après « le Prestataire »). Le Prestataire s’engage à assurer la conformité du traitement des données avec le Règlement Général sur la Protection des Données (RGPD – UE 2016/679) et la Loi fédérale suisse sur la protection des données (LPD).",
     
     "article2_title": "2. Données collectées",
-    "article2_text": "Le Prestataire collecte uniquement les données strictement nécessaires à la fourniture et à l’amélioration du Service :\n\n- **Données de contact** : nom, prénom, adresse e-mail, message (formulaire de contact)\n- **Données de paiement** : nom, prénom, adresse postale, adresse e-mail (collectées via Stripe). Aucune donnée sensible, telle que le numéro complet de carte bancaire, n’est stockée par le Prestataire.\n- **Données techniques** : adresse IP, type de navigateur, système d’exploitation, temps d’accès (à des fins statistiques et de sécurité)\n- **Images téléversées** : les images envoyées par l’Utilisateur sont temporairement stockées pour traitement. Certaines images peuvent être conservées de manière anonyme et sécurisée afin d’améliorer les algorithmes et modèles d’intelligence artificielle utilisés pour le Service.",
+    "article2_text": "Le Prestataire collecte uniquement les données strictement nécessaires à la fourniture et à l’amélioration du Service :\n\nDonnées de contact : nom, prénom, adresse e-mail, message (formulaire de contact)\n Données de paiement : nom, prénom, adresse postale, adresse e-mail (collectées via Stripe). Aucune donnée sensible, telle que le numéro complet de carte bancaire, n’est stockée par le Prestataire.\nDonnées techniques : adresse IP, type de navigateur, système d’exploitation, temps d’accès (à des fins statistiques et de sécurité)\nImages téléversées : les images envoyées par l’Utilisateur sont temporairement stockées pour traitement. Certaines images peuvent être conservées de manière anonyme et sécurisée afin d’améliorer les algorithmes et modèles d’intelligence artificielle utilisés pour le Service.",
     
     "article3_title": "3. Utilisation des données",
     "article3_text": "Les données collectées sont utilisées uniquement dans les finalités suivantes :\n\n- Fournir le Service et assurer son bon fonctionnement\n- Gérer la relation client et répondre aux demandes via le formulaire de contact\n- Traiter les paiements et la facturation via Stripe\n- Améliorer les performances du Service et de l’IA (apprentissage automatique sur images anonymisées)\n- Garantir la sécurité et la conformité légale du Service",
     
     "article4_title": "4. Cookies et authentification",
-    "article4_text": "Le Service n’utilise qu’un seul cookie, strictement nécessaire à son fonctionnement :\n\n- **Refresh Token** : il est utilisé exclusivement pour maintenir la session d’authentification sécurisée de l’Utilisateur. Aucun cookie publicitaire, de suivi ou d’analyse n’est utilisé.\n\nCe cookie est temporaire et ne contient aucune donnée personnelle directe.",
+    "article4_text": "Le Service n’utilise qu’un seul cookie, strictement nécessaire à son fonctionnement.Il est utilisé exclusivement pour maintenir la session d’authentification sécurisée de l’Utilisateur. Aucun cookie publicitaire, de suivi ou d’analyse n’est utilisé. Ce cookie est temporaire et ne contient aucune donnée personnelle directe.",
     
     "article5_title": "5. Base légale du traitement",
     "article5_text": "Le traitement des données repose sur :\n- L’exécution d’un contrat (abonnement ou utilisation du Service)\n- Le consentement explicite de l’Utilisateur pour le traitement de ses images\n- L’intérêt légitime du Prestataire à améliorer ses services et assurer la sécurité du système",
@@ -150,7 +204,44 @@
     "article11_text": "Pour toute question relative à la présente Politique de Confidentialité ou à l’exercice de vos droits, vous pouvez contacter le Prestataire via le formulaire de contact du site.",
     
     "conclusion": "En utilisant le Service, l’Utilisateur reconnaît avoir pris connaissance et accepté les termes de la présente Politique de Confidentialité."
+  },
+  
+  "legal": {
+    "title": "Mentions Légales",
+    "intro": "Les présentes mentions légales ont pour objet de définir les informations relatives à l’éditeur, à l’hébergeur et aux conditions générales d’utilisation du site et de l’application web progressive (PWA) de suppression d’arrière-plan d’images (ci-après « le Service »).",
+    
+    "article1_title": "1. Éditeur du site",
+    "article1_text": "Le site et le Service sont édités par :\n\nRaison sociale : Helveclick \nAdresse du siège social : Helveclick Dupanloup Guillaume Chemin du Mont Paisible 1 3963 Crans-Montana\nNuméro d’identification ou SIRET :\nAdresse e-mail de contact : info@helveclick.ch \nResponsable de la publication : Dupanloup Guillaume \n\nL’éditeur est responsable du contenu publié sur le site et de la gestion du Service.",
+    
+    "article2_title": "2. Hébergeur du site",
+    "article2_text": "Le site est hébergé par :\n\nNom de l’hébergeur : PlanetHoster \nAdresse :  \nSite web : \n E-mail de contact :  \n\nL’hébergeur assure la disponibilité technique du Service conformément à ses conditions générales.",
+    
+    "article3_title": "3. Propriété intellectuelle",
+    "article3_text": "L’ensemble du contenu du site et du Service, y compris, sans limitation, les textes, images, graphismes, logos, icônes, sons, vidéos, codes sources et algorithmes, est la propriété exclusive du Prestataire, sauf mention contraire.\n\nToute reproduction, représentation, modification, publication, transmission ou adaptation de tout ou partie du contenu du site, quel que soit le moyen ou le procédé utilisé, est interdite sans autorisation écrite préalable du Prestataire.\n\nToute utilisation non autorisée constitue une violation des droits de propriété intellectuelle et peut entraîner des poursuites judiciaires conformément au droit suisse et européen.",
+    
+    "article4_title": "4. Responsabilité",
+    "article4_text": "Le Prestataire s’efforce d’assurer l’exactitude et la mise à jour des informations publiées sur le site. Toutefois, il ne saurait être tenu responsable des erreurs, omissions, interruptions ou indisponibilités temporaires du Service.\n\nL’utilisateur reconnaît utiliser le Service sous sa responsabilité exclusive. Le Prestataire ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service, y compris la perte de données ou la détérioration de fichiers.\n\nL’utilisateur est seul responsable du contenu qu’il téléverse via le Service. Tout contenu illicite (notamment à caractère pédopornographique, violent, haineux ou contraire aux lois suisses et européennes) est strictement interdit et pourra faire l’objet d’un signalement aux autorités compétentes.",
+    
+    "article5_title": "5. Données personnelles",
+    "article5_text": "Le traitement des données personnelles est régi par la <a class=\"link\" href=\"/privacy\">Politique de Confidentialité</a>, consultable à tout moment sur le site. Celle-ci détaille la nature des données collectées, leur finalité, leur durée de conservation ainsi que les droits de l’utilisateur conformément au RGPD et à la LPD.",
+    "article5_link":"Consultez notre politique de confidentialité",
+    
+    "article6_title": "6. Liens externes",
+    "article6_text": "Le site peut contenir des liens hypertextes vers d’autres sites web. Le Prestataire ne peut être tenu responsable du contenu, de la sécurité ou des pratiques de confidentialité de ces sites tiers. L’accès à ces sites s’effectue sous la seule responsabilité de l’utilisateur.",
+    
+    "article7_title": "7. Sécurité du site",
+    "article7_text": "Le Prestataire met en œuvre toutes les mesures techniques nécessaires pour sécuriser l’accès et l’utilisation du Service. Cependant, l’utilisateur est informé que la sécurité absolue sur Internet n’existe pas. Il lui appartient de protéger ses équipements et ses données (mots de passe, fichiers, logiciels).",
+    
+    "article8_title": "8. Droit applicable et juridiction compétente",
+    "article8_text": "Les présentes mentions légales sont régies par le droit suisse. En cas de litige, et sauf disposition légale impérative contraire, les tribunaux compétents du canton du Valais seront seuls compétents.",
+    
+    "article9_title": "9. Contact",
+    "article9_text": "Pour toute question relative au site, à son contenu ou à ses conditions d’utilisation, vous pouvez contacter l’éditeur via le <a class=\"link\" href=\"/contact\">formulaire de contact du site </a> ou par e-mail à <a class=\"link\" href=\"mailto:info@helveclick.ch\"> info@helveclick.ch </a>.",
+    
+    "conclusion": "En accédant au site et en utilisant le Service, l’utilisateur reconnaît avoir pris connaissance des présentes mentions légales et les accepte sans réserve."
   }
+
+
 
 
 }

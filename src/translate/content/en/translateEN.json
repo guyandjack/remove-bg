@@ -67,6 +67,59 @@
   "loader": {
     "formContact": "loading..."
   },
+  "diff": {
+    "friend_label": "Friends",
+    "vehicule_label": "Vehicule",
+    "sport_label": "Sport",
+    "logo_label": "Logo",
+    "pet_label": "Pet"
+  },
+  "priceCard": {
+  "free_plan": {
+    "tag": "",
+    "title": "Free",
+    "price": "0/month",
+    "bg": "Background removal",
+    "resolution": "Low resolution",
+    "format": "Format: png",
+    "credit": "2 credits/day",
+    "subscribe": "I choose this plan",
+    "bill": "No card number required."
+  },
+  "hobby_plan": {
+    "tag": "Best seller",
+    "title": "Hobby",
+    "price": "5/month",
+    "bg": "Background removal",
+    "resolution": "High resolution",
+    "format": "Format: png, jpg, jpeg, webp",
+    "credit": "8 credits/day",
+    "tool_1": "Choose a new background",
+    "tool_2": "",
+    "subscribe": "I choose this plan",
+    "bill": "An annual invoice of"
+  },
+  "pro_plan": {
+    "tag": "",
+    "title": "Pro",
+    "price": "15/month",
+    "bg": "Background removal",
+    "resolution": "High resolution",
+    "format": "Format: png, jpg, jpeg, webp",
+    "credit": "20 credits/day",
+    "tool_1": "Choose a new background",
+    "tool_2": "Editing tools available",
+    "subscribe": "I choose this plan",
+    "bill": "An annual invoice of"
+  }
+},
+
+"pricing": {
+  "title_h1": "Plans tailored to every work context.",
+  "title_h2": "Switch your subscription according to your needs.",
+  "intro": "Choose an affordable plan that includes the best features for your needs."
+},
+
   "terms": {
     "title": "Terms of Service (ToS)",
     "intro": "These Terms of Service (hereinafter referred to as 'ToS') govern access to and use of the website and the progressive web application (PWA) for background removal (hereinafter referred to as 'the Service'), operated by the Provider. By accessing or using the Service, the user acknowledges having read, understood, and accepted these terms without reservation.",
@@ -105,5 +158,80 @@
     "article11_text": "The Provider reserves the right to modify these ToS at any time. Any modification becomes effective upon publication on the website. It is the user’s responsibility to regularly review the latest version of the Terms in force.",
 
     "conclusion": "By using the Service, the user acknowledges having read and accepted these Terms of Service without reservation."
+  },
+
+  "privacy": {
+    "title": "Privacy Policy",
+    "intro": "This Privacy Policy explains how the Provider collects, uses, stores, and protects users’ personal data (hereinafter referred to as 'the User') when using the background removal progressive web application (PWA) and related services (hereinafter referred to as 'the Service').",
+
+    "article1_title": "1. Data Controller",
+    "article1_text": "The data controller responsible for processing personal data is the operator of the Service (hereinafter referred to as 'the Provider'). The Provider ensures that all processing activities comply with the General Data Protection Regulation (GDPR – EU 2016/679) and the Swiss Federal Data Protection Act (FADP).",
+
+    "article2_title": "2. Data Collected",
+    "article2_text": "The Provider collects only the data strictly necessary for the operation and improvement of the Service:\n\n- Contact data : first name, last name, email address, message (via the contact form)\n-  Payment data : first name, last name, postal address, email address (collected via Stripe). No sensitive data, such as full credit card numbers, is stored by the Provider.\n- Technical data : IP address, browser type, operating system, access time (for statistical and security purposes)\n- Uploaded images : images uploaded by the User are temporarily stored for processing. Some images may be retained in an anonymized and secure form to improve the algorithms and artificial intelligence models used by the Service.",
+
+    "article3_title": "3. Purpose of Data Processing",
+    "article3_text": "The collected data are used exclusively for the following purposes:\n\n- To provide and operate the Service properly\n- To manage customer relationships and respond to contact requests\n- To process payments and billing through Stripe\n- To improve Service and AI performance (machine learning on anonymized images)\n- To ensure system security and legal compliance",
+
+    "article4_title": "4. Cookies and Authentication",
+    "article4_text": "The Service uses only one cookie, which is strictly necessary for its operation. It is used exclusively to maintain the User's secure authentication session. No advertising, tracking, or analytics cookies are used. This cookie is temporary and does not contain any direct personal data.",
+
+    "article5_title": "5. Legal Basis for Processing",
+    "article5_text": "Data processing is based on the following legal grounds:\n- Performance of a contract (subscription or Service use)\n- Explicit consent of the User for processing uploaded images\n- Legitimate interest of the Provider to improve the Service and ensure system security",
+
+    "article6_title": "6. Data Retention",
+    "article6_text": "Personal data are retained only for the time necessary to fulfill the purposes for which they were collected:\n- Contact data: 12 months after the last interaction\n- Payment data: retained for the statutory accounting period (10 years in Switzerland)\n- Uploaded images: automatically deleted after processing, unless the User consents to their use for AI improvement (in which case, they are anonymized and non-traceable)",
+
+    "article7_title": "7. Data Security",
+    "article7_text": "The Provider implements all appropriate technical and organizational measures to protect data against loss, theft, unauthorized access, disclosure, or alteration. All data exchanges are encrypted (HTTPS), and sensitive information is secured using international security standards.",
+
+    "article8_title": "8. Data Sharing and Transfers",
+    "article8_text": "Data are never sold to third parties. They may be shared only with:\n- The payment processor **Stripe**, for transaction handling\n- Technical service providers responsible for hosting and maintaining the Service, under strict confidentiality obligations\n\nNo data transfer outside Switzerland or the European Economic Area takes place without adequate protection guarantees.",
+
+    "article9_title": "9. User Rights",
+    "article9_text": "In accordance with the GDPR and the FADP, the User has the following rights:\n- Right of access to their data\n- Right to rectification and erasure\n- Right to object to or restrict processing\n- Right to data portability\n- Right to withdraw consent at any time\n\nRequests to exercise these rights can be made via the contact form or by email to the Provider.",
+
+    "article10_title": "10. Changes to the Privacy Policy",
+    "article10_text": "The Provider reserves the right to modify this Privacy Policy at any time, particularly to comply with legal or technical developments. Any change becomes effective upon publication on the website. Users are encouraged to review the latest version regularly.",
+
+    "article11_title": "11. Contact",
+    "article11_text": "For any questions regarding this Privacy Policy or the exercise of your rights, please contact the Provider through the website’s contact form.",
+
+    "conclusion": "By using the Service, the User acknowledges having read and accepted this Privacy Policy."
+  },
+
+  "legal": {
+    "title": "Legal Notice",
+    "intro": "This legal notice aims to define the information related to the publisher, the hosting provider, and the general terms of use of the website and the progressive web application (PWA) for background removal (hereinafter referred to as 'the Service').",
+
+    "article1_title": "1. Website Publisher",
+    "article1_text": "The website and the Service are published by:\n\nCompany name: Helveclick\nRegistered office address: Helveclick Dupanloup Guillaume, Chemin du Mont Paisible 1, 3963 Crans-Montana, Switzerland\nCompany identification or SIRET number:\nContact email address: info@helveclick.ch\nPublication manager: Dupanloup Guillaume\n\nThe publisher is responsible for the content published on the website and for managing the Service.",
+
+    "article2_title": "2. Hosting Provider",
+    "article2_text": "The website is hosted by:\n\nHosting provider: PlanetHoster\nAddress:\nWebsite:\nContact email:\n\nThe hosting provider ensures the technical availability of the Service in accordance with its general terms and conditions.",
+
+    "article3_title": "3. Intellectual Property",
+    "article3_text": "All content on the website and within the Service, including but not limited to text, images, graphics, logos, icons, sounds, videos, source code, and algorithms, is the exclusive property of the Provider, unless otherwise stated.\n\nAny reproduction, representation, modification, publication, transmission, or adaptation of all or part of the website content, by any means or process, is prohibited without the prior written authorization of the Provider.\n\nAny unauthorized use constitutes an infringement of intellectual property rights and may result in legal action under Swiss and European law.",
+
+    "article4_title": "4. Liability",
+    "article4_text": "The Provider strives to ensure the accuracy and regular updating of the information published on the website. However, the Provider cannot be held liable for any errors, omissions, interruptions, or temporary unavailability of the Service.\n\nThe User acknowledges that they use the Service at their own risk. The Provider shall not be held liable for any direct or indirect damages resulting from the use of the Service, including data loss or file corruption.\n\nThe User is solely responsible for the content they upload via the Service. Any illegal content (including but not limited to content of a pedopornographic, violent, hateful nature, or contrary to Swiss and European law) is strictly prohibited and may be reported to the competent authorities.",
+
+    "article5_title": "5. Personal Data",
+    "article5_text": "The processing of personal data is governed by the <a class=\"link\" href=\"/privacy\">Privacy Policy</a>, which can be consulted at any time on the website. It details the nature of the data collected, the purposes of processing, retention periods, and the User’s rights in accordance with the GDPR and the Swiss Data Protection Act (FADP).",
+    "article5_link": "Read our Privacy Policy",
+
+    "article6_title": "6. External Links",
+    "article6_text": "The website may contain hyperlinks to other websites. The Provider cannot be held responsible for the content, security, or privacy practices of such third-party sites. Access to these sites is at the sole responsibility of the User.",
+
+    "article7_title": "7. Website Security",
+    "article7_text": "The Provider implements all necessary technical measures to secure access to and use of the Service. However, the User is informed that absolute security on the Internet does not exist. It is the User’s responsibility to protect their equipment and data (passwords, files, software).",
+
+    "article8_title": "8. Governing Law and Jurisdiction",
+    "article8_text": "This legal notice is governed by Swiss law. In the event of a dispute, and unless otherwise required by mandatory legal provisions, the competent courts of the Canton of Valais shall have exclusive jurisdiction.",
+
+    "article9_title": "9. Contact",
+    "article9_text": "For any questions regarding the website, its content, or its terms of use, you can contact the publisher via the <a class=\"link\" href=\"/contact\">website contact form</a> or by email at <a class=\"link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>.",
+
+    "conclusion": "By accessing the website and using the Service, the User acknowledges having read and accepted this legal notice without reservation."
   }
 }

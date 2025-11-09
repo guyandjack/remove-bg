@@ -21,6 +21,7 @@ const Footer = () => {
   const terms = t("footer.terms")
   const privacy = t(`footer.privacy`);
   const cookie = t(`footer.cookie`);
+  
 
   return (
     <div>
@@ -125,12 +126,12 @@ const Footer = () => {
               <a
                 data-id="#"
                 className="py-[5] text-lg hover:text-primary"
-                href="/privacy"
+                href="/legal"
                 onClick={(e) => {
                   setActiveLink(e);
                 }}
               >
-                {cookie}
+                {legal}
               </a>
             </li>
           </ul>
