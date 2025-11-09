@@ -23,10 +23,32 @@ type FormValues = {
   agree: boolean;
 };
 
+type FormKey =
+  | "lastName"
+  | "firstName"
+  | "subject"
+  | "email"
+  | "message"
+  | "privacy"
+  | "link"
+  | "required"
+  | "minLength"
+  | "maxLength"
+  | "pattern"
+  | "button"
+  | "submit"
+  | "textSuccess"
+  | "textError";
+
+  type FormContent = Record<FormKey, string>;
+  type FormProps = {
+    content: FormContent;
+  };
+
 //constante et variable globales
 const { urlApi } = localOrProd();
 
-function FormContact() {
+function FormContact({content}:FormProps) {
   const { t } = useTranslation();
 
   //state qui gere l' validite de la reponse.
@@ -159,13 +181,13 @@ function FormContact() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto mt-16 mb-16 max-w-xl sm:mt-20 p-6 md:p-8 rounded-xl bg-base-100/60 backdrop-blur-sm shadow-sm"
+      className="mx-auto mb-16 max-w-xl p-6 md:p-8 rounded-xl bg-base-100/60 backdrop-blur-sm shadow-sm"
     >
       <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
         <div className="mb-3">
           <label htmlFor="firstname" className="label p-0">
             <span className="label-text text-base-content/80">
-              {t("formContact.firstName")}
+              {content.firstName}
             </span>
           </label>
           <div className="relative mt-2">
@@ -175,12 +197,12 @@ function FormContact() {
               className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
               aria-invalid={!!errors.firstname || undefined}
               {...register("firstname", {
-                required: t("formContact.required"),
-                minLength: { value: 2, message: t("formContact.minLength") },
-                maxLength: { value: 30, message: t("formContact.maxLength") },
+                required: content.required,
+                minLength: { value: 2, message: content.minLength },
+                maxLength: { value: 30, message: content.maxLength },
                 pattern: {
                   value: /^[a-zA-Z\-'. \D]{1,30}$/u,
-                  message: t("formContact.pattern"),
+                  message: content.pattern,
                 },
                 onChange: (e) => storeValue(e),
               })}
@@ -196,7 +218,7 @@ function FormContact() {
         <div className="mb-3">
           <label htmlFor="lastname" className="label p-0">
             <span className="label-text text-base-content/80">
-              {t("formContact.lastName")}
+              {content.lastName}
             </span>
           </label>
           <div className="relative mt-2">
@@ -206,12 +228,12 @@ function FormContact() {
               className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
               aria-invalid={!!errors.lastname || undefined}
               {...register("lastname", {
-                required: t("formContact.required"),
-                minLength: { value: 2, message: t("formContact.minLength") },
-                maxLength: { value: 30, message: t("formContact.maxLength") },
+                required: content.required,
+                minLength: { value: 2, message: content.minLength },
+                maxLength: { value: 30, message: content.maxLength },
                 pattern: {
                   value: /^[a-zA-Z\-'. ]{1,30}$/u,
-                  message: t("formContact.pattern"),
+                  message: content.pattern,
                 },
                 onChange: (e) => storeValue(e),
               })}
@@ -227,7 +249,7 @@ function FormContact() {
         <div className="mb-3 sm:col-span-2">
           <label htmlFor="subject" className="label p-0">
             <span className="label-text text-base-content/80">
-              {t("formContact.subject")}
+              {content.subject}
             </span>
           </label>
           <div className="relative mt-2">
@@ -237,11 +259,11 @@ function FormContact() {
               className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
               aria-invalid={!!errors.subject || undefined}
               {...register("subject", {
-                minLength: { value: 2, message: t("formContact.minLength") },
-                maxLength: { value: 50, message: t("formContact.maxLength") },
+                minLength: { value: 2, message: content.minLength },
+                maxLength: { value: 50, message: content.maxLength },
                 pattern: {
                   value: /^[\w\-'. 0-9]{1,50}$/u,
-                  message: t("formContact.pattern"),
+                  message: content.pattern,
                 },
                 onChange: (e) => storeValue(e),
               })}
@@ -257,7 +279,7 @@ function FormContact() {
         <div className="mb-3 sm:col-span-2">
           <label htmlFor="email" className="label p-0">
             <span className="label-text text-base-content/80">
-              {t("formContact.email")}
+              {content.email}
             </span>
           </label>
           <div className="relative mt-2">
@@ -267,12 +289,12 @@ function FormContact() {
               className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
               aria-invalid={!!errors.email || undefined}
               {...register("email", {
-                required: t("formContact.required"),
-                minLength: { value: 10, message: t("formContact.minLength") },
-                maxLength: { value: 80, message: t("formContact.maxLength") },
+                required: content.required,
+                minLength: { value: 10, message: content.minLength },
+                maxLength: { value: 80, message: content.maxLength },
                 pattern: {
                   value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,80}$/,
-                  message: t("formContact.pattern"),
+                  message: content.pattern,
                 },
                 onChange: (e) => storeValue(e),
               })}
@@ -288,7 +310,7 @@ function FormContact() {
         <div className="mb-3 sm:col-span-2">
           <label htmlFor="message" className="label p-0">
             <span className="label-text text-base-content/80">
-              {t("formContact.message")}
+              {content.message}
             </span>
           </label>
           <div className="relative mt-2">
@@ -298,12 +320,12 @@ function FormContact() {
               className="textarea textarea-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
               aria-invalid={!!errors.message || undefined}
               {...register("message", {
-                required: t("formContact.required"),
-                minLength: { value: 10, message: t("formContact.minLength") },
-                maxLength: { value: 1000, message: t("formContact.maxLength") },
+                required: content.required,
+                minLength: { value: 10, message: content.minLength },
+                maxLength: { value: 1000, message: content.maxLength },
                 pattern: {
                   value: /^[\w\-'.,!?:; ]{10,1000}$/,
-                  message: t("formContact.pattern"),
+                  message: content.pattern,
                 },
                 onChange: (e) => storeValue(e),
               })}
@@ -323,14 +345,14 @@ function FormContact() {
             className="toggle toggle-primary"
             aria-invalid={!!errors.agree || undefined}
             {...register("agree", {
-              required: t("formContact.required"),
+              required: content.required,
               onChange: (e) => storeValue(e),
             })}
           />
           <label htmlFor="agree" className="text-sm text-base-content/70">
-            {t("formContact.privacy")}
-            <a href="#" className="ml-1 font-semibold text-primary">
-              {t("formContact.link")}
+            {content.privacy}
+            <a href="/privacy" className="ml-1 font-semibold text-primary">
+              {content.link}
             </a>
             .
           </label>
@@ -355,7 +377,7 @@ function FormContact() {
             !agree
           }
         >
-          {isLoader ? "" : t("formContact.button")}
+          {isLoader ? "" : content.button}
           {isLoader ? <Loader direction="flex-col" top="top-20" /> : null}
         </button>
         <div
@@ -374,8 +396,8 @@ function FormContact() {
           }
         `}
         >
-          {status === "success" ? t("formContact.textSuccess") : ""}
-          {status === "error" ? t("formContact.textError") : ""}
+          {status === "success" ? content.textSuccess : ""}
+          {status === "error" ? content.textError : ""}
         
         </div>
       </div>

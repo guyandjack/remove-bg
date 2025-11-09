@@ -120,6 +120,11 @@
     }
   },
 
+  "contact":{
+"title":"Vous aves des questions? on vous repond!",
+"intro":"Utilisez le formulaire ci-dessous pour nous écrire. Notre équipe vous répondra dans les plus brefs délais, que ce soit pour une assistance technique, une question administrative ou toute autre demande liée à nos services."
+  },
+
   "pricing":{
     "title_h1": "Des plans adaptés à chaque contexte de travail.",
     "title_h2": "Changez d’abonnement en fonction de vos attentes.",
