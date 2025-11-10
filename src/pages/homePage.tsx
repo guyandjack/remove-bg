@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 //import de compoants enfants
 import { Hero } from "@/components/hero/hero";
-import { Diff } from "../components/example/diff";
+import { Diff } from "../components/diff/diff";
 
 type Labels = string[];
 
@@ -22,11 +22,11 @@ function HomePage() {
   return (
     <div
       className={
-        "mx-auto mt-[0px] flex flex-col justify-start items-center w-full"
+        "mx-auto flex flex-col justify-start items-center w-full"
       }
     >
-      <div className={"bg-primary/5 w-full py-[50px]"}>
-        <div className={"mx-auto max-w-[1000px]"}>
+      <div className={"w-full"}>
+        <div className={"mx-auto"}>
           <Hero />
         </div>
       </div>

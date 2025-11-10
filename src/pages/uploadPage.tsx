@@ -1,6 +1,13 @@
+//import des composants enfants
+import UploadImg from "@/components/form/UploadImg"
+
+
 function UploadPage() {
     return (
+        <div>
         <h1>Page Upload</h1>
+            <UploadImg />
+        </div>
     )
     
 }
