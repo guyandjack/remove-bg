@@ -135,4 +135,4 @@ const UploadImg = () => {
   );
 };
 
-export default UploadImg;
+export { UploadImg }

@@ -4,15 +4,17 @@
     "upload": "Upload",
     "pricing": "Pricing",
     "contact": "Contact",
-    "auth": "Signup"
-  },
-  "footer": {
-    "legal": "Legal",
+    "signup": "Signup",
+    "login": "Login",
     "terms": "Terms of Service (ToS)",
     "privacy": "Privacy policy",
+    "legal": "Legal"
+  },
+  "footer": {
     "cookie": "Cookie",
     "services": "Services",
-    "company": "Company"
+    "company": "Company",
+    "legal": "Mentions"
   },
   "auth": {
     "signup": "Sign up",
@@ -75,50 +77,75 @@
     "pet_label": "Pet"
   },
   "priceCard": {
-  "free_plan": {
-    "tag": "",
-    "title": "Free",
-    "price": "0/month",
-    "bg": "Background removal",
-    "resolution": "Low resolution",
-    "format": "Format: png",
-    "credit": "2 credits/day",
-    "subscribe": "I choose this plan",
-    "bill": "No card number required."
+    "free_plan": {
+      "tag": "",
+      "title": "Free",
+      "price": "0/month",
+      "bg": "Background removal",
+      "resolution": "Low resolution",
+      "format": "Format: png",
+      "credit": "2 credits/day",
+      "subscribe": "I choose this plan",
+      "bill": "No card number required."
+    },
+    "hobby_plan": {
+      "tag": "Best seller",
+      "title": "Hobby",
+      "price": "5/month",
+      "bg": "Background removal",
+      "resolution": "High resolution",
+      "format": "Format: png, jpg, jpeg, webp",
+      "credit": "8 credits/day",
+      "tool_1": "Choose a new background",
+      "tool_2": "",
+      "subscribe": "I choose this plan",
+      "bill": "An annual invoice of"
+    },
+    "pro_plan": {
+      "tag": "",
+      "title": "Pro",
+      "price": "15/month",
+      "bg": "Background removal",
+      "resolution": "High resolution",
+      "format": "Format: png, jpg, jpeg, webp",
+      "credit": "20 credits/day",
+      "tool_1": "Choose a new background",
+      "tool_2": "Editing tools available",
+      "subscribe": "I choose this plan",
+      "bill": "An annual invoice of"
+    }
   },
-  "hobby_plan": {
-    "tag": "Best seller",
-    "title": "Hobby",
-    "price": "5/month",
-    "bg": "Background removal",
-    "resolution": "High resolution",
-    "format": "Format: png, jpg, jpeg, webp",
-    "credit": "8 credits/day",
-    "tool_1": "Choose a new background",
-    "tool_2": "",
-    "subscribe": "I choose this plan",
-    "bill": "An annual invoice of"
+
+  "pricing": {
+    "title_h1": "Plans tailored to every work context.",
+    "title_h2": "Switch your subscription according to your needs.",
+    "intro": "Choose an affordable plan that includes the best features for your needs."
   },
-  "pro_plan": {
-    "tag": "",
-    "title": "Pro",
-    "price": "15/month",
-    "bg": "Background removal",
-    "resolution": "High resolution",
-    "format": "Format: png, jpg, jpeg, webp",
-    "credit": "20 credits/day",
-    "tool_1": "Choose a new background",
-    "tool_2": "Editing tools available",
-    "subscribe": "I choose this plan",
-    "bill": "An annual invoice of"
-  }
+  "heroHome": {
+    "title_h1": "Remove&nbsp;the&nbsp;background from&nbsp;your&nbsp;images with&nbsp;AI",
+    "title_h2": "Whether you're a professional or a photo editing enthusiast, choose simplicity,<span class='text-secondary text-2xl'> for&nbsp;maximum&nbsp;time&nbsp;savings</span>.",
+    "info_1": "You can use this service for free by selecting the free plan (2&nbsp;credits&nbsp;/&nbsp;day).",
+    "info_2": "To do so:",
+    "info_list_1": "1 – Select a plan on the ",
+    "info_list_1_link": "subscriptions",
+    "info_list_2": "2 – Create your account using the form.",
+    "info_list_3": "3 – Once logged in, you can use the service.",
+    "privacy_1": "No personal data is collected or shared with third parties.</br>You can view our ",
+    "privacy_1_link": "privacy&nbsp;policy",
+    "privacy_2": "No credit card number is required for the free plan.",
+    "btn_test": "I want to test the quality",
+    "btn_choice": "I choose a plan"
+  },
+  "cta": {
+  "label_choice": "I choose a plan",
+  "label_test": "I want to test the quality"
 },
 
-"pricing": {
-  "title_h1": "Plans tailored to every work context.",
-  "title_h2": "Switch your subscription according to your needs.",
-  "intro": "Choose an affordable plan that includes the best features for your needs."
-},
+
+  "contact": {
+    "title": "Have questions? We’ve got answers!",
+    "intro": "Use the form below to contact us. Our team will get back to you as soon as possible, whether it’s for technical support, an administrative question, or any other request related to our services."
+  },
 
   "terms": {
     "title": "Terms of Service (ToS)",

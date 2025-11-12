@@ -1,6 +1,9 @@
 // composant Diff optimisé
 
+//import des hooks
 import { useState } from "preact/hooks";
+
+
 
 // import des images originales
 import friendImg from "@/assets/images/friend.jpg";
@@ -19,7 +22,16 @@ import logoImgBGRemove from "@/assets/images/logo-removebg-preview.png";
 //import image de fond
 import bgImg from "@/assets/images/dessert.jpg";
 
+//import des fonctions
+import { setActiveLink } from "@/utils/setActiveLink";
+
+
 type PictureKey = "friend" | "pet" | "sport" | "vehicule" | "logo";
+
+type Tags = {
+  tag: string[]
+};
+
 
 type Labels = string[];
 
@@ -55,7 +67,7 @@ const buttonConfig: { id: PictureKey; className: string }[] = [
   { id: "logo", className: "btn btn-dash btn-success" },
 ];
 
-const Diff = ({ tags }) => {
+const Diff = ({ tag }: Tags) => {
   const [selectedKey, setSelectedKey] = useState<PictureKey>("vehicule");
 
   const pictureSrc = pictures[selectedKey];
@@ -63,12 +75,10 @@ const Diff = ({ tags }) => {
   const pictureAlt = pictureLabels[selectedKey];
 
   return (
-    <div className={"relative p-[20px]"}>
-      <span class="absolute top-[-50px] left-[30px] z-10 inline-flex items-center rounded-md bg-green-400/5 px-2 py-1 text-xl font-medium text-green-400 inset-ring inset-ring-green-500/20">
-        Essayer par vous même...
-      </span>
+    <div className={"flex flex-col justify-start items-center gap-10 w-full max-w-[1300px] "}>
 
-      <div className={""}>
+
+     
         <figure className="diff aspect-16/9 mx-auto" tabIndex={0}>
           <div className="diff-item-1" role="img" tabIndex={0}>
             <img alt={pictureAlt} src={pictureSrc} />
@@ -82,23 +92,21 @@ const Diff = ({ tags }) => {
           </div>
         </figure>
 
-        <ul className="flex flex-row justify-evenly items-center pt-[20px] pb-[20px]">
-          {buttonConfig.map(({ id, className }, index) => (
-            <li key={id}>
-              <button
-                type="button"
-                onClick={() => setSelectedKey(id)}
-                className={className}
-              >
-                {tags[index]}
-              </button>
-            </li>
-          ))}
-        </ul>
-        <a className="btn btn-info mt-[10px]" href="/auth">
-          Je m'inscris pour benificier du service gratuitement
-        </a>
-      </div>
+      { tag.length > 0 ? <ul className="flex flex-row justify-evenly items-center w-full pt-[20px] pb-[20px]">
+        {buttonConfig.map(({ id, className }, index) => (
+          <li key={id}>
+            <button
+              type="button"
+              onClick={() => setSelectedKey(id)}
+              className={className}
+            >
+              {tag[index]}
+            </button>
+          </li>
+        ))}
+      </ul> : null}
+       
+      
     </div>
   );
 };

@@ -8,12 +8,13 @@ import { LocationProvider, Router, ErrorBoundary, Route } from "preact-iso";
 //import des pages
 import { HomePage } from "./src/pages/homePage";
 import { UploadPage } from "./src/pages/uploadPage";
-import { AuthPage } from "./src/pages/authPage";
+import { SignUpPage } from "./src/pages/signUpPage";
 import { PricePage } from "./src/pages/pricePage";
 import { ContactPage} from "./src/pages/contactPage";
 import { TermsPage} from "./src/pages/termsPage";
 import { PrivacyPage} from "./src/pages/privacyPage";
 import { LegalPage} from "./src/pages/LegalPage";
+import { LoginPage} from "./src/pages/loginPage";
 import { Page404} from "./src/pages/404Page";
 
 //import des composants
@@ -37,9 +38,11 @@ export function App() {
               <Route path="/" component={HomePage} />
               <Route path="/upload" component={UploadPage} />
               <Route path="/pricing" component={PricePage} />
-              <Route path="/auth" component={AuthPage} />
+              <Route path="/pricing/signup" component={PricePage} />
+              <Route path="/login" component={LoginPage} />
+              <Route path="/signup" component={SignUpPage} />
               <Route path="/contact" component={ContactPage} />
-              <Route path="/cgu" component={TermsPage} />
+              <Route path="/terms" component={TermsPage} />
               <Route path="/privacy" component={PrivacyPage} />
               <Route path="/legal" component={LegalPage} />
               <Route path="*/*" component={Page404} />

@@ -13,7 +13,13 @@ const navBarContent: NavLink[] = [
   { key: "upload", href: "/upload" },
   { key: "pricing", href: "/pricing" },
   { key: "contact", href: "/contact" },
-  { key: "auth", href: "/auth" },
+  { key: "signup", href: "/pricing/signup" },
+  { key: "login", href: "/login" },
+  //only footer link
+  { key: "privacy", href: "/privacy" },
+  { key: "legal", href: "/legal" },
+  { key: "terms", href: "/terms" },
+
 ];
 
 

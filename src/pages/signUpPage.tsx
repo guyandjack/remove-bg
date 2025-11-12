@@ -3,13 +3,13 @@ import { FormSignUp } from "@/components/form/FormSignUp";
 
 
 
-function AuthPage() {
+function SignUpPage() {
   return (
     <div>
-      <h1 className="">Page Auth</h1>
+      <h1 className="px-[10px]">Page Auth</h1>
       <FormSignUp />
     </div>
   );
 }
 
-export { AuthPage };
+export { SignUpPage };

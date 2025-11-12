@@ -1,5 +1,6 @@
 //import des hooks
 import { useTranslation } from "react-i18next";
+import {useLocation } from "preact-iso"
 
 //import des composant enfants
 import { PriceCard } from "@/components/card/priceCard"; 
@@ -9,6 +10,8 @@ type PlanKey = "tag" | "title" | "price" | "bg" | "resolution" | "format" | "cre
 
 function PricePage() {
   const { t } = useTranslation();
+  const {path} = useLocation();
+  const IsCreateAccount = path.includes("signup") ? true : false;
   const billHobby = 12 * 5;
   const billPro = 12 * 15;
   const freePlan: Record<PlanKey, string> = {
@@ -53,32 +56,59 @@ function PricePage() {
 
  
   return (
-    <div className={"w-full mx-auto"}>
+    <div className={"px-[10px] w-full mx-auto"}>
       <div
         className={
-          "py-[50px] flex flex-col justify-start items-center gap-[30px]"
+          "relative w-full mx-auto max-w-[1300px] py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px] "
         }
       >
-        <h1 className={"mx-auto text-3xl"}>
-          {t("pricing.title_h1")}
-        </h1>
-        <h2 className={"mx-auto text-2xl"}>
-          {t("pricing.title_h2")}
-        </h2>
-        <p className={"mx-auto text-xl"}>
-          {t("pricing.intro")}
-          
-        </p>
+        <h1
+          className={
+            "text-center text-4xl font-bold lg:w-[40%] lg:text-6xl lg:text-left lg:self-start"
+          }
+          dangerouslySetInnerHTML={{
+            __html: t("pricing.title_h1").replace(/\n/g, "<br/>"),
+          }}
+        ></h1>
+        <h2
+          className={
+            " text-3xl text-center text-info lg:text-left lg:self-start"
+          }
+          dangerouslySetInnerHTML={{
+            __html: t("pricing.title_h2").replace(/\n/g, "<br/>"),
+          }}
+        ></h2>
+        <p
+          className={
+            " text-xl text-center text-success lg:text-left lg:self-start"
+          }
+          dangerouslySetInnerHTML={{
+            __html: t("pricing.intro").replace(/\n/g, "<br/>"),
+          }}
+        ></p>
+        {IsCreateAccount ? (
+          <div className={"absolute top-[-30px] left-[10px] z-10"}>
+            <div role="alert" className="alert alert-warning alert-outline">
+              <span>Pour s'inscrire, choisissez un plan.</span>
+            </div>
+          </div>
+        ) : null}
       </div>
-      <div
+      <ul
         className={
-          "py-[100px] flex flex-col justify-start items-center gap-[30px] lg:flex-row lg:justify-evenly"
+          "w-full max-w-[1300px] mx-auto my-[50px] flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-between lg:gap-[0px]"
         }
       >
-        <PriceCard plan={freePlan} />
-        <PriceCard plan={hobbyPlan} />
-        <PriceCard plan={proPlan} />
-      </div>
+        <li>
+          <PriceCard plan={freePlan} />
+        </li>
+        <li>
+          <PriceCard plan={hobbyPlan} />
+        </li>
+        <li>
+          <PriceCard plan={proPlan} />
+        </li>
+      </ul>
     </div>
   );
 }

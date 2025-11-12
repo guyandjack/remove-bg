@@ -40,7 +40,7 @@ function ContactPage() {
     textError: t("formContact.textError"),
   };
   return (
-    <div className="mx-auto my-[100px] flex flex-col justify-start items-center gap-10 w-full max-w-[800px]">
+    <div className="px-[10px] mx-auto my-[100px] flex flex-col justify-start items-center gap-10 w-full max-w-[800px]">
       <h1 className={"text-4xl"}>{t("contact.title")}</h1>
       <p className={"text-xl"}>
        {t("contact.intro")}

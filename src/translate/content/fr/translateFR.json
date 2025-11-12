@@ -4,21 +4,20 @@
     "upload": "Upload",
     "pricing": "Prix",
     "contact": "Contact",
-    "auth": "Créé un compte"
-    
-  },
-  "footer":{
-
-    "legal": "Mentions légales",
-    "terms": "Conditions Générales d’Utilisation (CGU)",
+    "signup": "Creer un compte",
+    "login": "Se connecter",
+    "terms": "Conditions générales d' utilisation (CGU)",
     "privacy": "Politique de confidentialité",
+    "legal": "Mentions légales"
+  },
+  "footer": {
     "cookie": "Cookie",
     "services": "Services",
-    "company": "Entreprise"
-    
+    "company": "Entreprise",
+    "legal": "Mentions"
   },
-  
-  "formContact":{
+
+  "formContact": {
     "lastName": "Nom",
     "firstName": "Prénom",
     "subject": "Objet",
@@ -35,44 +34,40 @@
     "textSuccess": "Message transmis",
     "textError": "Message non transmis!"
   },
-  "formSignUp":{
+  "formSignUp": {
     "title": "Créer votre compte",
     "email": "Email",
-    "password":"Mot de passe",
-    "passwordConfirm":"Confimation du mot de passe",
-    "pattern":"Format non valide",
-    "btnSubmit":"Créer votre compte",
-    "btnGoogle":"Continuer avec Google",
+    "password": "Mot de passe",
+    "passwordConfirm": "Confimation du mot de passe",
+    "pattern": "Format non valide",
+    "btnSubmit": "Créer votre compte",
+    "btnGoogle": "Continuer avec Google",
     "passwordError": "Mot de passe trop faible",
     "textSuccess": "Un mail de confirmation a été envoyé",
     "textError": "Une erreure c'est produite"
-
-
   },
-  "otpInput":{
-    "title":"Entrez votre code reçu par email.",
-    "question":"Vous n’avez rien reçu ?",
-    "btnResend":"Renvoyer un code",
-    "errorRequire":"Champs requis",
-    "errorPattern":"Format invalide",
-    "textSuccess":"Création du compte reussi",
-    "textError":"Impossible de créer le compte"
+  "otpInput": {
+    "title": "Entrez votre code reçu par email.",
+    "question": "Vous n’avez rien reçu ?",
+    "btnResend": "Renvoyer un code",
+    "errorRequire": "Champs requis",
+    "errorPattern": "Format invalide",
+    "textSuccess": "Création du compte reussi",
+    "textError": "Impossible de créer le compte"
   },
-  "formSignIn":{
+  "formSignIn": {
     "title": "Connection à votre espace",
     "email": "Email",
-    "password":"Mot de passe",
-    "btnSubmit":"Créer",
-    "btnGoogle":"Continuer avec Google",
+    "password": "Mot de passe",
+    "btnSubmit": "Créer",
+    "btnGoogle": "Continuer avec Google",
     "forgot": "Mot de passe oublié"
-
-
   },
-  "loader":{
-    "formContact":"loading..."
+  "loader": {
+    "formContact": "loading..."
   },
 
-  "diff":{
+  "diff": {
     "friend_label": "Amis",
     "vehicule_label": "Vehicule",
     "sport_label": "Sport",
@@ -80,8 +75,8 @@
     "pet_label": "Animaux"
   },
 
-  "priceCard":{
-    "free_plan":{
+  "priceCard": {
+    "free_plan": {
       "tag": "",
       "title": "Gratuit",
       "price": "0/mois",
@@ -90,9 +85,9 @@
       "format": "Format: png",
       "credit": "2 crédits/jour",
       "subscribe": "Je choisi ce plan",
-      "bill":"Pas de numéro de carte demandé."
+      "bill": "Pas de numéro de carte demandé."
     },
-    "hobby_plan":{
+    "hobby_plan": {
       "tag": "Best seller",
       "title": "Hobby",
       "price": "5/mois",
@@ -103,9 +98,9 @@
       "tool_1": "Choix d'un nouveau arrière plan",
       "tool_2": "",
       "subscribe": "Je choisi ce plan",
-      "bill":"Une facture annuelle de"
+      "bill": "Une facture annuelle de"
     },
-    "pro_plan":{
+    "pro_plan": {
       "tag": "",
       "title": "Pro",
       "price": "15/mois",
@@ -115,141 +110,153 @@
       "credit": "20 crédits/jour",
       "tool_1": "Choix d'un nouveau arrière plan",
       "tool_2": "Outils de retouche disponible",
-      "subscribe":"Je choisi ce plan",
-      "bill":"Une facture annuelle de"
+      "subscribe": "Je choisi ce plan",
+      "bill": "Une facture annuelle de"
     }
   },
-
-  "contact":{
-"title":"Vous aves des questions? on vous repond!",
-"intro":"Utilisez le formulaire ci-dessous pour nous écrire. Notre équipe vous répondra dans les plus brefs délais, que ce soit pour une assistance technique, une question administrative ou toute autre demande liée à nos services."
+  "heroHome": {
+    "title_h1": "Supprimez&nbsp;l'arrière-plan&nbsp;de&nbsp;vos&nbsp;images&nbsp;grâce&nbsp;à&nbsp;l'IA",
+    "title_h2": "Que vous soyez professionnel ou amateur de retouche photo, choisissez la simplicité,<span class='text-secondary text-2xl'> pour&nbsp;un&nbsp;gain&nbsp;de&nbsp;temps&nbsp;maximum</span>.",
+    "info_1": "Vous pouvez bénéficier de ce service gratuitement en sélectionnant le plan gratuit (2&nbsp;crédits&nbsp;/&nbsp;jour).",
+    "info_2": "Pour cela :",
+    "info_list_1": "1 – Sélectionnez un plan sur la page des ",
+    "info_list_1_link": "abonnements",
+    "info_list_2": "2 – Créez votre compte via le formulaire.",
+    "info_list_3": "3 – Une fois connecté, vous pouvez utiliser le service.",
+    "privacy_1": "Aucune donnée personnelle n’est collectée ni partagée avec des tiers.</br>Vous pouvez consulter notre ",
+    "privacy_1_link": "politique&nbsp;de&nbsp;confidentialité",
+    "privacy_2": "Aucun numéro de carte n’est demandé pour le plan gratuit."
   },
 
-  "pricing":{
-    "title_h1": "Des plans adaptés à chaque contexte de travail.",
-    "title_h2": "Changez d’abonnement en fonction de vos attentes.",
-    "intro": "Choisissez un forfait abordable qui comprend les meilleures fonctionnalités pour vos besoins."
+  "cta": {
+  "label_choice": "Je choisis un plan",
+  "label_test": "Je veux tester la qualité"
+},
+
+
+  "contact": {
+    "title": "Vous aves des questions? on vous repond!",
+    "intro": "Utilisez le formulaire ci-dessous pour nous écrire. Notre équipe vous répondra dans les plus brefs délais, que ce soit pour une assistance technique, une question administrative ou toute autre demande liée à nos services."
   },
-  
+
+  "pricing": {
+    "title_h1": "Des plans adaptés à&nbsp;chaque&nbsp;contexte de&nbsp;travail.",
+    "title_h2": "Changez d’abonnement en fonction de vos&nbsp;attentes.",
+    "intro": "Choisissez un forfait abordable qui&nbspcomprend les meilleures fonctionnalités pour&nbsp;vos&nbsp;besoins."
+  },
+
   "terms": {
     "title": "Conditions Générales d’Utilisation (CGU)",
     "intro": "Les présentes Conditions Générales d’Utilisation (ci-après « CGU ») régissent l’accès et l’utilisation du site et de l’application PWA de suppression d’arrière-plan d’images (ci-après « le Service »), édités par le Prestataire. En accédant au Service, l’utilisateur reconnaît avoir lu, compris et accepté sans réserve les présentes conditions.",
-    
+
     "article1_title": "1. Objet du Service",
     "article1_text": "Le Service permet à l’utilisateur d’uploader des images afin d’en supprimer automatiquement l’arrière-plan à l’aide d’un algorithme de traitement d’images. Le Service est accessible via une application web progressive (PWA) et peut proposer des fonctionnalités additionnelles dans le cadre d’abonnements payants.",
-    
+
     "article2_title": "2. Accès au Service",
     "article2_text": "L’accès au Service est ouvert à toute personne majeure ou disposant de l’autorisation légale de son représentant légal. Certaines fonctionnalités peuvent nécessiter la création d’un compte utilisateur et/ou la souscription à un abonnement payant. L’utilisateur s’engage à fournir des informations exactes lors de l’inscription et à maintenir leur mise à jour.",
-    
+
     "article3_title": "3. Contenu et responsabilité de l’utilisateur",
     "article3_text": "L’utilisateur est seul responsable du contenu (images, textes, métadonnées) qu’il transfère, téléverse ou traite via le Service. Il s’interdit strictement d’uploader tout contenu :\n- à caractère pédopornographique, violent, haineux, diffamatoire, obscène ou contraire aux bonnes mœurs,\n- violant le droit à l’image, le droit d’auteur ou tout autre droit de propriété intellectuelle,\n- contraire aux lois et règlements en vigueur en Suisse, dans l’Union Européenne ou dans le pays de l’utilisateur.\n\nLe Prestataire se réserve le droit de suspendre ou supprimer, sans préavis, tout compte ou contenu suspecté d’enfreindre la loi ou ces conditions, et de signaler toute activité illégale aux autorités compétentes. Le Prestataire décline toute responsabilité quant au contenu traité par les utilisateurs.",
-    
+
     "article4_title": "4. Utilisation du Service et limitations",
     "article4_text": "L’utilisateur s’engage à utiliser le Service uniquement dans un cadre légal et personnel. Il est interdit d’utiliser le Service à des fins de fraude, de spamming, de formation de modèles d’intelligence artificielle sans autorisation écrite, ou d’exploitation commerciale non autorisée. Le Prestataire peut limiter ou interrompre l’accès au Service pour maintenance, sécurité ou abus constaté.",
-    
+
     "article5_title": "5. Abonnements et paiement",
     "article5_text": "Certaines fonctionnalités du Service sont accessibles via des abonnements payants. Les tarifs, durées et conditions sont indiqués clairement avant toute souscription. Les paiements sont traités de manière sécurisée via un prestataire tiers. Aucun remboursement ne sera effectué sauf en cas d’erreur imputable au Prestataire ou conformément à la législation en vigueur sur la protection des consommateurs.",
-    
+
     "article6_title": "6. Protection des données personnelles",
     "article6_text": "Les données collectées (informations de compte, facturation, images uploadées) sont traitées conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi suisse sur la protection des données (LPD). Les images uploadées sont temporairement stockées pour traitement et supprimées automatiquement après un délai raisonnable. L’utilisateur conserve l’intégralité de ses droits sur ses fichiers.",
-    
+
     "article7_title": "7. Propriété intellectuelle",
     "article7_text": "Le Service, son interface, ses algorithmes et ses marques sont la propriété exclusive du Prestataire. Toute reproduction, modification ou exploitation non autorisée est strictement interdite. L’utilisateur conserve la propriété intellectuelle sur les images qu’il téléverse.",
-    
+
     "article8_title": "8. Responsabilités et garanties",
     "article8_text": "Le Prestataire met tout en œuvre pour assurer la fiabilité et la disponibilité du Service mais ne garantit pas un fonctionnement ininterrompu ou exempt d’erreur. Le Prestataire ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service, y compris en cas de perte de données, sauf faute grave prouvée.",
-    
+
     "article9_title": "9. Suspension et résiliation",
     "article9_text": "Le Prestataire se réserve le droit de suspendre ou de résilier un compte utilisateur en cas de non-respect des présentes CGU, de suspicion d’activité illégale ou d’abus du Service. En cas de résiliation, aucun remboursement partiel d’abonnement ne sera effectué.",
-    
+
     "article10_title": "10. Droit applicable et juridiction compétente",
     "article10_text": "Les présentes conditions sont soumises au droit suisse. En cas de litige, et sauf disposition légale impérative contraire, les tribunaux compétents du canton de Vaud seront seuls compétents.",
-    
+
     "article11_title": "11. Modifications des CGU",
     "article11_text": "Le Prestataire se réserve le droit de modifier à tout moment les présentes CGU. Toute modification prend effet dès sa publication sur le site. Il appartient à l’utilisateur de consulter régulièrement la dernière version en vigueur.",
-    
+
     "conclusion": "En utilisant le Service, l’utilisateur reconnaît avoir pris connaissance et accepté sans réserve les présentes Conditions Générales d’Utilisation."
   },
-  
+
   "privacy": {
     "title": "Politique de Confidentialité",
     "intro": "La présente Politique de Confidentialité décrit la manière dont le Prestataire collecte, utilise, conserve et protège les données personnelles des utilisateurs (ci-après « l’Utilisateur ») dans le cadre de l’utilisation du site et de l’application web progressive (PWA) de suppression d’arrière-plan d’images (ci-après « le Service »).",
-    
+
     "article1_title": "1. Responsable du traitement",
     "article1_text": "Le responsable du traitement des données personnelles est l’éditeur du Service (ci-après « le Prestataire »). Le Prestataire s’engage à assurer la conformité du traitement des données avec le Règlement Général sur la Protection des Données (RGPD – UE 2016/679) et la Loi fédérale suisse sur la protection des données (LPD).",
-    
+
     "article2_title": "2. Données collectées",
     "article2_text": "Le Prestataire collecte uniquement les données strictement nécessaires à la fourniture et à l’amélioration du Service :\n\nDonnées de contact : nom, prénom, adresse e-mail, message (formulaire de contact)\n Données de paiement : nom, prénom, adresse postale, adresse e-mail (collectées via Stripe). Aucune donnée sensible, telle que le numéro complet de carte bancaire, n’est stockée par le Prestataire.\nDonnées techniques : adresse IP, type de navigateur, système d’exploitation, temps d’accès (à des fins statistiques et de sécurité)\nImages téléversées : les images envoyées par l’Utilisateur sont temporairement stockées pour traitement. Certaines images peuvent être conservées de manière anonyme et sécurisée afin d’améliorer les algorithmes et modèles d’intelligence artificielle utilisés pour le Service.",
-    
+
     "article3_title": "3. Utilisation des données",
     "article3_text": "Les données collectées sont utilisées uniquement dans les finalités suivantes :\n\n- Fournir le Service et assurer son bon fonctionnement\n- Gérer la relation client et répondre aux demandes via le formulaire de contact\n- Traiter les paiements et la facturation via Stripe\n- Améliorer les performances du Service et de l’IA (apprentissage automatique sur images anonymisées)\n- Garantir la sécurité et la conformité légale du Service",
-    
+
     "article4_title": "4. Cookies et authentification",
     "article4_text": "Le Service n’utilise qu’un seul cookie, strictement nécessaire à son fonctionnement.Il est utilisé exclusivement pour maintenir la session d’authentification sécurisée de l’Utilisateur. Aucun cookie publicitaire, de suivi ou d’analyse n’est utilisé. Ce cookie est temporaire et ne contient aucune donnée personnelle directe.",
-    
+
     "article5_title": "5. Base légale du traitement",
     "article5_text": "Le traitement des données repose sur :\n- L’exécution d’un contrat (abonnement ou utilisation du Service)\n- Le consentement explicite de l’Utilisateur pour le traitement de ses images\n- L’intérêt légitime du Prestataire à améliorer ses services et assurer la sécurité du système",
-    
+
     "article6_title": "6. Conservation des données",
     "article6_text": "Les données personnelles sont conservées pour une durée limitée, proportionnelle à la finalité du traitement :\n- Données de contact : 12 mois après le dernier échange\n- Données de paiement : selon la durée légale de conservation comptable (10 ans en Suisse)\n- Images téléversées : supprimées automatiquement après traitement, sauf si l’Utilisateur consent à leur utilisation pour l’amélioration du modèle d’IA (dans ce cas, elles sont anonymisées et non traçables)",
-    
+
     "article7_title": "7. Sécurité des données",
     "article7_text": "Le Prestataire met en œuvre toutes les mesures techniques et organisationnelles nécessaires pour protéger les données contre la perte, le vol, l’accès non autorisé, la divulgation ou la modification. Les échanges de données sont chiffrés (HTTPS) et les informations sensibles sont protégées via des protocoles de sécurité conformes aux standards internationaux.",
-    
+
     "article8_title": "8. Partage et transfert de données",
     "article8_text": "Les données ne sont jamais vendues à des tiers. Elles peuvent toutefois être partagées avec :\n- Le prestataire de paiement **Stripe**, dans le cadre des transactions financières\n- Les prestataires techniques intervenant pour l’hébergement ou la maintenance du Service, soumis à des obligations strictes de confidentialité\n\nAucun transfert de données n’a lieu en dehors de la Suisse ou de l’Espace Économique Européen sans garanties de protection adéquates.",
-    
+
     "article9_title": "9. Droits de l’utilisateur",
     "article9_text": "Conformément au RGPD et à la LPD, l’Utilisateur dispose des droits suivants :\n- Droit d’accès à ses données\n- Droit de rectification et de suppression\n- Droit d’opposition et de limitation du traitement\n- Droit à la portabilité des données\n- Droit de retirer son consentement à tout moment\n\nToute demande d’exercice de ces droits peut être adressée au Prestataire via le formulaire de contact ou par e-mail.",
-    
+
     "article10_title": "10. Modifications de la politique de confidentialité",
     "article10_text": "Le Prestataire se réserve le droit de modifier la présente Politique de Confidentialité à tout moment, notamment pour se conformer à toute évolution légale ou technique. Les modifications prennent effet dès leur publication sur le site. L’Utilisateur est invité à consulter régulièrement la version en vigueur.",
-    
+
     "article11_title": "11. Contact",
     "article11_text": "Pour toute question relative à la présente Politique de Confidentialité ou à l’exercice de vos droits, vous pouvez contacter le Prestataire via le formulaire de contact du site.",
-    
+
     "conclusion": "En utilisant le Service, l’Utilisateur reconnaît avoir pris connaissance et accepté les termes de la présente Politique de Confidentialité."
   },
-  
+
   "legal": {
     "title": "Mentions Légales",
     "intro": "Les présentes mentions légales ont pour objet de définir les informations relatives à l’éditeur, à l’hébergeur et aux conditions générales d’utilisation du site et de l’application web progressive (PWA) de suppression d’arrière-plan d’images (ci-après « le Service »).",
-    
+
     "article1_title": "1. Éditeur du site",
     "article1_text": "Le site et le Service sont édités par :\n\nRaison sociale : Helveclick \nAdresse du siège social : Helveclick Dupanloup Guillaume Chemin du Mont Paisible 1 3963 Crans-Montana\nNuméro d’identification ou SIRET :\nAdresse e-mail de contact : info@helveclick.ch \nResponsable de la publication : Dupanloup Guillaume \n\nL’éditeur est responsable du contenu publié sur le site et de la gestion du Service.",
-    
+
     "article2_title": "2. Hébergeur du site",
     "article2_text": "Le site est hébergé par :\n\nNom de l’hébergeur : PlanetHoster \nAdresse :  \nSite web : \n E-mail de contact :  \n\nL’hébergeur assure la disponibilité technique du Service conformément à ses conditions générales.",
-    
+
     "article3_title": "3. Propriété intellectuelle",
     "article3_text": "L’ensemble du contenu du site et du Service, y compris, sans limitation, les textes, images, graphismes, logos, icônes, sons, vidéos, codes sources et algorithmes, est la propriété exclusive du Prestataire, sauf mention contraire.\n\nToute reproduction, représentation, modification, publication, transmission ou adaptation de tout ou partie du contenu du site, quel que soit le moyen ou le procédé utilisé, est interdite sans autorisation écrite préalable du Prestataire.\n\nToute utilisation non autorisée constitue une violation des droits de propriété intellectuelle et peut entraîner des poursuites judiciaires conformément au droit suisse et européen.",
-    
+
     "article4_title": "4. Responsabilité",
     "article4_text": "Le Prestataire s’efforce d’assurer l’exactitude et la mise à jour des informations publiées sur le site. Toutefois, il ne saurait être tenu responsable des erreurs, omissions, interruptions ou indisponibilités temporaires du Service.\n\nL’utilisateur reconnaît utiliser le Service sous sa responsabilité exclusive. Le Prestataire ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service, y compris la perte de données ou la détérioration de fichiers.\n\nL’utilisateur est seul responsable du contenu qu’il téléverse via le Service. Tout contenu illicite (notamment à caractère pédopornographique, violent, haineux ou contraire aux lois suisses et européennes) est strictement interdit et pourra faire l’objet d’un signalement aux autorités compétentes.",
-    
+
     "article5_title": "5. Données personnelles",
     "article5_text": "Le traitement des données personnelles est régi par la <a class=\"link\" href=\"/privacy\">Politique de Confidentialité</a>, consultable à tout moment sur le site. Celle-ci détaille la nature des données collectées, leur finalité, leur durée de conservation ainsi que les droits de l’utilisateur conformément au RGPD et à la LPD.",
-    "article5_link":"Consultez notre politique de confidentialité",
-    
+    "article5_link": "Consultez notre politique de confidentialité",
+
     "article6_title": "6. Liens externes",
     "article6_text": "Le site peut contenir des liens hypertextes vers d’autres sites web. Le Prestataire ne peut être tenu responsable du contenu, de la sécurité ou des pratiques de confidentialité de ces sites tiers. L’accès à ces sites s’effectue sous la seule responsabilité de l’utilisateur.",
-    
+
     "article7_title": "7. Sécurité du site",
     "article7_text": "Le Prestataire met en œuvre toutes les mesures techniques nécessaires pour sécuriser l’accès et l’utilisation du Service. Cependant, l’utilisateur est informé que la sécurité absolue sur Internet n’existe pas. Il lui appartient de protéger ses équipements et ses données (mots de passe, fichiers, logiciels).",
-    
+
     "article8_title": "8. Droit applicable et juridiction compétente",
     "article8_text": "Les présentes mentions légales sont régies par le droit suisse. En cas de litige, et sauf disposition légale impérative contraire, les tribunaux compétents du canton du Valais seront seuls compétents.",
-    
+
     "article9_title": "9. Contact",
     "article9_text": "Pour toute question relative au site, à son contenu ou à ses conditions d’utilisation, vous pouvez contacter l’éditeur via le <a class=\"link\" href=\"/contact\">formulaire de contact du site </a> ou par e-mail à <a class=\"link\" href=\"mailto:info@helveclick.ch\"> info@helveclick.ch </a>.",
-    
+
     "conclusion": "En accédant au site et en utilisant le Service, l’utilisateur reconnaît avoir pris connaissance des présentes mentions légales et les accepte sans réserve."
   }
-
-
-
-
 }
-
-  
-

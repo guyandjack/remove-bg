@@ -139,7 +139,7 @@ const PriceCard = ({ plan }: PriceCardProps) => {
         </ul>
         <div className="absolute bottom-[10px] left-[50%] w-[80%] translate-x-[-50%]  ">
           <a
-            href={`/auth?plan=${plan.title.toLowerCase()}`}
+            href={`/signup?plan=${plan.title.toLowerCase()}`}
             className="btn btn-success btn-block hover:bg-success/80 "
           >
             {plan.subscribe}

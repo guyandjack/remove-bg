@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 function LegalPage() {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col justify-center items-center gap-8 w-full max-w-[1000px] mx-auto p-10">
+    <div className="px-[10px] flex flex-col justify-center items-center gap-8 w-full max-w-[1000px] mx-auto p-10">
       <div className={"flex flex-col justify-center items-center gap-3"}>
         <h1 className={"text-3xl text-primary"}>{t("legal.title")}</h1>
         <p className={"mt-[20px]"}>{t("legal.intro")}</p>

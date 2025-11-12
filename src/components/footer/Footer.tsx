@@ -18,10 +18,9 @@ const Footer = () => {
   const company = t(`footer.company`);
   const legal = t(`footer.legal`);
 
-  const terms = t("footer.terms")
+  const terms = t("footer.terms");
   const privacy = t(`footer.privacy`);
   const cookie = t(`footer.cookie`);
-  
 
   return (
     <div>
@@ -51,7 +50,11 @@ const Footer = () => {
           <ul>
             {navBarContent.map((link) => {
               const label = t(`navBar.${link.key}`);
-              return link.key !== "contact" && link.key !== "aboutus" ? (
+              return link.key !== "contact" &&
+                link.key !== "aboutus" &&
+                link.key !== "privacy" &&
+                link.key !== "legal" &&
+                link.key !== "terms" ? (
                 <li key={link.href}>
                   <a
                     data-id={link.href}
@@ -98,42 +101,25 @@ const Footer = () => {
             {legal}
           </h6>
           <ul>
-            <li>
-              <a
-                data-id="#"
-                className="py-[5] text-lg hover:text-primary"
-                href="/cgu"
-                onClick={(e) => {
-                  setActiveLink(e);
-                }}
-              >
-                {terms}
-              </a>
-            </li>
-            <li>
-              <a
-                data-id="#"
-                className="py-[5] text-lg hover:text-primary"
-                href="/privacy"
-                onClick={(e) => {
-                  setActiveLink(e);
-                }}
-              >
-                {privacy}
-              </a>
-            </li>
-            <li>
-              <a
-                data-id="#"
-                className="py-[5] text-lg hover:text-primary"
-                href="/legal"
-                onClick={(e) => {
-                  setActiveLink(e);
-                }}
-              >
-                {legal}
-              </a>
-            </li>
+            {navBarContent.map((link) => {
+              const label = t(`navBar.${link.key}`);
+              return link.key === "privacy" ||
+                link.key === "legal" ||
+                link.key === "terms" ? (
+                <li key={link.href}>
+                  <a
+                    data-id={link.href}
+                    className="pb-[5px] text-lg hover:text-primary"
+                    href={link.href}
+                    onClick={(e) => {
+                      setActiveLink(e);
+                    }}
+                  >
+                    {label}
+                  </a>
+                </li>
+              ) : null;
+            })}
           </ul>
         </div>
       </nav>
