@@ -19,6 +19,7 @@
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
     "i18next": "^25.6.0",
+    "konva": "^9.3.22",
     "lucide-react": "^0.546.0",
     "preact": "^10.27.2",
     "preact-iso": "^2.11.0",

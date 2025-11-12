@@ -10,8 +10,8 @@ const ACCEPTED_MIME = new Set([
 ]);
 const ACCEPTED_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 
-const UploadImg = () => {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+const UploadImg = ({setPreviewUrl, previewUrl}) => {
+  //const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string>("");
 
@@ -65,6 +65,7 @@ const UploadImg = () => {
     setFileName(file.name);
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
+    
   };
 
   const onClear = () => {
