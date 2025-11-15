@@ -10,6 +10,7 @@ interface LoaderProps {
   colorText?: string;
   colorLoader?: string;
   classNameWrapper?: string;
+  text?: string;
 }
 
 function Loader({
@@ -20,13 +21,14 @@ function Loader({
   colorText = "text-secondary",
   colorLoader = "text-primary",
   classNameWrapper = "",
+  text=""
 }: LoaderProps) {
   const { t } = useTranslation();
 
   return (
     <div
       className={[
-        `absolute flex flex-col justify-center items-center`,
+        `absolute flex flex-col justify-center items-center z-10`,
         `${top} ${left} ${translateX} ${translateY} ${classNameWrapper}`,
       ].join(" ")}
     >
@@ -34,7 +36,7 @@ function Loader({
         className={`loading loading-infinity loading-xl ${colorLoader}`}
       ></span>
       <span className={`${colorText}`}>
-        {t("loader.formContact")}
+        {text == "" ? t("loader.formContact") : text}
       </span>
     </div>
   );

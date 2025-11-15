@@ -19,7 +19,7 @@ const Cta = ({cta}:CtaProps) => {
           <a
             data-id="/pricing"
             href="/pricing"
-            className={`btn ${cta.color_choice} w-[60%] lg:w-[40%] text-lg`}
+            className={`btn ${cta.color_choice} w-[60%] lg:w-[40%] text-m`}
             dangerouslySetInnerHTML={{ __html: cta.label_choice }}
             onClick={(e) => {
               setActiveLink(e);
@@ -28,7 +28,7 @@ const Cta = ({cta}:CtaProps) => {
           <a
             data-id="/upload"
             href="/upload"
-            className={`btn ${cta.color_test} w-[60%] lg:w-[40%] text-lg`}
+            className={`btn ${cta.color_test} w-[60%] lg:w-[40%] text-m`}
             dangerouslySetInnerHTML={{ __html: cta.label_test }}
             onClick={(e) => {
               setActiveLink(e);

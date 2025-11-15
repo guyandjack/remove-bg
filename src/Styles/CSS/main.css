@@ -3,3 +3,31 @@
 @plugin "daisyui" {
    themes: winter --default , night --prefersdark;
  }
+
+
+@plugin "daisyui/theme" {
+  name: "winter";
+  default: true;
+  --color-success:oklch(79% 0.209 151.711) ;
+  --color-info: oklch(78% 0.154 211.53);
+  --color-warning: oklch(75% 0.183 55.934);
+  
+}
+
+ @font-face {
+  font-family:"Roboto" ;
+  src: url(/src/fonts/Roboto-VariableFont_wdth\,wght.ttf);
+  } 
+
+  *{
+    font-family: "Roboto";
+    
+  }
+  
+    img {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+   } 
+

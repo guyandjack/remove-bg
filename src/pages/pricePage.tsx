@@ -56,7 +56,7 @@ function PricePage() {
 
  
   return (
-    <div className={"px-[10px] w-full mx-auto"}>
+    <div className={"px-[10px] w-full mx-auto pb-[100px] bg-base-200"}>
       <div
         className={
           "relative w-full mx-auto max-w-[1300px] py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px] "
@@ -72,7 +72,7 @@ function PricePage() {
         ></h1>
         <h2
           className={
-            " text-3xl text-center text-info lg:text-left lg:self-start"
+            "font-bold text-3xl text-center text-info lg:text-left lg:self-start"
           }
           dangerouslySetInnerHTML={{
             __html: t("pricing.title_h2").replace(/\n/g, "<br/>"),
@@ -80,7 +80,7 @@ function PricePage() {
         ></h2>
         <p
           className={
-            " text-xl text-center text-success lg:text-left lg:self-start"
+            "font-medium text-xl text-center text-success lg:text-left lg:self-start"
           }
           dangerouslySetInnerHTML={{
             __html: t("pricing.intro").replace(/\n/g, "<br/>"),
@@ -96,7 +96,7 @@ function PricePage() {
       </div>
       <ul
         className={
-          "w-full max-w-[1300px] mx-auto my-[50px] flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-between lg:gap-[0px]"
+          "w-full max-w-[1300px] mx-auto py-[50px] flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-between lg:gap-[0px]"
         }
       >
         <li>

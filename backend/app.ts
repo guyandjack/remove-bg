@@ -24,6 +24,7 @@ import signupRoute from "./routes/signUp.route.ts";
 import loginRoute from "./routes/login.route.ts";
 import logOutRoute from "./routes/logOut.routes.ts";
 import verifyRoute from "./routes/verifyAuth.route.ts";
+import pexelsRoute from "./routes/pexels.route.ts";
 
 //import verifyEmailCodeController from "./routes/verifyOpt.route.ts";
 
@@ -125,6 +126,7 @@ app.get("/test", (req, res) => {
  app.use("/api/contact", contactRoute);
  app.use("/api/logout", logOutRoute);
  app.use("/api/auth/me", verifyRoute );
+ app.use("/api/pexels", pexelsRoute );
 
 
 // ----------------------------------------------------

@@ -24,7 +24,7 @@ const Footer = () => {
 
   return (
     <div>
-      <nav className="footer md:footer-horizontal bg-base-200 p-10">
+      <nav className="footer md:footer-horizontal bg-base-300 p-10">
         <aside>
           <svg
             width="50"

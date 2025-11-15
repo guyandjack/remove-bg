@@ -18,7 +18,7 @@ type PriceCardProps = {
 
 const PriceCard = ({ plan }: PriceCardProps) => {
   return (
-    <div className="card w-96 h-[350px] bg-base-100 shadow-sm">
+    <div className="card w-96 h-[350px] bg-base-100 shadow-sm border border-white">
       <div className="relative card-body">
         {plan.tag === "Best seller" ? (
           <span className="absolute top-[-20px] badge badge-s badge-warning">

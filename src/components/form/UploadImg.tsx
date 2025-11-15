@@ -1,6 +1,6 @@
+// UploadImg.tsx
 import { useEffect, useState } from "preact/hooks";
 
-// Taille max 2 Mo
 const MAX_SIZE_BYTES = 2 * 1024 * 1024;
 const ACCEPTED_MIME = new Set([
   "image/jpeg",
@@ -10,11 +10,26 @@ const ACCEPTED_MIME = new Set([
 ]);
 const ACCEPTED_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 
-const UploadImg = ({setPreviewUrl, previewUrl}) => {
-  //const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+// simulation pour l’instant (image sans fond)
+import newImg from "@/assets/images/friend-removebg-preview.png";
+
+type UploadImgProps = {
+  previewUrl: string | null;
+  setPreviewUrl: (url: string | null) => void;
+  setCallApi: (value: boolean) => void;
+  setResponseApi: (url: string) => void;
+};
+
+const UploadImg = ({
+  setPreviewUrl,
+  previewUrl,
+  setCallApi,
+  setResponseApi,
+}: UploadImgProps) => {
   const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string>("");
 
+  // cleanup de l’ancienne URL de preview
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -32,15 +47,17 @@ const UploadImg = ({setPreviewUrl, previewUrl}) => {
     if (!file) return "Aucun fichier sélectionné.";
     if (file.size > MAX_SIZE_BYTES) return "Le fichier dépasse 2 Mo.";
 
-    // Vérif MIME
     const isImageMime = file.type.startsWith("image/");
     if (!isImageMime) return "Le fichier doit être une image.";
-    if (!ACCEPTED_MIME.has(file.type)) return "Format non supporté (JPEG, PNG, WEBP, GIF).";
+    if (!ACCEPTED_MIME.has(file.type))
+      return "Format non supporté (JPEG, PNG, WEBP, GIF).";
 
-    // Vérif extension
     const lower = file.name.toLowerCase();
-    const hasValidExt = Array.from(ACCEPTED_EXT).some((ext) => lower.endsWith(ext));
-    if (!hasValidExt) return "Extension non valide (jpg, jpeg, png, webp, gif).";
+    const hasValidExt = Array.from(ACCEPTED_EXT).some((ext) =>
+      lower.endsWith(ext)
+    );
+    if (!hasValidExt)
+      return "Extension non valide (jpg, jpeg, png, webp, gif).";
 
     return null;
   };
@@ -63,15 +80,24 @@ const UploadImg = ({setPreviewUrl, previewUrl}) => {
 
     setError("");
     setFileName(file.name);
+
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
-    
+
+    // on indique au parent de lancer API + chargement CDN
+    setCallApi(true);
+
+    // 💡 OPTIONNEL : tu peux retirer cette simulation si tu déplaces tout dans le parent
+    setTimeout(() => {
+      setResponseApi(newImg);
+    }, 3000);
   };
 
   const onClear = () => {
-    // Réinitialise l'état (l'input file sera réinitialisé via key sur le composant si besoin)
     resetState();
-    const input = document.getElementById("imageUpload") as HTMLInputElement | null;
+    const input = document.getElementById(
+      "imageUpload"
+    ) as HTMLInputElement | null;
     if (input) input.value = "";
   };
 
@@ -79,7 +105,9 @@ const UploadImg = ({setPreviewUrl, previewUrl}) => {
     <div className="w-full">
       <form className="mx-auto max-w-xl p-6 md:p-8 rounded-xl bg-base-100/60 backdrop-blur-sm shadow-sm">
         <fieldset className="fieldset">
-          <legend className="fieldset-legend text-base-content">Téléverser une image</legend>
+          <legend className="fieldset-legend text-base-content">
+            Téléverser une image
+          </legend>
 
           <div className="space-y-3">
             <input
@@ -87,15 +115,21 @@ const UploadImg = ({setPreviewUrl, previewUrl}) => {
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={onChangeFile}
-              className="file-input file-input-bordered file-input-primary w-full bg-base-200 text-base-content"
+              className="file-input file-input-bordered file-input-info w-full bg-base-200"
               aria-invalid={error ? true : undefined}
             />
             <div className="label p-0">
-              <span className="label-text text-base-content/70">Formats: JPG, PNG, WEBP, GIF • Max 2 Mo</span>
+              <span className="label-text text-base-content/70">
+                Formats: JPG, PNG, WEBP, GIF • Max 2 Mo
+              </span>
             </div>
 
             {error && (
-              <div className="alert alert-error py-2 text-sm" role="alert" aria-live="assertive">
+              <div
+                className="alert alert-error py-2 text-sm"
+                role="alert"
+                aria-live="assertive"
+              >
                 <span>{error}</span>
               </div>
             )}
@@ -104,9 +138,15 @@ const UploadImg = ({setPreviewUrl, previewUrl}) => {
           <div className="mt-6">
             <div className="grid grid-cols-1 gap-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-base-content/70 truncate">{fileName || "Aucun fichier sélectionné"}</span>
+                <span className="text-sm text-base-content/70 truncate">
+                  {fileName || "Aucun fichier sélectionné"}
+                </span>
                 {previewUrl && (
-                  <button type="button" onClick={onClear} className="btn btn-ghost btn-xs">
+                  <button
+                    type="button"
+                    onClick={onClear}
+                    className="btn btn-ghost btn-xs"
+                  >
                     Effacer
                   </button>
                 )}
@@ -120,7 +160,9 @@ const UploadImg = ({setPreviewUrl, previewUrl}) => {
                       alt="Aperçu de l'image uploadée"
                       className="max-h-64 w-auto rounded-lg shadow-md object-contain bg-base-100"
                     />
-                    <figcaption className="text-xs text-base-content/60">Aperçu</figcaption>
+                    <figcaption className="text-xs text-base-content/60">
+                      Aperçu
+                    </figcaption>
                   </figure>
                 ) : (
                   <div className="flex h-44 items-center justify-center text-base-content/50">
@@ -136,4 +178,4 @@ const UploadImg = ({setPreviewUrl, previewUrl}) => {
   );
 };
 
-export { UploadImg }
+export { UploadImg };
