@@ -4,6 +4,7 @@ import {useLocation } from "preact-iso"
 
 //import des composant enfants
 import { PriceCard } from "@/components/card/priceCard"; 
+import { PricingComparisonTable } from "@/components/table/priceTable"; 
 
 type PlanKey = "tag" | "title" | "price" | "bg" | "resolution" | "format" | "credit" | "tool_1" | "tool_2" | "subscribe" | "bill" ;
  
@@ -99,16 +100,19 @@ function PricePage() {
           "w-full max-w-[1300px] mx-auto py-[50px] flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-between lg:gap-[0px]"
         }
       >
-        <li>
+        <li className={"w-[30%] max-w-[90] min-w-[300px]"}>
           <PriceCard plan={freePlan} />
         </li>
-        <li>
+        <li className={"w-[30%] max-w-[90] min-w-[300px]"}>
           <PriceCard plan={hobbyPlan} />
         </li>
-        <li>
+        <li className={"w-[30%] max-w-[90] min-w-[300px]"}>
           <PriceCard plan={proPlan} />
         </li>
       </ul>
+      <div className={"w-full max-w-[1300px] mx-auto py-[50px]"}>
+        <PricingComparisonTable />
+      </div>
     </div>
   );
 }
