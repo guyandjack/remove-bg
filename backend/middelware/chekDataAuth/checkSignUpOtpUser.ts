@@ -28,7 +28,7 @@ const checkSignUpOtpUser = (
   
   const data: AuthDTO = result.data;
   (req as any).userValidated = {
-    codeOdt: data.otp,
+    otp: data.otp,
     email: data.email
   };
   next();

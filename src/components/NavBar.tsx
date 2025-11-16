@@ -5,8 +5,8 @@
 import axios from "axios";
 
 //import des hooks
+import { useEffect, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "preact/hooks";
 
 //import des composants enfants
 import { SelectLanguage } from "./LangSwitcher";
@@ -22,7 +22,7 @@ import { setActiveLink } from "@/utils/setActiveLink";
 const { urlApi } = localOrProd();
 
 //import des signaux de connexion user (signUp, login)
-import { isSignUp, tokenAccesComputed } from "./form/OdtInput";
+import { isSignUp, tokenAccesComputed } from "./form/OtpInput";
 
 //
 

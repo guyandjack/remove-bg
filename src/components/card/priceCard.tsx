@@ -1,4 +1,7 @@
 //composant pricCard
+
+//import des fonctions
+import { setActiveLink } from "@/utils/setActiveLink";
 type PlanKey =
   | "tag"
   | "title"
@@ -139,8 +142,10 @@ const PriceCard = ({ plan }: PriceCardProps) => {
         </ul>
         <div className="absolute bottom-[10px] left-[50%] w-[80%] translate-x-[-50%]  ">
           <a
+            data-id={"/signup"}
             href={`/signup?plan=${plan.title.toLowerCase()}`}
             className="btn btn-success btn-block hover:bg-success/80 "
+            onClick={(e)=>setActiveLink(e)}
           >
             {plan.subscribe}
           </a>

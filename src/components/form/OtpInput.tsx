@@ -19,8 +19,7 @@ type callback = {
   confirm: string;
   lang: string;
   id?: string;
-}
-
+};
 
 //Création d'un signal global pour être importé dans n'importe quel composant
 const user = signal(false);
@@ -29,11 +28,6 @@ const isSignUp = computed(() => user.value === true);
 const tokenAcces = signal(null);
 const tokenAccesComputed = computed(() => tokenAcces.value);
 
-
-
-
-
-
 type OtpInputProps = {
   length?: number; // par défaut 6
   onComplete?: (code: string) => void;
@@ -41,10 +35,10 @@ type OtpInputProps = {
   question: string;
   action: string;
   title: string;
-    dataUser: FormValues;
-    errorRequire: string;
-    errorPattern: string;
-    onSubmit: FormSubmitHandler<FormValues>;
+  dataUser: FormValues;
+  errorRequire: string;
+  errorPattern: string;
+  onSubmit: FormSubmitHandler<FormValues>;
   className?: string; // classes wrapper
   textSuccess: string;
   textError: string;
@@ -65,8 +59,8 @@ function OtpInput({
   title,
   question,
   action,
-    dataUser,
-    errorRequire,
+  dataUser,
+  errorRequire,
   errorPattern,
   className = "",
   textSuccess,
@@ -84,8 +78,6 @@ function OtpInput({
   const [values, setValues] = useState<string[]>(() => Array(length).fill(""));
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
 
-  
-
   //state qui gere l' validite de la reponse.
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
@@ -95,7 +87,6 @@ function OtpInput({
   // Initialise le tableau de refs
   const slots = useMemo(() => Array.from({ length }, (_, i) => i), [length]);
 
-  
   useEffect(() => {
     if (autoFocus && inputsRef.current[0]) {
       inputsRef.current[0].focus();
@@ -104,16 +95,22 @@ function OtpInput({
   }, [autoFocus]);
 
   //fonction apppeler lors du resend des infos users
-  const resend = (e:any) => {
+  const resend = (e: any) => {
     const idBtn: string = e.target.id.toString();
     //verif
     if (idBtn !== "resend") {
-      return
+      return;
     }
-    const payload = { ...dataUser, id: idBtn };
-    onSubmit(payload);
     
-  }
+    inputsRef.current.forEach((input, index) => {
+      setAt(index, "");
+      
+    })
+    inputsRef.current[0]?.focus();
+    const payload = { ...dataUser, id: idBtn };
+
+    onSubmit(payload);
+  };
 
   const focusIndex = (i: number) => {
     const el = inputsRef.current[i];
@@ -123,26 +120,26 @@ function OtpInput({
     }
   };
 
- const setAt = (i: number, val: string) => {
-   setValues((prev) => {
-     const next = [...prev];
-     next[i] = val;
-     const code = next.join("");
+  const setAt = (i: number, val: string) => {
+    setValues((prev) => {
+      const next = [...prev];
+      next[i] = val;
+      const code = next.join("");
 
-     // Quand les 6 cases sont remplies, on met otp + on valide + on soumet
-     if (next.every((v) => v !== "")) {
-       setValue("otp", code, { shouldValidate: true, shouldDirty: true });
-       // Option 1: valider puis soumettre si valide
-       trigger("otp").then((valid) => {
-         if (valid) handleSubmit(onSubmitOtp)(); // <-- ICI on APPELLE la fonction retournée
-       });
-     } else {
-       // sinon on garde otp partiel (optionnel)
-       setValue("otp", code, { shouldDirty: true });
-     }
-     return next;
-   });
- };
+      // Quand les 6 cases sont remplies, on met otp + on valide + on soumet
+      if (next.every((v) => v !== "")) {
+        setValue("otp", code, { shouldValidate: true, shouldDirty: true });
+        // Option 1: valider puis soumettre si valide
+        trigger("otp").then((valid) => {
+          if (valid) handleSubmit(onSubmitOtp)(); // <-- ICI on APPELLE la fonction retournée
+        });
+      } else {
+        // sinon on garde otp partiel (optionnel)
+        setValue("otp", code, { shouldDirty: true });
+      }
+      return next;
+    });
+  };
 
   const handleChange = (i: number, v: string) => {
     // garde uniquement le premier chiffre
@@ -212,7 +209,6 @@ function OtpInput({
       const last = Math.min(i + text.length - 1, length - 1);
       focusIndex(last < length - 1 ? last + 1 : last);
 
-     
       return next;
     });
   };
@@ -220,33 +216,36 @@ function OtpInput({
   const onSubmitOtp = async (data: FormValues) => {
     setIsLoader(true);
     try {
-        const mailUser: any  = dataUser.email;
-        const payload = {...data, email:mailUser}
-        
-      const response = await axios.post(`${urlApi}/api/signup/check/otp`, payload, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-        timeout: 10000,
-      });
+      const mailUser: any = dataUser.email;
+      const payload = { ...data, email: mailUser };
+
+      const response = await axios.post(
+        `${urlApi}/api/signup/check/otp`,
+        payload,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+          timeout: 10000,
+        }
+      );
 
       const result = response.data;
       if (result.status === "success") {
         //modifie la valeur du signal et stockage du token
-        tokenAcces.value = result.token
-        console.log("tokenAcces Values dans response odtinputs: ", tokenAcces.value);
+        tokenAcces.value = result.token;
+        console.log(
+          "tokenAcces Values dans response odtinputs: ",
+          tokenAcces.value
+        );
         setIsLoader(false);
         setStatus("success");
         user.value = true;
         setTimeout(() => {
-          
           window.location.href = "/upload";
         }, 2000);
-        
-        
       } else {
         setIsLoader(false);
         setStatus("error");
-        
       }
     } catch (error) {
       setIsLoader(false);
@@ -256,11 +255,9 @@ function OtpInput({
       //get token?
       setTimeout(() => {
         setStatus("idle");
-        
-      },3000);
+      }, 3000);
     }
   };
-  
 
   return (
     <form className={`flex flex-col items-center gap-3 ${className}`}>
@@ -345,9 +342,8 @@ function OtpInput({
           }
         `}
         >
-          {status === "success" ? textSuccess: null}
-          {status === "error" ? textError: null}
-
+          {status === "success" ? textSuccess : null}
+          {status === "error" ? textError : null}
         </span>
       </p>
       {isLoader ? <Loader top="top-[100%]" /> : null}
@@ -356,4 +352,3 @@ function OtpInput({
 }
 
 export { OtpInput, isSignUp, tokenAccesComputed };
-

@@ -7,13 +7,13 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 
 //import des composants enfants
-import { Loader } from "@/components/loader/Loader";
 import { BtnGoogleLogin } from "@/components/button/loginGoogle";
-import { OtpInput } from "@/components/form/OdtInput";
+import { OtpInput } from "@/components/form/OtpInput";
+import { Loader } from "@/components/loader/Loader";
 
 //import des fonctions
-import { localOrProd } from "@/utils/localOrProd";
 import { axiosError } from "@/utils/axiosError";
+import { localOrProd } from "@/utils/localOrProd";
 
 //declarations des types
 export type FormValues = {
@@ -22,11 +22,27 @@ export type FormValues = {
   confirm: string;
   lang: string;
   id?: string;
+  plan: string;
 };
 
 //constante et variable globales
 const { urlApi } = localOrProd();
 
+//declarations des fonctions
+
+//recupere la valeur du parametre "plan"
+const getPlan = () => {
+  // Récupérer la chaîne de requête
+  const queryString = window.location.search;
+
+  // Analyser la chaîne de requête
+  const urlParams = new URLSearchParams(queryString);
+
+  // Récupérer la valeur d'un paramètre spécifique
+  const plan = urlParams.get("plan") || ""; 
+
+  return plan
+}
 const FormSignUp = () => {
   const { t, i18n } = useTranslation();
   //state qui gere l' validite de la reponse.
@@ -45,6 +61,9 @@ const FormSignUp = () => {
   //reference qui stocke les data user a transmetre au form OTP
   const dataUser = useRef<FormValues>();
 
+
+  const plan = getPlan();
+
   const lang = i18n.resolvedLanguage || i18n.language;
 
   const {
@@ -60,6 +79,7 @@ const FormSignUp = () => {
       password: "qwertzuioP!789",
       confirm: "qwertzuioP!789",
       lang: lang,
+      plan: plan 
     },
   });
 
@@ -121,6 +141,7 @@ const FormSignUp = () => {
         <div className="sm:mx-auto sm:w-full sm:max-w-xl">
           <h2 className="text-center text-2xl font-bold tracking-tight text-base-content">
             {t("formSignUp.title")}
+            <span className="ml-[10px] p-[5px] bg-success text-black rounded">{`${plan}`}</span>
           </h2>
         </div>
 
@@ -287,6 +308,17 @@ const FormSignUp = () => {
               <div>
                 <div className="mt-2">
                   <input
+                    id="plan"
+                    type="text"
+                    hidden
+                    readOnly
+                    className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="mt-2">
+                  <input
                     id="lang"
                     type="text"
                     hidden
@@ -311,6 +343,7 @@ const FormSignUp = () => {
                   }
                 >
                   {t("formSignUp.btnSubmit")}
+                  
                 </button>
 
                 <div class="mt-5 h-[1px] w-full bg-gray-500 "></div>

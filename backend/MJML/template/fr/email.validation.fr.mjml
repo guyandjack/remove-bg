@@ -1,35 +1,102 @@
-<!-- =========================================
-     VERSION FRANÇAISE
-     ========================================= -->
 <mjml>
   <mj-body background-color="#ffffff">
     <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
       <mj-column vertical-align="top" width="100%">
-        <mj-image src="https://static.mailjet.com/mjml-website/templates/welcome-hero.jpg" alt="" align="center" border="none" width="600px" padding-left="0px" padding-right="0px" padding-bottom="0px" padding-top="0"></mj-image>
+        <mj-image
+          src="http://localhost:5173/src/assets/images/sport.jpg"
+          alt=""
+          align="center"
+          border="none"
+          width="600px"
+          padding-left="0px"
+          padding-right="0px"
+          padding-bottom="0px"
+          padding-top="0"
+        ></mj-image>
       </mj-column>
     </mj-section>
-    <mj-section background-color="#009FE3" padding-bottom="0px" padding-top="0">
+    <mj-section background-color="#1e293b" padding-bottom="0px" padding-top="0">
       <mj-column vertical-align="top" width="100%">
-        <mj-text align="left" color="#ffffff" font-size="35px" font-weight="bold" font-family="open Sans Helvetica, Arial, sans-serif" padding-left="25px" padding-right="25px" padding-bottom="30px" padding-top="50px">
-          Vérification de votre adresse email.
-        </mj-text>
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="45px"
+          font-weight="bold"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          padding-bottom="30px"
+          padding-top="50px"
+          >Removed BG</mj-text
+        >
       </mj-column>
     </mj-section>
-    <mj-section background-color="#009fe3" padding-bottom="20px" padding-top="20px">
+    <mj-section
+      background-color="#1e293b"
+      padding-bottom="20px"
+      padding-top="20px"
+    >
       <mj-column vertical-align="middle" width="100%">
-        <mj-text align="left" color="#ffffff" font-size="22px" font-family="open Sans Helvetica, Arial, sans-serif" padding-left="25px" padding-right="25px">
-          Bonjour
-          <span style="color:#FEEB35"> {{email}}</span><br /><br />
-        </mj-text>
-        <mj-text align="left" color="#ffffff" font-size="20px" font-family="open Sans Helvetica, Arial, sans-serif" padding-left="25px" padding-right="25px" line-height="1.3">
-          Veuillez valider votre adresse email, en saisissant le code de confirmation dans la fenêtre de votre navigateur.
-        </mj-text>
-        <mj-button align="left" font-size="22px" font-weight="bold" background-color="#ffffff" border-radius="10px" color="#000000" font-family="open Sans Helvetica, Arial, sans-serif" letter-spacing="0.5em">
-          {{code}}
-        </mj-button>
-        <mj-text align="left" color="#ffffff" font-size="15px" font-family="open Sans Helvetica, Arial, sans-serif" padding-left="25px" padding-right="25px" line-height="1.3">
-          Merci,<br /> L&rsquo;équipe de Backgound Remove
-        </mj-text>
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="22px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          >Chère<span style="color: #f4bf51"> {{email}}</span><br /><br />
+          Bienvenue chez Removed BG</mj-text
+        >
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="16px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          line-height="1.2"
+          >Pour terminer la création de ton compte
+          </mj-text>
+          <mj-button
+            padding="5px"
+            background-color="#2fd4bf"
+          >
+            {{plan}}
+          </mj-button>
+          <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="16px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          line-height="1.2">
+          confirme ton adresse email en copiant le code ci-dessous dans la fenetre du site internet.(valable 10mn)</mj-text
+        >
+
+        <mj-button
+          align="center"
+          color="#1e293b"
+          background-color="#f4bf51"
+          font-size="15px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          font-weight="5"
+          letter-spacing="5px"
+          padding-left="25px"
+          padding-right="25px"
+          >{{code}}</mj-button
+        >
+
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="15px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          >Merci, <br />
+          L' équipe de Removed BG</mj-text
+        >
       </mj-column>
     </mj-section>
   </mj-body>

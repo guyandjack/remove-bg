@@ -1,29 +1,36 @@
 // ImgEditor.tsx
-//import des hooks
+//
+// Rôle du composant:
+// - Afficher l’éditeur Filerobot pour une image sujet (sans fond) fournie par l’API.
+// - Proposer deux sélecteurs d’arrière‑plan (onglets): couleurs unies et images.
+// - Rechercher des images via l’API backend (Pexels) et les faire défiler horizontalement.
+// - Appliquer immédiatement le fond choisi dans l’éditeur (pas de preview séparée).
+// - Permettre de revenir à l’image d’origine (sans fond) et de télécharger le résultat.
+
 import { useEffect, useRef, useState } from "preact/hooks";
-
-//import des librairies
 import axios from "axios";
-
-//import des composants enfants
-import composeBackground from "@/utils/composeBackground";
-import {Loader} from "@/components/loader/Loader";
-
+import composeBackground from "@/utils/composeBackground"; // compose le sujet + le fond (canvas)
 import BgHero from "@/assets/images/hero-img.jpg";
 import BgDessert from "@/assets/images/dessert.jpg";
 import BgFriend from "@/assets/images/friend.jpg";
 import BgSport from "@/assets/images/sport.jpg";
 import { localOrProd } from "@/utils/localOrProd";
 
+// URLs construites selon l’environnement (local/prod)
 const { urlApi } = localOrProd();
 
+// Types auxiliaires
 type PexelsImage = { tiny: string; large: string };
 
+// Props du composant ImgEditor
 type ImgEditorProps = {
+  // src: image sans fond (dataURL/URL) retournée par votre API remove‑bg
   src: string;
+  // plan: configuration Filerobot (onglets/outils)
   plan?: "free" | "hobby" | "pro" | "test";
 };
 
+// Retourne une configuration Filerobot selon le plan
 function getConfigForPlan(plan: ImgEditorProps["plan"], TABS: any, TOOLS: any) {
   switch (plan) {
     case "free":
@@ -59,7 +66,7 @@ function getConfigForPlan(plan: ImgEditorProps["plan"], TABS: any, TOOLS: any) {
   }
 }
 
-// Palette de couleurs (winter/night friendly)
+// Palette (winter/night friendly) — défilable horizontalement si elle grandit
 const colorPalette = [
   "#000000",
   "#1f2937",
@@ -94,48 +101,48 @@ const colorPalette = [
   "#fef2f2",
 ];
 
+// Miniatures locales (fallback si aucune recherche Pexels)
 const backgroundImages = [BgHero, BgDessert, BgFriend, BgSport];
 
 const ImgEditor = ({ src, plan }: ImgEditorProps) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const editorRef = useRef<any>(null);
-  const FIERef = useRef<any>(null);
+  // Refs DOM/instances Filerobot
+  const containerRef = useRef<HTMLDivElement | null>(null); // conteneur pour le canvas Filerobot
+  const editorRef = useRef<any>(null); // instance Filerobot en cours
+  const FIERef = useRef<any>(null); // constructeur Filerobot (window.FilerobotImageEditor)
 
-  // Image d’origine (sans fond) provenant de l’API
+  // Sujet (sans fond) — référence figée à l’image d’origine pour recomposer
   const baseSubject = useRef<string>(src);
 
-  const [currentSource, setCurrentSource] = useState<string>(src);
-  const [isComposing, setIsComposing] = useState(false);
+  // Etats principaux
+  const [currentSource, setCurrentSource] = useState<string>(src); // image actuellement affichée dans l’éditeur
+  const [isComposing, setIsComposing] = useState(false); // spinner pendant la composition canvas
   const [selectedBg, setSelectedBg] = useState<
     | { type: "color"; value: string }
     | { type: "image"; value: string }
     | null
-  >(null);
-  const [activePicker, setActivePicker] = useState<"color" | "image">("color");
+  >(null); // dernier fond choisi
+  const [activePicker, setActivePicker] = useState<"color" | "image">("color"); // onglet actif
 
-  // Recherche Pexels
-  const [searchTerm, setSearchTerm] = useState("");
-  const [pexelsImages, setPexelsImages] = useState<PexelsImage[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchError, setSearchError] = useState("");
+  // Etats de recherche Pexels
+  const [searchTerm, setSearchTerm] = useState(""); // terme saisi
+  const [pexelsImages, setPexelsImages] = useState<PexelsImage[]>([]); // résultats (tiny + large)
+  const [isSearching, setIsSearching] = useState(false); // spinner requête
+  const [searchError, setSearchError] = useState(""); // message d’erreur
 
+  // Récupère des images de fond via le backend (Pexels)
   const fetchImages = async (theme: string) => {
     const value = theme.trim();
-    const lang = document.documentElement.lang;
-    if (value.length < 2) return;
+    if (value.length < 2) return; // évite les requêtes trop courtes
     try {
       setIsSearching(true);
       setSearchError("");
       const response = await axios.get(
-        `${urlApi}/api/pexels/images/?theme=${value}&lang=${lang}`,
+        `${urlApi}/api/pexels/images/?theme=${encodeURIComponent(value)}`,
         { headers: { "Content-Type": "application/json" }, timeout: 10000 }
       );
       const photos = (response?.data?.photos || []) as any[];
       const images: PexelsImage[] = photos
-        .map((p) => ({
-          tiny: p?.src?.tiny,
-          large: p?.src?.large2x || p?.src?.large || p?.src?.original,
-        }))
+        .map((p) => ({ tiny: p?.src?.tiny, large: p?.src?.large2x || p?.src?.large || p?.src?.original }))
         .filter((i) => i.tiny && i.large);
       setPexelsImages(images);
     } catch (error: any) {
@@ -146,10 +153,10 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
     }
   };
 
-  // Init Filerobot + protection clic droit
+  // 1) Montage: bloque le clic droit et instancie Filerobot sur currentSource
   useEffect(() => {
     const blockContext = (e: MouseEvent) => e.preventDefault();
-    //document.addEventListener("contextmenu", blockContext);
+    document.addEventListener("contextmenu", blockContext);
 
     const FIE = (window as any).FilerobotImageEditor;
     if (!FIE || !containerRef.current) {
@@ -159,17 +166,13 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
     FIERef.current = FIE;
     renderEditor(currentSource);
 
-    const rect = containerRef.current.getBoundingClientRect();
-    const scroll = rect.top;
-    window.scrollTo({top: scroll, behavior: "smooth"});
-
     return () => {
       document.removeEventListener("contextmenu", blockContext);
       editorRef.current?.terminate?.();
     };
   }, []);
 
-  // Quand le src change (nouvelle image sans fond)
+  // 2) Changement de sujet (src): réinitialise l’éditeur et les sélections
   useEffect(() => {
     baseSubject.current = src;
     setCurrentSource(src);
@@ -180,14 +183,16 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
     }
   }, [src]);
 
+  // Monte ou remonte Filerobot pour afficher/éditer `source`
   const renderEditor = (source: string) => {
     const FIE = FIERef.current;
     if (!FIE || !containerRef.current) return;
-    editorRef.current?.terminate?.();
+    editorRef.current?.terminate?.(); // nettoie l’ancienne instance
     const { TABS, TOOLS } = FIE;
     const baseConfig = {
       source,
       onSave: (result: any) => {
+        // met à jour la source avec la version sauvegardée par Filerobot
         if (result?.imageBase64) setCurrentSource(result.imageBase64);
       },
     };
@@ -198,6 +203,7 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
     editor.render({ onClose: () => editor.terminate() });
   };
 
+  // Compose et applique directement le fond choisi (couleur ou image)
   const applyBackground = async (
     bg: { type: "color"; value: string } | { type: "image"; value: string }
   ) => {
@@ -215,6 +221,7 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
     }
   };
 
+  // Restaure l’image d’origine (sans fond) issue de l’API
   const resetBackground = () => {
     setSelectedBg(null);
     setCurrentSource(baseSubject.current);
@@ -223,21 +230,25 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
 
   return (
     <div className="w-full">
+      {/* Zone éditeur Filerobot */}
       <div
         style={{ width: "100%", height: "80vh" }}
         className="relative rounded-xl ring-1 ring-base-200 bg-base-100/60 backdrop-blur-sm"
       >
         {isComposing && (
-          <Loader text="is composing..." />
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-base-100/50">
+            <span className="loading loading-spinner loading-md text-primary" />
+          </div>
         )}
         <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
       </div>
 
+      {/* Commandes: onglets, reset, téléchargement */}
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <div className="join">
           <button
             type="button"
-            className={`btn join-item ${activePicker === "color" ? "btn-success" : "btn-ghost"}`}
+            className={`btn join-item ${activePicker === "color" ? "btn-primary" : "btn-ghost"}`}
             onClick={() => setActivePicker("color")}
           >
             Couleurs
@@ -260,6 +271,7 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
         </a>
       </div>
 
+      {/* Panneau Couleurs */}
       {activePicker === "color" ? (
         <div className="mt-3">
           <div className="label p-0 mb-2">
@@ -285,11 +297,13 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
           </div>
         </div>
       ) : (
+        // Panneau Images (recherche Pexels + vignettes)
         <div className="mt-3">
           <div className="label p-0 mb-2">
             <span className="label-text text-base-content/70">Images de fond</span>
           </div>
 
+          {/* Barre de recherche */}
           <div className="mb-3">
             <form
               className="join w-full lg:w-[600px]"
@@ -316,6 +330,7 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
             {searchError && <p className="mt-2 text-sm text-error">{searchError}</p>}
           </div>
 
+          {/* Carrousel horizontal de vignettes */}
           <div className="overflow-x-auto">
             <div className="flex gap-3 pb-2 snap-x snap-mandatory">
               {(pexelsImages.length > 0 ? pexelsImages : backgroundImages).map((item: any) => {
