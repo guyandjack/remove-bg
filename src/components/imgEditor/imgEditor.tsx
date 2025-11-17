@@ -13,6 +13,9 @@ import { useEffect, useRef, useState } from "preact/hooks";
 //import des librairies
 import axios from "axios";
 
+//import des composants enfants
+import { DownloadLink } from "@/components/link/DownloadLink";
+
 //import des functions
 import composeBackground from "@/utils/composeBackground"; // compose le sujet + le fond (canvas)
 import { localOrProd } from "@/utils/localOrProd";
@@ -40,6 +43,8 @@ type ImgEditorProps = {
   src: string;
   // plan: configuration Filerobot (onglets/outils)
   planUser: string;
+
+  credit: number;
 };
 
 // Retourne une configuration Filerobot selon le plan
@@ -48,31 +53,34 @@ function getConfigForPlan(plan: ImgEditorProps["planUser"], TABS: any, TOOLS: an
     case "free":
       return {
         tabsIds: [TABS.ADJUST, TABS.RESIZE],
-        defaultTabId: TABS.ADJUST,
-        defaultToolId: TOOLS.CROP,
+        //defaultTabId: TABS.ADJUST,
+        //defaultToolId: TOOLS.CROP,
+        removeSaveButton: true,
         
       };
     case "hobby":
       return {
         tabsIds: [TABS.ADJUST, TABS.ANNOTATE, TABS.RESIZE, TABS.FILTER],
-        defaultTabId: TABS.ADJUST,
-        defaultToolId: TOOLS.RESIZE,
+        //defaultTabId: TABS.ADJUST,
+       //defaultToolId: TOOLS.RESIZE,
         finetune: { brightness: true, contrast: true, replaceColor: true },
+        removeSaveButton: true,
       };
     case "pro":
       return {
         tabsIds: [],
-        defaultTabId: TABS.ADJUST,
-        defaultToolId: TOOLS.FINETUNE,
+        //defaultTabId: TABS.ADJUST,
+        //defaultToolId: TOOLS.FINETUNE,
         finetune: { brightness: true, contrast: true, replaceColor: true },
+        removeSaveButton: true,
       };
     default:
       return {
         tabsIds: [],
-        defaultTabId: TABS.ADJUST,
-        defaultToolId: TOOLS.FINETUNE,
-        removeSaveButton: true,
+        //defaultTabId: TABS.ADJUST,
+        //defaultToolId: TOOLS.FINETUNE,
         finetune: { brightness: true, contrast: true, replaceColor: true },
+        removeSaveButton: true,
       };
   }
 }
@@ -82,7 +90,7 @@ function getConfigForPlan(plan: ImgEditorProps["planUser"], TABS: any, TOOLS: an
 // Miniatures locales (fallback si aucune recherche Pexels)
 const backgroundImages = [BgHero, BgDessert, BgFriend, BgSport];
 
-const ImgEditor = ({ src, planUser }: ImgEditorProps) => {
+const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
   // Refs DOM/instances Filerobot
   const containerRef = useRef<HTMLDivElement | null>(null); // conteneur pour le canvas Filerobot
   const editorRef = useRef<any>(null); // instance Filerobot en cours
@@ -98,6 +106,7 @@ const ImgEditor = ({ src, planUser }: ImgEditorProps) => {
     { type: "color"; value: string } | { type: "image"; value: string } | null
   >(null); // dernier fond choisi
   const [activePicker, setActivePicker] = useState<"color" | "image">("color"); // onglet actif
+  const [isPending, setIsPending] = useState(false);
 
   // Etats de recherche Pexels
   const [searchTerm, setSearchTerm] = useState(""); // terme saisi
@@ -136,7 +145,7 @@ const ImgEditor = ({ src, planUser }: ImgEditorProps) => {
   // 1) Montage: bloque le clic droit et instancie Filerobot sur currentSource
   useEffect(() => {
     const blockContext = (e: MouseEvent) => e.preventDefault();
-    document.addEventListener("contextmenu", blockContext);
+    //document.addEventListener("contextmenu", blockContext);
 
     const FIE = (window as any).FilerobotImageEditor;
     if (!FIE || !containerRef.current) {
@@ -224,6 +233,7 @@ const ImgEditor = ({ src, planUser }: ImgEditorProps) => {
       </div>
 
       {/* Commandes: onglets, reset, téléchargement */}
+      <h2 className={"mt-[10px] text-xl"}>Ajouter un nouveau fond à votre image</h2>
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <div className="join">
           <button
@@ -250,13 +260,7 @@ const ImgEditor = ({ src, planUser }: ImgEditorProps) => {
           Annuler le fond
         </button>
 
-        <a
-          className="btn btn-outline"
-          href={currentSource}
-          download="image-composed.png"
-        >
-          Télécharger
-        </a>
+        <DownloadLink currentSource={currentSource} credit={credit} />
       </div>
 
       {/* Panneau Couleurs */}
@@ -269,7 +273,7 @@ const ImgEditor = ({ src, planUser }: ImgEditorProps) => {
           </div>
           <div className="overflow-x-auto">
             <div className="flex gap-2 pb-2 snap-x snap-mandatory">
-              {planColor["pro"].map((c) => (
+              {planColor[planUser].map((c) => (
                 <button
                   key={c}
                   type="button"

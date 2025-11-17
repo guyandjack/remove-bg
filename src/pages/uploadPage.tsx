@@ -30,6 +30,7 @@ function UploadPage() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const typePlan = sessionSignal.value.plan?.code || sessionSignal.value.plan?.name || "noplan";
+  const creditRemaining = sessionSignal.value.credits?.remaining_last_24h || 0;
   
 
   // Effet : quand callApi passe à true → on lance API + CDN
@@ -95,7 +96,7 @@ function UploadPage() {
         />
 
         <div id="editor" className="relative mt-6 w-full min-h-[1000px]">
-          {shouldShowEditor && <ImgEditor src={responseApi} planUser={typePlan} />}
+          {shouldShowEditor && <ImgEditor src={responseApi} planUser={typePlan} credit={creditRemaining} />}
 
           {isProcessing && <Loader top="0px" text="is processing..." />}
         </div>
