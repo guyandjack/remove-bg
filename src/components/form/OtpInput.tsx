@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 //import des librairies
 import axios from "axios";
 import { FormSubmitHandler, useForm } from "react-hook-form";
-import { signal, computed, effect } from "@preact/signals";
+//import { signal, computed, effect } from "@preact/signals";
 
 //import des composnta enfants
 import { Loader } from "@/components/loader/Loader";
@@ -12,21 +12,8 @@ import { Loader } from "@/components/loader/Loader";
 //import des fonctions
 import { axiosError } from "@/utils/axiosError";
 import { localOrProd } from "@/utils/localOrProd";
+import { setSessionFromApiResponse, privileges } from "@/stores/session";
 
-type callback = {
-  email: string;
-  password: string;
-  confirm: string;
-  lang: string;
-  id?: string;
-};
-
-//Création d'un signal global pour être importé dans n'importe quel composant
-const user = signal(false);
-const isSignUp = computed(() => user.value === true);
-
-const tokenAcces = signal(null);
-const tokenAccesComputed = computed(() => tokenAcces.value);
 
 type OtpInputProps = {
   length?: number; // par défaut 6
@@ -231,17 +218,13 @@ function OtpInput({
 
       const result = response.data;
       if (result.status === "success") {
-        //modifie la valeur du signal et stockage du token
-        tokenAcces.value = result.token;
-        console.log(
-          "tokenAcces Values dans response odtinputs: ",
-          tokenAcces.value
-        );
+       
+        setSessionFromApiResponse(result)
         setIsLoader(false);
         setStatus("success");
-        user.value = true;
+        
         setTimeout(() => {
-          window.location.href = "/upload";
+          //window.location.href = "/upload";
         }, 2000);
       } else {
         setIsLoader(false);
@@ -351,4 +334,4 @@ function OtpInput({
   );
 }
 
-export { OtpInput, isSignUp, tokenAccesComputed };
+export { OtpInput };

@@ -9,6 +9,9 @@ import { Loader } from "@/components/loader/Loader";
 
 //import des fonctions
 import { loadScript } from "@/utils/loadScript";
+import { sessionSignal } from "@/stores/session";
+
+
 
 // CDN de l'éditeur
 const editorCdn =
@@ -25,6 +28,9 @@ function UploadPage() {
 
   const [isCdnLoaded, setCdnLoaded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const typePlan = sessionSignal.value.plan?.code || sessionSignal.value.plan?.name || "noplan";
+  
 
   // Effet : quand callApi passe à true → on lance API + CDN
   useEffect(() => {
@@ -89,7 +95,7 @@ function UploadPage() {
         />
 
         <div id="editor" className="relative mt-6 w-full min-h-[1000px]">
-          {shouldShowEditor && <ImgEditor src={responseApi} plan="pro" />}
+          {shouldShowEditor && <ImgEditor src={responseApi} planUser={typePlan} />}
 
           {isProcessing && <Loader top="0px" text="is processing..." />}
         </div>

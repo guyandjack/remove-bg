@@ -1,4 +1,4 @@
-// app.js
+// app.ts
 /**
  * 🌐 Application Express principale
  * ----------------------------------
@@ -6,31 +6,31 @@
  * Il initialise les middlewares essentiels (sécurité, logs, CORS, parsing, etc.)
  * et prépare les routes de ton backend.
  */
-
+//import des librairies / package
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import compression from "compression";
-// path not used here
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
-// fs not used here
-import { logger, httpLoggerStream, requestIdMiddleware } from "./logger.ts";
 
-import contactRoute from "./routes/contact.route.ts";
-import signupRoute from "./routes/signUp.route.ts";
-import loginRoute from "./routes/login.route.ts";
-import logOutRoute from "./routes/logOut.routes.ts";
-import verifyRoute from "./routes/verifyAuth.route.ts";
-import pexelsRoute from "./routes/pexels.route.ts";
-import stripeRoute from "./routes/stripe.route.ts";
+// methode de journalsiation des evenements
+import { logger, httpLoggerStream, requestIdMiddleware } from "./logger";
 
-//import verifyEmailCodeController from "./routes/verifyOpt.route.ts";
+//import des types
+import type { CorsOptions } from "cors";
+import type { Request, Response, NextFunction } from "express";
 
-import type { Request, Response, NextFunction, RequestHandler } from "express";
-
+//import des routes
+import contactRoute from "./routes/contact.route";
+import signupRoute from "./routes/signUp.route";
+import loginRoute from "./routes/login.route";
+import logOutRoute from "./routes/logOut.routes";
+import verifyRoute from "./routes/verifyAuth.route";
+import pexelsRoute from "./routes/pexels.route";
+import stripeRoute from "./routes/stripe.route";
 
 
 const app = express();
@@ -43,8 +43,8 @@ const app = express();
 app.use(helmet());
 
 // Configuration CORS (autorisations de domaines front-end)
-const corsOptions = {
-  origin: function (origin, callback) {
+const corsOptions: CorsOptions = {
+  origin(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     const allowedOrigins = [
       "https://bgremoved.ch", // domaine de production
       "http://localhost:5173", // front-end Vite dev
@@ -74,10 +74,10 @@ app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 
 // Compression des réponses HTTP (gzip)
-app.use(compression() as unknown as import("express").RequestHandler);
+app.use(compression());
 
 // Gestion des cookies
-app.use(cookieParser() as unknown as import("express").RequestHandler);
+app.use(cookieParser());
 
 // Gestion de l'upload de fichiers
 app.use(fileUpload());
@@ -93,10 +93,7 @@ app.use(requestIdMiddleware);
 const morganFormat = process.env.NODE_ENV === "production" ? "combined" : "dev";
 
 // Redirection des logs HTTP de Morgan vers Winston (type-safe)
-const httpLogMiddleware = morgan(morganFormat, {
-  stream: httpLoggerStream,
-}) as unknown as RequestHandler;
-app.use(httpLogMiddleware);
+app.use(morgan(morganFormat, { stream: httpLoggerStream }));
 
 // ----------------------------------------------------
 // 🚦 4️⃣ Limitation du nombre de requêtes (anti-spam / brute-force)

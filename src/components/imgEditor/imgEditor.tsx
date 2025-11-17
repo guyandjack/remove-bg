@@ -7,45 +7,56 @@
 // - Appliquer immédiatement le fond choisi dans l’éditeur (pas de preview séparée).
 // - Permettre de revenir à l’image d’origine (sans fond) et de télécharger le résultat.
 
+//import des hooks
 import { useEffect, useRef, useState } from "preact/hooks";
+
+//import des librairies
 import axios from "axios";
+
+//import des functions
 import composeBackground from "@/utils/composeBackground"; // compose le sujet + le fond (canvas)
+import { localOrProd } from "@/utils/localOrProd";
+
+//import des images basiques d' arrire plan
 import BgHero from "@/assets/images/hero-img.jpg";
 import BgDessert from "@/assets/images/dessert.jpg";
 import BgFriend from "@/assets/images/friend.jpg";
 import BgSport from "@/assets/images/sport.jpg";
-import { localOrProd } from "@/utils/localOrProd";
 
 // URLs construites selon l’environnement (local/prod)
 const { urlApi } = localOrProd();
 
+//import des data
+import { planColor } from "@/data/content/components/editor/planColor";
+
+//declaration des types
 // Types auxiliaires
 type PexelsImage = { tiny: string; large: string };
+
 
 // Props du composant ImgEditor
 type ImgEditorProps = {
   // src: image sans fond (dataURL/URL) retournée par votre API remove‑bg
   src: string;
   // plan: configuration Filerobot (onglets/outils)
-  plan?: "free" | "hobby" | "pro" | "test";
+  planUser: string;
 };
 
 // Retourne une configuration Filerobot selon le plan
-function getConfigForPlan(plan: ImgEditorProps["plan"], TABS: any, TOOLS: any) {
+function getConfigForPlan(plan: ImgEditorProps["planUser"], TABS: any, TOOLS: any) {
   switch (plan) {
     case "free":
       return {
         tabsIds: [TABS.ADJUST, TABS.RESIZE],
         defaultTabId: TABS.ADJUST,
         defaultToolId: TOOLS.CROP,
-        watermark: { text: "Helveclick", opacity: 0.8, url: "" },
+        
       };
     case "hobby":
       return {
         tabsIds: [TABS.ADJUST, TABS.ANNOTATE, TABS.RESIZE, TABS.FILTER],
         defaultTabId: TABS.ADJUST,
         defaultToolId: TOOLS.RESIZE,
-        watermark: { text: "" },
         finetune: { brightness: true, contrast: true, replaceColor: true },
       };
     case "pro":
@@ -66,45 +77,12 @@ function getConfigForPlan(plan: ImgEditorProps["plan"], TABS: any, TOOLS: any) {
   }
 }
 
-// Palette (winter/night friendly) — défilable horizontalement si elle grandit
-const colorPalette = [
-  "#000000",
-  "#1f2937",
-  "#4b5563",
-  "#9ca3af",
-  "#f3f4f6",
-  "#ffffff",
-  "#0c4a6e",
-  "#1d4ed8",
-  "#0ea5e9",
-  "#38bdf8",
-  "#bae6fd",
-  "#064e3b",
-  "#059669",
-  "#22c55e",
-  "#86efac",
-  "#d1fae5",
-  "#b45309",
-  "#f59e0b",
-  "#fbbf24",
-  "#fcd34d",
-  "#fef9c3",
-  "#7f1d1d",
-  "#dc2626",
-  "#f43f5e",
-  "#fb7185",
-  "#ffe4e6",
-  "#e0e7ff",
-  "#ede9fe",
-  "#fce7f3",
-  "#ecfdf5",
-  "#fef2f2",
-];
+
 
 // Miniatures locales (fallback si aucune recherche Pexels)
 const backgroundImages = [BgHero, BgDessert, BgFriend, BgSport];
 
-const ImgEditor = ({ src, plan }: ImgEditorProps) => {
+const ImgEditor = ({ src, planUser }: ImgEditorProps) => {
   // Refs DOM/instances Filerobot
   const containerRef = useRef<HTMLDivElement | null>(null); // conteneur pour le canvas Filerobot
   const editorRef = useRef<any>(null); // instance Filerobot en cours
@@ -117,9 +95,7 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
   const [currentSource, setCurrentSource] = useState<string>(src); // image actuellement affichée dans l’éditeur
   const [isComposing, setIsComposing] = useState(false); // spinner pendant la composition canvas
   const [selectedBg, setSelectedBg] = useState<
-    | { type: "color"; value: string }
-    | { type: "image"; value: string }
-    | null
+    { type: "color"; value: string } | { type: "image"; value: string } | null
   >(null); // dernier fond choisi
   const [activePicker, setActivePicker] = useState<"color" | "image">("color"); // onglet actif
 
@@ -131,18 +107,22 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
 
   // Récupère des images de fond via le backend (Pexels)
   const fetchImages = async (theme: string) => {
+    const language = document.documentElement.lang;
     const value = theme.trim();
     if (value.length < 2) return; // évite les requêtes trop courtes
     try {
       setIsSearching(true);
       setSearchError("");
       const response = await axios.get(
-        `${urlApi}/api/pexels/images/?theme=${encodeURIComponent(value)}`,
+        `${urlApi}/api/pexels/images/?theme=${encodeURIComponent(value)}&lang=${encodeURIComponent(language)}`,
         { headers: { "Content-Type": "application/json" }, timeout: 10000 }
       );
       const photos = (response?.data?.photos || []) as any[];
       const images: PexelsImage[] = photos
-        .map((p) => ({ tiny: p?.src?.tiny, large: p?.src?.large2x || p?.src?.large || p?.src?.original }))
+        .map((p) => ({
+          tiny: p?.src?.tiny,
+          large: p?.src?.large2x || p?.src?.large || p?.src?.original,
+        }))
         .filter((i) => i.tiny && i.large);
       setPexelsImages(images);
     } catch (error: any) {
@@ -196,7 +176,7 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
         if (result?.imageBase64) setCurrentSource(result.imageBase64);
       },
     };
-    const planConfig = getConfigForPlan(plan, TABS, TOOLS);
+    const planConfig = getConfigForPlan(planUser, TABS, TOOLS);
     const config = { ...baseConfig, ...planConfig };
     const editor = new FIE(containerRef.current, config);
     editorRef.current = editor;
@@ -248,14 +228,18 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
         <div className="join">
           <button
             type="button"
-            className={`btn join-item ${activePicker === "color" ? "btn-primary" : "btn-ghost"}`}
+            className={`btn join-item ${
+              activePicker === "color" ? "btn-primary" : "btn-ghost"
+            }`}
             onClick={() => setActivePicker("color")}
           >
             Couleurs
           </button>
           <button
             type="button"
-            className={`btn join-item ${activePicker === "image" ? "btn-info" : "btn-ghost"}`}
+            className={`btn join-item ${
+              activePicker === "image" ? "btn-info" : "btn-ghost"
+            }`}
             onClick={() => setActivePicker("image")}
           >
             Images
@@ -266,7 +250,11 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
           Annuler le fond
         </button>
 
-        <a className="btn btn-outline" href={currentSource} download="image-composed.png">
+        <a
+          className="btn btn-outline"
+          href={currentSource}
+          download="image-composed.png"
+        >
           Télécharger
         </a>
       </div>
@@ -275,11 +263,13 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
       {activePicker === "color" ? (
         <div className="mt-3">
           <div className="label p-0 mb-2">
-            <span className="label-text text-base-content/70">Couleurs unies</span>
+            <span className="label-text text-base-content/70">
+              Couleurs unies
+            </span>
           </div>
           <div className="overflow-x-auto">
             <div className="flex gap-2 pb-2 snap-x snap-mandatory">
-              {colorPalette.map((c) => (
+              {planColor["pro"].map((c) => (
                 <button
                   key={c}
                   type="button"
@@ -300,7 +290,9 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
         // Panneau Images (recherche Pexels + vignettes)
         <div className="mt-3">
           <div className="label p-0 mb-2">
-            <span className="label-text text-base-content/70">Images de fond</span>
+            <span className="label-text text-base-content/70">
+              Images de fond "PEXELS" gratuite et libre de droit.
+            </span>
           </div>
 
           {/* Barre de recherche */}
@@ -315,44 +307,61 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
               <input
                 id="search"
                 type="search"
-                placeholder="Rechercher des images (ex: nature, city, people, animals...)"
+                placeholder="Rechercher des images en ligne(ex: nature, city, people, animals...)"
                 className="input input-bordered join-item w-full bg-base-200 text-base-content placeholder:text-base-content/60"
                 pattern="[A-Za-z0-9 \-_'.,]{1,50}"
                 aria-label="Search through pexels images library"
                 maxLength={50}
                 value={searchTerm}
-                onChange={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
+                onChange={(e) =>
+                  setSearchTerm((e.target as HTMLInputElement).value)
+                }
               />
-              <button type="submit" className="btn btn-info join-item" disabled={isSearching}>
+              <button
+                type="submit"
+                className="btn btn-info join-item"
+                disabled={isSearching}
+              >
                 {isSearching ? "..." : "Search"}
               </button>
             </form>
-            {searchError && <p className="mt-2 text-sm text-error">{searchError}</p>}
+            {searchError && (
+              <p className="mt-2 text-sm text-error">{searchError}</p>
+            )}
           </div>
 
           {/* Carrousel horizontal de vignettes */}
           <div className="overflow-x-auto">
             <div className="flex gap-3 pb-2 snap-x snap-mandatory">
-              {(pexelsImages.length > 0 ? pexelsImages : backgroundImages).map((item: any) => {
-                const thumb = typeof item === "string" ? item : item.tiny;
-                const large = typeof item === "string" ? item : item.large;
-                return (
-                  <button
-                    key={thumb}
-                    type="button"
-                    onClick={() => applyBackground({ type: "image", value: large })}
-                    className={`overflow-hidden rounded-lg ring-1 ring-base-200 hover:ring-primary transition snap-start ${
-                      selectedBg?.type === "image" && selectedBg.value === large
-                        ? "ring-2 ring-primary"
-                        : ""
-                    } ${isSearching ? "opacity-60" : ""}`}
-                    style={{ minWidth: "6rem" }}
-                    disabled={isSearching}
-                  >
-                    <img src={thumb} alt="Fond" className="h-20 w-full object-cover" />
-                  </button>
-                );
-              })}
+              {(pexelsImages.length > 0 ? pexelsImages : backgroundImages).map(
+                (item: any) => {
+                  const thumb = typeof item === "string" ? item : item.tiny;
+                  const large = typeof item === "string" ? item : item.large;
+                  return (
+                    <button
+                      key={thumb}
+                      type="button"
+                      onClick={() =>
+                        applyBackground({ type: "image", value: large })
+                      }
+                      className={`overflow-hidden rounded-lg ring-1 ring-base-200 hover:ring-primary transition snap-start ${
+                        selectedBg?.type === "image" &&
+                        selectedBg.value === large
+                          ? "ring-2 ring-primary"
+                          : ""
+                      } ${isSearching ? "opacity-60" : ""}`}
+                      style={{ minWidth: "6rem" }}
+                      disabled={isSearching}
+                    >
+                      <img
+                        src={thumb}
+                        alt="Fond"
+                        className="h-20 w-full object-cover"
+                      />
+                    </button>
+                  );
+                }
+              )}
             </div>
           </div>
         </div>
@@ -362,4 +371,3 @@ const ImgEditor = ({ src, plan }: ImgEditorProps) => {
 };
 
 export { ImgEditor };
-

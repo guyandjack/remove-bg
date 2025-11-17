@@ -7,7 +7,15 @@ const logOut = () => {
   //fetch
 }
 
-const ProfileDropDown = ({ credit = 3,  textCredit = "Credits", plan = "free plan", userName="tartarpion" }) => {
+//declaration des types
+type DropDownProps = {
+  credit: number;
+  textCredit: string | null;
+  plan: string | null;
+  userName: string | null;
+};
+
+const ProfileDropDown = ({ credit = 0,  textCredit = "Crédits", plan = null, userName = null }:DropDownProps) => {
   return (
     <div className="dropdown dropdown-end">
       <button tabIndex={0} type="button" className="btn hover:bg-primary/40">
@@ -104,9 +112,9 @@ const ProfileDropDown = ({ credit = 3,  textCredit = "Credits", plan = "free pla
         <li className="w-[130px]">
           <button
             className="flex flex-row justify-left items-center gap-4"
-            onClick={() => {
+            /* onClick={() => {
               callback();
-            }}
+            }} */
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

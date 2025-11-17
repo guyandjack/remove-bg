@@ -22,14 +22,27 @@ import { setActiveLink } from "@/utils/setActiveLink";
 const { urlApi } = localOrProd();
 
 //import des signaux de connexion user (signUp, login)
-import { isSignUp, tokenAccesComputed } from "./form/OtpInput";
+import { sessionSignal } from "../stores/session";
 
-//
+
+//declarations des types
+type DisplayState = {
+  userName: string | null;
+  authentified: boolean;
+  textCredit: string | null;
+  credit: number;
+  plan: string | null;
+};
+
+
+
 
 
 //fonction
 const isAuthentified = async () => {
-  const token = tokenAccesComputed.value?.trim();
+  //recuperation des info de seesion
+
+  const token = sessionSignal?.value?.token?.trim();
   axios.defaults.headers.common[
     "Authorization"
   ] = `Bearer ${token}`;
@@ -56,10 +69,13 @@ const isAuthentified = async () => {
 };
 
 function NavBar() {
-  //state qui gere l' affichage du profileDropdown
-  const [isDisplay, setIsDisplay] = useState({
-    userName: "",
+  //state qui gere l'affichage du profileDropdown et son contenu textuel
+  const [isDisplay, setIsDisplay] = useState<DisplayState>({
+    userName: null,
     authentified: false,
+    credit: 0,
+    textCredit: null,
+    plan: null
   });
 
   
@@ -68,15 +84,21 @@ function NavBar() {
     isAuthentified()
       .then((result) => {
         setIsDisplay({
-          userName: result.email,
-          authentified: result.authentified,
+          userName:
+            sessionSignal.value.user?.first_name ||
+            sessionSignal.value.user?.email ||
+            null,
+          authentified: sessionSignal.value.authentified,
+          credit: sessionSignal.value.credits?.remaining_last_24h || 0,
+          textCredit: null,
+          plan: sessionSignal.value.plan?.name || null,
         });
       })
 
       .catch((e) => {
         console.error("un bug");
       });
-  }, [isSignUp.value]);
+  }, [sessionSignal.value]);
 
   //active le lien au montage du composant
   useEffect(() => {
@@ -163,7 +185,14 @@ function NavBar() {
       <div className="navbar-end gap-2">
         <ThemeControler />
         <SelectLanguage />
-        {isDisplay.authentified ? <ProfileDropDown userName={isDisplay.userName} /> : null}
+        {isDisplay.authentified ? <ProfileDropDown
+          credit={isDisplay.credit}
+          userName={isDisplay.userName}
+          textCredit={isDisplay.textCredit}
+          plan={isDisplay.plan}
+                 
+        
+        /> : null}
       </div>
     </nav>
   );

@@ -1,5 +1,5 @@
-import type { AuthDTO } from "../backend/middelware/chekDataUser/checkDataUser";
-import type { ContactDTO } from "../backend/middelware/checkDataFormContact/checkDataFormContact";
+import type { AuthDTO } from "../middelware/chekDataUser/checkDataUser";
+import type { ContactDTO } from "../middelware/checkDataFormContact/checkDataFormContact";
 
 declare global {
   namespace Express {

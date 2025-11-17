@@ -39,7 +39,11 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
     "nodemon": "^3.1.10",
     "tsx": "^4.20.6"
   }

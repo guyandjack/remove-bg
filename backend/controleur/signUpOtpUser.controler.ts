@@ -125,23 +125,30 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
       res.cookie("tokenRefresh", refreshToken, options);
 
       return res.status(200).json({
+        user: {email: email},
         status: "success",
-        email,
-        token: accessToken,
         authentified: true,
+        redirect: false,
+        redirectUrl: null,
+        token: accessToken,
         plan: { code: "free", name: "Free", price_cents: 0, currency: "EUR", daily_credit_quota: 2 },
         credits: usage ? { used_last_24h: usage.used_last_24h, remaining_last_24h: usage.remaining_last_24h } : null,
         subscriptionId: subId,
+        hint:""
       });
     }
 
     // Paid flow: only plan code is available here from EmailVerification.
     // Defer checkout creation until plans/stripe are configured.
     return res.status(200).json({
+      user:{email: email},
       status: "requires_payment",
-      email,
+      authentified: false,
+      redirect: true,
+      redirectUrl: "https://stripe.com",
       plan: { code: planCode },
-      redirectUrl: null,
+      credits: null,
+      subscriptionId: null,
       hint: "Configure plans and Stripe (price id) to enable checkout",
     });
   } catch (err: any) {
