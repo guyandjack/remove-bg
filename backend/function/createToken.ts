@@ -1,5 +1,8 @@
 
-import jwt from "jsonwebtoken";
+import jwt, { type SignOptions, type Secret, type JwtPayload } from "jsonwebtoken";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 type Option = {
   domain?: string;
@@ -9,38 +12,76 @@ type Option = {
 sameSite?: string;
 }
 
-/**
- * Sign JWT accesstoken
- */
-const signAccessToken = (email: string) => {
-  let privateKey = process.env.JWT_PRIVATE_KEY;
+export type PasswordResetPayload = {
+  sub: string;
+  email: string;
+  typ: "password_reset";
+  jti: string;
+};
 
-  if (!privateKey) {
-    throw new Error("Missing JWT_PRIVATE_KEY");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+function normalizePem(input: string): string {
+  const maybe = input.includes("\\n") ? input.replace(/\\n/g, "\n") : input;
+  return maybe.trim();
+}
+
+function tryRead(p?: string): string | null {
+  if (!p) return null;
+  try {
+    return fs.readFileSync(p, "utf8");
+  } catch {
+    return null;
   }
+}
 
-  return jwt.sign(
-    { email },
-    privateKey,
-    {
-      algorithm: "RS256",
-      expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || "15m",
-    }
-  );
+function resolvePrivateKey(): string {
+  const candidatePaths = [
+    process.env.PRIVATE_KEY_PATH,
+    path.resolve(__dirname, "..", "keys", "jwt_private_key.key"),
+  ];
+  for (const p of candidatePaths) {
+    const content = tryRead(p);
+    if (content && /BEGIN (RSA )?PRIVATE KEY/.test(content)) return content.trim();
+  }
+  const envKey = process.env.JWT_PRIVATE_KEY;
+  if (envKey) {
+    const k = normalizePem(envKey);
+    if (/BEGIN (RSA )?PRIVATE KEY/.test(k)) return k;
+  }
+  throw new Error("RSA private key not found. Set PRIVATE_KEY_PATH or place keys/private.key");
+}
+
+/**
+ * Sign JWT access token
+ * Accepts either a string email (legacy) or a password reset payload.
+ */
+const signAccessToken = (payload: string | PasswordResetPayload) => {
+  const privateKey = resolvePrivateKey();
+
+  const body: JwtPayload | string =
+    typeof payload === "string" ? { email: payload } : (payload as JwtPayload);
+
+  const key: Secret = privateKey as unknown as Secret;
+  const options: SignOptions = {
+    algorithm: "RS256" as SignOptions["algorithm"],
+    expiresIn: (process.env.JWT_ACCESS_EXPIRES_IN || "15m") as SignOptions["expiresIn"],
+  };
+
+  return jwt.sign(body, key, options);
 };
 
 /**
  * Sign JWT refreshToken
  */
 const signRefreshToken = (email: string) => {
-  const privateKey = process.env.JWT_PRIVATE_KEY;
-  if (!privateKey) {
-    throw new Error("Missing JWT_PRIVATE_KEY");
-  }
-  return jwt.sign({ email }, privateKey, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "1h",
-    algorithm: "RS256",
-  });
+  const privateKey = resolvePrivateKey();
+  const key: Secret = privateKey as unknown as Secret;
+  const options: SignOptions = {
+    expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || "1h") as SignOptions["expiresIn"],
+    algorithm: "RS256" as SignOptions["algorithm"],
+  };
+  return jwt.sign({ email } as JwtPayload, key, options);
 };
 
 

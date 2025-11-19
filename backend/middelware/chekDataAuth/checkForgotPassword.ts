@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 
 export const authSchema = z.object({
   email: z.email("email invalide").trim().toLowerCase(),
+  lang: z.enum(["fr", "en", "de", "it"])
 });
 
 export type AuthDTO = z.infer<typeof authSchema>;
@@ -28,6 +29,7 @@ const checkForgotPassword = (
   const data: AuthDTO = result.data;
   (req as any).userValidated = {
     email: data.email,
+    lang: data.lang
     
   };
   next();

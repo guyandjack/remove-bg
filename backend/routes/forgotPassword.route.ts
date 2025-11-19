@@ -1,14 +1,10 @@
 import express from "express";
 import { checkForgotPassword } from "../middelware/chekDataAuth/checkForgotPassword";
-//import {} from "../controleur/loginDataUser.controler";
+import { forgotPassword } from "../controleur/forgotPassword.controler";
 
 const router = express.Router();
 
-router.post("/", checkForgotPassword, (req, res) => {
-    return res.status(200).json({
-        "status": "success",
-        "message": "check data passed!"
-    })
-});
+// POST /forgot-password
+router.post("/", checkForgotPassword, forgotPassword);
 
 export default router;

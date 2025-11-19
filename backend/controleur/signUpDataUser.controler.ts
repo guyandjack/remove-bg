@@ -29,7 +29,14 @@ function resolveLocale(lang: unknown): string {
 
 export const sendMailVerification: RequestHandler = async (req, res) => {
   try {
-    const { email, password, lang, id, plan } = (req as any).userValidated || {};
+    const { email, password, lang, plan, id } = (req as any).userValidated || {};
+
+     if (!email || !lang || !password! || !plan) {
+       return res.status(400).json({
+         status: "error",
+         message: "missing payload code_signin_1",
+       });
+     }
     const normalizedEmail = normalizeEmail(email);
     if (!normalizedEmail) {
       return res.status(400).json({ error: true, message: "Missing email" });
@@ -39,10 +46,7 @@ export const sendMailVerification: RequestHandler = async (req, res) => {
     const isResend = String(id || "").toLowerCase() === "resend";
     
     const planCode = String(plan).toLowerCase();
-    /* const planRow = await getPlanByCode(planCode);
-    if (!planRow) {
-      return res.status(400).json({ error: true, message: "Invalid plan" });
-    } */
+   
 
     const otp = generateOtp();
     const salt = crypto.randomBytes(16);

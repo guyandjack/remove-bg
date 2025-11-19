@@ -75,19 +75,18 @@ const login :RequestHandler = async (req, res, next) => {
 
     
     res.cookie("tokenRefresh", refreshToken, options);
-    res.status(200).json({
-      status: "success",
-      accessToken,
-      data: user.name,
-    });
+    res.status(200).json(formatedObject);
   } catch (error) {
-    next(error);
+    res.status(400).json({
+      status: "error",
+      message: error
+    });
   }
 };
 
   
   // Check if user changed password after the token was issued
-  if (user.changedPasswordAfter(decoded.iat)) {
+  /* if (user.changedPasswordAfter(decoded.iat)) {
     return res.status(401).json({
       status: "error",
       message: "User recently changed password. Please log in again.",
@@ -100,8 +99,10 @@ const login :RequestHandler = async (req, res, next) => {
     status: "success",
     accessToken,
     data: user.name,
-  });
-};
+  }); */
+
+
+export {login}
 
 
 

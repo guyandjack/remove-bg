@@ -754,13 +754,31 @@ export async function getUserPlanAndCredits24h(
   userId: ID
 ): Promise<{ plan: string; remaining_credits_24h: number } | null> {
   const connexion = await connectDb();
-  const [rows] = await connexion.execute<UserPlanAndCreditsRow[]>(
-    `SELECT plan_code, remaining_last_24h FROM v_subscription_usage_24h WHERE user_id = ? LIMIT 1`,
-    [userId]
-  );
-  const row = rows[0];
-  if (!row) return null;
-  return { plan: row.plan_code, remaining_credits_24h: row.remaining_last_24h };
+  try {
+    const [rows] = await connexion.execute<UserPlanAndCreditsRow[]>(
+      `SELECT plan_code, remaining_last_24h FROM v_subscription_usage_24h WHERE user_id = ? LIMIT 1`,
+      [userId]
+    );
+    const row = rows[0];
+    if (!row) return null;
+    return { plan: row.plan_code, remaining_credits_24h: row.remaining_last_24h };
+  } catch (err: any) {
+    // Fallback for environments where the view doesn't expose plan_code yet
+    if (err && (err.code === "ER_BAD_FIELD_ERROR" || String(err.message || "").includes("plan_code"))) {
+      const [rows] = await connexion.execute<RowDataPacket[]>(
+        `SELECT p.code AS plan_code, v.remaining_last_24h
+         FROM v_subscription_usage_24h v
+         JOIN Plan p ON p.id = v.plan_id
+         WHERE v.user_id = ?
+         LIMIT 1`,
+        [userId]
+      );
+      const row: any = rows[0];
+      if (!row) return null;
+      return { plan: String(row.plan_code), remaining_credits_24h: Number(row.remaining_last_24h) };
+    }
+    throw err;
+  }
 }
 
 // ===================================================================

@@ -50,7 +50,7 @@ const FormLogin = () => {
   //etat qui gere la validite de la reponse du formulaire "mot de passe oublié"
   const [statusForgot, setStatusForgot] = useState<"idle" | "success" | "error">("idle");
 
-  const lang = i18n.resolvedLanguage || i18n.language;
+  const language = i18n.resolvedLanguage || i18n.language;
 
   const {
     register,
@@ -88,7 +88,7 @@ const FormLogin = () => {
     // Ici on pourrait appeler l'API de réinitialisation de mot de passe.
     // Pour le moment, on ferme simplement la modale.
     setIsLoader(true);
-    const DATA = data;
+    const DATA = { ...data, lang: language };
     try {
      const response = await axios.post(
        `${urlApi}/api/forgot`,

@@ -1,0 +1,103 @@
+<mjml>
+  <mj-body background-color="#ffffff">
+    <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
+      <mj-column vertical-align="top" width="100%">
+        <mj-image
+          src="http://localhost:5173/src/assets/images/sport.jpg"
+          alt=""
+          align="center"
+          border="none"
+          width="600px"
+          padding-left="0px"
+          padding-right="0px"
+          padding-bottom="0px"
+          padding-top="0"
+        ></mj-image>
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#1e293b" padding-bottom="0px" padding-top="0">
+      <mj-column vertical-align="top" width="100%">
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="45px"
+          font-weight="bold"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          padding-bottom="30px"
+          padding-top="50px"
+          >Removed BG</mj-text
+        >
+      </mj-column>
+    </mj-section>
+    <mj-section
+      background-color="#1e293b"
+      padding-bottom="20px"
+      padding-top="20px"
+    >
+      <mj-column vertical-align="middle" width="100%">
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="22px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          >Chère<span style="color: #f4bf51"> {{email}}</span><br /><br />
+          Bienvenue chez Removed BG</mj-text
+        >
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="16px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          line-height="1.2"
+          >Pour terminer la création de ton compte
+          </mj-text>
+          <mj-button
+            padding="5px"
+            background-color="#2fd4bf"
+          >
+            {{plan}}
+          </mj-button>
+          <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="16px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          line-height="1.2">
+          confirme ton adresse email en copiant le code ci-dessous dans la fenetre du site internet.(valable 10mn)</mj-text
+        >
+
+        <mj-button
+          align="center"
+          color="#1e293b"
+          background-color="#f4bf51"
+          font-size="15px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          font-weight="5"
+          letter-spacing="5px"
+          padding-left="25px"
+          padding-right="25px"
+          >{{code}}</mj-button
+        >
+
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="15px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          >Merci, <br />
+          L' équipe de Removed BG</mj-text
+        >
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

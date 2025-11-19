@@ -11,7 +11,7 @@ export const authSchema = z.object({
     .regex(/[A-Z]/, "1 majuscule requise")
     .regex(/[^0-9]/, "1 chiffre requis")
     .regex(/[^\w\s]/, "1 caractère spécial requis"),
-  lang: z.literal(["fr", "de", "en", "it"]),
+  
 });
 
 export type AuthDTO = z.infer<typeof authSchema>;
@@ -38,8 +38,7 @@ const checkLoginDataUser = (
   (req as any).userValidated = {
     email: data.email,
     password: data.password,
-    lang: data.lang,
-  };
+  }
   next();
 };
 

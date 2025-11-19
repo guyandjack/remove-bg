@@ -2,14 +2,7 @@ import type { RequestHandler } from "express";
 import crypto from "node:crypto";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { connectDb } from "../DB/poolConnexion/poolConnexion.ts";
-import {
-  createUser,
-  getUserByEmail,
-  upsertPlanByCode,
-  createSubscription,
-  getActiveUsage24h,
-  withTransaction,
-} from "../DB/queriesSQL/queriesSQL.ts";
+import { getUserByEmail, getActiveUsage24h, withTransaction } from "../DB/queriesSQL/queriesSQL.ts";
 import { signAccessToken, signRefreshToken, setCookieOptionsObject } from "../function/createToken.ts";
 
 function hashOtp(code: string, salt: Buffer): Buffer {
@@ -74,87 +67,146 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
     
     
       
-    // Mark OTP as consumed; avoid UNIQUE(email, active) conflicts by cleaning inactive rows first
-    const conn = await pool.getConnection();
-    try {
-      await conn.beginTransaction();
-      await conn.execute<ResultSetHeader>(
-        `DELETE FROM EmailVerification WHERE email = ? AND active = 0`,
-        [email]
-      );
-      await conn.execute<ResultSetHeader>(
-        `UPDATE EmailVerification SET active = 0, consumed_at = NOW() WHERE id = ?`,
-        [record.id]
-      );
-      await conn.commit();
-    } finally {
-      // ensure connection is always released
-      // @ts-ignore
-      conn.release && conn.release();
-    }
-      
-   
-
-
     // Use plan directly from EmailVerification (plan_type)
+    let isValidForDB = false;
+    console.log("plancode: ", planCode)
     if (planCode === "free") {
-      // For free: create user, then active subscription, then return tokens
-      let user = await getUserByEmail(email);
-      if (!user) {
-        const newId = await createUser(email, record.password_hash as string);
-        if (!newId) {
-          return res.status(400).json({ status: "error", message: "Impossible to create user", errorCode: "otp6" });
-        }
-        user = await getUserByEmail(email);
+      // 0) Create tokens first. If this fails, we touch nothing in DB.
+      let accessToken: string;
+      let refreshToken: string;
+      try {
+        accessToken = signAccessToken(email);
+        refreshToken = signRefreshToken(email);
+        isValidForDB = true;
+      } catch (err: any) {
+        isValidForDB = false;
+        return res.status(500).json({
+          status: "error",
+          message: err?.message || String(err),
+          errorCode: "otp6",
+        });
       }
 
-      // Mark account as created in EmailVerification
-      await pool.execute<ResultSetHeader>(
-        `UPDATE EmailVerification SET account = 1 WHERE id = ?`,
-        [record.id]
-      );
+      console.log("isValidForDB: ", isValidForDB)
+      // 1) Single transaction to consume OTP, create user (if needed), mark account, ensure plan, create subscription.
+      if (isValidForDB) {
+        console.log("le code continu de tourner");
+        let newUserId: string | null = null;
+        let finalUserId: string | null = null;
+        try {
+          await withTransaction(async (cx) => {
+            // 1) Consume/cleanup OTP rows
+            await cx.execute<ResultSetHeader>(
+              `DELETE FROM EmailVerification WHERE email = ? AND active = 0`,
+              [email]
+            );
+            await cx.execute<ResultSetHeader>(
+              `UPDATE EmailVerification SET active = 0, consumed_at = NOW() WHERE id = ?`,
+              [record.id]
+            );
 
-      // Ensure 'free' plan exists and get its id without separate lookup
-      const planId = await upsertPlanByCode({ code: "free", name: "Free", price: 0, daily_credit_quota: 2 });
-      const subId = await createSubscription({ userId: user!.id, planId, isActive: true });
-      const usage = await getActiveUsage24h(user!.id);
+            // 2) Find or create user
+            const [urows] = await cx.execute<RowDataPacket[]>(
+              `SELECT id FROM User WHERE email = ? LIMIT 1`,
+              [email]
+            );
+            if (!urows[0]) {
+              const id = crypto.randomUUID();
+              const [ires] = await cx.execute<ResultSetHeader>(
+                `INSERT INTO User (id, email, password_hash) VALUES (?, ?, ?)`,
+                [id, email, String(record.password_hash)]
+              );
+              if (ires.affectedRows !== 1) throw new Error("create_user_failed");
+              newUserId = id;
+              finalUserId = id;
+            } else {
+              finalUserId = String((urows[0] as any).id);
+            }
 
-      const accessToken = signAccessToken({ email });
-      const refreshToken = signRefreshToken(email);
-      const options = setCookieOptionsObject();
-      res.cookie("tokenRefresh", refreshToken, options);
+            // 3) Mark account created
+            await cx.execute<ResultSetHeader>(
+              `UPDATE EmailVerification SET account = 1 WHERE id = ?`,
+              [record.id]
+            );
 
-      return res.status(200).json({
-        user: {email: email},
-        status: "success",
-        authentified: true,
-        redirect: false,
-        redirectUrl: null,
-        token: accessToken,
-        plan: { code: "free", name: "Free", price_cents: 0, currency: "EUR", daily_credit_quota: 2 },
-        credits: usage ? { used_last_24h: usage.used_last_24h, remaining_last_24h: usage.remaining_last_24h } : null,
-        subscriptionId: null,
-        hint:""
-      });
+            // 4) Ensure 'free' plan exists, get its id
+            let planId: string | null = null;
+            const [prows] = await cx.execute<RowDataPacket[]>(
+              `SELECT id FROM Plan WHERE code = ? LIMIT 1`,
+              ["free"]
+            );
+            if (!prows[0]) {
+              const pid = crypto.randomUUID();
+              const [pres] = await cx.execute<ResultSetHeader>(
+                `INSERT INTO Plan (id, code, name, price, currency, billing_interval, daily_credit_quota, is_archived)
+               VALUES (?, 'free', 'Free', 0, 'EUR', 'month', 2, 0)`,
+                [pid]
+              );
+              if (pres.affectedRows !== 1) throw new Error("create_plan_failed");
+              planId = pid;
+            } else {
+              planId = String((prows[0] as any).id);
+            }
+
+            // 5) Create active subscription
+            const sid = crypto.randomUUID();
+            const [sres] = await cx.execute<ResultSetHeader>(
+              `INSERT INTO Subscription (id, user_id, plan_id, status, is_active, period_start, period_end)
+             VALUES (?, ?, ?, 'active', TRUE, NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY))`,
+              [sid, finalUserId, planId]
+            );
+            if (sres.affectedRows !== 1) throw new Error("create_subscription_failed");
+
+            // Tokens already created before starting the transaction to avoid partial DB updates on failure
+          });
+        } catch (err: any) {
+          return res.status(500).json({
+            status: "error",
+            message: err?.message || String(err),
+            errorCode: "otp7",
+          });
+        }
+
+        // 2) After commit: set cookie, get usage and respond
+        const user = await getUserByEmail(email);
+        const usage = user ? await getActiveUsage24h(user.id) : null;
+        const options = setCookieOptionsObject();
+        res.cookie("tokenRefresh", refreshToken, options);
+        return res.status(200).json({
+          user: { email: email },
+          status: "success",
+          authentified: true,
+          redirect: false,
+          redirectUrl: null,
+          token: accessToken,
+          plan: { code: "free", name: "Free", price_cents: 0, currency: "EUR", daily_credit_quota: 2 },
+          credits: usage ? { used_last_24h: usage.used_last_24h, remaining_last_24h: usage.remaining_last_24h } : null,
+          subscriptionId: null,
+          hint: "",
+        });
+      }
     }
 
     // Paid flow: only plan code is available here from EmailVerification.
     // Defer checkout creation until plans/stripe are configured.
-    return res.status(200).json({
-      user:{email: email},
-      status: "requires_payment",
-      authentified: false,
-      redirect: true,
-      redirectUrl: "https://stripe.com",
-      plan: { code: planCode },
-      credits: null,
-      subscriptionId: null,
-      hint: "Configure plans and Stripe (price id) to enable checkout",
-    });
-  } catch (err: any) {
-    console.error("createNewAccountUser error:", err?.message || err);
-    return res.status(500).json({ status: "error", message: err?.message || String(err), errorCode: "otp7" });
-  }
+    if (planCode !== "free") {
+      return res.status(200).json({
+        user: { email: email },
+        status: "requires_payment",
+        authentified: false,
+        redirect: true,
+        redirectUrl: "https://stripe.com",
+        plan: { code: planCode },
+        credits: null,
+        subscriptionId: null,
+        hint: "Configure plans and Stripe (price id) to enable checkout",
+      });
+    }
+    } catch (err: any) {
+      console.error("createNewAccountUser error:", err?.message || err);
+      return res.status(500).json({ status: "error", message: err?.message || String(err), errorCode: "otp8" });
+    }
+  
 };
 
 export { createNewAccountUser };
