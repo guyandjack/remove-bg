@@ -133,7 +133,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         token: accessToken,
         plan: { code: "free", name: "Free", price_cents: 0, currency: "EUR", daily_credit_quota: 2 },
         credits: usage ? { used_last_24h: usage.used_last_24h, remaining_last_24h: usage.remaining_last_24h } : null,
-        subscriptionId: subId,
+        subscriptionId: null,
         hint:""
       });
     }

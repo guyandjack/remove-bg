@@ -35,17 +35,20 @@
     "textError": "Message non transmis!"
   },
   "formSignUp": {
-    "title": "Créer votre compte",
-    "email": "Email",
-    "password": "Mot de passe",
-    "passwordConfirm": "Confimation du mot de passe",
-    "pattern": "Format non valide",
-    "btnSubmit": "Créer votre compte",
-    "btnGoogle": "Continuer avec Google",
-    "passwordError": "Mot de passe trop faible",
-    "textSuccess": "Un mail de confirmation a été envoyé",
-    "textError": "Une erreure c'est produite"
-  },
+  "title": "Créer votre compte",
+  "email": "Email",
+  "password": "Mot de passe",
+  "passwordConfirm": "Confirmation du mot de passe",
+  "pattern": "Format non valide",
+  "btnSubmit": "Créer votre compte",
+  "btnGoogle": "Continuer avec Google",
+  "passwordError": "Mot de passe trop faible",
+  "textSuccess": "Un mail de confirmation a été envoyé",
+  "textError": "Une erreur s'est produite",
+  "question": "Déjà membre",
+  "link": "Connectez-vous"
+},
+
   "otpInput": {
     "title": "Entrez votre code reçu par email.",
     "question": "Vous n’avez rien reçu ?",
@@ -55,13 +58,22 @@
     "textSuccess": "Création du compte reussi",
     "textError": "Impossible de créer le compte"
   },
-  "formSignIn": {
+  "formLogin": {
     "title": "Connection à votre espace",
     "email": "Email",
     "password": "Mot de passe",
-    "btnSubmit": "Créer",
+    "btnSubmit": "Se connecter",
     "btnGoogle": "Continuer avec Google",
-    "forgot": "Mot de passe oublié"
+    "forgot": "Mot de passe oublié",
+    "question": "Pas encore membre",
+    "link": "Créer votre compte"
+  },
+  "formForgot": {
+    "title": "Récupérer votre mot de passe",
+    "info": "Saisissez votre email pour recevoir un lien de réinitialisation.",
+    "email": "Email",
+    "btnSubmit": "Envoyer le lien",
+    "btnCancel": "Annuler"
   },
   "loader": {
     "formContact": "loading..."
@@ -129,10 +141,17 @@
   },
 
   "cta": {
-  "label_choice": "Je choisis un plan",
-  "label_test": "Je veux tester la qualité"
-},
+    "label_choice": "Je choisis un plan",
+    "label_test": "Je veux tester la qualité"
+  },
 
+  "uploadImg": {
+    "label": "Choisir un fichier",
+    "placeHolder": "Aucun fichier choisi",
+    "fileName": "Aucun fichier sélectionné",
+    "preview": "Aucun aperçu disponible",
+    "erase":"Effacer"
+  },
 
   "contact": {
     "title": "Vous aves des questions? on vous repond!",
@@ -258,5 +277,9 @@
     "article9_text": "Pour toute question relative au site, à son contenu ou à ses conditions d’utilisation, vous pouvez contacter l’éditeur via le <a class=\"link\" href=\"/contact\">formulaire de contact du site </a> ou par e-mail à <a class=\"link\" href=\"mailto:info@helveclick.ch\"> info@helveclick.ch </a>.",
 
     "conclusion": "En accédant au site et en utilisant le Service, l’utilisateur reconnaît avoir pris connaissance des présentes mentions légales et les accepte sans réserve."
+  },
+  "upload": {
+    "title_h1": "Téléversez votre image pour tester la qualité du traitement...",
+    "title_h1_loged": "Téléversez votre image pour supprimer son arrière-plan"
   }
 }

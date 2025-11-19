@@ -1,9 +1,9 @@
-//import { FormSignUp } from "@/components/form/FormSignUp";
+import {FormLogin  } from "@/components/form/formLogin";
 
 function LoginPage() {
   return (
     <div className={"px-[10px]"}>
-      <h1>Page login</h1>
+      <FormLogin />
     </div>
   );
 }

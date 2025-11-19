@@ -1,7 +1,7 @@
 import { createClient } from "pexels";
 import fs from "fs/promises";
 import path from "path";
-import "dotenv/config";
+
 
 const pexelsConnect = async () => {
   const apiKeyPath = process.env.PEXELS_API_KEY;

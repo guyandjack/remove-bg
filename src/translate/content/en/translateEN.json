@@ -37,6 +37,22 @@
     "textSuccess": "Message sended",
     "textError": "Error message no sended!"
   },
+ "formSignUp": {
+  "title": "Create your account",
+  "email": "Email",
+  "password": "Password",
+  "passwordConfirm": "Confirm password",
+  "pattern": "Invalid format",
+  "btnSubmit": "Create your account",
+  "btnGoogle": "Continue with Google",
+  "passwordError": "Password too weak",
+  "textSuccess": "A confirmation email has been sent",
+  "textError": "An error occurred",
+  "question": "Already a member?",
+  "link": "Log in"
+}
+
+  ,
   "otpInput": {
     "title": "Enter the code you received by email.",
     "question": "Haven't you received anything?",
@@ -46,26 +62,25 @@
     "textSuccess": "Account creation successful",
     "textError": "Unable to create account"
   },
-  "formSignUp": {
-    "title": "Create your account",
-    "email": "Email",
-    "password": "Password",
-    "passwordConfirm": "Confirm password",
-    "pattern": "Invalid format",
-    "btnSubmit": "Create your account",
-    "btnGoogle": "Continue with Google",
-    "passwordError": "Weak password",
-    "textSuccess": "A confirmation email has been sent",
-    "textError": "An error has occurred"
-  },
-  "formSignIn": {
+
+  "formLogin": {
     "title": "Login",
     "email": "Email",
     "password": "Password",
     "btnSubmit": "Login",
     "btnGoogle": "Continuer with Google",
-    "forgot": "Forgot password"
+    "forgot": "Forgot password",
+    "question": "No member yet",
+    "link": "Create your account"
   },
+  "formForgot": {
+  "title": "Recover your password",
+  "info": "Enter your email to receive a reset link.",
+  "email": "Email",
+  "btnSubmit": "Send the link",
+  "btnCancel": "Cancel"
+},
+
   "loader": {
     "formContact": "loading..."
   },
@@ -137,10 +152,16 @@
     "btn_choice": "I choose a plan"
   },
   "cta": {
-  "label_choice": "I choose a plan",
-  "label_test": "I want to test the quality"
-},
-
+    "label_choice": "I choose a plan",
+    "label_test": "I want to test the quality"
+  },
+  "uploadImg": {
+    "label": "Choose a file",
+    "placeHolder": "No file chosen",
+    "fileName": "No file selected",
+    "preview": "No preview available",
+    "erase": "Cancel"
+  },
 
   "contact": {
     "title": "Have questions? We’ve got answers!",
@@ -260,5 +281,9 @@
     "article9_text": "For any questions regarding the website, its content, or its terms of use, you can contact the publisher via the <a class=\"link\" href=\"/contact\">website contact form</a> or by email at <a class=\"link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>.",
 
     "conclusion": "By accessing the website and using the Service, the User acknowledges having read and accepted this legal notice without reservation."
+  },
+  "upload": {
+    "title_h1": "Upload your image to test the processing quality...",
+    "title_h1_loged": "Upload your image to remove its background"
   }
 }

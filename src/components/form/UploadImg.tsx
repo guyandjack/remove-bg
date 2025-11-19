@@ -1,6 +1,9 @@
 // UploadImg.tsx
 import { useEffect, useState } from "preact/hooks";
 
+//import des composant enfant
+import { InputFile } from "../input/InputFile";
+
 const MAX_SIZE_BYTES = 2 * 1024 * 1024;
 const ACCEPTED_MIME = new Set([
   "image/jpeg",
@@ -13,11 +16,23 @@ const ACCEPTED_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 // simulation pour l’instant (image sans fond)
 import newImg from "@/assets/images/friend-removebg-preview.png";
 
+//declaration des types
+type UploadImgType = {
+  label: string;
+  placeholder: string;
+  filename: string;
+  preview: string;
+  erase: string;
+};
+  
+
+
 type UploadImgProps = {
   previewUrl: string | null;
   setPreviewUrl: (url: string | null) => void;
   setCallApi: (value: boolean) => void;
   setResponseApi: (url: string) => void;
+  content:UploadImgType 
 };
 
 const UploadImg = ({
@@ -25,6 +40,7 @@ const UploadImg = ({
   previewUrl,
   setCallApi,
   setResponseApi,
+  content
 }: UploadImgProps) => {
   const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -62,15 +78,11 @@ const UploadImg = ({
     return null;
   };
 
-  const onChangeFile = (e: Event) => {
-    const input = e.target as HTMLInputElement;
-    const files = input.files;
-    if (!files || files.length === 0) {
+  const onChangeFile = (file: File | null) => {
+    if (!file) {
       resetState();
       return;
     }
-
-    const file = files[0];
     const err = validateFile(file);
     if (err) {
       resetState();
@@ -88,9 +100,9 @@ const UploadImg = ({
     setCallApi(true);
 
     // 💡 OPTIONNEL : tu peux retirer cette simulation si tu déplaces tout dans le parent
-    setTimeout(() => {
+    /* setTimeout(() => {
       setResponseApi(newImg);
-    }, 3000);
+    }, 3000); */
   };
 
   const onClear = () => {
@@ -98,25 +110,27 @@ const UploadImg = ({
     const input = document.getElementById(
       "imageUpload"
     ) as HTMLInputElement | null;
-    if (input) input.value = "";
+    if (input) {
+      input.value = "";
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    }
   };
 
   return (
     <div className="w-full">
       <form className="mx-auto max-w-xl p-6 md:p-8 rounded-xl bg-base-100/60 backdrop-blur-sm shadow-sm">
         <fieldset className="fieldset">
-          <legend className="fieldset-legend text-base-content">
-            Téléverser une image
-          </legend>
+          <legend className="fieldset-legend text-base-content"></legend>
 
           <div className="space-y-3">
-            <input
+            
+            <InputFile
               id="imageUpload"
-              type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={onChangeFile}
-              className="file-input file-input-bordered file-input-info w-full bg-base-200"
-              aria-invalid={error ? true : undefined}
+              className="w-full bg-base-200 file-input-info"
+              placeholder={content.placeholder}
+              buttonText={content.label}
             />
             <div className="label p-0">
               <span className="label-text text-base-content/70">
@@ -139,7 +153,7 @@ const UploadImg = ({
             <div className="grid grid-cols-1 gap-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-base-content/70 truncate">
-                  {fileName || "Aucun fichier sélectionné"}
+                  {fileName || content.filename}
                 </span>
                 {previewUrl && (
                   <button
@@ -147,7 +161,7 @@ const UploadImg = ({
                     onClick={onClear}
                     className="btn btn-ghost btn-xs"
                   >
-                    Effacer
+                    {content.erase}
                   </button>
                 )}
               </div>
@@ -166,7 +180,7 @@ const UploadImg = ({
                   </figure>
                 ) : (
                   <div className="flex h-44 items-center justify-center text-base-content/50">
-                    <span className="text-sm">Aucun aperçu disponible</span>
+                    <span className="text-sm">{content.preview}</span>
                   </div>
                 )}
               </div>
@@ -178,4 +192,4 @@ const UploadImg = ({
   );
 };
 
-export { UploadImg };
+export { UploadImg, UploadImgType };

@@ -1,23 +1,32 @@
 // UploadPage.tsx
 //import des hooks
 import { useState, useEffect } from "preact/hooks";
+import { useTranslation } from "react-i18next";
 
 //import des composants enfants
-import { UploadImg } from "@/components/form/UploadImg";
+import { UploadImg, UploadImgType } from "@/components/form/UploadImg";
 import { ImgEditor } from "@/components/imgEditor/imgEditor";
 import { Loader } from "@/components/loader/Loader";
+import { Example } from "@/components/colorPicker/colorPicker";
 
 //import des fonctions
 import { loadScript } from "@/utils/loadScript";
 import { sessionSignal } from "@/stores/session";
 
-
-
 // CDN de l'éditeur
 const editorCdn =
   "https://scaleflex.cloudimg.io/v7/plugins/filerobot-image-editor/latest/filerobot-image-editor.min.js";
 
-function UploadPage() {
+const UploadPage = () => {
+  const { t } = useTranslation();
+  const userLoged = sessionSignal.value.authentified;
+  const textUploadImgComponent:UploadImgType = {
+    label: t("uploadImg.label"),
+    placeholder: t("uploadImg.placeHolder"),
+    filename: t("uploadImg.fileName"),
+    preview: t("uploadImg.preview"),
+    erase: t("uploadImg.erase")
+  }
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // true quand on doit lancer traitement + chargement CDN
@@ -29,9 +38,11 @@ function UploadPage() {
   const [isCdnLoaded, setCdnLoaded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const typePlan = sessionSignal.value.plan?.code || sessionSignal.value.plan?.name || "noplan";
+  const typePlan =
+    sessionSignal.value.plan?.code ||
+    sessionSignal.value.plan?.name ||
+    "noplan";
   const creditRemaining = sessionSignal.value.credits?.remaining_last_24h || 0;
-  
 
   // Effet : quand callApi passe à true → on lance API + CDN
   useEffect(() => {
@@ -68,10 +79,8 @@ function UploadPage() {
       });
   }, [callApi]);
 
-
-
   const shouldShowEditor =
-    isCdnLoaded && responseApi !== "" && previewUrl !== null && !isProcessing ;
+    isCdnLoaded && responseApi !== "" && previewUrl !== null && !isProcessing;
 
   return (
     <div className="px-[10px] w-full mx-auto pb-[100px] bg-base-200">
@@ -85,7 +94,7 @@ function UploadPage() {
             "text-center text-4xl font-bold lg:w-[40%] lg:text-6xl lg:text-left lg:self-start lg:leading-[60px]!"
           }
         >
-          Televersez votre image pour tester la qualite du traitement...
+          {userLoged ? t("upload.title_h1_loged") : t("upload.title_h1")}
         </h1>
 
         <UploadImg
@@ -93,13 +102,19 @@ function UploadPage() {
           previewUrl={previewUrl}
           setCallApi={setCallApi}
           setResponseApi={setResponseApi} // tu peux le retirer si tu déplaces toute la logique API dans le parent
+          content={textUploadImgComponent}
         />
+      </div>
+      <div id="editor" className="relative mt-6 w-full min-h-[1000px]">
+        {shouldShowEditor && (
+          <ImgEditor
+            src={responseApi}
+            planUser={typePlan}
+            credit={creditRemaining}
+          />
+        )}
 
-        <div id="editor" className="relative mt-6 w-full min-h-[1000px]">
-          {shouldShowEditor && <ImgEditor src={responseApi} planUser={typePlan} credit={creditRemaining} />}
-
-          {isProcessing && <Loader top="0px" text="is processing..." />}
-        </div>
+        {isProcessing && <Loader top="0px" text="is processing..." />}
       </div>
     </div>
   );

@@ -157,6 +157,8 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   return rows[0] ?? null;
 }
 
+
+
 export async function listUser(limit = 50, offset = 0): Promise<User[]> {
   /**
    * SQL: SELECT * FROM User ORDER BY created_at DESC LIMIT ? OFFSET ?
@@ -396,8 +398,8 @@ export async function upsertPlanByCode(input: {
  */
 export async function seedDefaultPlans() {
   await upsertPlanByCode({ code: "free", name: "Free", price: 0, currency: "EUR", billing_interval: "month", daily_credit_quota: 10 });
-  await upsertPlanByCode({ code: "hobby", name: "Hobby", price: 999, currency: "EUR", billing_interval: "month", daily_credit_quota: 100 });
-  await upsertPlanByCode({ code: "pro", name: "Pro", price: 2999, currency: "EUR", billing_interval: "month", daily_credit_quota: 1000 });
+  await upsertPlanByCode({ code: "hobby", name: "Hobby", price: 500, currency: "EUR", billing_interval: "month", daily_credit_quota: 100 });
+  await upsertPlanByCode({ code: "pro", name: "Pro", price: 1500, currency: "EUR", billing_interval: "month", daily_credit_quota: 1000 });
 }
 
 // ===================================================================
@@ -733,6 +735,32 @@ export async function getActiveUsage24h(userId: ID): Promise<SubscriptionUsage24
     [userId]
   );
   return rows[0] ?? null;
+}
+
+// ------------------------------------------------------
+// Plan + crédits restants sur 24h (par utilisateur)
+// ------------------------------------------------------
+export interface UserPlanAndCreditsRow extends RowDataPacket {
+  plan_code: string;
+  remaining_last_24h: number;
+}
+
+/**
+ * Retourne le type de plan (code: 'free' | 'hobby' | 'pro', etc.)
+ * et le nombre de crédits restants sur 24h pour l'utilisateur donné.
+ * S'appuie sur la vue `v_subscription_usage_24h` et la table `Plan`.
+ */
+export async function getUserPlanAndCredits24h(
+  userId: ID
+): Promise<{ plan: string; remaining_credits_24h: number } | null> {
+  const connexion = await connectDb();
+  const [rows] = await connexion.execute<UserPlanAndCreditsRow[]>(
+    `SELECT plan_code, remaining_last_24h FROM v_subscription_usage_24h WHERE user_id = ? LIMIT 1`,
+    [userId]
+  );
+  const row = rows[0];
+  if (!row) return null;
+  return { plan: row.plan_code, remaining_credits_24h: row.remaining_last_24h };
 }
 
 // ===================================================================

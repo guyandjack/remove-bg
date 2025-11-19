@@ -1,7 +1,6 @@
 // signup email verification controller (robust, aligned with schema)
 import type { RequestHandler } from "express";
 import nodemailer from "nodemailer";
-import "dotenv/config";
 import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import type { ResultSetHeader } from "mysql2/promise";

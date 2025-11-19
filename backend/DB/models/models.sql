@@ -81,6 +81,7 @@ SELECT
   s.id AS subscription_id,
   s.user_id,
   s.plan_id,
+  p.code AS plan_code,
   p.daily_credit_quota,
   COALESCE(SUM(CASE WHEN cu.occurred_at >= (NOW() - INTERVAL 1 DAY) THEN cu.used ELSE 0 END), 0) AS used_last_24h,
   GREATEST(p.daily_credit_quota - COALESCE(SUM(CASE WHEN cu.occurred_at >= (NOW() - INTERVAL 1 DAY) THEN cu.used ELSE 0 END), 0), 0) AS remaining_last_24h
@@ -88,7 +89,7 @@ FROM Subscription s
 JOIN Plan p ON p.id = s.plan_id
 LEFT JOIN CreditUsage cu ON cu.subscription_id = s.id
 WHERE s.is_active = 1
-GROUP BY s.id, s.user_id, s.plan_id, p.daily_credit_quota;
+GROUP BY s.id, s.user_id, s.plan_id, p.code, p.daily_credit_quota;
 
 -- EmailVerification (OTP)
 CREATE TABLE IF NOT EXISTS `remove_bg`.`EmailVerification` (
@@ -162,4 +163,3 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`Invoice` (
   INDEX idx_invoice_paid (status, amount_paid_cents),
   INDEX idx_invoice_period (period_start, period_end)
 ) ENGINE=InnoDB;
-
