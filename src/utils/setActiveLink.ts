@@ -8,7 +8,7 @@ const setActiveLink = (e?: any) => {
   if (!element) {
     return;
   }
-  const data_id: string = element[0].href;
+  const data_id: string = element[0]["href"];
 
   const allLinksInNav = document.querySelectorAll("nav a");
 

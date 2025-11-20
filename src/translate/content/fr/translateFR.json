@@ -9,7 +9,8 @@
   "terms": "Conditions générales d'utilisation (CGU)",
   "privacy": "Politique de confidentialité",
   "legal": "Mentions légales",
-  "logout": "Déconnexion"
+  "logout": "Déconnexion",
+  "cgv": "Conditions générales de vente"
 },
 
   "footer": {
@@ -283,6 +284,48 @@
     "article9_text": "Pour toute question relative au site, à son contenu ou à ses conditions d’utilisation, vous pouvez contacter l’éditeur via le <a class=\"link\" href=\"/contact\">formulaire de contact du site </a> ou par e-mail à <a class=\"link\" href=\"mailto:info@helveclick.ch\"> info@helveclick.ch </a>.",
 
     "conclusion": "En accédant au site et en utilisant le Service, l’utilisateur reconnaît avoir pris connaissance des présentes mentions légales et les accepte sans réserve."
+  },
+  "cgv": {
+    "title": "Conditions Générales de Vente (CGV)",
+    "intro": "Les présentes Conditions Générales de Vente (ci-après « CGV ») régissent les relations contractuelles entre le Prestataire et tout utilisateur (ci-après « le Client ») souscrivant à une offre d’abonnement payant sur le site ou l’application web progressive (PWA) de suppression d’arrière-plan d’images (ci-après « le Service »). En souscrivant un abonnement, le Client accepte sans réserve les présentes conditions.",
+    
+    "article1_title": "1. Objet du contrat",
+    "article1_text": "Le présent contrat a pour objet de définir les conditions dans lesquelles le Prestataire met à disposition du Client un Service en ligne de suppression automatique d’arrière-plan d’images, accessible via abonnement annuel. Le Service est fourni en mode SaaS (Software as a Service), hébergé et maintenu par le Prestataire.",
+    
+    "article2_title": "2. Conditions d’abonnement",
+    "article2_text": "L’accès aux fonctionnalités payantes du Service nécessite la souscription d’un abonnement annuel. L’abonnement est nominatif, personnel et non transférable.\n\nLe Client peut souscrire, gérer ou résilier son abonnement depuis son espace personnel. La résiliation met fin au renouvellement automatique, mais n’entraîne pas de remboursement pour la période déjà entamée.",
+    
+    "article3_title": "3. Durée et renouvellement",
+    "article3_text": "L’abonnement est conclu pour une durée d’un (1) an à compter de la date de souscription. À l’expiration de cette période, il est renouvelé automatiquement pour une période équivalente, sauf résiliation préalable par le Client.\n\nLe Client peut résilier son abonnement à tout moment depuis son compte. La résiliation prend effet à la date d’échéance de l’abonnement en cours, sans remboursement de la période restante.",
+    
+    "article4_title": "4. Prix et modalités de paiement",
+    "article4_text": "Les tarifs applicables sont ceux en vigueur au moment de la souscription, exprimés en francs suisses (CHF) ou en euros (EUR), toutes taxes comprises.\n\nLe paiement s’effectue en ligne par carte bancaire via la plateforme sécurisée Stripe. Le Prestataire ne conserve aucune donnée bancaire sensible. Le paiement complet de la période d’abonnement est exigé au moment de la souscription.",
+    
+    "article5_title": "5. Absence de droit de rétractation et remboursement",
+    "article5_text": "Conformément à la législation applicable en matière de prestations de services numériques, le Client reconnaît que l’exécution du Service débute immédiatement après la validation de l’abonnement.\n\nEn conséquence, aucun remboursement, total ou partiel, ne pourra être exigé en cas d’annulation ou de résiliation anticipée. Le Client conserve toutefois la possibilité de résilier son abonnement pour éviter son renouvellement futur.",
+    
+    "article6_title": "6. Suspension et résiliation par le Prestataire",
+    "article6_text": "Le Prestataire se réserve le droit de suspendre ou de résilier un abonnement en cas de non-respect des présentes CGV, de fraude, de comportement abusif ou d’utilisation du Service contraire à la loi ou à l’éthique.\n\nAucune indemnisation ne pourra être réclamée par le Client en cas de suspension ou de résiliation justifiée par un manquement contractuel.",
+    
+    "article7_title": "7. Accès au Service",
+    "article7_text": "Le Prestataire met tout en œuvre pour assurer la disponibilité continue du Service. Toutefois, l’accès peut être temporairement suspendu pour maintenance, mise à jour, ou en cas de défaillance technique indépendante de la volonté du Prestataire.\n\nAucune compensation ne sera due en cas d’interruption temporaire du Service.",
+    
+    "article8_title": "8. Responsabilité",
+    "article8_text": "Le Prestataire n’est tenu qu’à une obligation de moyens. Il ne saurait être responsable des dommages directs ou indirects résultant de l’utilisation du Service, notamment la perte de données, la non-conformité d’une image traitée, ou un dysfonctionnement temporaire du site.\n\nLe Client demeure responsable des fichiers et contenus qu’il téléverse sur la plateforme.",
+    
+    "article9_title": "9. Données personnelles",
+    "article9_text": "Le Prestataire collecte et traite certaines données personnelles nécessaires à la gestion des abonnements et au fonctionnement du Service. Ces traitements sont réalisés conformément à la <a class=\"link\" href=\"/privacy\">Politique de Confidentialité</a> du site et dans le respect du RGPD et de la LPD (Suisse).",
+    
+    "article10_title": "10. Propriété intellectuelle",
+    "article10_text": "Le Service, ses algorithmes, son interface et son contenu sont la propriété exclusive du Prestataire. Toute reproduction, modification ou utilisation non autorisée est strictement interdite.\n\nLe Client conserve la propriété intellectuelle sur les images qu’il téléverse et traite via le Service.",
+    
+    "article11_title": "11. Force majeure",
+    "article11_text": "Aucune des parties ne pourra être tenue pour responsable en cas d’inexécution due à un événement de force majeure tel que défini par la jurisprudence suisse : catastrophe naturelle, panne électrique majeure, attaque informatique, guerre, ou décision gouvernementale empêchant l’exécution du contrat.",
+    
+    "article12_title": "12. Droit applicable et juridiction compétente",
+    "article12_text": "Les présentes CGV sont régies par le droit suisse. En cas de litige, et sauf disposition légale impérative contraire, les tribunaux compétents du canton du Valais seront seuls compétents.",
+    
+    "conclusion": "En validant son abonnement, le Client reconnaît avoir lu, compris et accepté sans réserve les présentes Conditions Générales de Vente."
   },
   "upload": {
     "title_h1": "Téléversez votre image pour tester la qualité du traitement...",

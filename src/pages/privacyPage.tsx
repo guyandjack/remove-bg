@@ -5,9 +5,9 @@ import { useTranslation } from "react-i18next";
 function PrivacyPage() {
   const { t } = useTranslation();
   return (
-    <div className=" px-[10px] flex flex-col justify-center items-center gap-8 w-full max-w-[1000px] mx-auto">
+    <div className=" p-[10px] flex flex-col justify-center items-center gap-8 w-full max-w-[1000px] mx-auto">
       <div className={"flex flex-col justify-center items-center gap-3"}>
-        <h1 className={"text-3xl text-primary"}>{t("privacy.title")}</h1>
+        <h1 className={"text-3xl text-primary text-center py-[20px]"}>{t("privacy.title")}</h1>
         <p className={"mt-[20px]"}>{t("privacy.intro")}</p>
       </div>
       <ul className={"flex flex-col justify-start items-left gap-10"}>

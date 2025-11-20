@@ -19,6 +19,7 @@ const navBarContent: NavLink[] = [
   { key: "privacy", href: "/privacy" },
   { key: "legal", href: "/legal" },
   { key: "terms", href: "/terms" },
+  { key: "cgv", href: "/cgv" },
 
 ];
 

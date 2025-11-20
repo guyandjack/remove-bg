@@ -13,6 +13,7 @@ const footerContent: NavLink[] = [
   { key: "legal", href: "/legal" },
   { key: "terms", href: "/cgu" },
   { key: "privacy", href: "/privacy" },
+  { key: "cgv", href: "/cgv" },
   { key: "cookie", href: "/cookie" },
   { key: "contact", href: "/contactPage" },
   { key: "auth", href: "/authPage" },

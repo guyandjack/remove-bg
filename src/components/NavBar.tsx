@@ -144,6 +144,13 @@ function NavBar() {
             {navBarContent.map((link) => {
               const label = t(`navBar.${link.key}`);
               return (
+                link.key !== "contact" &&
+                link.key !== "aboutus" &&
+                link.key !== "privacy" &&
+                link.key !== "legal" &&
+                link.key !== "cgv" &&
+                link.key !== "terms" ?
+                
                 <li key={link.href}>
                   <a
                     data-id={link.href}
@@ -157,7 +164,7 @@ function NavBar() {
                   >
                     {label}
                   </a>
-                </li>
+                </li> : null
               );
             })}
           </ul>
@@ -173,6 +180,7 @@ function NavBar() {
                 link.key !== "aboutus" &&
                 link.key !== "privacy" &&
                 link.key !== "legal" &&
+                link.key !== "cgv" &&
                 link.key !== "terms" ?
               <li key={link.href}>
                 <a

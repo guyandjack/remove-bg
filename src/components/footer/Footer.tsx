@@ -54,6 +54,7 @@ const Footer = () => {
                 link.key !== "aboutus" &&
                 link.key !== "privacy" &&
                 link.key !== "legal" &&
+                link.key !== "cgv" &&
                 link.key !== "terms" ? (
                 <li key={link.href}>
                   <a
@@ -105,6 +106,7 @@ const Footer = () => {
               const label = t(`navBar.${link.key}`);
               return link.key === "privacy" ||
                 link.key === "legal" ||
+                link.key === "cgv" ||
                 link.key === "terms" ? (
                 <li key={link.href}>
                   <a

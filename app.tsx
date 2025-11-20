@@ -16,6 +16,7 @@ import { PrivacyPage} from "./src/pages/privacyPage";
 import { LegalPage} from "./src/pages/LegalPage";
 import { LoginPage} from "./src/pages/loginPage";
 import { Page404} from "./src/pages/404Page";
+import { CgvPage} from "./src/pages/cgvPage";
 
 //import des composants
 import { NavBar } from "./src/components/navBar";
@@ -45,6 +46,7 @@ export function App() {
               <Route path="/terms" component={TermsPage} />
               <Route path="/privacy" component={PrivacyPage} />
               <Route path="/legal" component={LegalPage} />
+              <Route path="/cgv" component={CgvPage} />
               <Route path="*/*" component={Page404} />
             </Router>
           </ErrorBoundary>
