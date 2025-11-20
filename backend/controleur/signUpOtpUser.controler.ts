@@ -71,21 +71,10 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
     let isValidForDB = false;
     console.log("plancode: ", planCode)
     if (planCode === "free") {
-      // 0) Create tokens first. If this fails, we touch nothing in DB.
+      // Tokens will be created AFTER user creation to ensure DB persistence of refresh token
       let accessToken: string;
       let refreshToken: string;
-      try {
-        accessToken = signAccessToken(email);
-        refreshToken = signRefreshToken(email);
-        isValidForDB = true;
-      } catch (err: any) {
-        isValidForDB = false;
-        return res.status(500).json({
-          status: "error",
-          message: err?.message || String(err),
-          errorCode: "otp6",
-        });
-      }
+      isValidForDB = true;
 
       console.log("isValidForDB: ", isValidForDB)
       // 1) Single transaction to consume OTP, create user (if needed), mark account, ensure plan, create subscription.
@@ -167,9 +156,18 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
           });
         }
 
-        // 2) After commit: set cookie, get usage and respond
+        // 2) After commit: create tokens, set cookie, get usage and respond
         const user = await getUserByEmail(email);
-        const usage = user ? await getActiveUsage24h(user.id) : null;
+        if (!user) {
+          return res.status(500).json({ status: "error", message: "User missing after signup", errorCode: "otp6a" });
+        }
+        try {
+          accessToken = signAccessToken(email);
+          refreshToken = await signRefreshToken(email, { ip: req.ip, userAgent: req.headers['user-agent'] as string | undefined });
+        } catch (err: any) {
+          return res.status(500).json({ status: "error", message: err?.message || String(err), errorCode: "otp6b" });
+        }
+        const usage = await getActiveUsage24h(user.id);
         const options = setCookieOptionsObject();
         res.cookie("tokenRefresh", refreshToken, options);
         return res.status(200).json({

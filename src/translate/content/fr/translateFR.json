@@ -1,15 +1,17 @@
 {
   "navBar": {
-    "home": "Accueil",
-    "upload": "Upload",
-    "pricing": "Prix",
-    "contact": "Contact",
-    "signup": "Creer un compte",
-    "login": "Se connecter",
-    "terms": "Conditions générales d' utilisation (CGU)",
-    "privacy": "Politique de confidentialité",
-    "legal": "Mentions légales"
-  },
+  "home": "Accueil",
+  "upload": "Upload",
+  "pricing": "Prix",
+  "contact": "Contact",
+  "signup": "Créer un compte",
+  "login": "Se connecter",
+  "terms": "Conditions générales d'utilisation (CGU)",
+  "privacy": "Politique de confidentialité",
+  "legal": "Mentions légales",
+  "logout": "Déconnexion"
+},
+
   "footer": {
     "cookie": "Cookie",
     "services": "Services",
@@ -58,16 +60,20 @@
     "textSuccess": "Création du compte reussi",
     "textError": "Impossible de créer le compte"
   },
-  "formLogin": {
-    "title": "Connection à votre espace",
-    "email": "Email",
-    "password": "Mot de passe",
-    "btnSubmit": "Se connecter",
-    "btnGoogle": "Continuer avec Google",
-    "forgot": "Mot de passe oublié",
-    "question": "Pas encore membre",
-    "link": "Créer votre compte"
-  },
+ "formLogin": {
+  "title": "Connexion à votre espace",
+  "email": "Email",
+  "password": "Mot de passe",
+  "btnSubmit": "Se connecter",
+  "btnGoogle": "Continuer avec Google",
+  "forgot": "Mot de passe oublié",
+  "question": "Pas encore membre",
+  "link": "Créer votre compte",
+  "passwordError": "Mot de passe non valide",
+  "textSuccess": "Vous êtes connecté",
+  "textError": "Une erreur s'est produite"
+}
+,
   "formForgot": {
     "title": "Récupérer votre mot de passe",
     "info": "Saisissez votre email pour recevoir un lien de réinitialisation.",

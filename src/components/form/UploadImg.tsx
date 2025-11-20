@@ -100,9 +100,9 @@ const UploadImg = ({
     setCallApi(true);
 
     // 💡 OPTIONNEL : tu peux retirer cette simulation si tu déplaces tout dans le parent
-    /* setTimeout(() => {
+     setTimeout(() => {
       setResponseApi(newImg);
-    }, 3000); */
+    }, 3000); 
   };
 
   const onClear = () => {

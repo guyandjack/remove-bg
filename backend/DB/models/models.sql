@@ -11,6 +11,29 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`User` (
   updated_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
+-- TokenRefresh (stockage des refresh tokens)
+CREATE TABLE IF NOT EXISTS `remove_bg`.`TokenRefresh` (
+  id               VARCHAR(36)   NOT NULL PRIMARY KEY,
+  jti              VARCHAR(191)  NOT NULL,                  -- JWT ID (identifiant unique du refresh token)
+  user_id          VARCHAR(36)   NOT NULL,                  -- FK vers User
+  revoked          TINYINT(1)    NOT NULL DEFAULT 0,        -- 1 si révoqué (invalidé)
+  revoked_at       DATETIME      NULL,                      -- date de révocation
+  replaced_by_jti  VARCHAR(191)  NULL,                      -- rotation: jti qui remplace celui-ci
+  token_hash       VARBINARY(64) NULL,                      -- optionnel: hash (sha-256) du token si stocké
+  ip               VARCHAR(45)   NULL,                      -- IPv4/IPv6
+  user_agent       VARCHAR(255)  NULL,                      -- UA au moment de l'émission
+  issued_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  expires_at       DATETIME      NOT NULL,
+  created_at       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_refresh_user FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE CASCADE,
+  UNIQUE KEY uniq_refresh_jti (jti),
+  INDEX idx_refresh_user_revoked (user_id, revoked),
+  INDEX idx_refresh_expires (expires_at),
+  INDEX idx_refresh_replaced (replaced_by_jti)
+) ENGINE=InnoDB;
+
 -- Plan (catalogue)
 CREATE TABLE IF NOT EXISTS `remove_bg`.`Plan` (
   id                   VARCHAR(36)  NOT NULL PRIMARY KEY,

@@ -22,7 +22,7 @@ import { setActiveLink } from "@/utils/setActiveLink";
 const { urlApi } = localOrProd();
 
 //import des signaux de connexion user (signUp, login)
-import { sessionSignal } from "../stores/session";
+import { sessionSignal, initSessionFromLocalStorage } from "../stores/session";
 
 
 //declarations des types
@@ -32,29 +32,34 @@ type DisplayState = {
   textCredit: string | null;
   credit: number;
   plan: string | null;
+  textLogout: string | null;
 };
-
-
-
 
 
 //fonction
 const isAuthentified = async () => {
-  //recuperation des info de seesion
+  //recuperation des info de session
+  initSessionFromLocalStorage();
 
-  const token = sessionSignal?.value?.token?.trim();
-  axios.defaults.headers.common[
-    "Authorization"
-  ] = `Bearer ${token}`;
+  const token = sessionSignal?.value?.token;
+  console.log("session value: ", sessionSignal.value);
+  console.log("token: ", token);
+  //axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
   try {
-    const response = await axios.post(`${urlApi}/api/auth/me`, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      timeout: 10000,
-    });
+    const response = await axios.post(
+      `${urlApi}/api/auth/me`,
+      {}, // ← corps vide (obligatoire pour axios.post)
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        timeout: 10000,
+      }
+    );
+
 
     if (!response) {
       throw Error("une erreur est survenu lors de la requete:");
@@ -69,13 +74,15 @@ const isAuthentified = async () => {
 };
 
 function NavBar() {
+  const { t } = useTranslation();
   //state qui gere l'affichage du profileDropdown et son contenu textuel
   const [isDisplay, setIsDisplay] = useState<DisplayState>({
     userName: null,
     authentified: false,
     credit: 0,
     textCredit: null,
-    plan: null
+    plan: null,
+    textLogout: t("navBar.logout")
   });
 
   
@@ -86,26 +93,29 @@ function NavBar() {
         setIsDisplay({
           userName:
             sessionSignal.value.user?.first_name ||
-            sessionSignal.value.user?.email ||
+            sessionSignal.value.user?.email.split("@")[0] ||
             null,
           authentified: sessionSignal.value.authentified,
           credit: sessionSignal.value.credits?.remaining_last_24h || 0,
           textCredit: null,
-          plan: sessionSignal.value.plan?.name || null,
+          plan:
+            sessionSignal.value.plan?.name ||
+            sessionSignal.value.plan?.name ||
+            null,
         });
       })
 
       .catch((e) => {
         console.error("un bug");
       });
-  }, [sessionSignal.value]);
+  }, [sessionSignal.value.authentified]);
 
   //active le lien au montage du composant
   useEffect(() => {
     setActiveLink();
   }, []);
 
-  const { t } = useTranslation();
+  
   return (
     <nav className="navbar bg-base-100 shadow-sm">
       <div className="navbar-start">

@@ -21,7 +21,8 @@ const login :RequestHandler = async (req, res, next) => {
     if (!email || !password) {
       return res.status(400).json({
         status: "error",
-        message: "Please provide email and password ErrLog:1",
+        message: "Please provide email and password ",
+        codeErr: "ErrLog:1",
       });
     }
 
@@ -33,6 +34,7 @@ const login :RequestHandler = async (req, res, next) => {
       return res.status(401).json({
         status: "error",
         message: "Incorrect email or password ErrLog:2",
+        codeErr: "ErrLog:2",
       });
     }
 
@@ -44,34 +46,58 @@ const login :RequestHandler = async (req, res, next) => {
     if (!isValidPassword) {
       return res.status(401).json({
         status: "error",
-        message: "Incorrect email or password ErrLog:3",
+        message: "Incorrect email or password ",
+        codeErr: "ErrLog:3"
       });
     }
 
-    
-    // If everything ok, send token and cookie to client
-    const accessToken = signAccessToken(user.email);
-    const refreshToken = signRefreshToken(user.email);
-    const options = setCookieOptionsObject();
-
-    //if ok get plan and credit of user, for send un formated object response
-    const userId = user.id;
-    //get Plan et credit available
-    const planAndCredit = await getUserPlanAndCredits24h(userId);
-    const usage = await getActiveUsage24h(userId);
-
-    let formatedObject = {
-      user: { email: email },
-      status: "success",
-      authentified: true,
-      redirect: false,
-      redirectUrl: null,
-      token: accessToken,
-      plan: { code: planAndCredit?.plan, name: planAndCredit?.plan, price_cents: 0, currency: "EUR", daily_credit_quota: 2 },
-      credits: usage ? { used_last_24h: usage.used_last_24h, remaining_last_24h: usage.remaining_last_24h } : null,
-      subscriptionId: null,
-      hint: ""
+    let options = {};
+    let refreshToken = "";
+    let formatedObject = {};
+    try {
+      
+      const accessToken = signAccessToken(user.email);
+      refreshToken = await signRefreshToken(user.email, { ip: req.ip, userAgent: req.headers['user-agent'] as string | undefined });
+      options = setCookieOptionsObject();
+  
+      //if ok get plan and credit of user, for send un formated object response
+      const userId = user.id;
+      //get Plan et credit available
+      const planAndCredit = await getUserPlanAndCredits24h(userId);
+      const usage = await getActiveUsage24h(userId);
+      formatedObject = {
+        user: { email: email },
+        status: "success",
+        authentified: true,
+        redirect: false,
+        redirectUrl: null,
+        token: accessToken,
+        plan: {
+          code: planAndCredit?.plan,
+          name: planAndCredit?.plan,
+          price_cents: 0,
+          currency: "EUR",
+          daily_credit_quota: 2,
+        },
+        credits: usage
+          ? {
+              used_last_24h: usage.used_last_24h,
+              remaining_last_24h: usage.remaining_last_24h,
+            }
+          : null,
+        subscriptionId: null,
+        hint: "",
+      };
+    } catch (err) {
+      return res.status(500).json({
+        status: "error",
+        message: "serveur error: " + err,
+        codeErr: "ErrLog:4",
+      });
     }
+    // If everything ok, send token and cookie to client
+
+     
 
     
     res.cookie("tokenRefresh", refreshToken, options);

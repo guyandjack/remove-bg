@@ -1,15 +1,17 @@
 {
   "navBar": {
-    "home": "Home",
-    "upload": "Upload",
-    "pricing": "Pricing",
-    "contact": "Contact",
-    "signup": "Signup",
-    "login": "Login",
-    "terms": "Terms of Service (ToS)",
-    "privacy": "Privacy policy",
-    "legal": "Legal"
-  },
+  "home": "Home",
+  "upload": "Upload",
+  "pricing": "Pricing",
+  "contact": "Contact",
+  "signup": "Create an account",
+  "login": "Log in",
+  "terms": "Terms of Use (ToS)",
+  "privacy": "Privacy Policy",
+  "legal": "Legal Notice",
+  "logout": "Log out"
+},
+
   "footer": {
     "cookie": "Cookie",
     "services": "Services",
@@ -64,15 +66,18 @@
   },
 
   "formLogin": {
-    "title": "Login",
-    "email": "Email",
-    "password": "Password",
-    "btnSubmit": "Login",
-    "btnGoogle": "Continuer with Google",
-    "forgot": "Forgot password",
-    "question": "No member yet",
-    "link": "Create your account"
-  },
+  "title": "Log in to your account",
+  "email": "Email",
+  "password": "Password",
+  "btnSubmit": "Log in",
+  "btnGoogle": "Continue with Google",
+  "forgot": "Forgot password",
+  "question": "Not a member yet?",
+  "link": "Create your account",
+  "passwordError": "Invalid password",
+  "textSuccess": "You are logged in",
+  "textError": "An error occurred"
+},
   "formForgot": {
   "title": "Recover your password",
   "info": "Enter your email to receive a reset link.",

@@ -1,11 +1,16 @@
 //import des hook
-import { useRef, useEffect } from "preact/hooks";
-import axios from "axios";
+import { useState } from "preact/hooks";
 
-//function
-const logOut = () => {
-  //fetch
-}
+//import des instances perso
+import { api } from "@/utils/axiosConfig";
+import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
+
+//import des composants enfants
+import { Loader } from "@/components/loader/Loader";
+
+//import des functions
+
+//constante et variable globale
 
 //declaration des types
 type DropDownProps = {
@@ -15,7 +20,46 @@ type DropDownProps = {
   userName: string | null;
 };
 
-const ProfileDropDown = ({ credit = 0,  textCredit = "Crédits", plan = null, userName = null }:DropDownProps) => {
+
+const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, userName = null }: DropDownProps) => {
+  
+  //state qui gere l' affichage du loader
+  const [isLoader, setIsLoader] = useState(true);
+  const [isStatus, setIsStatus] = useState<"error"|"success"|"idle">("idle");
+  
+  
+  //declaration des fonctions
+  const logOut = async() => {
+    setIsLoader(true);
+    try {
+      
+      const response = await api.post("/api/logout",{});
+      if (!response) {
+        console.log("error http")
+      }
+      const data = response.data;
+      if (data.status === "success") {
+        //supression des info de session
+        sessionSignal.value = null;
+        localStorage.removeItem("session");
+
+        setIsLoader(false);
+        setIsStatus("success");
+        setTimeout(() => {
+          window.location.href = "/";
+        },2000)
+      }
+    } catch {
+      setIsLoader(false)
+      setIsStatus("error");
+    } finally {
+      setTimeout(() => {
+        setIsStatus("idle")
+        
+      }, 2000)
+    }
+  }
+  
   return (
     <div className="dropdown dropdown-end">
       <button tabIndex={0} type="button" className="btn hover:bg-primary/40">
@@ -112,9 +156,7 @@ const ProfileDropDown = ({ credit = 0,  textCredit = "Crédits", plan = null, us
         <li className="w-[130px]">
           <button
             className="flex flex-row justify-left items-center gap-4"
-            /* onClick={() => {
-              callback();
-            }} */
+             onClick={logOut} 
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -129,9 +171,11 @@ const ProfileDropDown = ({ credit = 0,  textCredit = "Crédits", plan = null, us
               />
             </svg>
 
-            <span>Logout</span>
+            <span className={"text-warning"}>Logout</span>
           </button>
+
         </li>
+          {isLoader && isStatus === "idle" ? <Loader top="top-[50%]" left="left-[80%]" text="Logout..." />: null}
       </ul>
     </div>
   );

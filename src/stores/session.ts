@@ -3,26 +3,26 @@ import { signal, computed } from "@preact/signals";
 
 // --- Type du plan renvoyé par l'API ---
 export type User = {
-  first_name?: string;
-  last_name?: string;
-  id?: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  id?: string | null;
   email: string;
-} | null;
+};
 
 // --- Type du plan renvoyé par l'API ---
 export type PlanAPI = {
-  code?: string;              // ex: "free"
-  name: string;              // ex: "Free"
-  price_cents: number;       // ex: 0
-  currency: string;          // ex: "EUR"
-  daily_credit_quota: number; // ex: 2
-} | null;
+  code: string; // ex: "free"
+  name?: string; // ex: "Free"
+  price_cents?: number; // ex: 0
+  currency?: string; // ex: "EUR"
+  daily_credit_quota?: number; // ex: 2
+};
 
 // --- Type des crédits (peut être null) ---
 export type CreditsAPI = {
   used_last_24h: number;
   remaining_last_24h: number;
-} | null;
+};
 
 // --- Type de la session complète ---
 export type SessionData = {
@@ -31,38 +31,44 @@ export type SessionData = {
   authentified: boolean;
   redirect: boolean;
   redirectUrl: string | null;
-  plan: PlanAPI | null;
+  plan: PlanAPI ;
   token: string | null;
   credits: CreditsAPI;
   subscriptionId: string | null;
   hint: string | null;
-};
-
+} | null;
 
 // =========================
 // 1. Objet global de session
 // =========================
 const sessionSignal = signal<SessionData>({
-  user: null,
+  user: {
+    email: "",
+  },
   status: null,
   authentified: false,
   redirect: false,
   redirectUrl: null,
   token: null,
-  plan: null,
-  credits: null ,
+  plan: {
+    code: "",
+  },
+  credits: {
+    used_last_24h: 0,
+    remaining_last_24h: 0,
+  },
   subscriptionId: null,
-  hint: null
-});
+  hint: null,
+} );
 
 // =========================
 // 2. Privileges dérivés (computed)
 // =========================
 const privileges = computed(() => {
-  if (!sessionSignal.value.plan) return null;
+  if (!sessionSignal?.value?.plan) return null;
 
-  const plan = sessionSignal.value.plan;
-  const user = sessionSignal.value.user;
+  const plan = sessionSignal?.value?.plan;
+  const user = sessionSignal?.value?.user;
 
   return {
     userId: user?.id,
@@ -86,34 +92,46 @@ const privileges = computed(() => {
 // =========================
 function setSessionFromApiResponse(data: SessionData) {
   sessionSignal.value = {
-    user: data.user,
-    status: data.status,
-    authentified: data.authentified,
-    redirect: data.redirect,
-    redirectUrl: data.redirectUrl,
-    token: data.token,
-    plan: data.plan,
-    credits: data.credits,
-    subscriptionId: data.subscriptionId,
-    hint: data.hint
+    user: {
+      first_name: data?.user.first_name,
+      email: data?.user.email || "",
+    },
+    status: data?.status || "",
+    authentified: data?.authentified || false,
+    redirect: data?.redirect || false,
+    redirectUrl: data?.redirectUrl || "",
+    token: data?.token || "",
+    plan: {
+      code: data?.plan.code || "",
+    },
+    credits: {
+      used_last_24h: data?.credits.used_last_24h || 0,
+      remaining_last_24h: data?.credits.remaining_last_24h || 0,
+    },
+    subscriptionId: data?.subscriptionId || "",
+    hint: data?.hint || "",
   };
 
   // Optionnel : persister dans localStorage
- //localStorage.setItem("session", JSON.stringify(sessionSignal.value));
+  localStorage.setItem("session", JSON.stringify(sessionSignal.value));
 }
 
 // =========================
 // 4. Re-hydratation locale au démarrage
 // =========================
-export function initSessionFromLocalStorage() {
+function initSessionFromLocalStorage() {
   const raw = localStorage.getItem("session");
   if (!raw) return;
 
   try {
     sessionSignal.value = JSON.parse(raw);
+
+    console.log("session sihnal value dans init seesion: ", sessionSignal.value)
+    
+
   } catch {
     console.error("Impossible de parser la session du localStorage");
   }
 }
 
-export {setSessionFromApiResponse, privileges, sessionSignal}
+export { setSessionFromApiResponse, privileges, sessionSignal, initSessionFromLocalStorage };

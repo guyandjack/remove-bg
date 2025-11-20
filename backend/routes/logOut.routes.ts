@@ -5,6 +5,6 @@ import {verifyAuth}  from "../middelware/verifAuth/verifyAuth"
 
 const router = express.Router();
 
-router.post("/", verifyAuth, logOut /* sendMailVerification */);
+router.post("/", verifyAuth, logOut);
 
 export default router;

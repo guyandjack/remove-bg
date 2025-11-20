@@ -116,6 +116,132 @@ export function addDays(d: Date, days: number) {
 }
 
 // ===================================================================
+// TokenRefresh — CRUD
+// ===================================================================
+export interface TokenRefresh extends RowDataPacket {
+  id: ID;
+  jti: string;
+  user_id: ID;
+  revoked: 0 | 1;
+  revoked_at: Date | null;
+  replaced_by_jti: string | null;
+  token_hash: Buffer | null;
+  ip: string | null;
+  user_agent: string | null;
+  issued_at: Date;
+  expires_at: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export function sha256Buffer(input: string): Buffer {
+  return crypto.createHash("sha256").update(input).digest();
+}
+
+export async function createRefreshTokenRecord(input: {
+  jti: string;
+  userId: ID;
+  expiresAt: Date;
+  token?: string; // to hash & store optionally
+  ip?: string | null;
+  userAgent?: string | null;
+  issuedAt?: Date | null;
+  replacedByJti?: string | null;
+  id?: ID;
+}): Promise<ID | null> {
+  const connexion = await connectDb();
+  const theId = input.id ?? crypto.randomUUID();
+  const tokenHash = input.token ? sha256Buffer(input.token) : null;
+  const sql = `
+    INSERT INTO TokenRefresh
+      (id, jti, user_id, revoked, revoked_at, replaced_by_jti, token_hash, ip, user_agent, issued_at, expires_at)
+    VALUES (?, ?, ?, 0, NULL, ?, ?, ?, ?, ?, ?)
+  `;
+  const [res] = await connexion.execute<ResultSetHeader>(sql, [
+    theId,
+    input.jti,
+    input.userId,
+    input.replacedByJti ?? null,
+    tokenHash,
+    input.ip ?? null,
+    input.userAgent ?? null,
+    input.issuedAt ?? new Date(),
+    input.expiresAt,
+  ]);
+  return res.affectedRows === 1 ? theId : null;
+}
+
+export async function getRefreshTokenByJti(jti: string): Promise<TokenRefresh | null> {
+  const connexion = await connectDb();
+  const [rows] = await connexion.execute<TokenRefresh[]>(
+    `SELECT * FROM TokenRefresh WHERE jti = ? LIMIT 1`,
+    [jti]
+  );
+  return rows[0] ?? null;
+}
+
+export async function findValidRefreshTokenByJti(jti: string, userId?: ID): Promise<TokenRefresh | null> {
+  const connexion = await connectDb();
+  const now = new Date();
+  const sql = `
+    SELECT * FROM TokenRefresh
+    WHERE jti = ?
+      AND revoked = 0
+      AND expires_at > ?
+      ${userId ? "AND user_id = ?" : ""}
+    LIMIT 1
+  `;
+  const params: any[] = [jti, now];
+  if (userId) params.push(userId);
+  const [rows] = await connexion.execute<TokenRefresh[]>(sql, params);
+  return rows[0] ?? null;
+}
+
+export async function revokeRefreshToken(jti: string, replacedByJti: string | null = null): Promise<boolean> {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE TokenRefresh SET revoked = 1, revoked_at = NOW(), replaced_by_jti = ? WHERE jti = ? AND revoked = 0`,
+    [replacedByJti, jti]
+  );
+  return res.affectedRows === 1;
+}
+
+export async function revokeAllRefreshTokensForUser(userId: ID): Promise<number> {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE TokenRefresh SET revoked = 1, revoked_at = NOW() WHERE user_id = ? AND revoked = 0`,
+    [userId]
+  );
+  return res.affectedRows;
+}
+
+export async function deleteRefreshTokenByJti(jti: string): Promise<boolean> {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `DELETE FROM TokenRefresh WHERE jti = ?`,
+    [jti]
+  );
+  return res.affectedRows === 1;
+}
+
+export async function purgeExpiredRefreshTokens(): Promise<number> {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `DELETE FROM TokenRefresh WHERE expires_at <= NOW()`
+  );
+  return res.affectedRows;
+}
+
+export async function listRefreshTokensForUser(userId: ID, limit = 50, offset = 0): Promise<TokenRefresh[]> {
+  const connexion = await connectDb();
+  const [rows] = await connexion.execute<TokenRefresh[]>(
+    `SELECT * FROM TokenRefresh WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    [userId, limit, offset]
+  );
+  return rows;
+}
+
+// ===================================================================
 // User — CRUD
 // ===================================================================
 export async function createUser(email: string, passwordHash: string, id?: ID) {

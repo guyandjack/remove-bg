@@ -32,6 +32,7 @@ import verifyRoute from "./routes/verifyAuth.route";
 import pexelsRoute from "./routes/pexels.route";
 import stripeRoute from "./routes/stripe.route";
 import forgotPasswordRoute from "./routes/forgotPassword.route";
+import refreshRoute from "./routes/authRefresh.route";
 
 
 const app = express();
@@ -124,10 +125,13 @@ app.get("/test", (req, res) => {
  app.use("/api/signup", signupRoute);
  app.use("/api/contact", contactRoute);
  app.use("/api/logout", logOutRoute);
- app.use("/api/auth/me", verifyRoute );
+ app.use("/api/auth/me", verifyRoute);
 app.use("/api/pexels", pexelsRoute);
 app.use("/api/stripe", stripeRoute);
 app.use("/api/forgot", forgotPasswordRoute);
+app.use("/api/forgot", forgotPasswordRoute);
+app.use("/api/refresh", refreshRoute);
+
  
 
 

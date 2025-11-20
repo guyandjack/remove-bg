@@ -1,9 +1,11 @@
 //import des hooks
 import { useRef, useState } from "preact/hooks";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 
 //import des librairies
-import axios from "axios";
+import { login } from "@/utils/axiosConfig";
+
+//import des instance
 import { useTranslation } from "react-i18next";
 
 //import des composants enfants
@@ -12,7 +14,7 @@ import { Loader } from "@/components/loader/Loader";
 
 //import des fonctions
 import { axiosError } from "@/utils/axiosError";
-import { localOrProd } from "@/utils/localOrProd";
+import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
 
 //declarations des types
 export type FormValues = {
@@ -29,7 +31,6 @@ export type FormValuesForgot = {
 };
 
 //constante et variable globales
-const { urlApi } = localOrProd();
 
 //declarations des fonctions
 
@@ -90,8 +91,8 @@ const FormLogin = () => {
     setIsLoader(true);
     const DATA = { ...data, lang: language };
     try {
-     const response = await axios.post(
-       `${urlApi}/api/forgot`,
+     const response = await login.post(
+       `/api/forgot`,
        DATA,
        {
          withCredentials: true,
@@ -125,13 +126,13 @@ const FormLogin = () => {
     //setIsForgotOpen(false); 
   };
 
-  //permet la soumission du formulaire
+  //permet la soumission du formulaire LOGIN
   const onSubmit = async (data: FormValues) => {
     //afficha du loader
     setIsLoader(true);
 
     try {
-      const response = await axios.post(`${urlApi}/api/login/`, data, {
+      const response = await login.post(`/api/login/`, data, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
@@ -139,11 +140,27 @@ const FormLogin = () => {
         timeout: 10000,
       });
 
-      let message = "";
-      if (response.data.status === "success") {
+      if (!response) {
+        console.log("error http code:Login_1");
+      }
+
+      const DATA = response.data;
+      
+      if (DATA.status === "success") {
         setIsLoader(false);
         setStatus("success");
-        //mettre a jour seession signal
+
+        //met jour signalsession pour detecter le user connecté
+        setSessionFromApiResponse(DATA);
+
+        
+        setIsLoader(false);
+        setTimeout(() => {
+          setStatus("idle");
+         //window.location.href = "/upload"
+        }, 2000);
+
+        
       } else {
         setIsLoader(false);
         setStatus("error");
@@ -158,6 +175,11 @@ const FormLogin = () => {
       setTimeout(() => {
         setStatus("idle");
       }, 3000);
+    } finally {
+      setTimeout(() => {
+        
+        setStatus("idle")
+      },2000)
     }
   };
 
@@ -189,7 +211,7 @@ const FormLogin = () => {
                       required: t("formContact.required"),
                       pattern: {
                         value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,80}$/,
-                        message: t("formContact.pattern"),
+                        message: t("formLogin.pattern"),
                       },
                     })}
                   />
@@ -251,11 +273,11 @@ const FormLogin = () => {
                     className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
                     aria-invalid={!!errors.password || undefined}
                     {...register("password", {
-                      required: t("formContact.required"),
+                      required: t("formLogin.required"),
                       pattern: {
                         value:
                           /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~])(?=.{8,20}).*$/u,
-                        message: t("formSignUp.passwordError"),
+                        message: t("formLogin.passwordError"),
                       },
                     })}
                   />
@@ -306,8 +328,8 @@ const FormLogin = () => {
           }
         `}
                 >
-                  {status === "success" ? t("formSignUp.textSuccess") : ""}
-                  {status === "error" ? t("formSignUp.textError") : ""}
+                  {status === "success" ? t("formLogin.textSuccess") : ""}
+                  {status === "error" ? t("formLogin.textError") : ""}
                 </div>
               </div>
 
