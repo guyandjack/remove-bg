@@ -16,10 +16,10 @@ const navBarContent: NavLink[] = [
   { key: "signup", href: "/pricing/signup" },
   { key: "login", href: "/login" },
   //only footer link
-  { key: "privacy", href: "/privacy" },
+  /* { key: "privacy", href: "/privacy" },
   { key: "legal", href: "/legal" },
   { key: "terms", href: "/terms" },
-  { key: "cgv", href: "/cgv" },
+  { key: "cgv", href: "/cgv" }, */
 
 ];
 

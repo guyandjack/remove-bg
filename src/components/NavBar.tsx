@@ -33,7 +33,7 @@ type DisplayState = {
   credit: number;
   plan: string | null;
   textLogout: string | null;
-};
+}| null;
 
 
 //fonction
@@ -90,25 +90,26 @@ function NavBar() {
   useEffect(() => {
     isAuthentified()
       .then((result) => {
-        setIsDisplay({
+        return setIsDisplay({
           userName:
-            sessionSignal.value.user?.first_name ||
-            sessionSignal.value.user?.email.split("@")[0] ||
+            sessionSignal?.value?.user.first_name ||
+            sessionSignal?.value?.user.email.split("@")[0] ||
             null,
-          authentified: sessionSignal.value.authentified,
-          credit: sessionSignal.value.credits?.remaining_last_24h || 0,
+          authentified: sessionSignal?.value?.authentified || false,
+          credit: sessionSignal?.value?.credits?.remaining_last_24h || 0,
           textCredit: null,
           plan:
-            sessionSignal.value.plan?.name ||
-            sessionSignal.value.plan?.name ||
+            sessionSignal?.value?.plan.code ||
+            sessionSignal?.value?.plan.name ||
             null,
+          textLogout: t("navBar.logout"),
         });
       })
 
       .catch((e) => {
         console.error("un bug");
       });
-  }, [sessionSignal.value.authentified]);
+  }, [sessionSignal?.value?.authentified]);
 
   //active le lien au montage du composant
   useEffect(() => {
@@ -144,12 +145,7 @@ function NavBar() {
             {navBarContent.map((link) => {
               const label = t(`navBar.${link.key}`);
               return (
-                link.key !== "contact" &&
-                link.key !== "aboutus" &&
-                link.key !== "privacy" &&
-                link.key !== "legal" &&
-                link.key !== "cgv" &&
-                link.key !== "terms" ?
+               
                 
                 <li key={link.href}>
                   <a
@@ -164,7 +160,7 @@ function NavBar() {
                   >
                     {label}
                   </a>
-                </li> : null
+                </li> 
               );
             })}
           </ul>
@@ -176,12 +172,7 @@ function NavBar() {
           {navBarContent.map((link) => {
             const label = t(`navBar.${link.key}`);
             return (
-              link.key !== "contact" &&
-                link.key !== "aboutus" &&
-                link.key !== "privacy" &&
-                link.key !== "legal" &&
-                link.key !== "cgv" &&
-                link.key !== "terms" ?
+              
               <li key={link.href}>
                 <a
                   data-id={link.href}
@@ -195,7 +186,7 @@ function NavBar() {
                 >
                   {label}
                 </a>
-              </li> : null
+              </li> 
             );
           })}
         </ul>
@@ -203,7 +194,7 @@ function NavBar() {
       <div className="navbar-end gap-2">
         <ThemeControler />
         <SelectLanguage />
-        {isDisplay.authentified ? <ProfileDropDown
+        {isDisplay?.authentified ? <ProfileDropDown
           credit={isDisplay.credit}
           userName={isDisplay.userName}
           textCredit={isDisplay.textCredit}

@@ -1,22 +1,23 @@
 {
   "navBar": {
-  "home": "Home",
-  "upload": "Upload",
-  "pricing": "Pricing",
-  "contact": "Contact",
-  "signup": "Create an account",
-  "login": "Log in",
-  "terms": "Terms of Use (ToS)",
-  "privacy": "Privacy Policy",
-  "legal": "Legal Notice",
-  "logout": "Log out"
-},
+    "home": "Home",
+    "upload": "Upload",
+    "pricing": "Pricing",
+    "contact": "Contact",
+    "signup": "Create an account",
+    "login": "Login"
+    
+  },
 
   "footer": {
-    "cookie": "Cookie",
+    "cookie": "Cookies",
     "services": "Services",
-    "company": "Company",
-    "legal": "Mentions"
+    "company": "Entreprise",
+    "legal": "Mentions",
+    "terms": "Conditions générales d'utilisation (CGU)",
+    "privacy": "Politique de confidentialité",
+    "legalLink": "Mentions légales",
+    "cgv": "Conditions générales de vente"
   },
   "auth": {
     "signup": "Sign up",
@@ -39,22 +40,21 @@
     "textSuccess": "Message sended",
     "textError": "Error message no sended!"
   },
- "formSignUp": {
-  "title": "Create your account",
-  "email": "Email",
-  "password": "Password",
-  "passwordConfirm": "Confirm password",
-  "pattern": "Invalid format",
-  "btnSubmit": "Create your account",
-  "btnGoogle": "Continue with Google",
-  "passwordError": "Password too weak",
-  "textSuccess": "A confirmation email has been sent",
-  "textError": "An error occurred",
-  "question": "Already a member?",
-  "link": "Log in"
-}
+  "formSignUp": {
+    "title": "Create your account",
+    "email": "Email",
+    "password": "Password",
+    "passwordConfirm": "Confirm password",
+    "pattern": "Invalid format",
+    "btnSubmit": "Create your account",
+    "btnGoogle": "Continue with Google",
+    "passwordError": "Password too weak",
+    "textSuccess": "A confirmation email has been sent",
+    "textError": "An error occurred",
+    "question": "Already a member?",
+    "link": "Log in"
+  },
 
-  ,
   "otpInput": {
     "title": "Enter the code you received by email.",
     "question": "Haven't you received anything?",
@@ -66,25 +66,25 @@
   },
 
   "formLogin": {
-  "title": "Log in to your account",
-  "email": "Email",
-  "password": "Password",
-  "btnSubmit": "Log in",
-  "btnGoogle": "Continue with Google",
-  "forgot": "Forgot password",
-  "question": "Not a member yet?",
-  "link": "Create your account",
-  "passwordError": "Invalid password",
-  "textSuccess": "You are logged in",
-  "textError": "An error occurred"
-},
+    "title": "Log in to your account",
+    "email": "Email",
+    "password": "Password",
+    "btnSubmit": "Log in",
+    "btnGoogle": "Continue with Google",
+    "forgot": "Forgot password",
+    "question": "Not a member yet?",
+    "link": "Create your account",
+    "passwordError": "Invalid password",
+    "textSuccess": "You are logged in",
+    "textError": "An error occurred"
+  },
   "formForgot": {
-  "title": "Recover your password",
-  "info": "Enter your email to receive a reset link.",
-  "email": "Email",
-  "btnSubmit": "Send the link",
-  "btnCancel": "Cancel"
-},
+    "title": "Recover your password",
+    "info": "Enter your email to receive a reset link.",
+    "email": "Email",
+    "btnSubmit": "Send the link",
+    "btnCancel": "Cancel"
+  },
 
   "loader": {
     "formContact": "loading..."
@@ -287,6 +287,49 @@
 
     "conclusion": "By accessing the website and using the Service, the User acknowledges having read and accepted this legal notice without reservation."
   },
+  "cgv": {
+  "title": "Terms and Conditions of Sale (TCS)",
+  "intro": "These Terms and Conditions of Sale (hereinafter “TCS”) govern the contractual relationship between the Provider and any user (hereinafter “the Client”) subscribing to a paid subscription offer on the website or progressive web application (PWA) for image background removal (hereinafter “the Service”). By subscribing to a plan, the Client unreservedly accepts these terms.",
+
+  "article1_title": "1. Purpose of the Agreement",
+  "article1_text": "The purpose of this agreement is to define the conditions under which the Provider makes available to the Client an online automatic image background removal Service, accessible through an annual subscription. The Service is provided in SaaS (Software as a Service) mode, hosted and maintained by the Provider.",
+
+  "article2_title": "2. Subscription Conditions",
+  "article2_text": "Access to the paid features of the Service requires an annual subscription. The subscription is nominative, personal, and non-transferable.\n\nThe Client may subscribe, manage, or cancel their subscription from their personal account. Cancellation stops the automatic renewal but does not entitle the Client to a refund for the period already started.",
+
+  "article3_title": "3. Duration and Renewal",
+  "article3_text": "The subscription is concluded for a period of one (1) year from the subscription date. At the end of this period, it is automatically renewed for an equivalent duration unless cancelled beforehand by the Client.\n\nThe Client may cancel their subscription at any time from their account. The cancellation takes effect at the subscription’s expiration date, with no refund for the remaining period.",
+
+  "article4_title": "4. Pricing and Payment Terms",
+  "article4_text": "The applicable prices are those in effect at the time of subscription, expressed in Swiss francs (CHF) or euros (EUR), all taxes included.\n\nPayment is made online by credit card through the secure Stripe platform. The Provider does not store any sensitive banking information. Full payment for the subscription period is required at the time of subscription.",
+
+  "article5_title": "5. No Withdrawal Right and Refund Policy",
+  "article5_text": "In accordance with applicable legislation regarding digital service provision, the Client acknowledges that the Service begins immediately after the subscription is validated.\n\nConsequently, no refund—full or partial—may be claimed in case of cancellation or early termination. However, the Client may cancel their subscription to prevent future renewal.",
+
+  "article6_title": "6. Suspension and Termination by the Provider",
+  "article6_text": "The Provider reserves the right to suspend or terminate a subscription in case of breach of these TCS, fraud, abusive behavior, or use of the Service contrary to law or ethics.\n\nNo compensation may be claimed by the Client in case of suspension or termination justified by a contractual breach.",
+
+  "article7_title": "7. Access to the Service",
+  "article7_text": "The Provider makes every effort to ensure continuous availability of the Service. However, access may be temporarily suspended for maintenance, updates, or technical failures beyond the Provider’s control.\n\nNo compensation will be due for temporary interruptions of the Service.",
+
+  "article8_title": "8. Liability",
+  "article8_text": "The Provider is bound by a best-effort obligation. The Provider cannot be held liable for direct or indirect damages resulting from the use of the Service, including data loss, non-compliant processed images, or temporary website malfunction.\n\nThe Client remains responsible for the files and content they upload to the platform.",
+
+  "article9_title": "9. Personal Data",
+  "article9_text": "The Provider collects and processes certain personal data necessary for managing subscriptions and operating the Service. These processes are carried out in accordance with the website’s <a class=\"link\" href=\"/privacy\">Privacy Policy</a> and in compliance with GDPR and LPD (Switzerland).",
+
+  "article10_title": "10. Intellectual Property",
+  "article10_text": "The Service, its algorithms, interface, and content are the exclusive property of the Provider. Any reproduction, modification, or unauthorized use is strictly prohibited.\n\nThe Client retains intellectual property rights over the images they upload and process through the Service.",
+
+  "article11_title": "11. Force Majeure",
+  "article11_text": "Neither party shall be held liable for failure to perform due to an event of force majeure as defined under Swiss case law: natural disaster, major power outage, cyberattack, war, or government decision preventing contract execution.",
+
+  "article12_title": "12. Governing Law and Jurisdiction",
+  "article12_text": "These TCS are governed by Swiss law. In case of dispute, and unless otherwise required by mandatory legal provisions, the competent courts of the canton of Valais shall have exclusive jurisdiction.",
+
+  "conclusion": "By validating their subscription, the Client acknowledges having read, understood, and unreservedly accepted these Terms and Conditions of Sale."
+},
+
   "upload": {
     "title_h1": "Upload your image to test the processing quality...",
     "title_h1_loged": "Upload your image to remove its background"

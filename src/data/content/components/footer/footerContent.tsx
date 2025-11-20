@@ -1,5 +1,4 @@
-
-    //Contenu textuel des liens de navigation du composant "NavBar"
+//Contenu textuel des liens de navigation du composant "NavBar"
 
 //declaration des types
 type NavLink = {
@@ -11,13 +10,11 @@ type NavLink = {
 
 const footerContent: NavLink[] = [
   { key: "legal", href: "/legal" },
-  { key: "terms", href: "/cgu" },
+  { key: "terms", href: "/terms" },
   { key: "privacy", href: "/privacy" },
   { key: "cgv", href: "/cgv" },
-  { key: "cookie", href: "/cookie" },
+
   { key: "contact", href: "/contactPage" },
-  { key: "auth", href: "/authPage" },
 ];
 
-
-export {footerContent}
+export { footerContent };

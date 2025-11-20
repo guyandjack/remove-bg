@@ -15,8 +15,9 @@ import { TermsPage} from "./src/pages/termsPage";
 import { PrivacyPage} from "./src/pages/privacyPage";
 import { LegalPage} from "./src/pages/LegalPage";
 import { LoginPage} from "./src/pages/loginPage";
-import { Page404} from "./src/pages/404Page";
 import { CgvPage} from "./src/pages/cgvPage";
+//import { CguPage} from "./src/pages/cguPage";
+import { Page404} from "./src/pages/404Page";
 
 //import des composants
 import { NavBar } from "./src/components/navBar";

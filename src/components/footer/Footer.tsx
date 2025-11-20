@@ -6,6 +6,7 @@ import { FooterBottom } from "./FooterBottom";
 
 //import des data
 import { navBarContent } from "@/data/content/components/nav/navBarContent";
+import { footerContent } from "@/data/content/components/footer/footerContent";
 
 //import des fonctions
 import { setActiveLink } from "@/utils/setActiveLink";
@@ -13,7 +14,7 @@ import { setActiveLink } from "@/utils/setActiveLink";
 const Footer = () => {
   const { t } = useTranslation();
 
-  //Determination la langue a affiché
+  //Content title footer
   const services = t(`footer.services`);
   const company = t(`footer.company`);
   const legal = t(`footer.legal`);
@@ -50,12 +51,8 @@ const Footer = () => {
           <ul>
             {navBarContent.map((link) => {
               const label = t(`navBar.${link.key}`);
-              return link.key !== "contact" &&
-                link.key !== "aboutus" &&
-                link.key !== "privacy" &&
-                link.key !== "legal" &&
-                link.key !== "cgv" &&
-                link.key !== "terms" ? (
+              return (
+                link.key !== "contact" ?
                 <li key={link.href}>
                   <a
                     data-id={link.href}
@@ -67,8 +64,8 @@ const Footer = () => {
                   >
                     {label}
                   </a>
-                </li>
-              ) : null;
+                </li> : null
+              ) ;
             })}
           </ul>
         </div>
@@ -77,7 +74,7 @@ const Footer = () => {
             {company}
           </h6>
           <ul>
-            {navBarContent.map((link) => {
+            {footerContent.map((link) => {
               const label = t(`navBar.${link.key}`);
               return link.key === "contact" || link.key === "aboutus" ? (
                 <li key={link.href}>
@@ -102,12 +99,10 @@ const Footer = () => {
             {legal}
           </h6>
           <ul>
-            {navBarContent.map((link) => {
-              const label = t(`navBar.${link.key}`);
-              return link.key === "privacy" ||
-                link.key === "legal" ||
-                link.key === "cgv" ||
-                link.key === "terms" ? (
+            {footerContent.map((link) => {
+              const label = t(`footer.${link.key}`);
+              return(
+              link.key !== "contact" && link.key !== "aboutus" ? (
                 <li key={link.href}>
                   <a
                     data-id={link.href}
@@ -120,7 +115,7 @@ const Footer = () => {
                     {label}
                   </a>
                 </li>
-              ) : null;
+              ) : null);
             })}
           </ul>
         </div>
