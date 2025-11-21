@@ -34,6 +34,7 @@ import stripeRoute from "./routes/stripe.route";
 import forgotPasswordRoute from "./routes/forgotPassword.route";
 import refreshRoute from "./routes/authRefresh.route";
 import usageRoute from "./routes/usage.route";
+import planOptionRoute from "./routes/planOption.route";
 
 const app = express();
 
@@ -143,6 +144,9 @@ app.use("/api/stripe", stripeRoute);
 
 //route mise à jour user
 app.use("/api/usage", usageRoute);
+
+//route des options des plans
+app.use("/api/plan/option", planOptionRoute);
 
 // ----------------------------------------------------
 // ⚠️ 6️⃣ Middleware de gestion d’erreurs global

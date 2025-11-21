@@ -1,6 +1,10 @@
 //import des hooks
+import { useEffect, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
-import {useLocation } from "preact-iso"
+import { useLocation } from "preact-iso"
+
+//import des instance
+import {api} from "@/utils/axiosConfig"
 
 //import des composant enfants
 import { PriceCard } from "@/components/card/priceCard"; 
@@ -11,7 +15,8 @@ type PlanKey = "tag" | "title" | "price" | "bg" | "resolution" | "format" | "cre
 
 function PricePage() {
   const { t } = useTranslation();
-  const {path} = useLocation();
+  const { path } = useLocation();
+  const [planOption, setPlanOption] = useState();
   const IsCreateAccount = path.includes("signup") ? true : false;
   const billHobby = 12 * 5;
   const billPro = 12 * 15;
@@ -54,6 +59,16 @@ function PricePage() {
     subscribe: t("priceCard.pro_plan.subscribe"),
     bill: t("priceCard.pro_plan.bill") + " " + `${billPro}` + " $",
   };
+
+  useEffect(() => {
+    api.get("api/plan/option")
+      .then((result) => {
+        setPlanOption(result);
+      })
+      .catch(e){
+      setPlanOption(null);
+    }
+  })
 
  
   return (
