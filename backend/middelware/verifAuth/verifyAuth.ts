@@ -27,15 +27,18 @@ const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
       else if (decoded.payload && typeof decoded.payload === "object") email = decoded.payload.email;
       else if (typeof decoded.payload === "string") email = decoded.payload;
     }
-
+    
     if (!email) {
       return res
-        .status(401)
-        .set("Cache-Control", "no-store")
-        .json({ status: "error", message: "Invalid token", errorCode: "veri2" });
+      .status(401)
+      .set("Cache-Control", "no-store")
+      .json({ status: "error", message: "Invalid token", errorCode: "veri2" });
     }
-
-    (req as any).payload = email;
+    
+    console.log("email decoded dans verifiauth: ", email);
+    
+    (req as any).payload = { ...(req as any).payload, email: email };
+    console.log("req payload  dans verifiauth: ", (req as any).payload);
     next();
   } catch (err: any) {
     return res

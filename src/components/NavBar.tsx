@@ -178,8 +178,8 @@ function NavBar() {
                   data-id={link.href}
                   className={[
                     //ajout de la tramsition
-                    "transition-all duration-300 ease-out",
-                    "hover:text-primary",
+                    "transition-all duration-300 ease-out border border-transparent",
+                    "hover:text-primary hover:border-primary",
                   ].join(" ")}
                   href={link.href}
                   onClick={(e) => setActiveLink(e)}

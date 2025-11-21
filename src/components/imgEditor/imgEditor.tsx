@@ -149,6 +149,14 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
     const blockContext = (e: MouseEvent) => e.preventDefault();
     //document.addEventListener("contextmenu", blockContext);
 
+    if (containerRef.current) {
+       containerRef.current.scrollIntoView({
+         behavior: "smooth",
+         block: "center", // centre verticalement
+         inline: "center", // centre horizontalement (si utile)
+       });
+    }
+
     const FIE = (window as any).FilerobotImageEditor;
     if (!FIE || !containerRef.current) {
       console.warn("FilerobotImageEditor non disponible.");

@@ -33,7 +33,7 @@ import pexelsRoute from "./routes/pexels.route";
 import stripeRoute from "./routes/stripe.route";
 import forgotPasswordRoute from "./routes/forgotPassword.route";
 import refreshRoute from "./routes/authRefresh.route";
-
+import usageRoute from "./routes/usage.route";
 
 const app = express();
 
@@ -46,7 +46,10 @@ app.use(helmet());
 
 // Configuration CORS (autorisations de domaines front-end)
 const corsOptions: CorsOptions = {
-  origin(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+  origin(
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void
+  ) {
     const allowedOrigins = [
       "https://bgremoved.ch", // domaine de production
       "http://localhost:5173", // front-end Vite dev
@@ -121,19 +124,25 @@ app.get("/test", (req, res) => {
 });
 
 // Ici, tu pourras importer tes routes spécifiques :
- app.use("/api/login", loginRoute);
- app.use("/api/signup", signupRoute);
- app.use("/api/contact", contactRoute);
- app.use("/api/logout", logOutRoute);
- app.use("/api/auth/me", verifyRoute);
+//route authentification
+app.use("/api/login", loginRoute);
+app.use("/api/signup", signupRoute);
+app.use("/api/logout", logOutRoute);
+app.use("/api/auth/me", verifyRoute);
+app.use("/api/auth/refresh", refreshRoute);
+app.use("/api/forgot", forgotPasswordRoute);
+
+//route pour formulaire de contact
+app.use("/api/contact", contactRoute);
+
+//route pour api pexels
 app.use("/api/pexels", pexelsRoute);
+
+//route pour api de paiement
 app.use("/api/stripe", stripeRoute);
-app.use("/api/forgot", forgotPasswordRoute);
-app.use("/api/forgot", forgotPasswordRoute);
-app.use("/api/refresh", refreshRoute);
 
- 
-
+//route mise à jour user
+app.use("/api/usage", usageRoute);
 
 // ----------------------------------------------------
 // ⚠️ 6️⃣ Middleware de gestion d’erreurs global

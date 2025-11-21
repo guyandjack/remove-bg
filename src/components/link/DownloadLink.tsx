@@ -2,15 +2,11 @@
 import { useState } from "preact/hooks";
 
 //import des librairies
-import axios from "axios";
+import { api } from "@/utils/axiosConfig";
 
-//import des fonction
-import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
-import { localOrProd } from "@/utils/localOrProd";
-//import { axiosError } from "@/utils/axiosError";
-
-//variable et constante globale
-const { urlApi } = localOrProd();
+//import des fonctions
+import { sessionSignal } from "@/stores/session";
+import { updateSessionUser } from "@/utils/localstorage/updateSessionUser";
 
 type DownloadLinkProps = {
   currentSource: string; // dataURL ou URL de l'image finale
@@ -20,14 +16,14 @@ type DownloadLinkProps = {
 type StatusError = "error" | "valid" | "idle";
 
 type Message = {
-  error: string
+  error: string;
   success: string;
 };
 
 type ObjectError = {
   status: StatusError;
   message: Message;
-}
+};
 
 const DownloadLink = ({ currentSource, credit }: DownloadLinkProps) => {
   const [isPending, setIsPending] = useState(false);
@@ -35,10 +31,9 @@ const DownloadLink = ({ currentSource, credit }: DownloadLinkProps) => {
     status: "idle",
     message: {
       error: "",
-      success:""
-    }
+      success: "",
+    },
   });
-  
 
   const handleClick = async (e: JSX.TargetedMouseEvent<HTMLAnchorElement>) => {
     // Si pas de crédit ou déjà en cours → on bloque direct
@@ -47,54 +42,58 @@ const DownloadLink = ({ currentSource, credit }: DownloadLinkProps) => {
       return;
     }
 
-    e.preventDefault(); // on prend le contrôle du download
+    e.preventDefault(); // on prend le contrôle du download pour éviter les doubles appels
     setIsPending(true);
 
     try {
-      const payload = {
-        reason: "download",
-      };
-      // 1. Appel API pour décrémenter
-      const response = await axios.post(`${urlApi}/api/usage/download`, payload, {
+      const payload = { reason: "download" };
+
+      // 1) Décrémentation via API (géré par axios + refresh si 401)
+      const response = await api.post(`/api/usage/download`, payload, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
         timeout: 10000,
       });
 
       if (!response) {
-        console.error("Erreur décrémentation crédits");
-        setShowToast({
-          status: "error",
-          message: {
-            error: "A HTTP error was occured",
-            success:""
-          }
-       })
-        return;
+        throw new Error("No response from server");
       }
 
+      const data = response.data as any;
 
+      if (data?.status === "success") {
+        // 2) Met à jour les crédits côté session/localStorage
+        sessionSignal.value = {
+          ...sessionSignal.value,
+          credits: {
+            used_last_24h: data.used_last_24h,
+            remaining_last_24h: data.remaining_last_24h,
+          },
+        };
 
-      
-      // TODO : mettre à jour ton signal global de session avec les nouveaux crédits
-      // sessionSignal.value = { ...sessionSignal.value, credits: data.credits };
+        updateSessionUser("credits", {
+          used_last_24h: data.used_last_24h,
+          remaining_last_24h: data.remaining_last_24h,
+        });
 
-
-      // 2. Une fois l'API OK → on déclenche le téléchargement manuellement
-      const link = document.createElement("a");
-      link.href = currentSource;
-      link.download = "image-composed.png";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+        // 3) Déclenche le téléchargement via un lien temporaire
+        const link = document.createElement("a");
+        link.download = "image-composed.png";
+        link.href = currentSource;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } else {
+        throw new Error("Unexpected API response");
+      }
     } catch (err) {
       setShowToast({
         status: "error",
         message: {
           error: `A unknow error was occured: ${err}`,
-          success:""
-        }
-      })
+          success: "",
+        },
+      });
       console.error("Erreur durant le clic de téléchargement :", err);
     } finally {
       setTimeout(() => {
@@ -103,10 +102,10 @@ const DownloadLink = ({ currentSource, credit }: DownloadLinkProps) => {
           status: "idle",
           message: {
             error: "",
-            success:""
-          }
-        })
-      },2500)
+            success: "",
+          },
+        });
+      }, 2500);
     }
   };
 
@@ -114,35 +113,33 @@ const DownloadLink = ({ currentSource, credit }: DownloadLinkProps) => {
 
   return (
     <div>
-      {disabled ?
-        
+      {disabled ? (
         <button
-        className={`btn btn-outline border border-warning text-warning `}
+          className={`btn btn-outline border border-warning text-warning `}
           aria-disabled={disabled}
           disabled
-        
-      >
-        {credit > 0
-          ? isPending
-            ? "En cours..."
-            : "Télécharger"
-          : "No more credit for today..."}
-        </button>:
+        >
+          {credit > 0
+            ? isPending
+              ? "En cours..."
+              : "Télécharger"
+            : "No more credit for today..."}
+        </button>
+      ) : (
         <a
-        className={`btn btn-outline`}
-        href={disabled ? "#" :currentSource}
-        download="image-composed.png"
-        onClick={handleClick}
-        aria-disabled={disabled}
-        
-      >
-        {credit > 0
-          ? isPending
-            ? "En cours..."
-            : "Télécharger"
-          : "No more credit for today..."}
+          className={`btn btn-outline`}
+          href={disabled ? "#" : currentSource}
+          download="image-composed.png"
+          onClick={handleClick}
+          aria-disabled={disabled}
+        >
+          {credit > 0
+            ? isPending
+              ? "En cours..."
+              : "Télécharger"
+            : "No more credit for today..."}
         </a>
-      }
+      )}
       {showToast.status !== "idle" ? (
         <div className="toast toast-center toast-middle">
           {showToast.status === "error" ? (

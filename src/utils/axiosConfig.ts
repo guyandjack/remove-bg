@@ -99,12 +99,16 @@ api.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const refreshResponse = await refreshClient.post("/auth/refresh", {});
+      const refreshResponse = await refreshClient.post("/api/auth/refresh", {});
 
-      const newAccessToken = (refreshResponse.data as any).accessToken as string;
+      const newAccessToken = (refreshResponse.data as any).token as string;
 
       // 1) On stocke le nouveau token
-      localStorage.setItem("access_token", newAccessToken);
+      const objectSession = localStorage.getItem("session") || "";
+      const objectSessionParsed = JSON.parse(objectSession);
+      objectSessionParsed.token = newAccessToken;
+      localStorage.setItem("session", JSON.stringify(objectSessionParsed));
+      sessionSignal.value.token = newAccessToken;
 
       // 2) On réveille toutes les requêtes en attente
       onRefreshed(newAccessToken);

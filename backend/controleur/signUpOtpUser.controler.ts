@@ -1,10 +1,19 @@
-import type { RequestHandler } from "express";
+//import des librairies
 import crypto from "node:crypto";
-import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+
+//import des fonctions
 import { connectDb } from "../DB/poolConnexion/poolConnexion.ts";
 import { getUserByEmail, getActiveUsage24h, withTransaction } from "../DB/queriesSQL/queriesSQL.ts";
 import { signAccessToken, signRefreshToken, setCookieOptionsObject } from "../function/createToken.ts";
 
+//import des spec des plan
+import {planOption} from "../data/planOption.ts"
+
+//import des types
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import type { RequestHandler } from "express";
+
+//declaration de fonctions
 function hashOtp(code: string, salt: Buffer): Buffer {
   return crypto.scryptSync(code, salt, 64);
 }
@@ -126,10 +135,11 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
             );
             if (!prows[0]) {
               const pid = crypto.randomUUID();
+              const dailyCredit = planOption[planCode].credit;
               const [pres] = await cx.execute<ResultSetHeader>(
                 `INSERT INTO Plan (id, code, name, price, currency, billing_interval, daily_credit_quota, is_archived)
-               VALUES (?, 'free', 'Free', 0, 'EUR', 'month', 2, 0)`,
-                [pid]
+               VALUES (?, ?, 'Free', 0, 'EUR', 'month',? , 0)`,
+                [pid, planCode, dailyCredit]
               );
               if (pres.affectedRows !== 1) throw new Error("create_plan_failed");
               planId = pid;
@@ -177,7 +187,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
           redirect: false,
           redirectUrl: null,
           token: accessToken,
-          plan: { code: "free", name: "Free", price_cents: 0, currency: "EUR", daily_credit_quota: 2 },
+          plan: { code: "free", name: "Free", price_cents: 0, currency: "EUR", daily_credit_quota: 200 },
           credits: usage ? { used_last_24h: usage.used_last_24h, remaining_last_24h: usage.remaining_last_24h } : null,
           subscriptionId: null,
           hint: "",

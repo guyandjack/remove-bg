@@ -19,7 +19,7 @@ const editorCdn =
 
 const UploadPage = () => {
   const { t } = useTranslation();
-  const userLoged = sessionSignal.value.authentified;
+  const userLoged = sessionSignal?.value?.authentified;
   const textUploadImgComponent:UploadImgType = {
     label: t("uploadImg.label"),
     placeholder: t("uploadImg.placeHolder"),
@@ -39,10 +39,13 @@ const UploadPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const typePlan =
-    sessionSignal.value.plan?.code ||
-    sessionSignal.value.plan?.name ||
+    sessionSignal?.value?.plan?.code ||
+    sessionSignal?.value?.plan?.name ||
     "noplan";
-  const creditRemaining = sessionSignal.value.credits?.remaining_last_24h || 0;
+  const objectSession: string = localStorage.getItem("session") || "";
+  const objectSessionParsed = JSON.parse(objectSession);
+  const localCredits = objectSessionParsed.credits.remaining_last_24h;
+  const creditRemaining = sessionSignal?.value?.credits?.remaining_last_24h || localCredits ;
 
   // Effet : quand callApi passe à true → on lance API + CDN
   useEffect(() => {
@@ -63,7 +66,7 @@ const UploadPage = () => {
         import("@/assets/images/friend-removebg-preview.png").then((mod) => {
           resolve(mod.default);
         });
-      }, 3000);
+      }, 2000);
     }).then((result) => {
       setResponseApi(result);
     });
