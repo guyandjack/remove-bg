@@ -43,9 +43,13 @@ const UploadPage = () => {
     sessionSignal?.value?.plan?.name ||
     "noplan";
   const objectSession: string = localStorage.getItem("session") || "";
-  const objectSessionParsed = JSON.parse(objectSession);
-  const localCredits = objectSessionParsed.credits.remaining_last_24h;
-  const creditRemaining = sessionSignal?.value?.credits?.remaining_last_24h || localCredits ;
+  let creditRemaining = 0;
+  if (objectSession !== "") {
+    
+    const objectSessionParsed = JSON.parse(objectSession);
+    const localCredits = objectSessionParsed.credits.remaining_last_24h;
+    creditRemaining = sessionSignal?.value?.credits?.remaining_last_24h || localCredits ;
+  }
 
   // Effet : quand callApi passe à true → on lance API + CDN
   useEffect(() => {

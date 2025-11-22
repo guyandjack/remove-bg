@@ -10,15 +10,15 @@
   },
 
   "footer": {
-  "cookie": "Cookies",
-  "services": "Services",
-  "company": "Entreprise",
-  "legal": "Mentions",
-  "terms": "Conditions générales d'utilisation (CGU)",
-  "privacy": "Politique de confidentialité",
-  "legalLink": "Mentions légales",
-  "cgv": "Conditions générales de vente"
-},
+    "cookie": "Cookies",
+    "services": "Services",
+    "company": "Entreprise",
+    "legal": "Mentions",
+    "terms": "Conditions générales d'utilisation (CGU)",
+    "privacy": "Politique de confidentialité",
+    "legalLink": "Mentions légales",
+    "cgv": "Conditions générales de vente"
+  },
 
   "formContact": {
     "lastName": "Nom",
@@ -92,46 +92,40 @@
     "logo_label": "Logo",
     "pet_label": "Animaux"
   },
+  "priceTab": {
+    "title_h2": "Comparaison des abonnements",
+    "col_free": "Free",
+    "col_hobby": "Hobby",
+    "col_pro": "Pro",
+    "price": "Prix",
+    "credit": "Crédits",
+    "formats": "Format d'export",
+    "remove_bg": "Suppression de l'arrière-plan",
+    "change_bg_color": "Changement du fond avec couleur unie",
+    "tools": "Outils de retouche \n (Resize, Ajust, Finetune, Filters, Watermark, Annotate)",
+    "model_IA_ressource": "Ressources IA",
+    "gomme_magique": "Gomme magique",
+    "img_pexels": "Image de fond PEXELS",
+    "delay_improved": "Délai de traitement amélioré",
+    "bg_IA_generation": "Génération d'arrière-plan par IA",
+    "bundle": "Traitement par lot",
+    "api": "API",
+    "api_external": "API externe"
+  },
 
   "priceCard": {
-    "free_plan": {
-      "tag": "",
-      "title": "Free",
-      "price": "0/mois",
-      "bg": "Supression de l'arrière plan",
-      "resolution": "Basse résolution",
-      "format": "Format: png",
-      "credit": "2 crédits/jour",
-      "subscribe": "Je choisi ce plan",
-      "bill": "Pas de numéro de carte demandé."
-    },
-    "hobby_plan": {
-      "tag": "Best seller",
-      "title": "Hobby",
-      "price": "5/mois",
-      "bg": "Supression de l'arrière plan",
-      "resolution": "Haute résolution",
-      "format": "Format: png, jpg, jpeg, webp",
-      "credit": "8 crédits/jour",
-      "tool_1": "Choix d'un nouveau arrière plan",
-      "tool_2": "",
-      "subscribe": "Je choisi ce plan",
-      "bill": "Une facture annuelle de"
-    },
-    "pro_plan": {
-      "tag": "",
-      "title": "Pro",
-      "price": "15/mois",
-      "bg": "Supression de l'arriere plan",
-      "resolution": "Haute résolution",
-      "format": "Format: png, jpg, jpeg, webp",
-      "credit": "20 crédits/jour",
-      "tool_1": "Choix d'un nouveau arrière plan",
-      "tool_2": "Outils de retouche disponible",
-      "subscribe": "Je choisi ce plan",
-      "bill": "Une facture annuelle de"
-    }
-  },
+  "tag": "Le plus populaire",
+  "remove_bg": "Suppression de l'arrière-plan",
+  "price": "/ mois",
+  "credit": "Crédits / jour",
+  "gomme_magique": "Gomme magique",
+  "img_pexels": "Images PEXELS",
+  "api": "API",
+  "bundle": "Traitement par lot",
+  "subscribe": "Je choisis ce plan"
+},
+
+
   "heroHome": {
     "title_h1": "Supprimez&nbsp;l'arrière-plan&nbsp;de&nbsp;vos&nbsp;images&nbsp;grâce&nbsp;à&nbsp;l'IA",
     "title_h2": "Que vous soyez professionnel ou amateur de retouche photo, choisissez la simplicité,<span class='text-secondary text-2xl'> pour&nbsp;un&nbsp;gain&nbsp;de&nbsp;temps&nbsp;maximum</span>.",
@@ -158,6 +152,38 @@
     "preview": "Aucun aperçu disponible",
     "erase": "Effacer"
   },
+  "faqPricing": {
+  "question_1": "Puis-je annuler mon abonnement à tout moment ?",
+  "reponse_1": "Oui, vous pouvez annuler votre abonnement à tout moment depuis votre espace personnel. L’annulation stoppe simplement le renouvellement automatique. Votre accès reste actif jusqu'à la fin de la période déjà payée.",
+
+  "question_2": "L’annulation donne-t-elle droit à un remboursement ?",
+  "reponse_2": "Non, conformément à notre politique et à la législation applicable, les abonnements déjà commencés ne sont pas remboursables. Vous conservez toutefois l’accès au service jusqu’à l’échéance de votre abonnement en cours.",
+
+  "question_3": "Puis-je changer de formule (downgrade ou upgrade) ?",
+  "reponse_3": "Oui, vous pouvez modifier votre abonnement à tout moment. La nouvelle formule sera appliquée au début du prochain cycle de facturation. Vous pouvez passer à une offre supérieure ou inférieure selon vos besoins.",
+
+  "question_4": "Que se passe-t-il si je passe à une formule supérieure ?",
+  "reponse_4": "Si vous choisissez une formule supérieure, celle-ci sera appliquée au prochain renouvellement mensuel. Vous profiterez alors immédiatement des avantages liés à votre nouveau plan.",
+
+  "question_5": "Que se passe-t-il si je rétrograde vers une formule inférieure ?",
+  "reponse_5": "Le changement vers une formule inférieure sera appliqué au prochain cycle mensuel. Vous conservez jusqu'à cette date les fonctionnalités de votre formule actuelle.",
+
+  "question_6": "Comment fonctionne le paiement de l’abonnement ?",
+  "reponse_6": "Le paiement est mensuel et s’effectue par carte bancaire via Stripe, une plateforme sécurisée. Nous ne conservons aucune donnée bancaire sensible.",
+
+  "question_7": "Puis-je tester le service avant de m’abonner ?",
+  "reponse_7": "Oui, un plan gratuit est disponible et vous permet de tester la qualité du traitement avec un nombre limité de crédits par jour. Aucun numéro de carte n’est requis pour l’utiliser.",
+
+  "question_8": "Que se passe-t-il si mes crédits quotidiens sont épuisés ?",
+  "reponse_8": "Vos crédits sont réinitialisés automatiquement chaque jour. Si vous avez besoin de plus de crédits, vous pouvez passer à un abonnement supérieur à tout moment.",
+
+  "question_9": "L'abonnement se renouvelle-t-il automatiquement ?",
+  "reponse_9": "Oui, l’abonnement se renouvelle automatiquement chaque mois pour garantir la continuité du service. Vous pouvez désactiver le renouvellement dans votre espace personnel.",
+
+  "question_10": "Puis-je utiliser le service sur plusieurs appareils ?",
+  "reponse_10": "Oui, votre abonnement est lié à votre compte. Vous pouvez utiliser le service sur n’importe quel appareil, tant que vous êtes connecté."
+},
+
 
   "contact": {
     "title": "Vous aves des questions? on vous repond!",
@@ -165,10 +191,13 @@
   },
 
   "pricing": {
-    "title_h1": "Des plans adaptés à&nbsp;chaque&nbsp;contexte de&nbsp;travail.",
-    "title_h2": "Changez d’abonnement en fonction de vos&nbsp;attentes.",
-    "intro": "Choisissez un forfait abordable qui&nbspcomprend les meilleures fonctionnalités pour&nbsp;vos&nbsp;besoins."
-  },
+  "title_h1": "Des plans adaptés à&nbsp;chaque&nbsp;contexte&nbsp;de&nbsp;travail.",
+  "title_h2_card": "Changez d’abonnement en fonction de vos&nbsp;attentes.",
+  "intro": "Choisissez un forfait abordable qui&nbsp;comprend les meilleures fonctionnalités pour&nbsp;vos&nbsp;besoins.",
+  "title_h2_tab": "Comparatif des abonnements",
+  "title_h2_faq": "Questions fréquentes"
+},
+
 
   "terms": {
     "title": "Conditions Générales d’Utilisation (CGU)",

@@ -105,12 +105,12 @@ app.use(morgan(morganFormat, { stream: httpLoggerStream }));
 // 🚦 4️⃣ Limitation du nombre de requêtes (anti-spam / brute-force)
 // ----------------------------------------------------
 
-const limiter = rateLimit({
+/* const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // max 100 requêtes / IP
   message: "Too many requests from this IP, please try again after 15 minutes",
 });
-app.use("/api/", limiter);
+app.use("/api/", limiter); */
 
 // ----------------------------------------------------
 // 🧩 5️⃣ Routes principales
