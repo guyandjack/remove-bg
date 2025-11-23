@@ -121,16 +121,17 @@ function setSessionFromApiResponse(data: SessionData) {
 // =========================
 function initSessionFromLocalStorage() {
   const raw = localStorage.getItem("session");
-  if (!raw) return;
+  if (!raw) return false;
 
   try {
     sessionSignal.value = JSON.parse(raw);
-
     console.log("session sihnal value dans init seesion: ", sessionSignal.value)
+    return true
     
 
   } catch {
     console.error("Impossible de parser la session du localStorage");
+    return false
   }
 }
 

@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response } from "express";
 
 const authMe = (req: Request, res: Response) => {
 
@@ -8,7 +8,7 @@ const authMe = (req: Request, res: Response) => {
         return res.status(500).json({ status: "error", message: "User unknow", errorCode: "auth1" });
     }
 
-     const user = {
+  const user = {
        email: email,
        authentified: true,
       

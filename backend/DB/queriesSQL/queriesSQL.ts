@@ -78,6 +78,24 @@ export interface SubscriptionUsage24h extends RowDataPacket {
   remaining_last_24h: number;
 }
 
+export interface Customer extends RowDataPacket {
+  id: ID;
+  user_id: ID;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  address_line1: string | null;
+  address_line2: string | null;
+  postal_code: string | null;
+  city: string | null;
+  country: string | null;
+  phone: string | null;
+  stripe_customer_id: string | null;
+  total_spent_cents: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
 
 
 
@@ -331,6 +349,178 @@ export async function deleteUser(userId: ID) {
   const [res] = await connexion.execute<ResultSetHeader>(
     `DELETE FROM User WHERE id = ?`,
     [userId]
+  );
+  return res.affectedRows === 1;
+}
+
+// ===================================================================
+// Customer — CRUD
+// ===================================================================
+type CustomerWritableFields = Pick<
+  Customer,
+  | "email"
+  | "first_name"
+  | "last_name"
+  | "address_line1"
+  | "address_line2"
+  | "postal_code"
+  | "city"
+  | "country"
+  | "phone"
+  | "stripe_customer_id"
+  | "total_spent_cents"
+>;
+
+export async function createCustomer(params: {
+  user_id: ID;
+  email: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  address_line1?: string | null;
+  address_line2?: string | null;
+  postal_code?: string | null;
+  city?: string | null;
+  country?: string | null;
+  phone?: string | null;
+  stripe_customer_id?: string | null;
+  total_spent_cents?: number;
+  id?: ID;
+}) {
+  const connexion = await connectDb();
+  const id = params.id ?? crypto.randomUUID();
+  const sql = `INSERT INTO Customer (
+      id,
+      user_id,
+      email,
+      first_name,
+      last_name,
+      address_line1,
+      address_line2,
+      postal_code,
+      city,
+      country,
+      phone,
+      stripe_customer_id,
+      total_spent_cents
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const values = [
+    id,
+    params.user_id,
+    params.email,
+    params.first_name ?? null,
+    params.last_name ?? null,
+    params.address_line1 ?? null,
+    params.address_line2 ?? null,
+    params.postal_code ?? null,
+    params.city ?? null,
+    params.country ?? null,
+    params.phone ?? null,
+    params.stripe_customer_id ?? null,
+    params.total_spent_cents ?? 0,
+  ];
+  const [res] = await connexion.execute<ResultSetHeader>(sql, values);
+  return res.affectedRows === 1 ? id : null;
+}
+
+export async function getCustomerById(customerId: ID): Promise<Customer | null> {
+  const connexion = await connectDb();
+  const [rows] = await connexion.execute<Customer[]>(
+    `SELECT * FROM Customer WHERE id = ? LIMIT 1`,
+    [customerId]
+  );
+  return rows[0] ?? null;
+}
+
+export async function getCustomerByUserId(userId: ID): Promise<Customer | null> {
+  const connexion = await connectDb();
+  const [rows] = await connexion.execute<Customer[]>(
+    `SELECT * FROM Customer WHERE user_id = ? LIMIT 1`,
+    [userId]
+  );
+  return rows[0] ?? null;
+}
+
+export async function getCustomerByStripeCustomerId(stripeCustomerId: string): Promise<Customer | null> {
+  const connexion = await connectDb();
+  const [rows] = await connexion.execute<Customer[]>(
+    `SELECT * FROM Customer WHERE stripe_customer_id = ? LIMIT 1`,
+    [stripeCustomerId]
+  );
+  return rows[0] ?? null;
+}
+
+export async function listCustomers(limit = 50, offset = 0): Promise<Customer[]> {
+  const connexion = await connectDb();
+  const [rows] = await connexion.execute<Customer[]>(
+    `SELECT * FROM Customer ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    [limit, offset]
+  );
+  return rows;
+}
+
+export async function updateCustomer(customerId: ID, fields: Partial<CustomerWritableFields>) {
+  const connexion = await connectDb();
+  const sets: string[] = [];
+  const values: any[] = [];
+
+  if (fields.email !== undefined) {
+    sets.push(`email = ?`);
+    values.push(fields.email);
+  }
+  if (fields.first_name !== undefined) {
+    sets.push(`first_name = ?`);
+    values.push(fields.first_name);
+  }
+  if (fields.last_name !== undefined) {
+    sets.push(`last_name = ?`);
+    values.push(fields.last_name);
+  }
+  if (fields.address_line1 !== undefined) {
+    sets.push(`address_line1 = ?`);
+    values.push(fields.address_line1);
+  }
+  if (fields.address_line2 !== undefined) {
+    sets.push(`address_line2 = ?`);
+    values.push(fields.address_line2);
+  }
+  if (fields.postal_code !== undefined) {
+    sets.push(`postal_code = ?`);
+    values.push(fields.postal_code);
+  }
+  if (fields.city !== undefined) {
+    sets.push(`city = ?`);
+    values.push(fields.city);
+  }
+  if (fields.country !== undefined) {
+    sets.push(`country = ?`);
+    values.push(fields.country);
+  }
+  if (fields.phone !== undefined) {
+    sets.push(`phone = ?`);
+    values.push(fields.phone);
+  }
+  if (fields.stripe_customer_id !== undefined) {
+    sets.push(`stripe_customer_id = ?`);
+    values.push(fields.stripe_customer_id);
+  }
+  if (fields.total_spent_cents !== undefined) {
+    sets.push(`total_spent_cents = ?`);
+    values.push(fields.total_spent_cents);
+  }
+
+  if (sets.length === 0) return false;
+
+  const sql = `UPDATE Customer SET ${sets.join(", ")} WHERE id = ?`;
+  values.push(customerId);
+  const [res] = await connexion.execute<ResultSetHeader>(sql, values);
+  return res.affectedRows === 1;
+}
+
+export async function deleteCustomer(customerId: ID) {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `DELETE FROM Customer WHERE id = ?`,
+    [customerId]
   );
   return res.affectedRows === 1;
 }
@@ -906,23 +1096,3 @@ export async function getUserPlanAndCredits24h(
     throw err;
   }
 }
-
-// ===================================================================
-// Exemples d’utilisation (à enlever en prod)
-// ===================================================================
-// (async () => {
-//   await initDb();
-//   const userId = await createUser("alice@example.com", "hash");
-//   const plan = await getPlanByName("Free");
-//   if (userId && plan) {
-//     await createSubscription({ userId, planId: plan.id, isActive: true });
-//     console.log(await getActiveSubscription(userId));
-//     // Upgrade vers Premium:
-//     const premium = await getPlanByName("Premium");
-//     if (premium) {
-//       await switchPlan(userId, premium.id);
-//       console.log(await getActiveSubscription(userId));
-//     }
-//   }
-//   await closeDb();
-// })();

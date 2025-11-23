@@ -24,7 +24,7 @@ type DropDownProps = {
 const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, userName = null }: DropDownProps) => {
   
   //state qui gere l' affichage du loader
-  const [isLoader, setIsLoader] = useState(true);
+  const [isLoader, setIsLoader] = useState(false);
   const [isStatus, setIsStatus] = useState<"error"|"success"|"idle">("idle");
   
   
@@ -45,17 +45,18 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
 
         setIsLoader(false);
         setIsStatus("success");
-        setTimeout(() => {
-          window.location.href = "/";
-        },2000)
+        
       }
     } catch {
+      sessionSignal.value = null;
+      localStorage.removeItem("session");
       setIsLoader(false)
-      setIsStatus("error");
+      setIsStatus("success");
+      
     } finally {
       setTimeout(() => {
         setIsStatus("idle")
-        
+        window.location.href = "/";
       }, 2000)
     }
   }
@@ -77,9 +78,17 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
         </svg>
       </button>
       <ul
-        tabIndex="-1"
+        tabIndex={-1}
         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
       >
+        <li>
+          <a href="/dashboard" className="flex flex-row justify-left items-center gap-4">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+              <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm4.5 0a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 .75.75v6a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75v-6Zm5.25-3.75a.75.75 0 0 0-.75.75V18a.75.75 0 0 0 .75.75h2.25A.75.75 0 0 0 18 18V9a.75.75 0 0 0-.75-.75h-2.25Zm3.75-2.25a.75.75 0 0 0-.75.75v12a.75.75 0 0 0 .75.75h2.25a.75.75 0 0 0 .75-.75V6.75a.75.75 0 0 0-.75-.75H15.75Z" clipRule="evenodd" />
+            </svg>
+            <span>Tableau de bord</span>
+          </a>
+        </li>
         <li className="w-[130px]">
           <div className="flex flex-row justify-left items-center gap-4">
             {credit < 2 ? (
@@ -110,14 +119,14 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
               </svg>
             )}
 
-            <span className={credit < 2 ? "text-red-500" : "text-green-500"}>
+            <span className={credit < 2 ? "text-red-500" : "text-success"}>
               {userName}
             </span>
           </div>
         </li>
         <li className="w-[130px]">
-          <a
-            href="/pricing"
+          <p
+            
             className="flex flex-row justify-left items-center gap-4"
           >
             <svg
@@ -135,10 +144,10 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
             </svg>
 
             <span>{textCredit}</span>
-            <span className={credit < 2 ? "text-red-500" : "text-green-500"}>
+            <span className={credit < 2 ? "text-red-500" : "text-success"}>
               {credit}
             </span>
-          </a>
+          </p>
         </li>
         <li className="w-[130px]">
           <div className= "flex flex-row justify-left items-center gap-4">
@@ -150,7 +159,7 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
             >
               <path d="M2.25 2.25a.75.75 0 0 0 0 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 0 0-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 0 0 0-1.5H5.378A2.25 2.25 0 0 1 7.5 15h11.218a.75.75 0 0 0 .674-.421 60.358 60.358 0 0 0 2.96-7.228.75.75 0 0 0-.525-.965A60.864 60.864 0 0 0 5.68 4.509l-.232-.867A1.875 1.875 0 0 0 3.636 2.25H2.25ZM3.75 20.25a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM16.5 20.25a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" />
             </svg>
-            <span>{plan}</span>
+            <span className={"capitalize"}>{plan}</span>
           </div>
         </li>
         <li className="w-[130px]">

@@ -2,7 +2,7 @@
 
 
 //import des librairies
-import axios from "axios";
+import {api} from "@/utils/axiosConfig";
 
 //import des hooks
 import { useEffect, useState } from "preact/hooks";
@@ -17,9 +17,9 @@ import { ThemeControler } from "./themeControler/ThemeControler";
 import { navBarContent } from "@/data/content/components/nav/navBarContent";
 
 //import des functions
-import { localOrProd } from "@/utils/localOrProd";
+import { isAuthentified } from "@/utils/request/isAuthentified";
 import { setActiveLink } from "@/utils/setActiveLink";
-const { urlApi } = localOrProd();
+
 
 //import des signaux de connexion user (signUp, login)
 import { sessionSignal, initSessionFromLocalStorage } from "../stores/session";
@@ -36,80 +36,45 @@ type DisplayState = {
 }| null;
 
 
-//fonction
-const isAuthentified = async () => {
-  //recuperation des info de session
-  initSessionFromLocalStorage();
-
-  const token = sessionSignal?.value?.token;
-  console.log("session value: ", sessionSignal.value);
-  console.log("token: ", token);
-  //axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-  try {
-    const response = await axios.post(
-      `${urlApi}/api/auth/me`,
-      {}, // ← corps vide (obligatoire pour axios.post)
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        timeout: 10000,
-      }
-    );
-
-
-    if (!response) {
-      throw Error("une erreur est survenu lors de la requete:");
-    }
-    ;
-    if (response.data.status === "success") {
-      return response.data;
-    }
-  } catch (error) {
-    throw Error("une erreur est survenu lors de la requete:" + error);
-  }
-};
-
-function NavBar() {
+const NavBar = ()=> {
   const { t } = useTranslation();
   //state qui gere l'affichage du profileDropdown et son contenu textuel
   const [isDisplay, setIsDisplay] = useState<DisplayState>({
     userName: null,
     authentified: false,
     credit: 0,
-    textCredit: null,
+    textCredit: t("priceTab.credit"),
     plan: null,
     textLogout: t("navBar.logout")
   });
 
-  
+
 
   useEffect(() => {
-    isAuthentified()
-      .then((result) => {
-        return setIsDisplay({
-          userName:
-            sessionSignal?.value?.user.first_name ||
-            sessionSignal?.value?.user.email.split("@")[0] ||
-            null,
-          authentified: sessionSignal?.value?.authentified || false,
-          credit: sessionSignal?.value?.credits?.remaining_last_24h || 0,
-          textCredit: null,
-          plan:
-            sessionSignal?.value?.plan.code ||
-            sessionSignal?.value?.plan.name ||
-            null,
-          textLogout: t("navBar.logout"),
-        });
-      })
+    initSessionFromLocalStorage();
+    isAuthentified().catch((e) => {
+      console.error("un bug!", e);
+    });
+  }, []);
 
-      .catch((e) => {
-        console.error("un bug");
+    useEffect(() => {
+      const session = sessionSignal?.value;
+      // Ensure email is always a string. If session?.user?.email is not null/undefined
+      // but also not a string (e.g., a number), convert it to a string.
+      const email = String(session?.user?.email || "");
+      const emailFallback =
+        email && email.includes("@") ? email.split("@")[0] : email || null;
+
+      setIsDisplay({
+        userName: session?.user?.first_name || emailFallback ,
+        authentified: session?.authentified || false,
+        credit: session?.credits?.remaining_last_24h || 0,
+        textCredit: t("priceTab.credit"),
+        plan: session?.plan?.name || session?.plan?.code || null,
+        textLogout: t("navBar.logout"),
       });
-  }, [sessionSignal?.value?.authentified]);
+    }, [sessionSignal?.value, t]);
+
 
   //active le lien au montage du composant
   useEffect(() => {
@@ -139,7 +104,7 @@ function NavBar() {
             </svg>
           </div>
           <ul
-            tabIndex="-1"
+            tabIndex={-1}
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
           >
             {navBarContent.map((link) => {
@@ -209,13 +174,4 @@ function NavBar() {
 
 export { NavBar };
 
-/*<ul className="menu menu-horizontal px-1">
-  {navBarContent.map((link) => {
-    const label = t(`navBar.${link.key}`);
-    return (
-      <li key={link.href}>
-        <a href={link.href}>{label}</a>
-      </li>
-    );
-  })}
-</ul>;*/
+

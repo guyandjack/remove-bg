@@ -106,7 +106,7 @@ function PricePage() {
       const objectOptionParsed = JSON.parse(objectOption) || "";
       setArrayOption(objectOptionParsed);
       const byName: Record<string, PlanOption> = objectOptionParsed.reduce(
-        (acc, p) => ({ ...acc, [p.name]: p }),
+        (acc:any, p:any) => ({ ...acc, [p.name]: p }),
         {}
       );
       setObjectOption(byName);

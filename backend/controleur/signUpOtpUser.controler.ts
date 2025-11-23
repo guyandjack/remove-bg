@@ -3,15 +3,22 @@ import crypto from "node:crypto";
 
 //import des fonctions
 import { connectDb } from "../DB/poolConnexion/poolConnexion.ts";
-import { getUserByEmail, getActiveUsage24h, withTransaction } from "../DB/queriesSQL/queriesSQL.ts";
+import {
+  getUserByEmail,
+  getActiveUsage24h,
+  withTransaction,
+  getPlanByCode,
+  getCustomerByUserId,
+} from "../DB/queriesSQL/queriesSQL.ts";
 import { signAccessToken, signRefreshToken, setCookieOptionsObject } from "../function/createToken.ts";
 
 //import des spec des plan
-import {planOption} from "../data/planOption.ts"
+import { planOption } from "../data/planOption.ts";
 
 //import des types
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import type { RequestHandler } from "express";
+import type { ObjectResponse } from "./loginDataUser.controler.ts";
 
 //declaration de fonctions
 function hashOtp(code: string, salt: Buffer): Buffer {
@@ -78,17 +85,19 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
       
     // Use plan directly from EmailVerification (plan_type)
     let isValidForDB = false;
-    console.log("plancode: ", planCode)
+    const planDefinition =
+      planOption.find((option) => option.name === planCode) ||
+      planOption.find((option) => option.name === "free");
+    const planDailyCredit = planDefinition?.credit ?? 0;
+
     if (planCode === "free") {
       // Tokens will be created AFTER user creation to ensure DB persistence of refresh token
       let accessToken: string;
       let refreshToken: string;
       isValidForDB = true;
 
-      console.log("isValidForDB: ", isValidForDB)
       // 1) Single transaction to consume OTP, create user (if needed), mark account, ensure plan, create subscription.
       if (isValidForDB) {
-        console.log("le code continu de tourner");
         let newUserId: string | null = null;
         let finalUserId: string | null = null;
         try {
@@ -135,11 +144,10 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
             );
             if (!prows[0]) {
               const pid = crypto.randomUUID();
-              const dailyCredit = planOption[planCode].credit;
               const [pres] = await cx.execute<ResultSetHeader>(
                 `INSERT INTO Plan (id, code, name, price, currency, billing_interval, daily_credit_quota, is_archived)
                VALUES (?, ?, 'Free', 0, 'EUR', 'month',? , 0)`,
-                [pid, planCode, dailyCredit]
+                [pid, planCode, planDailyCredit]
               );
               if (pres.affectedRows !== 1) throw new Error("create_plan_failed");
               planId = pid;
@@ -178,20 +186,44 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
           return res.status(500).json({ status: "error", message: err?.message || String(err), errorCode: "otp6b" });
         }
         const usage = await getActiveUsage24h(user.id);
+        const planRow = await getPlanByCode(planCode);
+        const customer = await getCustomerByUserId(user.id);
         const options = setCookieOptionsObject();
+        const planPrice = planRow?.price ?? planDefinition?.price ?? 0;
+        const planCurrency = planRow?.currency ?? "EUR";
+        const planQuota = planRow?.daily_credit_quota ?? planDailyCredit;
+        const planName = planRow?.name ?? planDefinition?.name ?? planCode;
+        const usedCredits = usage?.used_last_24h ?? 0;
+        const remainingCredits = usage?.remaining_last_24h ?? planQuota;
         res.cookie("tokenRefresh", refreshToken, options);
-        return res.status(200).json({
-          user: { email: email },
-          status: "success",
-          authentified: true,
-          redirect: false,
-          redirectUrl: null,
-          token: accessToken,
-          plan: { code: "free", name: "Free", price_cents: 0, currency: "EUR", daily_credit_quota: 200 },
-          credits: usage ? { used_last_24h: usage.used_last_24h, remaining_last_24h: usage.remaining_last_24h } : null,
-          subscriptionId: null,
-          hint: "",
-        });
+        const formatedObject: ObjectResponse = {
+          
+        user: {
+          email: email,
+          first_name: customer?.first_name ?? "",
+          last_name: customer?.last_name ?? ""
+         },
+        status: "success",
+        authentified: true,
+        redirect: false,
+        redirectUrl: null,
+        token: accessToken,
+        plan: {
+          code: planCode,
+          name: planName,
+          price_cents: planPrice,
+          currency: planCurrency,
+          daily_credit_quota: planQuota ,
+        },
+        credits: {
+              used_last_24h: usedCredits,
+              remaining_last_24h: remainingCredits,
+            },
+        subscriptionId: null,
+        hint: "",
+      };
+        
+        return res.status(200).json(formatedObject);
       }
     }
 

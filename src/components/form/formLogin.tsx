@@ -157,7 +157,7 @@ const FormLogin = () => {
         setIsLoader(false);
         setTimeout(() => {
           setStatus("idle");
-         //window.location.href = "/upload"
+         window.location.href = "/upload"
         }, 2000);
 
         

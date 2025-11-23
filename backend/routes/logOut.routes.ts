@@ -1,5 +1,5 @@
 import express from "express";
-import { logOut } from "../controleur/logOut";
+import { logOut } from "../controleur/logOut.controler";
 import {verifyAuth}  from "../middelware/verifAuth/verifyAuth"
 
 

@@ -101,12 +101,33 @@ api.interceptors.response.use(
     try {
       const refreshResponse = await refreshClient.post("/api/auth/refresh", {});
 
-      const newAccessToken = (refreshResponse.data as any).token as string;
+      //si pas de reponse on log une erreur http ou autre
+      if (!refreshResponse) {
+        console.log("erreur http sur refresh request");
+      }
+
+      const data = refreshResponse.data;
+
+      //si refresh client echoue:
+      
+
+      if (data.status !== "success") {
+        // Cleanup côté front
+        localStorage.removeItem("session");
+        sessionSignal.value = null;
+
+        // Option : redirection vers la page de login
+       return //window.location.href = "/login";
+        
+      }
+
+      const newAccessToken = (data as any).token as string;
 
       // 1) On stocke le nouveau token
       const objectSession = localStorage.getItem("session") || "";
       const objectSessionParsed = JSON.parse(objectSession);
       objectSessionParsed.token = newAccessToken;
+      //mise a jour de la session dans le localstorage et signalSession
       localStorage.setItem("session", JSON.stringify(objectSessionParsed));
       sessionSignal.value.token = newAccessToken;
 
@@ -129,7 +150,7 @@ api.interceptors.response.use(
       sessionSignal.value = null;
 
       // Option : redirection vers la page de login
-      // window.location.href = "/login";
+       //window.location.href = "/login";
 
       return Promise.reject(refreshError);
     }

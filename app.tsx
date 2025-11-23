@@ -16,6 +16,7 @@ import { PrivacyPage} from "./src/pages/privacyPage";
 import { LegalPage} from "./src/pages/LegalPage";
 import { LoginPage} from "./src/pages/loginPage";
 import { CgvPage} from "./src/pages/cgvPage";
+import { DashboardPage } from "./src/pages/dashboardPage";
 //import { CguPage} from "./src/pages/cguPage";
 import { Page404} from "./src/pages/404Page";
 
@@ -48,6 +49,7 @@ export function App() {
               <Route path="/privacy" component={PrivacyPage} />
               <Route path="/legal" component={LegalPage} />
               <Route path="/cgv" component={CgvPage} />
+              <Route path="/dashboard" component={DashboardPage} />
               <Route path="*/*" component={Page404} />
             </Router>
           </ErrorBoundary>

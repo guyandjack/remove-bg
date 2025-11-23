@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 //import des fonctions
-import { setCookieOptionsObject } from "../function/createToken";
+import { setCookieOptionsObject } from "../function/createToken.ts";
 import { revokeAllRefreshTokensForUser, getUserByEmail } from "../DB/queriesSQL/queriesSQL.ts";
 
 const logOut = async (req: Request, res: Response) => {
