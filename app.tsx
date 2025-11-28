@@ -29,9 +29,8 @@ export function App() {
 
   return (
     <div>
-      <header>
+      <header className="sticky top-0 z-100 ">
         <NavBar />
-        
       </header>
 
       <main>
@@ -55,8 +54,9 @@ export function App() {
           </ErrorBoundary>
         </LocationProvider>
       </main>
-
-      <Footer/ >
+      <footer>
+        <Footer />
+      </footer>
     </div>
   );
 }

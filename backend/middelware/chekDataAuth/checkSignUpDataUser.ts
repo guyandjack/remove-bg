@@ -22,7 +22,7 @@ export const authSchema = z.object({
     .regex(/[0-9]/, "1 chiffre requis")
     .regex(/[^\w\s]/, "1 caractère spécial requis"),
   lang: z.enum(["fr", "de", "en", "it"]),
-  plan: z.enum(["free","hobby","pro"]),
+  plan: z.enum(["free","hobby","pro"], "Plan non reconnu"),
   id: z.literal("resend").optional(), // <-- propriété optionnelle
 });
 

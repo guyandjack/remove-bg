@@ -1,12 +1,18 @@
 //Page home
 
+//import des hooks
+import { useEffect } from "preact/hooks";
+
 //import des librairies
 import { useTranslation } from "react-i18next";
 
 //import de compoants enfants
+import { Cta } from '@/components/cta/Cta';
 import { Hero } from "@/components/hero/hero";
 import { Diff } from "../components/diff/diff";
-import {Cta} from '@/components/cta/Cta';
+
+//import de fonctions
+import { setDocumentTitle } from "@/utils/setDocumentTitle";
 
 
 
@@ -79,6 +85,10 @@ function HomePage() {
   const label: Labels = [
     
   ];
+
+  useEffect(() => {
+    setDocumentTitle()
+  }, []);
 
   return (
     <div

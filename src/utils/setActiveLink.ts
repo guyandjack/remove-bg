@@ -15,14 +15,14 @@ const setActiveLink = (e?: any) => {
   //suprime la couleur actif de tous les liens
   if (allLinksInNav.length > 0) {
     allLinksInNav.forEach((el) => {
-      el.classList.remove("text-secondary");
+      el.classList.remove("text-primary");
     });
   }
   const elementLinks = document.querySelectorAll(`a[data-id="${data_id}"]`);
   // ajoute la couleur uniquement aux liens actifs
   if (elementLinks.length > 0) {
     elementLinks.forEach((el) => {
-      el.classList.add("text-secondary");
+      el.classList.add("text-primary");
     });
   }
 };

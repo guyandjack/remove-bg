@@ -1,10 +1,10 @@
 const FooterBottom = () => {
   return (
-    <footer class="p-10 flex flex-col justify-center items-center gap-10 md:flex-row justify-evenly">
+    <div class="p-8 flex flex-col justify-center items-center gap-10 bg-base-100 md:flex-row justify-evenly lg:h-[30px]">
       <aside>
         <p>Copyright © {new Date().getFullYear()} - All rights reserved</p>
       </aside>
-      <nav>
+      {/* <nav className={"relative z-10"}>
         <div class="gap-10 flex flex-row ">
           <a
             href="#"
@@ -52,13 +52,13 @@ const FooterBottom = () => {
             </svg>
           </a>
         </div>
-      </nav>
-      <div className="">
-        <a class="hover:text-primary" href="https://helveclick.ch">
+      </nav> */}
+      <div className={"relative z-10"}>
+        <a class="hover:text-primary" href="https://helveclick.ch" target={"_blank"}>
           Powered by Helveclick
         </a>
       </div>
-    </footer>
+    </div>
   );
 };
 

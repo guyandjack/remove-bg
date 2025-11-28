@@ -1,4 +1,9 @@
+import { useEffect } from "preact/hooks";
+
 const Page404 = () => {
+      useEffect(() => {
+        setDocumentTitle();
+      }, []);
     
       return (
         <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
@@ -24,4 +29,5 @@ const Page404 = () => {
       );
     }
 
-export {Page404}
+export { Page404 };
+

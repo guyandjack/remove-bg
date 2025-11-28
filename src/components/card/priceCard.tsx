@@ -60,7 +60,7 @@ const PriceCard = ({ lang, option }: PriceCardProps) => {
     >
       <div className="relative card-body">
         {option.name === "hobby" ? (
-          <span className="absolute top-[-20px] badge badge-s badge-warning">
+          <span className="absolute top-[-15px] badge badge-s badge-warning">
             {lang.tag}
           </span>
         ) : null}

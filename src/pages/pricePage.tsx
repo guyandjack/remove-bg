@@ -1,15 +1,19 @@
 //import des hooks
-import { useEffect, useState, useRef } from "preact/hooks";
-import { useTranslation } from "react-i18next";
 import { useLocation } from "preact-iso";
+import { useEffect, useState } from "preact/hooks";
+import { useTranslation } from "react-i18next";
 
 //import des instance
 import { api } from "@/utils/axiosConfig";
 
 //import des composant enfants
 import { PriceCard } from "@/components/card/priceCard";
+import { Faq } from "@/components/faq/faq";
 import { PricingComparisonTable } from "@/components/table/PriceTable";
-import {Faq} from "@/components/faq/faq"
+
+//import des fonctions
+import { setDocumentTitle } from "@/utils/setDocumentTitle";
+
 
 type PlanKey =
   | "remove_bg"
@@ -55,7 +59,7 @@ function PricePage() {
   const IsCreateAccount = path.includes("signup") ? true : false;
 
   const textLangCard: PlanText = {
-    tag:t("priceCard.tag"),
+    tag: t("priceCard.tag"),
     remove_bg: t("priceCard.remove_bg"),
     price: t("priceCard.price"),
     credit: t("priceCard.credit"),
@@ -63,7 +67,7 @@ function PricePage() {
     Image_pexels: t("priceCard.img_pexels"),
     api: t("priceCard.api"),
     bundle: t("priceCard.bundle"),
-    subscribe:t("priceCard.subscribe")
+    subscribe: t("priceCard.subscribe"),
   };
 
   const textLangTab = {
@@ -88,16 +92,46 @@ function PricePage() {
   };
 
   const textLangFaq = [
-    { question: t("faqPricing.question_1"), response: t("faqPricing.reponse_1") },
-    { question: t("faqPricing.question_2"), response: t("faqPricing.reponse_2") },
-    { question: t("faqPricing.question_3"), response: t("faqPricing.reponse_3") },
-    { question: t("faqPricing.question_4"), response: t("faqPricing.reponse_4") },
-    { question: t("faqPricing.question_5"), response: t("faqPricing.reponse_5") },
-    { question: t("faqPricing.question_6"), response: t("faqPricing.reponse_6") },
-    { question: t("faqPricing.question_7"), response: t("faqPricing.reponse_7") },
-    { question: t("faqPricing.question_8"), response: t("faqPricing.reponse_8") },
-    { question: t("faqPricing.question_9"), response: t("faqPricing.reponse_9") },
-    { question: t("faqPricing.question_10"), response: t("faqPricing.reponse_10") },
+    {
+      question: t("faqPricing.question_1"),
+      response: t("faqPricing.reponse_1"),
+    },
+    {
+      question: t("faqPricing.question_2"),
+      response: t("faqPricing.reponse_2"),
+    },
+    {
+      question: t("faqPricing.question_3"),
+      response: t("faqPricing.reponse_3"),
+    },
+    {
+      question: t("faqPricing.question_4"),
+      response: t("faqPricing.reponse_4"),
+    },
+    {
+      question: t("faqPricing.question_5"),
+      response: t("faqPricing.reponse_5"),
+    },
+    {
+      question: t("faqPricing.question_6"),
+      response: t("faqPricing.reponse_6"),
+    },
+    {
+      question: t("faqPricing.question_7"),
+      response: t("faqPricing.reponse_7"),
+    },
+    {
+      question: t("faqPricing.question_8"),
+      response: t("faqPricing.reponse_8"),
+    },
+    {
+      question: t("faqPricing.question_9"),
+      response: t("faqPricing.reponse_9"),
+    },
+    {
+      question: t("faqPricing.question_10"),
+      response: t("faqPricing.reponse_10"),
+    },
   ];
 
   useEffect(() => {
@@ -106,11 +140,11 @@ function PricePage() {
       const objectOptionParsed = JSON.parse(objectOption) || "";
       setArrayOption(objectOptionParsed);
       const byName: Record<string, PlanOption> = objectOptionParsed.reduce(
-        (acc:any, p:any) => ({ ...acc, [p.name]: p }),
+        (acc: any, p: any) => ({ ...acc, [p.name]: p }),
         {}
       );
       setObjectOption(byName);
-      return
+      return;
     }
     api
       .get("api/plan/option")
@@ -131,6 +165,10 @@ function PricePage() {
       .catch((e) => {
         //setPlanOption([]);
       });
+  }, []);
+
+  useEffect(() => {
+    setDocumentTitle();
   }, []);
 
   return (
@@ -165,7 +203,7 @@ function PricePage() {
           }}
         ></p>
         {IsCreateAccount ? (
-          <div className={"absolute top-[-30px] left-[10px] z-10"}>
+          <div className={"absolute top-[-10px] left-[10px] z-100"}>
             <div role="alert" className="alert alert-warning alert-outline">
               <span>Pour s'inscrire, choisissez un plan.</span>
             </div>
@@ -189,7 +227,9 @@ function PricePage() {
       </ul>
 
       {/* tableau de comparaison*/}
-      <div className={"w-full max-w-[1300px] mx-auto py-[50px] "}>
+      <div
+        className={"w-full max-w-[1300px] mx-auto py-[50px] "}
+      >
         <h2
           className={
             "font-bold text-3xl text-center text-info lg:text-left lg:self-start"

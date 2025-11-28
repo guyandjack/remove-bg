@@ -50,10 +50,7 @@ function resolveLocale(lang: unknown): string {
     
     const planCode = String(plan).toLowerCase();
     // Validate plan against static config (no DB dependency)
-    const planExists = !!(planOption && Object.prototype.hasOwnProperty.call(planOption, planCode));
-    if (!planExists) {
-      return res.status(400).json({ error: true, message: "Invalid plan", code: "signup_invalid_plan" });
-    }
+    
    
 
     const otp = generateOtp();

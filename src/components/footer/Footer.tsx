@@ -11,6 +11,10 @@ import { footerContent } from "@/data/content/components/footer/footerContent";
 //import des fonctions
 import { setActiveLink } from "@/utils/setActiveLink";
 
+//import des images
+import shape_1 from "@/assets/images/shape-1.svg";
+import shape_2 from "@/assets/images/shape-3.svg";
+
 const Footer = () => {
   const { t } = useTranslation();
 
@@ -24,9 +28,9 @@ const Footer = () => {
   const cookie = t(`footer.cookie`);
 
   return (
-    <div>
+    <div className={"relative overflow-hidden"}>
       <nav className="footer md:footer-horizontal bg-base-300 p-10">
-        <aside>
+        <aside className={"relative z-10"}>
           <svg
             width="50"
             height="50"
@@ -44,15 +48,14 @@ const Footer = () => {
             Providing reliable tech since 1992
           </p>
         </aside>
-        <div>
+        <div className={"relative z-10"}>
           <h6 className="text-lg footer-title opacity-100 text-secondary">
             {services}
           </h6>
           <ul>
             {navBarContent.map((link) => {
               const label = t(`navBar.${link.key}`);
-              return (
-                link.key !== "contact" ?
+              return link.key !== "contact" ? (
                 <li key={link.href}>
                   <a
                     data-id={link.href}
@@ -64,12 +67,12 @@ const Footer = () => {
                   >
                     {label}
                   </a>
-                </li> : null
-              ) ;
+                </li>
+              ) : null;
             })}
           </ul>
         </div>
-        <div>
+        <div className={"relative z-10"}>
           <h6 className="text-lg footer-title opacity-100 text-secondary">
             {company}
           </h6>
@@ -94,15 +97,14 @@ const Footer = () => {
           </ul>
         </div>
 
-        <div>
+        <div className={"relative z-10"}>
           <h6 className="text-lg footer-title opacity-100 text-secondary">
             {legal}
           </h6>
           <ul>
             {footerContent.map((link) => {
               const label = t(`footer.${link.key}`);
-              return(
-              link.key !== "contact" && link.key !== "aboutus" ? (
+              return link.key !== "contact" && link.key !== "aboutus" ? (
                 <li key={link.href}>
                   <a
                     data-id={link.href}
@@ -115,12 +117,25 @@ const Footer = () => {
                     {label}
                   </a>
                 </li>
-              ) : null);
+              ) : null;
             })}
           </ul>
         </div>
       </nav>
-      <FooterBottom />
+      <div>
+        <FooterBottom />
+      </div>
+
+      <img
+        className={"absolute top-0 left-0 "}
+        src={shape_1}
+        alt="decoration footer"
+      />
+      <img
+        className={"absolute bottom-[0px] right-[0%]"}
+        src={shape_2}
+        alt="decoration footer"
+      />
     </div>
   );
 };

@@ -185,15 +185,15 @@ const FormLogin = () => {
 
   return (
     <>
-      <div className="flex min-h-full flex-col justify-center px-6 py-15 lg:px-8">
+      <div className="mx-auto max-w-[500px] h-[calc(100svh-70px)] flex flex-col justify-center ">
         <div className="sm:mx-auto sm:w-full sm:max-w-xl">
-          <h2 className="text-center text-2xl font-bold tracking-tight text-base-content">
+          <h1 className="text-center text-2xl font-bold tracking-tight text-base-content">
             {t("formLogin.title")}
-          </h2>
+          </h1>
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl">
-          <div className="rounded-xl bg-base-100/60 backdrop-blur-sm shadow-sm p-6 md:p-8">
+          <div className="rounded-xl bg-base-100/60 backdrop-blur-sm shadow-sm p-6 bg-component md:p-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
                 <label htmlFor="email" className="label p-0">
@@ -205,7 +205,7 @@ const FormLogin = () => {
                   <input
                     id="email"
                     type="email"
-                    className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                    className="input-clean"
                     aria-invalid={!!errors.email || undefined}
                     {...register("email", {
                       required: t("formContact.required"),
@@ -270,7 +270,7 @@ const FormLogin = () => {
                   <input
                     id="password"
                     type={!eyePass ? "password" : "text"}
-                    className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                    className="input-clean"
                     aria-invalid={!!errors.password || undefined}
                     {...register("password", {
                       required: t("formLogin.required"),
@@ -292,7 +292,7 @@ const FormLogin = () => {
               <div className="relative flex flex-col justify-center items-center">
                 <button
                   type="submit"
-                  className="btn btn-primary w-full mt-10"
+                  className="btn btn-primary w-full mt-10 "
                   disabled={
                     isSubmitting || //soumission du formulaire
                     !email || //si formulaire pas rempli entierement
@@ -309,7 +309,7 @@ const FormLogin = () => {
                 <div className="relative w-full flex flex-col justify-center items-center mt-4">
                   <BtnGoogleLogin
                     text={t("formSignUp.btnGoogle")}
-                    disabled={isLoader || status !== "idle"}
+                    disabled={isLoader || status !== "idle" || true}
                   />
                   {isLoader ? <Loader top="top-20" /> : null}
                 </div>
@@ -335,7 +335,7 @@ const FormLogin = () => {
 
               <a
                 href="#"
-                className={"link"}
+                className={"link link-primary"}
                 onClick={(e) => {
                   e.preventDefault();
                   setIsForgotOpen(true);
@@ -414,7 +414,9 @@ const FormLogin = () => {
                   >
                     {t("formForgot.btnCancel")}
                   </button>
-                  {isLoader && statusForgot === "idle" ? <Loader top="top-[100%]" /> : null}
+                  {isLoader && statusForgot === "idle" ? (
+                    <Loader top="top-[100%]" />
+                  ) : null}
                   <div
                     className={`btn w-full transition-all duration-500 transform 
           ${statusForgot === "idle" ? "opacity-0 translate-y-0" : ""}

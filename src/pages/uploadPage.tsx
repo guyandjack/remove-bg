@@ -12,6 +12,7 @@ import { Example } from "@/components/colorPicker/colorPicker";
 //import des fonctions
 import { loadScript } from "@/utils/loadScript";
 import { sessionSignal } from "@/stores/session";
+import { setDocumentTitle } from "@/utils/setDocumentTitle";
 
 // CDN de l'éditeur
 const editorCdn =
@@ -85,6 +86,9 @@ const UploadPage = () => {
         setCallApi(false); // on remet le flag à false
       });
   }, [callApi]);
+  useEffect(() => {
+    setDocumentTitle();
+  }, []);
 
   const shouldShowEditor =
     isCdnLoaded && responseApi !== "" && previewUrl !== null && !isProcessing;

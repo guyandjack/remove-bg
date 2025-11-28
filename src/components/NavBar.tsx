@@ -83,7 +83,7 @@ const NavBar = ()=> {
 
   
   return (
-    <nav className="navbar bg-base-100 shadow-sm">
+    <nav className="navbar bg-navbar shadow-sm backdrop-blur-sm">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -110,8 +110,6 @@ const NavBar = ()=> {
             {navBarContent.map((link) => {
               const label = t(`navBar.${link.key}`);
               return (
-               
-                
                 <li key={link.href}>
                   <a
                     data-id={link.href}
@@ -125,7 +123,7 @@ const NavBar = ()=> {
                   >
                     {label}
                   </a>
-                </li> 
+                </li>
               );
             })}
           </ul>
@@ -133,25 +131,24 @@ const NavBar = ()=> {
         <a className="btn btn-ghost text-xl">daisyUI</a>
       </div>
       <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal px-1">
+        <ul className="menu-horizontal gap-5 px-1">
           {navBarContent.map((link) => {
             const label = t(`navBar.${link.key}`);
             return (
-              
               <li key={link.href}>
                 <a
                   data-id={link.href}
                   className={[
                     //ajout de la tramsition
-                    "transition-all duration-300 ease-out border border-transparent",
-                    "hover:text-primary hover:border-primary",
+                    "transition-all duration-300 ease-out ",
+                    "hover:text-primary",
                   ].join(" ")}
                   href={link.href}
                   onClick={(e) => setActiveLink(e)}
                 >
                   {label}
                 </a>
-              </li> 
+              </li>
             );
           })}
         </ul>
@@ -159,14 +156,14 @@ const NavBar = ()=> {
       <div className="navbar-end gap-2">
         <ThemeControler />
         <SelectLanguage />
-        {isDisplay?.authentified ? <ProfileDropDown
-          credit={isDisplay.credit}
-          userName={isDisplay.userName}
-          textCredit={isDisplay.textCredit}
-          plan={isDisplay.plan}
-                 
-        
-        /> : null}
+        {isDisplay?.authentified ? (
+          <ProfileDropDown
+            credit={isDisplay.credit}
+            userName={isDisplay.userName}
+            textCredit={isDisplay.textCredit}
+            plan={isDisplay.plan}
+          />
+        ) : null}
       </div>
     </nav>
   );

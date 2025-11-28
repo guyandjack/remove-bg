@@ -22,16 +22,24 @@ export type FormValues = {
   confirm: string;
   lang: string;
   id?: string;
-  plan: string;
+  plan: string | null;
 };
+
+type BgColor = {
+  free: string | "";
+  hobby: string | "";
+  pro: string | "";
+}
 
 //constante et variable globales
 const { urlApi } = localOrProd();
 
+
+
 //declarations des fonctions
 
 //recupere la valeur du parametre "plan"
-const getPlan = () => {
+const getPlan = (): string | null  => {
   // Récupérer la chaîne de requête
   const queryString = window.location.search;
 
@@ -39,14 +47,15 @@ const getPlan = () => {
   const urlParams = new URLSearchParams(queryString);
 
   // Récupérer la valeur d'un paramètre spécifique
-  const plan = urlParams.get("plan") || ""; 
+  const plan = urlParams.get("plan") || null;
 
-  return plan
-}
+  return plan;
+};
 const FormSignUp = () => {
   const { t, i18n } = useTranslation();
   //state qui gere l' validite de la reponse.
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   //gere en partie l' affichage du loader
   const [isLoader, setIsLoader] = useState(false);
@@ -61,8 +70,16 @@ const FormSignUp = () => {
   //reference qui stocke les data user a transmetre au form OTP
   const dataUser = useRef<FormValues>();
 
-
   const plan = getPlan();
+  //class css dynamique
+  let bgColor: string | null = null;
+  if (plan) {
+     bgColor = {
+      free: "bg-secondary/80",
+      hobby: "bg-success/80",
+      pro: "bg-info/80",
+    }[plan] || null;
+  }
 
   const lang = i18n.resolvedLanguage || i18n.language;
 
@@ -79,7 +96,7 @@ const FormSignUp = () => {
       password: "qwertzuioP!789",
       confirm: "qwertzuioP!789",
       lang: lang,
-      plan: plan 
+      plan: plan,
     },
   });
 
@@ -107,46 +124,49 @@ const FormSignUp = () => {
           timeout: 10000,
         }
       );
-
-      let message = "";
-      if (response.data.status === "success") {
+      const DATA:any = response.data;
+      let message = DATA.message;
+      console.log("DATA message: ", message);
+      setErrorMessage(message);
+      if (DATA.status === "success") {
         setIsLoader(false);
         setStatus("success");
-        setTimeout(() => {
-          setDisplayOtp(() => {
-            setStatus("idle");
-            return true;
-          });
-        }, 3000);
+        
       } else {
         setIsLoader(false);
+        setErrorMessage(message);
         setStatus("error");
-        setTimeout(() => {
-          setStatus("idle");
-        }, 3000);
+        
       }
     } catch (error) {
       setIsLoader(false);
       setStatus("error");
-      axiosError(setStatus, error);
+      
+    } finally {
       setTimeout(() => {
         setStatus("idle");
       }, 3000);
-    } 
+      
+    }
   };
 
   return (
     <>
-      <div className="flex min-h-full flex-col justify-center px-6 py-15 lg:px-8">
+      <div className="mx-auto max-w-[500px] h-[calc(100svh-70px)] flex flex-col justify-center py-15">
         <div className="sm:mx-auto sm:w-full sm:max-w-xl">
-          <h2 className="text-center text-2xl font-bold tracking-tight text-base-content">
+          <h1 className="text-center text-2xl font-bold">
             {t("formSignUp.title")}
-            <span className="ml-[10px] p-[5px] bg-success text-black rounded">{`${plan}`}</span>
-          </h2>
+            <span
+              className={`ml-[10px] p-[5px] text-black rounded ${bgColor} capitalize`}
+              style={{ textTransform: "capitalize" }}
+            >
+              {plan}
+            </span>
+          </h1>
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl">
-          <div className="rounded-xl bg-base-100/60 backdrop-blur-sm shadow-sm p-6 md:p-8">
+          <div className="rounded-xl bg-base-100/60 backdrop-blur-sm shadow-sm p-6 bg-component md:p-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
                 <label htmlFor="email" className="label p-0">
@@ -158,7 +178,7 @@ const FormSignUp = () => {
                   <input
                     id="email"
                     type="email"
-                    className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                    className="input-clean"
                     aria-invalid={!!errors.email || undefined}
                     {...register("email", {
                       required: t("formContact.required"),
@@ -223,7 +243,7 @@ const FormSignUp = () => {
                   <input
                     id="password"
                     type={!eyePass ? "password" : "text"}
-                    className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                    className="input-clean"
                     aria-invalid={!!errors.password || undefined}
                     {...register("password", {
                       required: t("formContact.required"),
@@ -288,7 +308,7 @@ const FormSignUp = () => {
                   <input
                     id="confirm"
                     type={!eyeConfirm ? "password" : "text"}
-                    className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                    className="input-clean"
                     {...register("confirm", {
                       required: t("formContact.required"),
                       pattern: {
@@ -350,7 +370,9 @@ const FormSignUp = () => {
                 <div className="relative w-full flex flex-col justify-center items-center mt-4">
                   <BtnGoogleLogin
                     text={t("formSignUp.btnGoogle")}
-                    disabled={isLoader || status !== "idle" || displayOtp}
+                    disabled={
+                      isLoader || status !== "idle" || displayOtp || true
+                    }
                   />
                   {isLoader ? <Loader top="top-20" /> : null}
                 </div>
@@ -370,7 +392,7 @@ const FormSignUp = () => {
         `}
                 >
                   {status === "success" ? t("formSignUp.textSuccess") : ""}
-                  {status === "error" ? t("formSignUp.textError") : ""}
+                  {status === "error" ? errorMessage : ""}
                 </div>
               </div>
               {

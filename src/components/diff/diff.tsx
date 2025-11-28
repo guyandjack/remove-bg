@@ -75,38 +75,38 @@ const Diff = ({ tag }: Tags) => {
   const pictureAlt = pictureLabels[selectedKey];
 
   return (
-    <div className={"flex flex-col justify-start items-center gap-10 w-full max-w-[1300px] "}>
+    <div
+      className={
+        "flex flex-col justify-start items-center gap-10 w-full max-w-[1300px] "
+      }
+    >
+      <figure className="diff aspect-16/9 mx-auto" tabIndex={0}>
+        <div className="diff-item-1" role="img" tabIndex={0}>
+          <img alt={pictureAlt} src={pictureSrc} />
+        </div>
 
+        <div className="diff-item-2 bg-white" role="img">
+          <img alt="Image de référence floutée" src={pictureSrcBGRemove} />
+        </div>
 
-     
-        <figure className="diff aspect-16/9 mx-auto" tabIndex={0}>
-          <div className="diff-item-1" role="img" tabIndex={0}>
-            <img alt={pictureAlt} src={pictureSrc} />
-          </div>
-          <div className="diff-item-2 bg-white" role="img">
-            <img alt="Image de référence floutée" src={pictureSrcBGRemove} />
-          </div>
+        <div className="diff-resizer" />
+      </figure>
 
-          <div className="diff-resizer">
-            <div className={"bg-info p-[20px]"}></div>
-          </div>
-        </figure>
-
-      { tag.length > 0 ? <ul className="flex flex-row justify-evenly items-center w-full pt-[20px] pb-[20px]">
-        {buttonConfig.map(({ id, className }, index) => (
-          <li key={id}>
-            <button
-              type="button"
-              onClick={() => setSelectedKey(id)}
-              className={className}
-            >
-              {tag[index]}
-            </button>
-          </li>
-        ))}
-      </ul> : null}
-       
-      
+      {tag.length > 0 ? (
+        <ul className="flex flex-row justify-evenly items-center w-full pt-[20px] pb-[20px]">
+          {buttonConfig.map(({ id, className }, index) => (
+            <li key={id}>
+              <button
+                type="button"
+                onClick={() => setSelectedKey(id)}
+                className={className}
+              >
+                {tag[index]}
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 };

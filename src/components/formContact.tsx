@@ -68,7 +68,7 @@ function FormContact({content}:FormProps) {
     agree: "",
   } ;
   if (localSorageValue) {
-    defaultValue = {};
+    //defaultValue = {};
     defaultValue = JSON.parse(localSorageValue);
   }
 
@@ -181,7 +181,7 @@ function FormContact({content}:FormProps) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto mb-16 max-w-xl p-6 md:p-8 rounded-xl bg-base-100/60 backdrop-blur-sm shadow-sm"
+      className="mx-auto w-full mb-16 p-6 bg-component md:p-8 rounded-xl"
     >
       <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
         <div className="mb-3">
@@ -194,7 +194,7 @@ function FormContact({content}:FormProps) {
             <input
               id="firstname"
               type="text"
-              className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+              className="input-clean"
               aria-invalid={!!errors.firstname || undefined}
               {...register("firstname", {
                 required: content.required,
@@ -225,7 +225,7 @@ function FormContact({content}:FormProps) {
             <input
               id="lastname"
               type="text"
-              className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+              className="input-clean"
               aria-invalid={!!errors.lastname || undefined}
               {...register("lastname", {
                 required: content.required,
@@ -256,7 +256,7 @@ function FormContact({content}:FormProps) {
             <input
               id="subject"
               type="text"
-              className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+              className="input-clean"
               aria-invalid={!!errors.subject || undefined}
               {...register("subject", {
                 minLength: { value: 2, message: content.minLength },
@@ -286,7 +286,7 @@ function FormContact({content}:FormProps) {
             <input
               id="email"
               type="email"
-              className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+              className="input-clean"
               aria-invalid={!!errors.email || undefined}
               {...register("email", {
                 required: content.required,
@@ -317,7 +317,7 @@ function FormContact({content}:FormProps) {
             <textarea
               id="message"
               rows={4}
-              className="textarea textarea-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+              className="input-clean"
               aria-invalid={!!errors.message || undefined}
               {...register("message", {
                 required: content.required,
@@ -349,13 +349,13 @@ function FormContact({content}:FormProps) {
               onChange: (e) => storeValue(e),
             })}
           />
-          <label htmlFor="agree" className="text-sm text-base-content/70">
+          <p className="text-sm text-base-content/70">
             {content.privacy}
-            <a href="/privacy" className="ml-1 font-semibold text-primary">
+            <a href="/privacy" className="ml-1 font-semibold link link-primary">
               {content.link}
             </a>
             .
-          </label>
+          </p>
           {errors.agree && (
             <p className="absolute top-6 left-0 sm:col-span-2 text-sm text-error">
               {errors.agree.message}

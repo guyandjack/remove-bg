@@ -1,5 +1,8 @@
 //import de hooks
+import { useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
+
+//import de fonctions
 
 //import des composants enfant
 import { FormContact } from "../components/formContact";
@@ -22,6 +25,9 @@ type FormKey = "lastName" |
 
 function ContactPage() {
   const { t } = useTranslation();
+  useEffect(() => {
+    setDocumentTitle();
+  }, []);
   const contentForm:Record<FormKey, string> = {
     lastName: t("formContact.lastName"),
     firstName: t("formContact.firstName"),
@@ -40,12 +46,21 @@ function ContactPage() {
     textError: t("formContact.textError"),
   };
   return (
-    <div className="px-[10px] mx-auto my-[100px] flex flex-col justify-start items-center gap-10 w-full max-w-[800px]">
-      <h1 className={"text-4xl"}>{t("contact.title")}</h1>
-      <p className={"text-xl"}>
-       {t("contact.intro")}
-      </p>
-      <FormContact content={contentForm} />
+    <div className="px-[10px] w-full mx-auto bg-page lg:px-[0px] flex flex-col justify-start items-center gap-[50px]">
+      <h1
+        dangerouslySetInnerHTML={{
+          __html: t("contact.title").replace(/\n/g, "<br/>"),
+        }}
+        className={
+          "mt-[50px] self-center text-center text-4xl font-bold lg:w-[60%] lg:text-6xl lg:text-left"
+        }
+      >
+        
+      </h1>
+      <p className={"text-xl max-w-[800px]"}>{t("contact.intro")}</p>
+      <div className={"w-full max-w-[600px]"}>
+        <FormContact content={contentForm} />
+      </div>
     </div>
   );
 }

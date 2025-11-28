@@ -1,9 +1,9 @@
 
-import { useEffect, useState } from "preact/hooks";
+import { initSessionFromLocalStorage, sessionSignal } from "@/stores/session";
 import { api } from "@/utils/axiosConfig";
-import { sessionSignal, initSessionFromLocalStorage } from "@/stores/session";
 import { langSignal } from "@/utils/langSignal";
 import { isAuthentified } from "@/utils/request/isAuthentified";
+import { useEffect, useState } from "preact/hooks";
 
 type SubmitState = "idle" | "loading" | "success" | "error";
 
@@ -11,6 +11,10 @@ const DashboardPage = () => {
   const [email, setEmail] = useState<string>("");
   const [pwSubmitting, setPwSubmitting] = useState<SubmitState>("idle");
   const [cancelSubmitting, setCancelSubmitting] = useState<SubmitState>("idle");
+
+  useEffect(() => {
+    setDocumentTitle();
+  }, []);
 
   // Auth + hydration guard
   useEffect(() => {

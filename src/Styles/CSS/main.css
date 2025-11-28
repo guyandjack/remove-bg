@@ -1,33 +1,121 @@
 @import "tailwindcss";
 
 @plugin "daisyui" {
-   themes: winter --default , night --prefersdark;
- }
-
+  themes: winter --default, night --prefersdark;
+}
 
 @plugin "daisyui/theme" {
   name: "winter";
   default: true;
-  --color-success:oklch(79% 0.209 151.711) ;
+  --color-success: oklch(79% 0.209 151.711);
   --color-info: oklch(78% 0.154 211.53);
   --color-warning: oklch(75% 0.183 55.934);
-  
+  --custom-bg-page: #F2F7FE;
+  --custom-bg-component: #F9FAFB;
+  --custom-bg-footer: #0A1120;
+  --custom-bg-navbar: rgba(249, 250, 251, 0.9)
 }
 
- @font-face {
-  font-family:"Roboto" ;
-  src: url(/src/fonts/Roboto-VariableFont_wdth\,wght.ttf);
-  } 
+@plugin "daisyui/theme" {
+  name: "night";
+  default: true;
+  --color-success: oklch(79% 0.209 151.711);
+  --color-info: oklch(78% 0.154 211.53);
+  --color-warning: oklch(75% 0.183 55.934);
+  --custom-bg-page: #111928;
+  --custom-bg-component: #1F2A37;
+  --custom-bg-footer: #0A1120;
+  --custom-bg-navbar: rgba(31, 42, 55, 0.9);
+}
 
-  *{
-    font-family: "Roboto";
-    
-  }
-  
-    img {
+@font-face {
+  font-family: "Roboto";
+  src: url(/src/fonts/Roboto-VariableFont_wdth\,wght.ttf);
+}
+
+* {
+  font-family: "Roboto";
+}
+
+img {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
-   } 
+}
+/***********************************************
+****** custom css pour composant principaux *********
+**********************************************/
+.bg-page {
+  background-color: var(--custom-bg-page);
+}
+.bg-component {
+  background-color: var(--custom-bg-component);
+}
+.bg-footer{
+  background-color: #0A1120;
+}
 
+.bg-navbar{
+  background-color: var(--custom-bg-navbar);
+}
+
+/******input *****/
+.input-clean {
+  background: transparent;
+  border: 1px solid grey; /* Blanc selon DaisyUI */
+  color: var(--color-base-content);
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.6rem;
+  width: 100%;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.input-clean::placeholder {
+  color: rgba(255, 255, 255, 0.4); /* gris léger pour les thèmes sombres */
+}
+
+.input-clean:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--color-secondary) );
+  outline: none;
+}
+
+
+/***********************************************
+****** custom css pour composant diff *********
+**********************************************
+ /* Curseur principal = pseudo-élément de .diff-item-2 */
+.diff-item-2::after {
+  /* taille plus grande */
+  width: 3rem;
+  height: 3rem;
+
+  /* fond + bordure blancs dans tous les thèmes */
+  background-color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  /*box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.9);*/
+
+  /* afficher "<>" dedans */
+  content: "< >";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000000;
+
+  /* animation */
+  transition: scale 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+/* Petit zoom au survol de la zone diff */
+.diff:hover .diff-item-2::after {
+  scale: 1.1;
+  /*box-shadow: 0 0 14px 4px rgba(255, 255, 255, 1);*/
+}
+
+/* Barre verticale blanche (tous thèmes) */
+.diff-item-1 {
+  border-right: 2px solid #ffffff !important;
+}

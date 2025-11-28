@@ -1,10 +1,13 @@
 //page conditions d' utilisations
 
-
+import { useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
 const TermsPage = () => {
   const { t } = useTranslation();
+  useEffect(() => {
+    setDocumentTitle();
+  }, []);
   return (
     <div className="mx-auto w-full max-w-4xl px-4 md:px-6 lg:px-8 py-10">
       <header className="text-center space-y-3 mb-8">

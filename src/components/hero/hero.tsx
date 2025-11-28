@@ -25,8 +25,8 @@ type ContentProps = {
 
 const Hero = ({ content }: ContentProps) => {
   return (
-    <section className="hero bg-base-200 w-full">
-      <div className="hero-content flex-col lg:flex-row-reverse">
+    <section className="hero bg-base-200 w-full rounded-[40px]">
+      <div className="hero-content rounded-[40px] flex-col lg:flex-row-reverse">
         <img
           src={heroImg}
           alt="exapmle d'image sans arriere plan"
@@ -41,10 +41,10 @@ const Hero = ({ content }: ContentProps) => {
             className="self-center text-center py-[20px] text-xl w-[80%] lg:self-start lg:text-left"
             dangerouslySetInnerHTML={{ __html: content.title_h2 }}
           ></h2>
-          <p
+          {/* <p
             className="py-[20px] text-[18px]"
             dangerouslySetInnerHTML={{ __html: content.info_1 }}
-          ></p>
+          ></p> */}
           <p
             className="py-[20px]"
             dangerouslySetInnerHTML={{ __html: content.info_2 }}
@@ -60,7 +60,9 @@ const Hero = ({ content }: ContentProps) => {
                   className={"link"}
                   href={"/pricing"}
                   dangerouslySetInnerHTML={{ __html: content.info_list_1_link }}
-                  onClick={(e)=>{setActiveLink(e)}}
+                  onClick={(e) => {
+                    setActiveLink(e);
+                  }}
                 ></a>
               </p>
             </li>
