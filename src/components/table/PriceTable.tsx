@@ -62,7 +62,7 @@ const PricingComparisonTable = ({ option, lang }: PricingComparisonTableProps) =
    return (
      <section className="mt-12">
        <div className="overflow-x-auto">
-         <div className="rounded-2xl border border-base-300/70 bg-base-100/80 shadow-xl backdrop-blur">
+         <div className="rounded-2xl border border-base-300/70 bg-base-100/80 shadow-xl backdrop-blur bg-component">
            <table className="table w-full text-sm lg:text-base">
              <thead className="bg-base-200/80">
                <tr>

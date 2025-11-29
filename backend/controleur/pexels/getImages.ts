@@ -9,6 +9,15 @@ import type { RequestHandler } from "express";
 const getImages: RequestHandler = async (req, res) => {
     const query = req.query.theme;
     let lang = req.query.lang;
+    const MAX_PAGE = 5;
+    const rawPage = Array.isArray(req.query.page)
+        ? req.query.page[0]
+        : req.query.page;
+    let pageNumber = parseInt(rawPage as string, 10);
+    if (Number.isNaN(pageNumber) || pageNumber < 1) {
+        pageNumber = 1;
+    }
+    pageNumber = Math.min(pageNumber, MAX_PAGE);
     switch (lang) {
         case "fr": 
             lang = "fr-FR"
@@ -31,7 +40,11 @@ const getImages: RequestHandler = async (req, res) => {
     
     try {
         
-        const response = await client.photos.search({ query, locale:lang });
+        const response = await client.photos.search({
+            query,
+            locale:lang,
+            page: pageNumber,
+        });
         if (!response) {
             res.status(500).json("error HTTP code: pex-1")
         }

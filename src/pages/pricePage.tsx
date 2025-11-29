@@ -1,6 +1,5 @@
 //import des hooks
-import { useLocation } from "preact-iso";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
 //import des instance
@@ -13,6 +12,11 @@ import { PricingComparisonTable } from "@/components/table/PriceTable";
 
 //import des fonctions
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
+import {
+  planOptionsSignal,
+  setPlanOptions,
+  PlanOption,
+} from "@/stores/planOptions";
 
 
 type PlanKey =
@@ -28,35 +32,16 @@ type PlanKey =
 
 type PlanText = Record<PlanKey, string>;
 
-type PlanOption = {
-  name: string;
-  price: number;
-  credit: number;
-  format: string;
-  remove_bg: boolean;
-  change_bg_color: boolean;
-  tools_qt: string;
-  tool_name: string[];
-  model_IA_ressource: string;
-  gomme_magique: boolean;
-  img_pexels: boolean;
-  delay_improved: boolean;
-  bg_IA_generation: boolean;
-  bundle: boolean;
-  bundle_qt: number;
-  api: boolean;
-  api_external: boolean;
+type PricePageProps = {
+  routeKey?: string;
+  isSignup?: boolean;
 };
 
-function PricePage() {
+const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
   const { t } = useTranslation();
-  const { path } = useLocation();
-  const [arrayOption, setArrayOption] = useState<PlanOption[]>([]);
-  const [objectOption, setObjectOption] = useState<Record<string, PlanOption>>(
-    {}
-  );
+  const planOptions = planOptionsSignal.value;
 
-  const IsCreateAccount = path.includes("signup") ? true : false;
+  const IsCreateAccount = isSignup;
 
   const textLangCard: PlanText = {
     tag: t("priceCard.tag"),
@@ -135,37 +120,48 @@ function PricePage() {
   ];
 
   useEffect(() => {
-    if (localStorage.getItem("option")) {
-      const objectOption = localStorage.getItem("option") || "";
-      const objectOptionParsed = JSON.parse(objectOption) || "";
-      setArrayOption(objectOptionParsed);
-      const byName: Record<string, PlanOption> = objectOptionParsed.reduce(
-        (acc: any, p: any) => ({ ...acc, [p.name]: p }),
-        {}
-      );
-      setObjectOption(byName);
-      return;
-    }
-    api
-      .get("api/plan/option")
-      .then((result) => {
-        const data = result.data;
-        if (data.status !== "success") {
+    console.log("use effect run");
+    const hydrateFromCache = (): boolean => {
+      const cache = localStorage.getItem("option");
+      if (!cache)  {
+        console.log("Pas objet option dans le localstorage. code_price-1 ");
+        return false
+      } 
+      try {
+        const parsed = JSON.parse(cache);
+        if (!Array.isArray(parsed) || parsed.length === 0) {
+         console.log("L' objet parsed n' est pas un tableau ou sa longeur est nulle code_price_2 ");
+         return false;
+        }
+        setPlanOptions(parsed as PlanOption[]);
+        console.log("Le tableau arrayOption a ete mis à jour avec le localstorage! ");
+        
+        return true;
+      } catch (error) {
+        console.warn("Option cache invalide, suppression… code_price_3", error);
+        localStorage.removeItem("option");
+        return false;
+      }
+    };
+
+    const fetchOptions = async () => {
+      try {
+        const { data } = await api.get("api/plan/option");
+        if (data?.status !== "success" || !Array.isArray(data?.plans)) {
           return;
         }
-        const plans: PlanOption[] = data.plans;
-        localStorage.setItem("option", JSON.stringify(plans));
-        setArrayOption(plans);
-        const byName: Record<string, PlanOption> = plans.reduce(
-          (acc, p) => ({ ...acc, [p.name]: p }),
-          {}
-        );
-        setObjectOption(byName);
-      })
-      .catch((e) => {
-        //setPlanOption([]);
-      });
-  }, []);
+        localStorage.setItem("option", JSON.stringify(data.plans));
+        setPlanOptions(data.plans);
+        
+      } catch (error) {
+        console.error("Erreur lors de la récupération des plans", error);
+      }
+    };
+
+    if (!hydrateFromCache()) {
+      fetchOptions();
+    }
+  }, [routeKey]);
 
   useEffect(() => {
     setDocumentTitle();
@@ -217,7 +213,7 @@ function PricePage() {
           "relative w-full max-w-[1300px] mx-auto py-[50px] flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-between lg:gap-[0px]"
         }
       >
-        {arrayOption.map((items) => {
+        {planOptions.map((items) => {
           return (
             <li key={items.name} className={"max-w-[350px] min-w-[300px]"}>
               <PriceCard lang={textLangCard} option={items} />
@@ -237,7 +233,7 @@ function PricePage() {
         >
           {t("pricing.title_h2_tab")}
         </h2>
-        <PricingComparisonTable lang={textLangTab} option={arrayOption} />
+        <PricingComparisonTable lang={textLangTab} option={planOptions} />
       </div>
 
       {/* FAQ*/}

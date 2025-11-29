@@ -3,6 +3,8 @@ import { useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
 //import de fonctions
+import { setDocumentTitle } from '@/utils/setDocumentTitle';
+
 
 //import des composants enfant
 import { FormContact } from "../components/formContact";

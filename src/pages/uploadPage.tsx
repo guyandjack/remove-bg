@@ -1,6 +1,6 @@
 // UploadPage.tsx
 //import des hooks
-import { useState, useEffect } from "preact/hooks";
+import { useState, useEffect, useRef } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
 //import des composants enfants
@@ -13,6 +13,7 @@ import { Example } from "@/components/colorPicker/colorPicker";
 import { loadScript } from "@/utils/loadScript";
 import { sessionSignal } from "@/stores/session";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
+import { planOption24 } from "@/data/content/components/editor/planOption";
 
 // CDN de l'éditeur
 const editorCdn =
@@ -38,19 +39,53 @@ const UploadPage = () => {
 
   const [isCdnLoaded, setCdnLoaded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  const typePlan =
-    sessionSignal?.value?.plan?.code ||
+  const [typePlan, setTypePlan] = useState<string>(sessionSignal?.value?.plan?.code ||
     sessionSignal?.value?.plan?.name ||
-    "noplan";
+    "")
+
+  const planChoiceEl = useRef<HTMLUListElement | null>(null);
   const objectSession: string = localStorage.getItem("session") || "";
   let creditRemaining = 0;
   if (objectSession !== "") {
     
     const objectSessionParsed = JSON.parse(objectSession);
     const localCredits = objectSessionParsed.credits.remaining_last_24h;
-    creditRemaining = sessionSignal?.value?.credits?.remaining_last_24h || localCredits ;
+    creditRemaining = sessionSignal?.value?.credits?.remaining_last_24h || localCredits;
   }
+
+  const choicePlan = (e?: MouseEvent) => {
+    const elementList = planChoiceEl?.current;
+        //si pas d'event et pas de plan c'est option de style par defaut
+    if (!e && typePlan === "" && elementList) {
+      const buttons =
+        Array.from(elementList?.querySelectorAll("button")) || null;
+      buttons.forEach((btn) => {
+        btn.classList.remove("opacity-[1]");
+        btn.style.outline = "none";
+      });
+      buttons[2].classList.add("opacity-[1]");
+      buttons[2].style.outline = "dashed red";
+      return
+    };
+
+    if (elementList) {
+      const buttons = Array.from(elementList?.querySelectorAll("button")) || null;
+      buttons.forEach((btn) => {
+        btn.classList.remove("opacity-[1]");
+        btn.style.outline = "none";
+      })
+      const el = e?.currentTarget as HTMLElement | null;
+      if (!el) return;
+
+      const plan = el.dataset.plan?.trim();
+      if (!plan) return;
+
+      el.classList.add("opacity-[1]");
+      el.style.outline = "dashed red";
+      setTypePlan(plan);
+    }
+  };
+
 
   // Effet : quand callApi passe à true → on lance API + CDN
   useEffect(() => {
@@ -86,12 +121,42 @@ const UploadPage = () => {
         setCallApi(false); // on remet le flag à false
       });
   }, [callApi]);
+
+  //affiche le titre de la page dans l' onglet
   useEffect(() => {
     setDocumentTitle();
   }, []);
 
+  //si un utilisateur est connecté
+  // Image editor sera remonte avec la valeur du plan de l'utilisateur connecte
+  useEffect(() => {
+    if(!userLoged) return
+   setTypePlan(sessionSignal?.value?.plan?.code || "");
+  }, [sessionSignal?.value?.plan?.code]);
+
+
   const shouldShowEditor =
     isCdnLoaded && responseApi !== "" && previewUrl !== null && !isProcessing;
+  
+  //style par defaut de l' element planChoice
+  useEffect(() => {
+    if (!planChoiceEl?.current) return;
+    choicePlan();
+  }, [shouldShowEditor]);
+
+
+  //scroll sur l' element principal
+  useEffect(() => {
+    if (!shouldShowEditor) return;
+    if (planChoiceEl.current) {
+      planChoiceEl.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center", // centre verticalement
+        inline: "center", // centre horizontalement (si utile)
+      });
+    }
+  }, [shouldShowEditor]);
+
 
   return (
     <div className="px-[10px] w-full mx-auto pb-[100px] bg-base-200">
@@ -116,7 +181,47 @@ const UploadPage = () => {
           content={textUploadImgComponent}
         />
       </div>
-      <div id="editor" className="relative mt-6 w-full min-h-[1000px]">
+      {!userLoged && shouldShowEditor ? (
+        <ul
+          ref={planChoiceEl}
+          className={
+            "mx-auto max-w-[1300px] flex flex-col justify-start items-center gap-3 lg:flex-row lg:gap-5"
+          }
+        >
+          <li>
+            Simule un abonement et evalue les outils de retouche que tu
+            souhaites
+          </li>
+          <li>
+            <button
+              data-plan="free"
+              className={"btn btn-secondary opacity-[0.6]"}
+              onClick={(e) => choicePlan(e)}
+            >
+              Free plan
+            </button>
+          </li>
+          <li>
+            <button
+              data-plan="hobby"
+              className={"btn btn-success opacity-[0.6]"}
+              onClick={(e) => choicePlan(e)}
+            >
+              Hobby plan
+            </button>
+          </li>
+          <li>
+            <button
+              data-plan="pro"
+              className={"btn btn-info opacity-[0.6]"}
+              onClick={(e) => choicePlan(e)}
+            >
+              Pro plan
+            </button>
+          </li>
+        </ul>
+      ) : null}
+      <div id="editor" className="mt-6 w-full">
         {shouldShowEditor && (
           <ImgEditor
             src={responseApi}

@@ -1,6 +1,5 @@
-
 //import  des librairies et des types preact
-import { LocationProvider, Router, ErrorBoundary, Route } from "preact-iso";
+import { LocationProvider, Router, ErrorBoundary, Route, useLocation } from "preact-iso";
 
 //import des types
 // Types are inferred; no explicit JSX.Element return type needed
@@ -10,22 +9,25 @@ import { HomePage } from "./src/pages/homePage";
 import { UploadPage } from "./src/pages/uploadPage";
 import { SignUpPage } from "./src/pages/signUpPage";
 import { PricePage } from "./src/pages/pricePage";
-import { ContactPage} from "./src/pages/contactPage";
-import { TermsPage} from "./src/pages/termsPage";
-import { PrivacyPage} from "./src/pages/privacyPage";
-import { LegalPage} from "./src/pages/LegalPage";
-import { LoginPage} from "./src/pages/loginPage";
-import { CgvPage} from "./src/pages/cgvPage";
+import { ContactPage } from "./src/pages/contactPage";
+import { TermsPage } from "./src/pages/termsPage";
+import { PrivacyPage } from "./src/pages/privacyPage";
+import { LegalPage } from "./src/pages/LegalPage";
+import { LoginPage } from "./src/pages/loginPage";
+import { CgvPage } from "./src/pages/cgvPage";
 import { DashboardPage } from "./src/pages/dashboardPage";
 //import { CguPage} from "./src/pages/cguPage";
-import { Page404} from "./src/pages/404Page";
+import { Page404 } from "./src/pages/404Page";
 
 //import des composants
 import { NavBar } from "./src/components/navBar";
 import { Footer } from "./src/components/footer/Footer";
 
 export function App() {
-  
+  const RoutedPricePage = () => {
+    const { url, path } = useLocation();
+    return <PricePage routeKey={url} isSignup={path.includes("signup")} />;
+  };
 
   return (
     <div>
@@ -39,8 +41,8 @@ export function App() {
             <Router>
               <Route path="/" component={HomePage} />
               <Route path="/upload" component={UploadPage} />
-              <Route path="/pricing" component={PricePage} />
-              <Route path="/pricing/signup" component={PricePage} />
+              <Route path="/pricing" component={RoutedPricePage} />
+              <Route path="/pricing/signup" component={RoutedPricePage} />
               <Route path="/login" component={LoginPage} />
               <Route path="/signup" component={SignUpPage} />
               <Route path="/contact" component={ContactPage} />

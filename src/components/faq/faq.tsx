@@ -5,19 +5,16 @@ const Faq = ({text}) => {
         <ul className={"mt-12 flex flex-col justify-start items-center gap-[20px] w-full"}>
           {text.map((item) => {
             return (
-              <li className={"w-full max-w-[1000px]"}>
-                <details
-                  className="collapse bg-base-100 border border-base-300"
-                  name="my-accordion-det-1"
-                  open
-                >
-                  <summary className="collapse-title font-semibold lg:text-xl">
+              <li className={"w-full max-w-[1000px] p-3 "}>
+                <div className="collapse collapse-plus bg-base-100 border border-base-300 bg-component">
+                  <input type="radio" name="my-accordion-3" />
+                  <div className="collapse-title font-semibold text-lg">
                     {item.question}
-                  </summary>
-                  <div className="collapse-content text-m">
+                  </div>
+                  <div className="collapse-content text-base">
                     {item.response}
                   </div>
-                </details>
+                </div>
               </li>
             );
           })}

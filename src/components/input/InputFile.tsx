@@ -51,7 +51,7 @@ const InputFile = ({
         )}
       </div>
 
-      <div className="btn btn-sm">{buttonText}</div>
+      <div className="btn btn-sm text-black">{buttonText}</div>
     </label>
   );
 };

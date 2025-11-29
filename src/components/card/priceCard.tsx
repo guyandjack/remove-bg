@@ -56,7 +56,7 @@ const PriceCard = ({ lang, option }: PriceCardProps) => {
 
   return (
     <div
-      className={`card w-full h-[350px] bg-base-100 shadow-sm border ${borderColor}`}
+      className={`card w-full h-[350px] bg-base-100 shadow-sm border ${borderColor} bg-component`}
     >
       <div className="relative card-body">
         {option.name === "hobby" ? (

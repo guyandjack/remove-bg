@@ -35,7 +35,7 @@ const DownloadLink = ({ currentSource, credit }: DownloadLinkProps) => {
     },
   });
 
-  const handleClick = async (e: JSX.TargetedMouseEvent<HTMLAnchorElement>) => {
+  const handleClick = async (e:MouseEvent) => {
     // Si pas de crédit ou déjà en cours → on bloque direct
     if (credit < 1 || isPending) {
       e.preventDefault();
@@ -49,11 +49,7 @@ const DownloadLink = ({ currentSource, credit }: DownloadLinkProps) => {
       const payload = { reason: "download" };
 
       // 1) Décrémentation via API (géré par axios + refresh si 401)
-      const response = await api.post(`/api/usage/download`, payload, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-        timeout: 10000,
-      });
+      const response = await api.post(`/api/usage/download`, payload);
 
       if (!response) {
         throw new Error("No response from server");
@@ -62,7 +58,7 @@ const DownloadLink = ({ currentSource, credit }: DownloadLinkProps) => {
       const data = response.data as any;
 
       if (data?.status === "success") {
-        // 2) Met à jour les crédits côté session/localStorage
+        // 2) Met à jour les crédits côté session
         sessionSignal.value = {
           ...sessionSignal.value,
           credits: {
@@ -70,7 +66,7 @@ const DownloadLink = ({ currentSource, credit }: DownloadLinkProps) => {
             remaining_last_24h: data.remaining_last_24h,
           },
         };
-
+        //Met à jour les crédits côté localStorage
         updateSessionUser("credits", {
           used_last_24h: data.used_last_24h,
           remaining_last_24h: data.remaining_last_24h,
@@ -115,7 +111,7 @@ const DownloadLink = ({ currentSource, credit }: DownloadLinkProps) => {
     <div>
       {disabled ? (
         <button
-          className={`btn btn-outline border border-warning text-warning `}
+          className={`btn btn-outline border border-error text-error `}
           aria-disabled={disabled}
           disabled
         >
@@ -123,7 +119,7 @@ const DownloadLink = ({ currentSource, credit }: DownloadLinkProps) => {
             ? isPending
               ? "En cours..."
               : "Télécharger"
-            : "No more credit for today..."}
+            : "No more crédits for download image...."}
         </button>
       ) : (
         <a
