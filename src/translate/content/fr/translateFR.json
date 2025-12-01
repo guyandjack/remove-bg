@@ -114,17 +114,16 @@
   },
 
   "priceCard": {
-  "tag": "Le plus populaire",
-  "remove_bg": "Suppression de l'arrière-plan",
-  "price": "/ mois",
-  "credit": "Crédits / jour",
-  "gomme_magique": "Gomme magique",
-  "img_pexels": "Images PEXELS",
-  "api": "API",
-  "bundle": "Traitement par lot",
-  "subscribe": "Je choisis ce plan"
-},
-
+    "tag": "Le plus populaire",
+    "remove_bg": "Suppression de l'arrière-plan",
+    "price": "/ mois",
+    "credit": "Crédits / jour",
+    "gomme_magique": "Gomme magique",
+    "img_pexels": "Images PEXELS",
+    "api": "API",
+    "bundle": "Traitement par lot",
+    "subscribe": "Je choisis ce plan"
+  },
 
   "heroHome": {
     "title_h1": "Supprimez&nbsp;l'arrière-plan&nbsp;de&nbsp;vos&nbsp;images&nbsp;grâce&nbsp;à&nbsp;l'IA",
@@ -139,6 +138,22 @@
     "privacy_1_link": "politique&nbsp;de&nbsp;confidentialité",
     "privacy_2": "Aucun numéro de carte n’est demandé pour le plan gratuit."
   },
+  "stepsContent": {
+    "title": "Comment ça marche ?",
+    "intro": "Téléversez votre image et laissez l'IA travailler à votre place.",
+    "step_1": {
+      "title": "Choisissez un plan",
+      "description": "Le plan sélectionné vous permet de bénéficier d’un nombre de crédits limité toutes les 24 heures."
+    },
+    "step_2": {
+      "title": "Créez un compte",
+      "description": "Une adresse email valide, un mot de passe sécurisé et le tour est joué. Aucune carte de crédit n’est demandée pour le plan gratuit."
+    },
+    "step_3": {
+      "title": "Utilisez notre service",
+      "description": "Téléversez vos images, patientez quelques secondes et votre image est détourée. Selon l’abonnement choisi, vous disposez également d’outils de retouche photo."
+    }
+  },
 
   "cta": {
     "label_choice": "Je choisis un plan",
@@ -152,52 +167,100 @@
     "preview": "Aucun aperçu disponible",
     "erase": "Effacer"
   },
+  "faqHome": {
+    "question_1": "Le site respecte-t-il le RGPD ?",
+    "reponse_1": "Oui. Notre service est pleinement conforme au RGPD. Les données personnelles ne sont collectées que lorsqu’elles sont strictement nécessaires (inscription ou formulaire de contact). Vous disposez d’un droit d’accès, de rectification et de suppression de vos données à tout moment.",
+
+    "question_2": "À qui s’adresse ce service de suppression d’arrière-plan ?",
+    "reponse_2": "Notre outil s’adresse aux créateurs de contenu, e-commerçants, photographes, graphistes, étudiants et à toute personne souhaitant obtenir rapidement des images détourées, prêtes à l’usage professionnel ou personnel.",
+
+    "question_3": "Le site est-il sécurisé ?",
+    "reponse_3": "Oui. Aucune donnée n’est partagée à des tiers sans votre consentement, aucun cookie de suivi n’est utilisé, et les paiements sont traités par Stripe, un prestataire certifié PCI-DSS garantissant un haut niveau de sécurité.",
+
+    "question_4": "Comment utiliser le service ?",
+    "reponse_4": "Il vous suffit de choisir un plan (gratuit ou payant), de créer un compte puis d’importer vos images. Le traitement se lance automatiquement et vous pouvez télécharger le résultat en quelques secondes.",
+
+    "question_5": "Le plan gratuit est-il vraiment gratuit ?",
+    "reponse_5": "Oui, totalement. Certaines fonctionnalités avancées sont limitées mais aucune carte bancaire n’est requise et vous disposez de crédits quotidiens pour utiliser le service sans frais.",
+
+    "question_6": "Mes images servent-elles à entraîner les modèles d’IA ?",
+    "reponse_6": "Uniquement si vous l’autorisez explicitement. Avec consentement, les images sont anonymisées et utilisées pour améliorer nos modèles. Sans consentement, elles sont supprimées automatiquement après traitement.",
+
+    "question_7": "Quels risques existent pour mes données personnelles ?",
+    "reponse_7": "Aucun risque notable : nous ne collectons que l’adresse IP et les informations que vous fournissez volontairement (inscription ou contact). Aucune donnée sensible n’est demandée ou stockée.",
+
+    "question_8": "Combien de temps mes images sont-elles conservées ?",
+    "reponse_8": "Avec consentement, vos images sont conservées le temps nécessaire à l’amélioration du modèle d’IA. Sans consentement, elles sont automatiquement supprimées juste après le traitement.",
+
+    "question_9": "Puis-je annuler mon abonnement à tout moment ?",
+    "reponse_9": "Oui. Vous pouvez annuler librement votre abonnement depuis votre espace personnel. L’annulation désactive le renouvellement, sans couper votre accès immédiat.",
+
+    "question_10": "L’annulation donne-t-elle droit à un remboursement ?",
+    "reponse_10": "Non. Conformément à nos conditions d’abonnement, les périodes déjà réglées restent dues jusqu’à leur échéance, même en cas d’annulation anticipée.",
+
+    "question_11": "Quelle est la qualité des résultats obtenus ?",
+    "reponse_11": "Notre modèle d’IA a été entraîné pour produire un détourage propre, précis et professionnel, même pour des images complexes. Les abonnés payants bénéficient d’une qualité accrue et de traitements avancés.",
+
+    "question_12": "Y a-t-il une limite au nombre d’images que je peux traiter ?",
+    "reponse_12": "Oui, chaque plan inclut un quota quotidien de crédits correspondant au nombre d’images traitables. Vous pouvez consulter votre solde à tout moment dans votre tableau de bord.",
+
+    "question_13": "Le service fonctionne-t-il sur mobile ?",
+    "reponse_13": "Oui. Notre PWA est entièrement compatible avec smartphones, tablettes et ordinateurs. Vous pouvez l’installer sur votre appareil comme une application classique.",
+
+    "question_14": "Que faire si une image est mal détourée ?",
+    "reponse_14": "Vous pouvez réessayer avec une version de meilleure qualité ou utiliser nos outils d’amélioration (selon le plan). En cas de problème persistant, notre support peut vous assister.",
+
+    "question_15": "Proposez-vous une API ?",
+    "reponse_15": "Oui, une API est disponible pour les plans professionnels afin d’intégrer le détourage automatique dans vos applications, workflows ou sites e-commerce.",
+
+    "question_16": "Mes informations de paiement sont-elles stockées ?",
+    "reponse_16": "Non. Toutes les données de paiement sont traitées et sécurisées exclusivement par Stripe. Nous n’y avons jamais accès et ne les conservons pas."
+  },
+
   "faqPricing": {
-  "question_1": "Puis-je annuler mon abonnement à tout moment ?",
-  "reponse_1": "Oui, vous pouvez annuler votre abonnement à tout moment depuis votre espace personnel. L’annulation stoppe simplement le renouvellement automatique. Votre accès reste actif jusqu'à la fin de la période déjà payée.",
+    "question_1": "Puis-je annuler mon abonnement à tout moment ?",
+    "reponse_1": "Oui, vous pouvez annuler votre abonnement à tout moment depuis votre espace personnel. L’annulation stoppe simplement le renouvellement automatique. Votre accès reste actif jusqu'à la fin de la période déjà payée.",
 
-  "question_2": "L’annulation donne-t-elle droit à un remboursement ?",
-  "reponse_2": "Non, conformément à notre politique et à la législation applicable, les abonnements déjà commencés ne sont pas remboursables. Vous conservez toutefois l’accès au service jusqu’à l’échéance de votre abonnement en cours.",
+    "question_2": "L’annulation donne-t-elle droit à un remboursement ?",
+    "reponse_2": "Non, conformément à notre politique et à la législation applicable, les abonnements déjà commencés ne sont pas remboursables. Vous conservez toutefois l’accès au service jusqu’à l’échéance de votre abonnement en cours.",
 
-  "question_3": "Puis-je changer de formule (downgrade ou upgrade) ?",
-  "reponse_3": "Oui, vous pouvez modifier votre abonnement à tout moment. La nouvelle formule sera appliquée au début du prochain cycle de facturation. Vous pouvez passer à une offre supérieure ou inférieure selon vos besoins.",
+    "question_3": "Puis-je changer de formule (downgrade ou upgrade) ?",
+    "reponse_3": "Oui, vous pouvez modifier votre abonnement à tout moment. La nouvelle formule sera appliquée au début du prochain cycle de facturation. Vous pouvez passer à une offre supérieure ou inférieure selon vos besoins.",
 
-  "question_4": "Que se passe-t-il si je passe à une formule supérieure ?",
-  "reponse_4": "Si vous choisissez une formule supérieure, celle-ci sera appliquée au prochain renouvellement mensuel. Vous profiterez alors immédiatement des avantages liés à votre nouveau plan.",
+    "question_4": "Que se passe-t-il si je passe à une formule supérieure ?",
+    "reponse_4": "Si vous choisissez une formule supérieure, celle-ci sera appliquée au prochain renouvellement mensuel. Vous profiterez alors immédiatement des avantages liés à votre nouveau plan.",
 
-  "question_5": "Que se passe-t-il si je rétrograde vers une formule inférieure ?",
-  "reponse_5": "Le changement vers une formule inférieure sera appliqué au prochain cycle mensuel. Vous conservez jusqu'à cette date les fonctionnalités de votre formule actuelle.",
+    "question_5": "Que se passe-t-il si je rétrograde vers une formule inférieure ?",
+    "reponse_5": "Le changement vers une formule inférieure sera appliqué au prochain cycle mensuel. Vous conservez jusqu'à cette date les fonctionnalités de votre formule actuelle.",
 
-  "question_6": "Comment fonctionne le paiement de l’abonnement ?",
-  "reponse_6": "Le paiement est mensuel et s’effectue par carte bancaire via Stripe, une plateforme sécurisée. Nous ne conservons aucune donnée bancaire sensible.",
+    "question_6": "Comment fonctionne le paiement de l’abonnement ?",
+    "reponse_6": "Le paiement est mensuel et s’effectue par carte bancaire via Stripe, une plateforme sécurisée. Nous ne conservons aucune donnée bancaire sensible.",
 
-  "question_7": "Puis-je tester le service avant de m’abonner ?",
-  "reponse_7": "Oui, un plan gratuit est disponible et vous permet de tester la qualité du traitement avec un nombre limité de crédits par jour. Aucun numéro de carte n’est requis pour l’utiliser.",
+    "question_7": "Puis-je tester le service avant de m’abonner ?",
+    "reponse_7": "Oui, un plan gratuit est disponible et vous permet de tester la qualité du traitement avec un nombre limité de crédits par jour. Aucun numéro de carte n’est requis pour l’utiliser.",
 
-  "question_8": "Que se passe-t-il si mes crédits quotidiens sont épuisés ?",
-  "reponse_8": "Vos crédits sont réinitialisés automatiquement chaque jour. Si vous avez besoin de plus de crédits, vous pouvez passer à un abonnement supérieur à tout moment.",
+    "question_8": "Que se passe-t-il si mes crédits quotidiens sont épuisés ?",
+    "reponse_8": "Vos crédits sont réinitialisés automatiquement chaque jour. Si vous avez besoin de plus de crédits, vous pouvez passer à un abonnement supérieur à tout moment.",
 
-  "question_9": "L'abonnement se renouvelle-t-il automatiquement ?",
-  "reponse_9": "Oui, l’abonnement se renouvelle automatiquement chaque mois pour garantir la continuité du service. Vous pouvez désactiver le renouvellement dans votre espace personnel.",
+    "question_9": "L'abonnement se renouvelle-t-il automatiquement ?",
+    "reponse_9": "Oui, l’abonnement se renouvelle automatiquement chaque mois pour garantir la continuité du service. Vous pouvez désactiver le renouvellement dans votre espace personnel.",
 
-  "question_10": "Puis-je utiliser le service sur plusieurs appareils ?",
-  "reponse_10": "Oui, votre abonnement est lié à votre compte. Vous pouvez utiliser le service sur n’importe quel appareil, tant que vous êtes connecté."
-},
-
+    "question_10": "Puis-je utiliser le service sur plusieurs appareils ?",
+    "reponse_10": "Oui, votre abonnement est lié à votre compte. Vous pouvez utiliser le service sur n’importe quel appareil, tant que vous êtes connecté."
+  },
 
   "contact": {
-    "title": "Vous aves des questions?\non vous repond!",
+    "title": "Vous avez des questions ?\nNous vous répondons !",
     "intro": "Utilisez le formulaire ci-dessous pour nous écrire. Notre équipe vous répondra dans les plus brefs délais, que ce soit pour une assistance technique, une question administrative ou toute autre demande liée à nos services."
   },
 
   "pricing": {
-  "title_h1": "Des plans adaptés à&nbsp;chaque&nbsp;contexte&nbsp;de&nbsp;travail.",
-  "title_h2_card": "Changez d’abonnement en fonction de vos&nbsp;attentes.",
-  "intro": "Choisissez un forfait abordable qui&nbsp;comprend les meilleures fonctionnalités pour&nbsp;vos&nbsp;besoins.",
-  "title_h2_tab": "Comparatif des abonnements",
-  "title_h2_faq": "Questions fréquentes"
-},
-
+    "title_h1": "Des plans adaptés à&nbsp;chaque&nbsp;contexte&nbsp;de&nbsp;travail.",
+    "title_h2_card": "Changez d’abonnement en fonction de vos&nbsp;attentes.",
+    "intro": "Choisissez un forfait abordable qui&nbsp;comprend les meilleures fonctionnalités pour&nbsp;vos&nbsp;besoins.",
+    "title_h2_tab": "Comparatif des abonnements",
+    "title_h2_faq": "Questions fréquentes"
+  },
 
   "terms": {
     "title": "Conditions Générales d’Utilisation (CGU)",

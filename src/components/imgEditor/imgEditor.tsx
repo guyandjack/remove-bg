@@ -57,7 +57,7 @@ function getConfigForPlan(
     case "free":
       return {
         tabsIds: [TABS.RESIZE],
-        defaultTabId: TABS.RESIZE,
+        //defaultTabId: TABS.RESIZE,
         //defaultToolId: TOOLS.RESIZE,
         removeSaveButton: true,
       };

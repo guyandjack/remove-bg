@@ -7,16 +7,16 @@ import { api } from "@/utils/axiosConfig";
 
 //import des composant enfants
 import { PriceCard } from "@/components/card/priceCard";
-import { Faq } from "@/components/faq/faq";
+import { Faq } from "@/components/faq/Faq";
 import { PricingComparisonTable } from "@/components/table/PriceTable";
 
 //import des fonctions
-import { setDocumentTitle } from "@/utils/setDocumentTitle";
 import {
+  PlanOption,
   planOptionsSignal,
   setPlanOptions,
-  PlanOption,
 } from "@/stores/planOptions";
+import { setDocumentTitle } from "@/utils/setDocumentTitle";
 
 
 type PlanKey =

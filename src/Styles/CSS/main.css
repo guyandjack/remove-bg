@@ -53,7 +53,7 @@ img {
   background-color: var(--custom-bg-component);
 }
 .bg-footer{
-  background-color: #0A1120;
+  background-color: var(--custom-bg-footer);
 }
 
 .bg-navbar{

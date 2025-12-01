@@ -23,7 +23,7 @@ const  ReactColorPicker = ({setColorValue, setLastChoice})=> {
         value={color}
         onChange={setColor}
         presets={planColor}
-        //height={150}
+        height={200}
         width={325}
         hideInputs={true}
         hideAdvancedSliders={true}

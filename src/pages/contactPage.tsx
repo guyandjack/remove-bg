@@ -56,10 +56,15 @@ function ContactPage() {
         className={
           "mt-[50px] self-center text-center text-4xl font-bold lg:w-[60%] lg:text-6xl lg:text-left"
         }
+      ></h1>
+      <p
+        dangerouslySetInnerHTML={{
+          __html: t("contact.intro").replace(/\n/g, "<br/>"),
+        }}
+        className={"text-xl max-w-[800px]"}
       >
-        
-      </h1>
-      <p className={"text-xl max-w-[800px]"}>{t("contact.intro")}</p>
+       
+      </p>
       <div className={"w-full max-w-[600px]"}>
         <FormContact content={contentForm} />
       </div>
