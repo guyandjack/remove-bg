@@ -5,16 +5,25 @@ import { langSignal } from "@/utils/langSignal";
 import { isAuthentified } from "@/utils/request/isAuthentified";
 import { useEffect, useState } from "preact/hooks";
 
+//import des fonctions
+import { setActiveLink } from "@/utils/setActiveLink";
+import { setDocumentTitle } from "@/utils/setDocumentTitle";
+
 type SubmitState = "idle" | "loading" | "success" | "error";
 
-const DashboardPage = () => {
+type PropsPage = {
+  routeKey: string;
+};
+
+const DashboardPage = ({routeKey}: PropsPage) => {
   const [email, setEmail] = useState<string>("");
   const [pwSubmitting, setPwSubmitting] = useState<SubmitState>("idle");
   const [cancelSubmitting, setCancelSubmitting] = useState<SubmitState>("idle");
 
   useEffect(() => {
+    setActiveLink();
     setDocumentTitle();
-  }, []);
+  }, [routeKey]);
 
   // Auth + hydration guard
   useEffect(() => {

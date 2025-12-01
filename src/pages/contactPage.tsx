@@ -2,8 +2,9 @@
 import { useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
-//import de fonctions
-import { setDocumentTitle } from '@/utils/setDocumentTitle';
+///import des fonctions
+import { setDocumentTitle } from "@/utils/setDocumentTitle";
+import { setActiveLink } from "@/utils/setActiveLink";
 
 
 //import des composants enfant
@@ -25,11 +26,17 @@ type FormKey = "lastName" |
   "textSuccess" |
   "textError";
 
-function ContactPage() {
+type PropsPage = {
+  routeKey: string
+};
+
+function ContactPage({routeKey}: PropsPage) {
   const { t } = useTranslation();
   useEffect(() => {
+    setActiveLink();
     setDocumentTitle();
-  }, []);
+  }, [routeKey]);
+
   const contentForm:Record<FormKey, string> = {
     lastName: t("formContact.lastName"),
     firstName: t("formContact.firstName"),

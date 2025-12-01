@@ -1,19 +1,19 @@
 // UploadPage.tsx
 //import des hooks
-import { useState, useEffect, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
 //import des composants enfants
+import { CtaStyled } from "@/components/cta/CtaStyled";
 import { UploadImg, UploadImgType } from "@/components/form/UploadImg";
 import { ImgEditor } from "@/components/imgEditor/imgEditor";
 import { Loader } from "@/components/loader/Loader";
-import { CtaStyled } from "@/components/cta/CtaStyled";
 
 //import des fonctions
-import { loadScript } from "@/utils/loadScript";
 import { sessionSignal } from "@/stores/session";
+import { loadScript } from "@/utils/loadScript";
+import { setActiveLink } from "@/utils/setActiveLink";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
-import { planOption24 } from "@/data/content/components/editor/planOption";
 
 // CDN de l'éditeur
 const editorCdn =
@@ -32,9 +32,13 @@ type CtaKey =
   | "isBtn_2";
 
 type CtaContent = Record<CtaKey, string | boolean>;
+
+type PropsPage = {
+  routeKey: string;
+};
   
 
-const UploadPage = () => {
+const UploadPage = ({routeKey}: PropsPage) => {
   const { t } = useTranslation();
   const userLoged = sessionSignal?.value?.authentified;
   const textUploadImgComponent:UploadImgType = {
@@ -152,8 +156,9 @@ const UploadPage = () => {
 
   //affiche le titre de la page dans l' onglet
   useEffect(() => {
+    setActiveLink()
     setDocumentTitle();
-  }, []);
+  }, [routeKey]);
 
   //si un utilisateur est connecté
   // Image editor sera remonte avec la valeur du plan de l'utilisateur connecte
@@ -276,3 +281,4 @@ const UploadPage = () => {
 }
 
 export { UploadPage };
+

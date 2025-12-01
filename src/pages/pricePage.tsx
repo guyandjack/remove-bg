@@ -17,6 +17,7 @@ import {
   setPlanOptions,
 } from "@/stores/planOptions";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
+import { setActiveLink } from "@/utils/setActiveLink";
 
 
 type PlanKey =
@@ -164,8 +165,9 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
   }, [routeKey]);
 
   useEffect(() => {
+    setActiveLink();
     setDocumentTitle();
-  }, []);
+  }, [routeKey]);
 
   return (
     <div className={"px-[10px] w-full mx-auto pb-[100px] bg-base-200"}>

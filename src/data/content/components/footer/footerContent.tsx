@@ -14,7 +14,7 @@ const footerContent: NavLink[] = [
   { key: "privacy", href: "/privacy" },
   { key: "cgv", href: "/cgv" },
 
-  { key: "contact", href: "/contactPage" },
+  { key: "contact", href: "/contact" },
 ];
 
 export { footerContent };

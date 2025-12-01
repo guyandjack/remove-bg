@@ -1,11 +1,17 @@
 import { navBarContent } from "@/data/content/components/nav/navBarContent";
+import { footerContent } from "@/data/content/components/footer/footerContent";
 
 const setActiveLink = (e?: any) => {
   const pageName = e?.currentTarget.dataset.id || window.location.pathname;
 
-  const element = navBarContent.filter((el) => el.href.includes(pageName));
+  let element = navBarContent.filter((el) => el.href.includes(pageName));
+  
+  if (element.length < 1) {
+    element = footerContent.filter((el) => el.href.includes(pageName));
+  }
+  
 
-  if (!element) {
+  if (element.length < 1) {
     return;
   }
   const data_id: string = element[0]["href"];
@@ -19,7 +25,7 @@ const setActiveLink = (e?: any) => {
     });
   }
   const elementLinks = document.querySelectorAll(`a[data-id="${data_id}"]`);
-  // ajoute la couleur uniquement aux liens actifs
+  // ajoute la couleur uniquement aux liens actifs navbar et footer
   if (elementLinks.length > 0) {
     elementLinks.forEach((el) => {
       el.classList.add("text-primary");

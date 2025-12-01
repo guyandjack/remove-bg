@@ -16,6 +16,7 @@ import { Faq } from "../components/faq/Faq";
 
 //import de fonctions
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
+import { setActiveLink } from "@/utils/setActiveLink";
 
 type Labels = string[];
 
@@ -31,17 +32,6 @@ type HeroContentKey =
   | "privacy_1"
   | "privacy_1_link"
   | "privacy_2";
-
-/* type CtaKey =
-  | "title_home_1"
-  | "title_home_2"
-  | "label_choice"
-  | "label_test"
-  | "color_choice"
-  | "color_test"
-  | "bg"
-  | "isBtn_2"; */
-
 
 type CtaContent = {
   title_home_1: string;
@@ -66,7 +56,11 @@ type stepsContent = {
   step_3: StepsNumber;
 };
 
-function HomePage() {
+type PropsPage = {
+  routeKey: string;
+};
+
+function HomePage({routeKey = ""}: PropsPage) {
   const { t } = useTranslation();
 
   //hero content
@@ -261,8 +255,9 @@ function HomePage() {
   const label: Labels = [];
 
   useEffect(() => {
+    setActiveLink();
     setDocumentTitle();
-  }, []);
+  }, [routeKey]);
 
   return (
     <div

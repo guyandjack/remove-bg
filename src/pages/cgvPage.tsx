@@ -3,11 +3,20 @@
 import { useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
-const CgvPage = () => {
+//import des fonctions
+import { setActiveLink } from "@/utils/setActiveLink";
+import { setDocumentTitle } from "@/utils/setDocumentTitle";
+
+type PropsPage = {
+  routeKey: string;
+};
+
+const CgvPage = ({routeKey}: PropsPage) => {
   const { t } = useTranslation();
   useEffect(() => {
+    setActiveLink();
     setDocumentTitle();
-  }, []);
+  }, [routeKey]);
   return (
     <div className="mx-auto w-full max-w-4xl px-4 md:px-6 lg:px-8 py-10">
       <header className="text-center space-y-3 mb-8">

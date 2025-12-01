@@ -24,10 +24,59 @@ import { NavBar } from "./src/components/navBar";
 import { Footer } from "./src/components/footer/Footer";
 
 export function App() {
+
+  
+  const RoutedUploadPage = () => {
+    const { url } = useLocation();
+    return <UploadPage routeKey={url}  />;
+  }
+  const RoutedHomePage = () => {
+    const { url } = useLocation();
+    return <HomePage routeKey={url}  />;
+  }
   const RoutedPricePage = () => {
     const { url, path } = useLocation();
     return <PricePage routeKey={url} isSignup={path.includes("signup")} />;
   };
+  
+  const RoutedLoginPage = () => {
+    const { url } = useLocation();
+    return <LoginPage routeKey={url}  />;
+  }
+  
+  const RoutedSignUpPage = () => {
+    const { url } = useLocation();
+    return <SignUpPage routeKey={url}  />;
+  }
+  const RoutedContactPage = () => {
+    const { url } = useLocation();
+    return <ContactPage routeKey={url}  />;
+  }
+  const RoutedTermsPage = () => {
+    const { url } = useLocation();
+    return <TermsPage routeKey={url}  />;
+  }
+  const RoutedPrivacyPage = () => {
+    const { url } = useLocation();
+    return <PrivacyPage routeKey={url}  />;
+  }
+  const RoutedLegalPage = () => {
+    const { url } = useLocation();
+    return <LegalPage routeKey={url}  />;
+  }
+  const RoutedCgvPage = () => {
+    const { url } = useLocation();
+    return <CgvPage routeKey={url}  />;
+  }
+  const RoutedDashboardPage = () => {
+    const { url } = useLocation();
+    return <DashboardPage routeKey={url}  />;
+  }
+  const RoutedPage404 = () => {
+    const { url } = useLocation();
+    return <Page404 routeKey={url}  />;
+  }
+  
 
   return (
     <div>
@@ -39,19 +88,19 @@ export function App() {
         <LocationProvider>
           <ErrorBoundary onError={(e) => console.log(e)}>
             <Router>
-              <Route path="/" component={HomePage} />
-              <Route path="/upload" component={UploadPage} />
+              <Route path="/" component={RoutedHomePage} />
+              <Route path="/upload" component={RoutedUploadPage} />
               <Route path="/pricing" component={RoutedPricePage} />
               <Route path="/pricing/signup" component={RoutedPricePage} />
-              <Route path="/login" component={LoginPage} />
-              <Route path="/signup" component={SignUpPage} />
-              <Route path="/contact" component={ContactPage} />
-              <Route path="/terms" component={TermsPage} />
-              <Route path="/privacy" component={PrivacyPage} />
-              <Route path="/legal" component={LegalPage} />
-              <Route path="/cgv" component={CgvPage} />
-              <Route path="/dashboard" component={DashboardPage} />
-              <Route path="*/*" component={Page404} />
+              <Route path="/login" component={RoutedLoginPage} />
+              <Route path="/signup" component={RoutedSignUpPage} />
+              <Route path="/contact" component={RoutedContactPage} />
+              <Route path="/terms" component={RoutedTermsPage} />
+              <Route path="/privacy" component={RoutedPrivacyPage} />
+              <Route path="/legal" component={RoutedLegalPage} />
+              <Route path="/cgv" component={RoutedCgvPage} />
+              <Route path="/dashboard" component={RoutedDashboardPage} />
+              <Route path="*/*" component={RoutedPage404} />
             </Router>
           </ErrorBoundary>
         </LocationProvider>
