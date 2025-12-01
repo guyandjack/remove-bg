@@ -1,34 +1,33 @@
 //import des fonctions
 import { setActiveLink } from "@/utils/setActiveLink";
 
-type CtaKey =
-  | "label_choice"
-  | "label_test"
-  | "color_choice"
-  | "color_test"
-  | "bg";
-type CtaContent = Record<CtaKey, string>;
+type CtaContent = {
+  title_home_1: string;
+  title_home_2: string;
+  label_choice: string;
+  label_test: string;
+  color_choice: string;
+  color_test: string;
+  bg: string;
+  isBtn_2: boolean;
+};
 type CtaProps = {
   content: CtaContent;
 };
 
 const CtaStyled = ({ content }: CtaProps) => {
   return (
-    <section class="relative z-10 w-full overflow-hidden bg-secondary/20 py-16 px-8">
-      <div class="container">
-        <div class="-mx-4 flex flex-wrap items-center">
-          <div class="w-full px-4 lg:w-1/2">
-            <div class="text-center lg:text-left ">
-              <div class="mb-10 lg:mb-0 ">
-                <h1 class="mt-0 mb-3 text-3xl font-bold leading-tight sm:text-4xl sm:leading-tight md:text-[40px] md:leading-tight text-white ">
-                  Start building automated serverless forms
-                </h1>
-                <p class="w-full text-base font-medium leading-relaxed sm:text-lg sm:leading-relaxed text-white"></p>
-              </div>
-            </div>
+    <section class="relative z-10 w-full overflow-hidden py-16 px-8">
+      <div class="mx-auto">
+        <div class="mx-auto flex flex-col justify-center items-center lg:flex-row lg:justify-between">
+          <div class="w-full lg:max-w-[50%]">
+            <h1
+              class="mt-0 mb-3 text-3xl text-center font-bold leading-tight sm:text-4xl sm:leading-tight md:text-[40px] md:leading-tight text-white lg:text-left "
+              dangerouslySetInnerHTML={{ __html: content.title_home_1 }}
+            ></h1>
           </div>
-          <div class="w-full px-4 lg:w-1/2">
-            <div class="flex flex-col justify-center items-center gap-5 lg:flex-row">
+          <div class="w-full lg:max-w-[50%]">
+            <div class="flex flex-col justify-center items-center gap-5 lg:flex-row justify-end">
               <a
                 /* class="font-semibold rounded-lg mx-auto inline-flex items-center justify-center bg-white py-4 px-9 hover:bg-opacity-90" */
                 data-id="/pricing"
@@ -39,15 +38,17 @@ const CtaStyled = ({ content }: CtaProps) => {
                   setActiveLink(e);
                 }}
               ></a>
-              <a
-                data-id="/upload"
-                href="/upload"
-                className={` ${content.color_test} w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out `}
-                dangerouslySetInnerHTML={{ __html: content.label_test }}
-                onClick={(e) => {
-                  setActiveLink(e);
-                }}
-              ></a>
+              {content.isBtn_2 ? (
+                <a
+                  data-id="/upload"
+                  href="/upload"
+                  className={` ${content.color_test} w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out `}
+                  dangerouslySetInnerHTML={{ __html: content.label_test }}
+                  onClick={(e) => {
+                    setActiveLink(e);
+                  }}
+                ></a>
+              ) : null}
             </div>
           </div>
         </div>

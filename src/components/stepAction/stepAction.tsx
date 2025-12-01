@@ -1,4 +1,6 @@
-import { Fragment } from "react";
+
+//import des images
+import curvedDotedLine from "@/assets/images/curved-dotted-line.svg"
 
 type StepsNumber = {
   title: string;
@@ -14,7 +16,7 @@ type StepsContent = {
 
 const StepAction = ( {content} : StepsContent) => {
   return (
-    <section class="w-full py-10 bg-component sm:py-16 lg:py-24">
+    <section class="w-full py-10 bg-component sm:py-16 lg:py-18">
       <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="max-w-2xl mx-auto text-center">
           <h2 class="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
@@ -27,14 +29,10 @@ const StepAction = ( {content} : StepsContent) => {
 
         <div class="relative mt-12 lg:mt-20">
           <div class=" relative flex flex-col justify-start items-center text-center gap-y-12 lg:flex-row lg:justify-between">
-            <div class=" w-full absolute inset-x-0 hidden  top-2 lg:block  lg:px-[125px]">
-              <img
-                class="w-full "
-                src="https://cdn.rareblocks.xyz/collection/celebration/images/steps/2/curved-dotted-line.svg"
-                alt=""
-              />
+            <div class="w-full hidden absolute inset-x-0  top-2 lg:block lg:px-[125px]">
+              <img class="w-full" src={curvedDotedLine} alt="doted line" />
             </div>
-            <div className={"relative z-10 w-[80%] lg:w-[250px]"}>
+            <div className={"relative z-10 w-[60%] lg:w-[250px]"}>
               <div class="flex items-center justify-center w-16 h-16 mx-auto bg-page border-2 border-secondary rounded-full shadow">
                 <span class="text-xl font-semibold text-secondary"> 1 </span>
               </div>
@@ -44,7 +42,7 @@ const StepAction = ( {content} : StepsContent) => {
               <p class="mt-4 text-base">{content.step_1.description}</p>
             </div>
 
-            <div className={"relative z-10 w-[80%] lg:w-[250px]"}>
+            <div className={"relative z-10 w-[60%] lg:w-[250px]"}>
               <div class="flex items-center justify-center w-16 h-16 mx-auto bg-page border-2 border-info rounded-full shadow">
                 <span class="text-xl font-semibold text-info"> 2 </span>
               </div>
@@ -54,7 +52,7 @@ const StepAction = ( {content} : StepsContent) => {
               <p class="mt-4 text-base">{content.step_2.description}</p>
             </div>
 
-            <div className={"relative z-10 w-[80%] lg:w-[250px]"}>
+            <div className={"relative z-10 w-[60%] lg:w-[250px]"}>
               <div class="flex items-center justify-center w-16 h-16 mx-auto bg-page border-2 border-success rounded-full shadow">
                 <span class="text-xl font-semibold text-success"> 3 </span>
               </div>

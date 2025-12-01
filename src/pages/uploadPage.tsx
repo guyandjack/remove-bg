@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { UploadImg, UploadImgType } from "@/components/form/UploadImg";
 import { ImgEditor } from "@/components/imgEditor/imgEditor";
 import { Loader } from "@/components/loader/Loader";
-import { Example } from "@/components/colorPicker/colorPicker";
+import { CtaStyled } from "@/components/cta/CtaStyled";
 
 //import des fonctions
 import { loadScript } from "@/utils/loadScript";
@@ -19,6 +19,21 @@ import { planOption24 } from "@/data/content/components/editor/planOption";
 const editorCdn =
   "https://scaleflex.cloudimg.io/v7/plugins/filerobot-image-editor/latest/filerobot-image-editor.min.js";
 
+
+//declaration des types
+type CtaKey =
+  | "title_home_1"
+  | "title_home_2"
+  | "label_choice"
+  | "label_test"
+  | "color_choice"
+  | "color_test"
+  | "bg"
+  | "isBtn_2";
+
+type CtaContent = Record<CtaKey, string | boolean>;
+  
+
 const UploadPage = () => {
   const { t } = useTranslation();
   const userLoged = sessionSignal?.value?.authentified;
@@ -29,6 +44,19 @@ const UploadPage = () => {
     preview: t("uploadImg.preview"),
     erase: t("uploadImg.erase")
   }
+
+  const ctaContent: CtaContent = {
+    title_home_1: t("cta.title_home_1"),
+    title_home_2: t("cta.title_home_1"),
+    label_choice: t("cta.label_choice"),
+    label_test: t("cta.label_test"),
+    color_choice: "btn-success",
+    color_test: "btn-primary",
+    bg: "bg-base-200",
+    isBtn_2: false
+  };
+
+
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // true quand on doit lancer traitement + chargement CDN
@@ -221,7 +249,7 @@ const UploadPage = () => {
           </li>
         </ul>
       ) : null}
-      <div id="editor" className="mt-6 w-full">
+      <div id="editor" className="mt-6 w-full pb-[200px]">
         {shouldShowEditor && (
           <ImgEditor
             src={responseApi}
@@ -232,6 +260,17 @@ const UploadPage = () => {
 
         {isProcessing && <Loader top="0px" text="is processing..." />}
       </div>
+      {shouldShowEditor && (
+        <div className={"w-full bg-secondary/20"}>
+          <div
+            className={
+              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
+            }
+          >
+            <CtaStyled content={ctaContent} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -126,7 +126,7 @@
   },
 
   "heroHome": {
-    "title_h1": "Supprimez&nbsp;l'arrière-plan&nbsp;de&nbsp;vos&nbsp;images&nbsp;grâce&nbsp;à&nbsp;l'IA",
+    "title_h1": "Supprimez l'arrière&#8209;plan de&nbsp;vos&nbsp;images grâce&nbsp;à&nbsp;l'IA",
     "title_h2": "Que vous soyez professionnel ou amateur de retouche photo, choisissez la simplicité,<span class='text-secondary text-2xl'> pour&nbsp;un&nbsp;gain&nbsp;de&nbsp;temps&nbsp;maximum</span>.",
     "info_1": "Vous pouvez bénéficier de ce service gratuitement en sélectionnant le plan gratuit (2&nbsp;crédits&nbsp;/&nbsp;jour).",
     "info_2": "Pour cela :",
@@ -156,8 +156,86 @@
   },
 
   "cta": {
+    "title_home_1": "Commencez à traité vos images.",
     "label_choice": "Je choisis un plan",
     "label_test": "Je veux tester la qualité"
+  },
+  "featureCardContent": {
+    "card_1": {
+      "url": "",
+      "title": "Développeurs Web",
+      "description": "Automatisez le détourage et la retouche d’images directement dans vos applications grâce à une API simple et rapide."
+    },
+    "card_2": {
+      "url": "",
+      "title": "Photographes",
+      "description": "Gagnez un temps précieux en supprimant automatiquement les arrière-plans et en améliorant vos clichés en quelques secondes."
+    },
+    "card_3": {
+      "url": "",
+      "title": "Boutiques e-commerce",
+      "description": "Créez des visuels produits propres, homogènes et prêts à être publiés sur votre site ou marketplace."
+    },
+    "card_4": {
+      "url": "",
+      "title": "Designers & Graphistes",
+      "description": "Accélérez votre workflow en générant des détourages propres et des mises en scène réalistes sans travail manuel."
+    },
+    "card_5": {
+      "url": "",
+      "title": "Créateurs de contenu",
+      "description": "Préparez des vignettes, miniatures et visuels attractifs sans compétences avancées en retouche."
+    },
+    "card_6": {
+      "url": "",
+      "title": "Agences Marketing",
+      "description": "Produisez rapidement des images optimisées pour les campagnes publicitaires et les réseaux sociaux."
+    },
+    "card_7": {
+      "url": "",
+      "title": "Gestionnaires de Marketplace",
+      "description": "Uniformisez les images des vendeurs en supprimant automatiquement les fonds pour respecter vos standards visuels."
+    },
+    "card_8": {
+      "url": "",
+      "title": "Entreprises de Print-on-Demand",
+      "description": "Préparez vos visuels produits (t-shirts, mugs, accessoires) avec un détourage propre et des mockups instantanés."
+    },
+    "card_9": {
+      "url": "",
+      "title": "Artisans & Créateurs",
+      "description": "Valorisez vos produits avec des images nettes et professionnelles sans matériel coûteux."
+    },
+    "card_10": {
+      "url": "",
+      "title": "Immobilier",
+      "description": "Nettoyez ou modifiez des photos de biens, supprimez des éléments gênants ou mettez les objets en valeur."
+    },
+    "card_11": {
+      "url": "",
+      "title": "Dropshippers",
+      "description": "Améliorez instantanément vos fiches produits pour augmenter vos taux de conversion."
+    },
+    "card_12": {
+      "url": "",
+      "title": "Community Managers",
+      "description": "Générez des visuels propres et engageants pour les réseaux sociaux en quelques secondes."
+    },
+    "card_13": {
+      "url": "",
+      "title": "Développeurs d’Apps Mobiles",
+      "description": "Intégrez un outil de détourage automatisé dans vos applications, sans maintenance d’infrastructure IA."
+    },
+    "card_14": {
+      "url": "",
+      "title": "Éditeurs de Catalogues",
+      "description": "Normalisez rapidement des dizaines ou centaines d’images pour préparer vos catalogues PDF ou print."
+    },
+    "card_15": {
+      "url": "",
+      "title": "Auto-entrepreneurs et indépendants",
+      "description": "Créez des images professionnelles pour vos présentations, portfolios et promotions sans faire appel à un studio."
+    }
   },
 
   "uploadImg": {

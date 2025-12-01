@@ -3,8 +3,6 @@
 //import des hooks
 import { useState } from "preact/hooks";
 
-
-
 // import des images originales
 import friendImg from "@/assets/images/friend.jpg";
 import petImg from "@/assets/images/pet.jpg";
@@ -92,7 +90,7 @@ const Diff = ({ tag }: Tags) => {
         <div className="diff-resizer" />
       </figure>
 
-      {tag.length > 0 ? (
+      {tag.length > 0 ?(
         <ul className="flex flex-row justify-evenly items-center w-full pt-[20px] pb-[20px]">
           {buttonConfig.map(({ id, className }, index) => (
             <li key={id}>
@@ -105,8 +103,7 @@ const Diff = ({ tag }: Tags) => {
               </button>
             </li>
           ))}
-        </ul>
-      ) : null}
+        </ul>) : null }
     </div>
   );
 };

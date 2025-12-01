@@ -9,7 +9,7 @@ import { planColor } from "@/data/content/components/editor/planColor";
 
 
 const  ReactColorPicker = ({setColorValue, setLastChoice})=> {
-    const [color, setColor] = useState("");
+    const [color, setColor] = useState("rgba(200,77,150,0.5)");
     
     useEffect(() => {
         if (color === "") return;
