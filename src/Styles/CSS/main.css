@@ -8,7 +8,7 @@
   name: "winter";
   default: true;
   --color-success: oklch(79% 0.209 151.711);
-  --color-info: oklch(78% 0.154 211.53);
+  --color-info: oklch(78% 0.45 255.53);
   --color-warning: oklch(75% 0.183 55.934);
   --custom-bg-page: #F2F7FE;
   --custom-bg-component: #F9FAFB;
@@ -130,4 +130,56 @@ img {
 **********************************************/
 .collapse-title:after{
 color:var(--color-secondary);
+}
+
+/***********************************************
+****** custom css pour pattern cube *********
+**********************************************/
+/* From Uiverse.io by mobinkakei */ 
+.patern-point-std {
+  width: 100%;
+  height: 100%;
+  /* Add your background pattern here */
+  background: transparent
+    radial-gradient(rgba(255, 255, 255, 0.712) 10%, transparent 1%);
+
+  background-size: 20px 20px;
+}
+
+.patern-point-secondary {
+  width: 100%;
+  height: 100%;
+  /* Add your background pattern here */
+  background: transparent
+    radial-gradient(var(--color-secondary) 10%, transparent 1%);
+
+  background-size: 20px 20px;
+}
+
+.patern-point-success {
+  width: 100%;
+  height: 100%;
+  /* Add your background pattern here */
+  background: transparent
+    radial-gradient(var(--color-success) 10%, transparent 1%);
+
+  background-size: 20px 20px;
+}
+.patern-point-info {
+  width: 100%;
+  height: 100%;
+  /* Add your background pattern here */
+  background: transparent
+    radial-gradient(var(--color-info) 10%, transparent 1%);
+
+  background-size: 20px 20px;
+}
+.patern-point-warning {
+  width: 100%;
+  height: 100%;
+  /* Add your background pattern here */
+  background: transparent
+    radial-gradient(var(--color-warning) 10%, transparent 1%);
+
+  background-size: 20px 20px;
 }

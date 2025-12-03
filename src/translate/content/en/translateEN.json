@@ -160,9 +160,11 @@
 },
 
   "cta": {
-    "label_choice": "I choose a plan",
-    "label_test": "I want to test the quality"
-  },
+  "title_home_1": "Start processing your images.",
+  "label_choice": "I choose a plan",
+  "label_test": "I want to test the quality"
+},
+
   "uploadImg": {
     "label": "Choose a file",
     "placeHolder": "No file chosen",
@@ -202,7 +204,7 @@
     "reponse_10": "Yes, your subscription is linked to your account. You can use the service on any device as long as you are logged in."
   },
   "contact": {
-    "title": "Got questions?\nWe're here to help!",
+    "title": "Got questions&nbsp;?\nWe're here to help&nbsp;!",
     "intro": "Use the form below to contact us. Our team will get back to you as soon as possible, whether you need technical assistance, have an administrative question, or any other request related to our services."
   },
 

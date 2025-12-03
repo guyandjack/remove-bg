@@ -156,10 +156,11 @@
   },
 
   "cta": {
-    "title_home_1": "Commencez à traité vos images.",
-    "label_choice": "Je choisis un plan",
-    "label_test": "Je veux tester la qualité"
-  },
+  "title_home_1": "Commencez à traiter vos images.",
+  "label_choice": "Je choisis un plan",
+  "label_test": "Je veux tester la qualité"
+}
+,
   "featureCardContent": {
     "card_1": {
       "url": "",
@@ -328,7 +329,7 @@
   },
 
   "contact": {
-    "title": "Vous avez des questions ?\nNous vous répondons !",
+    "title": "Vous avez des questions&nbsp;?\nNous vous répondons&nbsp;!",
     "intro": "Utilisez le formulaire ci-dessous pour nous écrire. Notre équipe vous répondra dans les plus brefs délais, que ce soit pour une assistance technique, une question administrative ou toute autre demande liée à nos services."
   },
 

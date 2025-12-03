@@ -10,6 +10,11 @@ import { setActiveLink } from "@/utils/setActiveLink";
 //import des composants enfant
 import { FormContact } from "../components/formContact";
 
+//import des images
+import undraw_contact from "@/assets/images/undraw-contact.svg";
+import undraw_email from "@/assets/images/undraw-contact-email.svg";
+import { DesignPaternPoint } from "@/components/disignPatern/designPaternPoint";
+
 type FormKey = "lastName" |
   "firstName" |
   "subject" |
@@ -55,7 +60,8 @@ function ContactPage({routeKey}: PropsPage) {
     textError: t("formContact.textError"),
   };
   return (
-    <div className="px-[10px] w-full mx-auto bg-page lg:px-[0px] flex flex-col justify-start items-center gap-[50px]">
+    <div className="relative px-[10px] w-full mx-auto bg-page lg:px-[0px] flex flex-col justify-start items-center gap-[50px]">
+      
       <h1
         dangerouslySetInnerHTML={{
           __html: t("contact.title").replace(/\n/g, "<br/>"),
@@ -69,10 +75,9 @@ function ContactPage({routeKey}: PropsPage) {
           __html: t("contact.intro").replace(/\n/g, "<br/>"),
         }}
         className={"text-xl max-w-[800px]"}
-      >
-       
-      </p>
-      <div className={"w-full max-w-[600px]"}>
+      ></p>
+      <div className={"relative w-full max-w-[600px]"}>
+        <DesignPaternPoint width={80} height={100} color={"info"} styled={"absolute top-[-40px] right-[-80px] hidden lg:block" } />
         <FormContact content={contentForm} />
       </div>
     </div>
