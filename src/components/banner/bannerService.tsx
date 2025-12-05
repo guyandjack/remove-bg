@@ -1,4 +1,7 @@
 
+import iconSocial from "@/assets/images/icon/grouper.png"
+import iconConvert from "@/assets/images/icon/convertir.png"
+
 const BannerService = () => {
   return (
 
@@ -11,7 +14,7 @@ const BannerService = () => {
       href={"/upload"}
                   className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl  hover:shadow-gray-600/10">
         <div className="relative space-y-8 py-12 p-8">
-          <img src="https://www.svgrepo.com/show/164986/logo.svg" loading="lazy" width="200" height="200"className="w-12 h-12 rounded-full" style="color:transparent"/>
+          <img src={iconSocial} loading="lazy" width="200" height="200"className="w-12 h-12" style="color:transparent"/>
           <div className="space-y-2">
             <h5 className="text-xl font-semibold transition group-hover:text-primary">Social media</h5>
             <p className="">Converti et formate des images pour tes réseaux prefereés</p>
@@ -33,24 +36,14 @@ const BannerService = () => {
       href={"/upload"}
       className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl hover:shadow-gray-600/10">
         <div className="relative space-y-8 py-12 p-8">
-          <img src="https://www.svgrepo.com/show/120852/logo.svg" loading="lazy" width="200" height="200"className="w-12 h-12 rounded-full" style="color:transparent" />
+          <img src={iconConvert} loading="lazy" width="200" height="200"className="w-12 h-12" style="color:transparent" />
           <div className="space-y-2">
-            <h5 className="text-xl font-semibold transition group-hover:text-primary">Convert images</h5>
+            <h5 className="text-xl font-semibold transition group-hover:text-primary">Convert images file</h5>
             <p className="">Converti tout type d'image au format et l'extension desirée.</p>
           </div>
         </div>
       </a>
-      {/* <a
-      href={"/upload"}
-      className="group relative bg-component transition hover:z-[1] hover:shadow-2xl hover:shadow-gray-600/10">
-        <div className="relative space-y-8 py-12 p-8">
-          <img src="https://www.svgrepo.com/show/120850/logo.svg" loading="lazy" width="200" height="200"className="w-12 h-12 rounded-full" style="color:transparent" />
-          <div className="space-y-2">
-            <h5 className="text-xl font-semibold transition group-hover:text-primary"></h5>
-            <p className="">Chrome Extension that lets you add ChatGPT on any website</p>
-          </div>
-        </div>
-      </a> */}
+      
     </div>
   </div>
 

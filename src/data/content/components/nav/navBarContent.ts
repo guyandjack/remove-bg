@@ -10,9 +10,8 @@ type NavLink = {
 
 const navBarContent: NavLink[] = [
   { key: "home", href: "/" },
-  { key: "upload", href: "/upload" },
+  { key: "service", href: "/services" },
   { key: "pricing", href: "/pricing" },
-  { key: "contact", href: "/contact" },
   { key: "signup", href: "/pricing/signup" },
   { key: "login", href: "/login" },
   //only footer link

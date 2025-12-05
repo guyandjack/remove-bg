@@ -51,8 +51,8 @@ const CtaStyled = ({ content }: CtaProps) => {
               ></a>
               {content.isBtn_2 ? (
                 <a
-                  data-id="/upload"
-                  href="/upload"
+                  data-id="/services"
+                  href="/services"
                   className={` ${content.color_test} w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out `}
                   dangerouslySetInnerHTML={{ __html: content.label_test }}
                   onClick={(e) => {

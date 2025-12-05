@@ -61,11 +61,11 @@ img {
   background-color: var(--custom-bg-page);
   
 }
-@media screen and (min-width: 1024px) {
+/* @media screen and (min-width: 1024px) {
   .page-container {
-    padding: 100px 0;
+    padding: 80px 0;
   }
-}
+} */
 
 .bg-page {
   background-color: var(--custom-bg-page);

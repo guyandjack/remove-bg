@@ -1,8 +1,7 @@
 // Component navBar
 
-
 //import des librairies
-import {api} from "@/utils/axiosConfig";
+import { api } from "@/utils/axiosConfig";
 
 //import des hooks
 import { useEffect, useState } from "preact/hooks";
@@ -20,13 +19,11 @@ import { navBarContent } from "@/data/content/components/nav/navBarContent";
 import { isAuthentified } from "@/utils/request/isAuthentified";
 import { setActiveLink } from "@/utils/setActiveLink";
 
-
 //import des signaux de connexion user (signUp, login)
 import { sessionSignal, initSessionFromLocalStorage } from "../stores/session";
 
 //import des images
-import logo from "@/assets/images/logo/logo_6.svg"
-
+import logo from "@/assets/images/logo/logo_6.svg";
 
 //declarations des types
 type DisplayState = {
@@ -36,10 +33,9 @@ type DisplayState = {
   credit: number;
   plan: string | null;
   textLogout: string | null;
-}| null;
+} | null;
 
-
-const NavBar = ()=> {
+const NavBar = () => {
   const { t } = useTranslation();
   //state qui gere l'affichage du profileDropdown et son contenu textuel
   const [isDisplay, setIsDisplay] = useState<DisplayState>({
@@ -48,10 +44,8 @@ const NavBar = ()=> {
     credit: 0,
     textCredit: t("priceTab.credit"),
     plan: null,
-    textLogout: t("navBar.logout")
+    textLogout: t("navBar.logout"),
   });
-
-
 
   useEffect(() => {
     initSessionFromLocalStorage();
@@ -60,51 +54,51 @@ const NavBar = ()=> {
     });
   }, []);
 
-    useEffect(() => {
-      const session = sessionSignal?.value;
-      // Ensure email is always a string. If session?.user?.email is not null/undefined
-      // but also not a string (e.g., a number), convert it to a string.
-      const email = String(session?.user?.email || "");
-      const emailFallback =
-        email && email.includes("@") ? email.split("@")[0] : email || null;
+  useEffect(() => {
+    const session = sessionSignal?.value;
+    // Ensure email is always a string. If session?.user?.email is not null/undefined
+    // but also not a string (e.g., a number), convert it to a string.
+    const email = String(session?.user?.email || "");
+    const emailFallback =
+      email && email.includes("@") ? email.split("@")[0] : email || null;
 
-      setIsDisplay({
-        userName: session?.user?.first_name || emailFallback ,
-        authentified: session?.authentified || false,
-        credit: session?.credits?.remaining_last_24h || 0,
-        textCredit: t("priceTab.credit"),
-        plan: session?.plan?.name || session?.plan?.code || null,
-        textLogout: t("navBar.logout"),
-      });
-    }, [sessionSignal?.value, t]);
-
+    setIsDisplay({
+      userName: session?.user?.first_name || emailFallback,
+      authentified: session?.authentified || false,
+      credit: session?.credits?.remaining_last_24h || 0,
+      textCredit: t("priceTab.credit"),
+      plan: session?.plan?.name || session?.plan?.code || null,
+      textLogout: t("navBar.logout"),
+    });
+  }, [sessionSignal?.value, t]);
 
   //active le lien au montage du composant
   useEffect(() => {
     setActiveLink();
   }, []);
 
-  
   return (
     <nav className="navbar bg-navbar shadow-sm backdrop-blur-sm">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-            {/*  <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              {" "}
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h8m-8 6h16"
-              />{" "}
-            </svg> */}
+            {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                {" "}
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h8m-8 6h16"
+                />{" "}
+              </svg>
+            }
           </div>
           <ul
             tabIndex={-1}
@@ -131,14 +125,14 @@ const NavBar = ()=> {
             })}
           </ul>
         </div>
-        {/* <a className="btn btn-ghost text-xl">daisyUI</a> */}
+
         <img src={logo} alt={"logo wizpix"} className={"w-[200px]"} />
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu-horizontal gap-5 px-1">
           {navBarContent.map((link) => {
             const label = t(`navBar.${link.key}`);
-            return (
+            return link.key !== "signup" && link.key !== "login" ? (
               <li key={link.href}>
                 <a
                   data-id={link.href}
@@ -153,26 +147,48 @@ const NavBar = ()=> {
                   {label}
                 </a>
               </li>
-            );
+            ) : null;
           })}
         </ul>
       </div>
-      <div className="navbar-end gap-2">
+      <div className="navbar-end gap-2 flex flex-row gap-x-5">
+        <ul className="menu-horizontal gap-x-5 flex flex-row items-center ">
+          {navBarContent.map((link) => {
+            const label = t(`navBar.${link.key}`);
+            return link.key === "signup" || link.key === "login" ? (
+              <li className={"hidden lg:block shrink-0"} key={link.href}>
+                <a
+                  data-id={link.href}
+                  className={[
+                    //ajout de la tramsition
+                    "transition-all duration-300 ease-out ",
+                    "hover:text-primary",
+                  ].join(" ")}
+                  href={link.href}
+                  onClick={(e) => setActiveLink(e)}
+                >
+                  {label}
+                </a>
+              </li>
+            ) : null;
+          })}
+          
+        </ul>
         <ThemeControler />
         <SelectLanguage />
         {isDisplay?.authentified ? (
-          <ProfileDropDown
-            credit={isDisplay.credit}
-            userName={isDisplay.userName}
-            textCredit={isDisplay.textCredit}
-            plan={isDisplay.plan}
-          />
+          
+            <ProfileDropDown
+              credit={isDisplay?.credit}
+              userName={isDisplay?.userName}
+              textCredit={isDisplay?.textCredit}
+              plan={isDisplay?.plan}
+            />
+          
         ) : null}
       </div>
     </nav>
   );
-}
+};
 
 export { NavBar };
-
-

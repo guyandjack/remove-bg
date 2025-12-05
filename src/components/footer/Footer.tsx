@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 //import des composant enfant
 import { FooterBottom } from "./FooterBottom";
+import { ThemeControler } from "@/components/themeControler/ThemeControler";
 
 //import des data
 import { navBarContent } from "@/data/content/components/nav/navBarContent";
@@ -32,11 +33,11 @@ const Footer = () => {
     <div className={"relative overflow-hidden"}>
       <nav className="footer md:footer-horizontal bg-base-300 p-10">
         <aside className={"relative z-10"}>
-          <img src={logo} alt={"logo wizpix"} />
-          <p>
-            L’intelligence artificielle au service de vos visuels.
-            <br />
-          </p>
+          <a href={"/"}>
+            <img src={logo} alt={"logo wizpix"} className={"w-[300px]"} />
+          </a>
+          <p>L’intelligence artificielle au service de vos visuels.</p>
+          <ThemeControler />
         </aside>
         <div className={"relative z-10"}>
           <h6 className="text-lg footer-title opacity-100 text-secondary">

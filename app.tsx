@@ -89,7 +89,7 @@ export function App() {
           <ErrorBoundary onError={(e) => console.log(e)}>
             <Router>
               <Route path="/" component={RoutedHomePage} />
-              <Route path="/upload" component={RoutedUploadPage} />
+              <Route path="/services" component={RoutedUploadPage} />
               <Route path="/pricing" component={RoutedPricePage} />
               <Route path="/pricing/signup" component={RoutedPricePage} />
               <Route path="/login" component={RoutedLoginPage} />
