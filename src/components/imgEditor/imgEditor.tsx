@@ -73,7 +73,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
   const [currentSource, setCurrentSource] = useState<string>(src); // image actuellement affichée dans l’éditeur
   const [isComposing, setIsComposing] = useState(false); // spinner pendant la composition canvas
   const [selectedBg, setSelectedBg] = useState<BgValue>(null); // dernier fond choisi
-  const [activePicker, setActivePicker] = useState<"color" | "image" | "erase">("color"); // onglet actif
+  const [activePicker, setActivePicker] = useState<"color" | "image" | "erase" | "social">("color"); // onglet actif
   const [isPending, setIsPending] = useState(false);
   const [isColorPicker, setIsColorPicker] = useState(false); // affichage du composant colorpicker
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
@@ -484,10 +484,177 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
   const activeBackground =
     isPreviewVisible && previewSelection ? previewSelection : selectedBg;
 
+  const renderActiveOptionContent = (activePiker) => {
+    if (activePicker === "color") {
+      return (
+        <div
+          className={
+            "flex flex-row flex-wrap justify-evenly w-full lg:flex-col lg:items-start gap-5"
+          }
+        >
+          <div className="min-h-[400px] w-auto lg:w-full">
+            <ReactColorPicker setLastChoice={setLastPikerColor} />
+          </div>
+        </div>
+      );
+    }
+
+    if (activePicker === "image") {
+      if (planUser === "free") {
+        return (
+          <p className="mt-4 text-sm text-warning">
+            Cette option est réservée aux abonnements supérieurs.
+          </p>
+        );
+      }
+      return (
+        <div className="mt-3 lg:max-h-[65%] lg:w-full ">
+          <p className="text-start text-base-content/70 mb-[10px]">
+            Recherche d'images "PEXELS".
+          </p>
+
+          <div className="mb-3">
+            <form
+              className="join w-full lg:w-full"
+              onSubmit={(e) => {
+                e.preventDefault();
+                fetchImages(searchTerm, 1);
+              }}
+            >
+              <input
+                id="search"
+                type="search"
+                placeholder="Images en ligne(ex: nature, city, people, animals...)"
+                className="input input-bordered join-item w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                pattern="[A-Za-z0-9 \\-_'.,]{1,50}"
+                aria-label="Search through pexels images library"
+                maxLength={50}
+                value={searchTerm}
+                onChange={(e) =>
+                  setSearchTerm((e.target as HTMLInputElement).value)
+                }
+              />
+              <button
+                type="submit"
+                className="btn btn-info join-item"
+                disabled={isSearching}
+              >
+                {isSearching ? "..." : "Search"}
+              </button>
+            </form>
+            {searchError && (
+              <p className="mt-2 text-sm text-error">{searchError}</p>
+            )}
+          </div>
+
+          <div className="my-4 text-start text-base-content/70 mb-[10px] flex flex-col gap-2">
+            <span>Images libre de droit.</span>
+            <div className="flex items-center justify-center gap-5">
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                disabled={!lastSearchTerm || !hasPrevPage || isSearching}
+                onClick={() => handleChangePage("prev")}
+              >
+                Prev
+              </button>
+              <span className="text-sm">
+                {lastSearchTerm
+                  ? `Page ${currentPage}/${MAX_PEXELS_PAGES}`
+                  : "Page -"}
+              </span>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                disabled={!lastSearchTerm || !hasNextPage || isSearching}
+                onClick={() => handleChangePage("next")}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <ul className="w-[80%] flex gap-3 pb-2 overflow-auto flex-wrap lg:w-full lg:max-h-[300px]">
+              {(pexelsImages.length > 0 ? pexelsImages : backgroundImages).map(
+                (item: any) => {
+                  const thumb = typeof item === "string" ? item : item.tiny;
+                  const large = typeof item === "string" ? item : item.large;
+                  const isActiveBg =
+                    activeBackground?.type === "image" &&
+                    activeBackground.value === large;
+                  return (
+                    <li key={thumb}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          previewBackground({ type: "image", value: large })
+                        }
+                        className={`cursor-pointer overflow-hidden rounded-lg ring-1 ring-base-200 hover:ring-primary transition snap-start ${
+                          isActiveBg ? "ring-2 ring-primary" : ""
+                        } ${isSearching ? "opacity-60" : ""} `}
+                        disabled={isSearching}
+                      >
+                        <img
+                          src={thumb}
+                          alt="Fond"
+                          className="h-[80px] w-[80px] object-cover"
+                        />
+                      </button>
+                    </li>
+                  );
+                }
+              )}
+            </ul>
+          </div>
+        </div>
+      );
+    }
+
+    if (activePicker === "erase") {
+      return (
+        <div className="space-y-4 text-start">
+          <div className="space-y-1">
+            <h3 className="text-lg font-semibold">Gomme magique</h3>
+            <p className="text-sm text-base-content/70">
+              Ajustez la taille du pinceau puis dessinez directement sur
+              l'aperçu pour marquer les zones à effacer.
+            </p>
+          </div>
+          <label className="flex flex-col gap-2 text-sm">
+            Taille du pinceau :
+            <span className="text-base font-semibold">
+              {Math.round(eraserBrushSize)} px
+            </span>
+            <input
+              type="range"
+              min={10}
+              max={200}
+              step={5}
+              value={eraserBrushSize}
+              onInput={(event) =>
+                setEraserBrushSize(
+                  Number((event.target as HTMLInputElement).value)
+                )
+              }
+              onChange={(event) =>
+                setEraserBrushSize(
+                  Number((event.target as HTMLInputElement).value)
+                )
+              }
+            />
+          </label>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className="max-w-[1300px] mx-auto min-h-[80vh] flex flex-col justify-between items-center gap-3 lg:flex-row lg:h-[80vh]">
       {/* Zone éditeur Filerobot */}
-      <div className="relative w-full h-full rounded-xl ring-1 ring-base-200 bg-base-100/60 backdrop-blur-sm lg:w-[calc(100%-350px)]">
+      <div className="relative w-full h-full rounded-xl ring-1 ring-base-200 bg-base-100/60 backdrop-blur-sm lg:w-[calc(100%-400px)]">
         {isComposing && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-base-100/50">
             <span className="loading loading-spinner loading-md text-primary" />
@@ -589,14 +756,6 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                   exit={{ scale: 0.95, opacity: 0 }}
                   transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
                 >
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-semibold">Gomme magique</h3>
-                    {/* <p className="text-sm text-base-content/70">
-                      Coloriez les zones à supprimer avec une teinte
-                      semi-transparente, puis envoyez-les à notre IA. Validez
-                      uniquement lorsque le résultat vous convient.
-                    </p> */}
-                  </div>
                   {eraserResult ? (
                     <div className="space-y-4">
                       <p className="text-base-content/80">
@@ -613,29 +772,10 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <label className="flex flex-col gap-2 text-sm">
-                        Taille du pinceau :
-                        <span className="text-base font-semibold">
-                          {Math.round(eraserBrushSize)} px
-                        </span>
-                        <input
-                          type="range"
-                          min={10}
-                          max={200}
-                          step={5}
-                          value={eraserBrushSize}
-                          onInput={(event) =>
-                            setEraserBrushSize(
-                              Number((event.target as HTMLInputElement).value)
-                            )
-                          }
-                          onChange={(event) =>
-                            setEraserBrushSize(
-                              Number((event.target as HTMLInputElement).value)
-                            )
-                          }
-                        />
-                      </label>
+                      <p className="text-sm text-base-content/70">
+                        Dessinez directement sur l'image pour marquer les zones
+                        à effacer. Maintenez le clic pour créer votre masque.
+                      </p>
                       <div className="relative w-full overflow-hidden rounded-2xl border border-base-200 bg-base-200/60">
                         <img
                           ref={eraserImageRef}
@@ -711,18 +851,18 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
 
       <div
         className={
-          "bg-component rounded-lg w-full flex flex-col justifi-start items-center lg:w-[350px] lg:h-[100%] p-[10px]"
+          "bg-component rounded-lg w-full flex flex-col justify-between items-center lg:w-[400px] lg:h-[100%] p-[10px]"
         }
       >
         {/* Commandes: onglets, reset, téléchargement */}
-        <div className={"lg:h-[20%] lg:w-full lg:w-full "}>
-          <h2 className={"mt-[10px] text-xl text-center"}>
+        <div className={"lg:h-[25%] lg:w-full "}>
+          <h2 className={"p-[5px] text-xl text-center "}>
             Outils de retouche
           </h2>
-          <div className="my-4 flex flex-row justify-evenly flex-wrap items-center gap-2">
+          <div className="my-4 border-b border-t py-[10px] border-white/30 flex flex-row justify-evenly flex-wrap items-center gap-y-2 ">
             <button
               type="button"
-              className={`flex flex-row gap-3 p-[5px] btn ${
+              className={`w-[180px] btn ${
                 activePicker === "color" ? "btn-success" : "btn-ghost"
               } hover:bg-success/50`}
               onClick={() => {
@@ -743,15 +883,15 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                   d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z"
                 />
               </svg>
-              <span>color picker</span>
+              <span>Colors picker</span>
             </button>
             {planUser !== "free" ? (
               <>
                 <button
                   type="button"
-                  className={`btn  ${
-                    activePicker === "image" ? "btn-info" : "btn-ghost"
-                  } hover:bg-info/50`}
+                  className={`w-[180px] btn  ${
+                    activePicker === "image" ? "btn-success" : "btn-ghost"
+                  } hover:bg-success/50`}
                   onClick={() => setActivePicker("image")}
                 >
                   <svg
@@ -768,13 +908,13 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                       d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                     />
                   </svg>
-                  <span>Images</span>
+                  <span>Images select</span>
                 </button>
                 <button
                   type="button"
-                  className={`btn  ${
-                    activePicker === "erase" ? "btn-warning" : "btn-ghost"
-                  } hover:bg-warning/50`}
+                  className={`w-[180px] btn  ${
+                    activePicker === "erase" ? "btn-success" : "btn-ghost"
+                  } hover:bg-success/50`}
                   onClick={openMagicEraser}
                 >
                   <svg
@@ -799,133 +939,47 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                     <path d="m3 21 9-9" />
                     <path d="M12.2 6.2 11 5" />
                   </svg>
-                  <span>Magic erase</span>
+                  <span>Magic eraser</span>
+                </button>
+                <button
+                  type="button"
+                  className={`w-[180px] btn  ${
+                    activePicker === "social" ? "btn-success" : "btn-ghost"
+                  } hover:bg-success/50`}
+                  onClick={openMagicEraser}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    className="lucide lucide-wand-icon lucide-wand"
+                  >
+                    <path d="M15 4V2" />
+                    <path d="M15 16v-2" />
+                    <path d="M8 9h2" />
+                    <path d="M20 9h2" />
+                    <path d="M17.8 11.8 19 13" />
+                    <path d="M15 9h.01" />
+                    <path d="M17.8 6.2 19 5" />
+                    <path d="m3 21 9-9" />
+                    <path d="M12.2 6.2 11 5" />
+                  </svg>
+                  <span>Social content</span>
                 </button>
               </>
             ) : null}
           </div>
         </div>
 
-        {/* Panneau Couleurs */}
-        {activePicker === "color" ? (
-          <div className="lg:h-full lg:max-h-[65%] lg:w-full ">
-            <div
-              className={
-                "flex flex-row flex-wrap justify-evenly w-full lg:flex-col lg:items-start gap-5"
-              }
-            >
-              <div className="min-h-[400px] w-auto lg:w-full">
-                <ReactColorPicker setLastChoice={setLastPikerColor} />
-              </div>
-            </div>
-          </div>
-        ) : activePicker === "image" && planUser !== "free" ? (
-          // Panneau Images (recherche Pexels + vignettes)
-          <div className="mt-3 lg:h-full lg:max-h-[65%] lg:w-full ">
-            <p className="text-start text-base-content/70 mb-[10px]">
-              Recherche d'images "PEXELS".
-            </p>
-
-            {/* Barre de recherche */}
-            <div className="mb-3">
-              <form
-                className="join w-full lg:w-full"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  fetchImages(searchTerm, 1);
-                }}
-              >
-                <input
-                  id="search"
-                  type="search"
-                  placeholder="Images en ligne(ex: nature, city, people, animals...)"
-                  className="input input-bordered join-item w-full bg-base-200 text-base-content placeholder:text-base-content/60"
-                  pattern="[A-Za-z0-9 \-_'.,]{1,50}"
-                  aria-label="Search through pexels images library"
-                  maxLength={50}
-                  value={searchTerm}
-                  onChange={(e) =>
-                    setSearchTerm((e.target as HTMLInputElement).value)
-                  }
-                />
-                <button
-                  type="submit"
-                  className="btn btn-info join-item"
-                  disabled={isSearching}
-                >
-                  {isSearching ? "..." : "Search"}
-                </button>
-              </form>
-              {searchError && (
-                <p className="mt-2 text-sm text-error">{searchError}</p>
-              )}
-            </div>
-
-            {/* Carrousel horizontal de vignettes */}
-
-            <div className="my-4 text-start text-base-content/70 mb-[10px] flex flex-col gap-2">
-              <span>Images libre de droit.</span>
-              <div className="flex items-center justify-center gap-5">
-                <button
-                  type="button"
-                  className="btn btn-outline btn-sm"
-                  disabled={!lastSearchTerm || !hasPrevPage || isSearching}
-                  onClick={() => handleChangePage("prev")}
-                >
-                  Prev
-                </button>
-                <span className="text-sm">
-                  {lastSearchTerm
-                    ? `Page ${currentPage}/${MAX_PEXELS_PAGES}`
-                    : "Page -"}
-                </span>
-                <button
-                  type="button"
-                  className="btn btn-outline btn-sm"
-                  disabled={!lastSearchTerm || !hasNextPage || isSearching}
-                  onClick={() => handleChangePage("next")}
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-
-            <div className="">
-              <ul className="w-[80%] flex gap-3 pb-2 overflow-auto flex-wrap lg:w-full lg:max-h-[300px]">
-                {(pexelsImages.length > 0
-                  ? pexelsImages
-                  : backgroundImages
-                ).map((item: any) => {
-                  const thumb = typeof item === "string" ? item : item.tiny;
-                  const large = typeof item === "string" ? item : item.large;
-                  const isActiveBg =
-                    activeBackground?.type === "image" &&
-                    activeBackground.value === large;
-                  return (
-                    <li key={thumb}>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          previewBackground({ type: "image", value: large })
-                        }
-                        className={`cursor-pointer overflow-hidden rounded-lg ring-1 ring-base-200 hover:ring-primary transition snap-start ${
-                          isActiveBg ? "ring-2 ring-primary" : ""
-                        } ${isSearching ? "opacity-60" : ""} `}
-                        disabled={isSearching}
-                      >
-                        <img
-                          src={thumb}
-                          alt="Fond"
-                          className="h-[80px] w-[80px] object-cover"
-                        />
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </div>
-        ) : null}
+        <div id="active-option" className="w-full lg:max-h-[65%] lg:w-full">
+          {renderActiveOptionContent()}
+        </div>
         <div className={"lg:w-full h-[15%]"}>
           <div className={"my-3"}>
             <DownloadLink currentSource={currentSource} credit={credit} />

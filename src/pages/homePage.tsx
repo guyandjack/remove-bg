@@ -12,6 +12,7 @@ import { Hero } from "@/components/hero/hero";
 import { StepAction } from "@/components/stepAction/stepAction";
 import { FeatureCard } from "../components/card/FeatureCard";
 import { Diff } from "../components/diff/diff";
+import { BannerService } from "../components/banner/bannerService";
 import { Faq } from "../components/faq/Faq";
 
 //import de fonctions
@@ -338,6 +339,21 @@ function HomePage({routeKey = ""}: PropsPage) {
           }
         >
           <CtaStyled content={ctaContent} />
+        </div>
+      </div>
+      
+      <div className={"w-full pt-[200px]"}>
+        <div
+          className={
+            "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
+          }
+        >
+          <h2 className="mb-[50px] text-center text-3xl font-bold lg:w-[60%] lg:text-5xl">
+            Services complementaires
+          </h2>
+          <div className={"mb-[100px]"}>
+            <BannerService />
+          </div>
         </div>
       </div>
       <div className={"w-full pt-[200px]"}>

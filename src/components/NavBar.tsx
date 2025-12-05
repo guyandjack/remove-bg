@@ -24,6 +24,9 @@ import { setActiveLink } from "@/utils/setActiveLink";
 //import des signaux de connexion user (signUp, login)
 import { sessionSignal, initSessionFromLocalStorage } from "../stores/session";
 
+//import des images
+import logo from "@/assets/images/logo/logo_6.svg"
+
 
 //declarations des types
 type DisplayState = {
@@ -87,7 +90,7 @@ const NavBar = ()=> {
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-            <svg
+            {/*  <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
               fill="none"
@@ -101,7 +104,7 @@ const NavBar = ()=> {
                 strokeWidth="2"
                 d="M4 6h16M4 12h8m-8 6h16"
               />{" "}
-            </svg>
+            </svg> */}
           </div>
           <ul
             tabIndex={-1}
@@ -128,7 +131,8 @@ const NavBar = ()=> {
             })}
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl">daisyUI</a>
+        {/* <a className="btn btn-ghost text-xl">daisyUI</a> */}
+        <img src={logo} alt={"logo wizpix"} className={"w-[200px]"} />
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu-horizontal gap-5 px-1">
