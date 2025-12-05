@@ -1,54 +1,148 @@
+import iconSocial from "@/assets/images/icon/grouper.png";
+import iconConvert from "@/assets/images/icon/convertir.png";
 
-import iconSocial from "@/assets/images/icon/grouper.png"
-import iconConvert from "@/assets/images/icon/convertir.png"
 
-const BannerService = () => {
+type Id = "remove" | "social" | "product" | "convert";
+
+type BannerProps = {
+  selectService: React.Dispatch<
+    React.SetStateAction<"remove" | "social" | "product" | "convert">
+  >;
+};
+
+const BannerService = ({ selectService }: BannerProps) => {
+
+  const handleClick = (e: MouseEvent) => {
+    e.preventDefault();
+
+    const target = e.currentTarget as HTMLElement;
+    console.log("target: ", target)
+    if (!target) return;
+    const id: Id = target.dataset.id;
+    console.log("id: ", id)
+    if (!id) return;
+
+    if (window.location.pathname.includes("services")) {
+      selectService(id);
+      return;
+    }
+
+    window.location.href = `/services`;
+  };
+
   return (
+    <div className="max-w-7xl mx-auto px-6 md:px-12 xl:px-6">
+      <div className="mt-16 w-full max-w-[1300px] flex flex-col justify-start items-center gap-y-5 lg:flex-row lg:justify-evenly lg:gap-x-15">
+        <a
+          data-id="remove"
+          href={"/services"}
+          onClick={(e) => {
+             handleClick(e);
+          }}
+          className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl  hover:shadow-gray-600/10"
+        >
+          <div className="relative space-y-8 py-12 p-8">
+            <img
+              src={iconSocial}
+              loading="lazy"
+              width="200"
+              height="200"
+              className="w-12 h-12"
+              style="color:transparent"
+            />
+            <div className="space-y-2">
+              <h5 className="text-xl font-semibold transition group-hover:text-primary">
+                Remove BG
+              </h5>
+              <p className="">Suprime l'arriere plan de vos image</p>
+            </div>
+          </div>
+        </a>
+        <a
+          data-id="social"
+          href={"/services"}
+          onClick={(e) => {
+             handleClick(e);
+          }}
+          className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl  hover:shadow-gray-600/10"
+        >
+          <div className="relative space-y-8 py-12 p-8">
+            <img
+              src={iconSocial}
+              loading="lazy"
+              width="200"
+              height="200"
+              className="w-12 h-12"
+              style="color:transparent"
+            />
+            <div className="space-y-2">
+              <h5 className="text-xl font-semibold transition group-hover:text-primary">
+                Social media
+              </h5>
+              <p className="">
+                Converti et formate vos images pour tes réseaux sociaux prefereés.
+              </p>
+            </div>
+          </div>
+        </a>
+        <a
+          data-id="product"
+          href={"/services"}
+          onClick={(e) => {
+             handleClick(e);
+          }}
+          className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl  hover:shadow-gray-600/10"
+        >
+          <div className="relative space-y-8 py-12 p-8">
+            <img
+              src={iconSocial}
+              loading="lazy"
+              width="200"
+              height="200"
+              className="w-12 h-12"
+              style="color:transparent"
+            />
+            <div className="space-y-2">
+              <h5 className="text-xl font-semibold transition group-hover:text-primary">
+                Showcase
+              </h5>
+              <p className="">
+                Utilise l'iA pour mettre vos produits en situation.
+              </p>
+            </div>
+          </div>
+        </a>
 
-          
-  <div className="max-w-7xl mx-auto px-6 md:px-12 xl:px-6"> 
-   
-    <div
-      className="mt-16 w-full max-w-[1300px] flex flex-col justify-start items-center gap-y-5 lg:flex-row lg:justify-evenly lg:gap-x-15">
-              <a
-      href={"/upload"}
-                  className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl  hover:shadow-gray-600/10">
-        <div className="relative space-y-8 py-12 p-8">
-          <img src={iconSocial} loading="lazy" width="200" height="200"className="w-12 h-12" style="color:transparent"/>
-          <div className="space-y-2">
-            <h5 className="text-xl font-semibold transition group-hover:text-primary">Social media</h5>
-            <p className="">Converti et formate des images pour tes réseaux prefereés</p>
+        <a
+          data-id="convert"
+          href={"/services"}
+          onClick={(e) => {
+             handleClick(e);
+          }}
+          className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl hover:shadow-gray-600/10"
+        >
+          <div className="relative space-y-8 py-12 p-8">
+            <img
+              src={iconConvert}
+              loading="lazy"
+              width="200"
+              height="200"
+              className="w-12 h-12"
+              style="color:transparent"
+            />
+            <div className="space-y-2">
+              <h5 className="text-xl font-semibold transition group-hover:text-primary">
+                Convert images file
+              </h5>
+              <p className="">
+                Converti tout type d'image au format et à l'extension desirée.
+              </p>
+            </div>
           </div>
-        </div>
-      </a>
-              <a
-      href={"/upload"}
-                  className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl hover:shadow-gray-600/10">
-        <div className="relative space-y-8 py-12 p-8">
-          <img src="https://www.svgrepo.com/show/120853/logo.svg" loading="lazy" width="200" height="200"className="w-12 h-12 rounded-full" style="color:transparent" />
-          <div className="space-y-2">
-            <h5 className="text-xl font-semibold transition group-hover:text-primary">Showcase product</h5>
-            <p className="">Met en situation les produits que tu souhaites vendre.</p>
-          </div>
-        </div>
-      </a>
-      <a
-      href={"/upload"}
-      className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl hover:shadow-gray-600/10">
-        <div className="relative space-y-8 py-12 p-8">
-          <img src={iconConvert} loading="lazy" width="200" height="200"className="w-12 h-12" style="color:transparent" />
-          <div className="space-y-2">
-            <h5 className="text-xl font-semibold transition group-hover:text-primary">Convert images file</h5>
-            <p className="">Converti tout type d'image au format et l'extension desirée.</p>
-          </div>
-        </div>
-      </a>
-      
+        </a>
+      </div>
     </div>
-  </div>
+  );
+};
 
-  )
-}
-
-export { BannerService }
-
+export { BannerService };

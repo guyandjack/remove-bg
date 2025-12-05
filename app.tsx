@@ -6,7 +6,7 @@ import { LocationProvider, Router, ErrorBoundary, Route, useLocation } from "pre
 
 //import des pages
 import { HomePage } from "./src/pages/homePage";
-import { UploadPage } from "./src/pages/uploadPage";
+import { ServicesPage } from "./src/pages/servicesPage";
 import { SignUpPage } from "./src/pages/signUpPage";
 import { PricePage } from "./src/pages/pricePage";
 import { ContactPage } from "./src/pages/contactPage";
@@ -26,9 +26,9 @@ import { Footer } from "./src/components/footer/Footer";
 export function App() {
 
   
-  const RoutedUploadPage = () => {
+  const RoutedServicesPage = () => {
     const { url } = useLocation();
-    return <UploadPage routeKey={url}  />;
+    return <ServicesPage routeKey={url}  />;
   }
   const RoutedHomePage = () => {
     const { url } = useLocation();
@@ -89,7 +89,7 @@ export function App() {
           <ErrorBoundary onError={(e) => console.log(e)}>
             <Router>
               <Route path="/" component={RoutedHomePage} />
-              <Route path="/services" component={RoutedUploadPage} />
+              <Route path="/services" component={RoutedServicesPage} />
               <Route path="/pricing" component={RoutedPricePage} />
               <Route path="/pricing/signup" component={RoutedPricePage} />
               <Route path="/login" component={RoutedLoginPage} />

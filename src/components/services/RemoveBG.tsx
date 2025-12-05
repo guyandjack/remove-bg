@@ -1,66 +1,28 @@
 // UploadPage.tsx
 //import des hooks
 import { useEffect, useRef, useState } from "preact/hooks";
-import { useTranslation } from "react-i18next";
+import { sessionSignal } from "@/stores/session";
 
 //import des composants enfants
-import { CtaStyled } from "@/components/cta/CtaStyled";
 import { UploadImg, UploadImgType } from "@/components/form/UploadImg";
 import { ImgEditor } from "@/components/imgEditor/imgEditor";
 import { Loader } from "@/components/loader/Loader";
 
 //import des fonctions
-import { sessionSignal } from "@/stores/session";
 import { loadScript } from "@/utils/loadScript";
-import { setActiveLink } from "@/utils/setActiveLink";
-import { setDocumentTitle } from "@/utils/setDocumentTitle";
 
 // CDN de l'éditeur
 const editorCdn =
   "https://scaleflex.cloudimg.io/v7/plugins/filerobot-image-editor/latest/filerobot-image-editor.min.js";
 
 
-//declaration des types
-type CtaKey =
-  | "title_home_1"
-  | "title_home_2"
-  | "label_choice"
-  | "label_test"
-  | "color_choice"
-  | "color_test"
-  | "bg"
-  | "isBtn_2";
-
-type CtaContent = Record<CtaKey, string | boolean>;
 
 type PropsPage = {
-  routeKey: string;
+  removeTextContent: Record<string, string>;
+  uploadTextContent: UploadImgType;
 };
-  
 
-const UploadPage = ({routeKey}: PropsPage) => {
-  const { t } = useTranslation();
-  const userLoged = sessionSignal?.value?.authentified;
-  const textUploadImgComponent:UploadImgType = {
-    label: t("uploadImg.label"),
-    placeholder: t("uploadImg.placeHolder"),
-    filename: t("uploadImg.fileName"),
-    preview: t("uploadImg.preview"),
-    erase: t("uploadImg.erase")
-  }
-
-  const ctaContent: CtaContent = {
-    title_home_1: t("cta.title_home_1"),
-    title_home_2: t("cta.title_home_1"),
-    label_choice: t("cta.label_choice"),
-    label_test: t("cta.label_test"),
-    color_choice: "btn-success",
-    color_test: "btn-primary",
-    bg: "bg-base-200",
-    isBtn_2: false
-  };
-
-
+const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // true quand on doit lancer traitement + chargement CDN
@@ -71,23 +33,25 @@ const UploadPage = ({routeKey}: PropsPage) => {
 
   const [isCdnLoaded, setCdnLoaded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [typePlan, setTypePlan] = useState<string>(sessionSignal?.value?.plan?.code ||
-    sessionSignal?.value?.plan?.name ||
-    "")
+  const [typePlan, setTypePlan] = useState<string>(
+    sessionSignal?.value?.plan?.code || sessionSignal?.value?.plan?.name || ""
+  );
+
+  const userLoged = sessionSignal?.value?.authentified;
 
   const planChoiceEl = useRef<HTMLUListElement | null>(null);
   const objectSession: string = localStorage.getItem("session") || "";
   let creditRemaining = 0;
   if (objectSession !== "") {
-    
     const objectSessionParsed = JSON.parse(objectSession);
     const localCredits = objectSessionParsed.credits.remaining_last_24h;
-    creditRemaining = sessionSignal?.value?.credits?.remaining_last_24h || localCredits;
+    creditRemaining =
+      sessionSignal?.value?.credits?.remaining_last_24h || localCredits;
   }
 
   const choicePlan = (e?: MouseEvent) => {
     const elementList = planChoiceEl?.current;
-        //si pas d'event et pas de plan c'est option de style par defaut
+    //si pas d'event et pas de plan c'est option de style par defaut
     if (!e && typePlan === "" && elementList) {
       const buttons =
         Array.from(elementList?.querySelectorAll("button")) || null;
@@ -97,15 +61,16 @@ const UploadPage = ({routeKey}: PropsPage) => {
       });
       buttons[2].classList.add("opacity-[1]");
       buttons[2].style.outline = "dashed red";
-      return
-    };
+      return;
+    }
 
     if (elementList) {
-      const buttons = Array.from(elementList?.querySelectorAll("button")) || null;
+      const buttons =
+        Array.from(elementList?.querySelectorAll("button")) || null;
       buttons.forEach((btn) => {
         btn.classList.remove("opacity-[1]");
         btn.style.outline = "none";
-      })
+      });
       const el = e?.currentTarget as HTMLElement | null;
       if (!el) return;
 
@@ -117,7 +82,6 @@ const UploadPage = ({routeKey}: PropsPage) => {
       setTypePlan(plan);
     }
   };
-
 
   // Effet : quand callApi passe à true → on lance API + CDN
   useEffect(() => {
@@ -154,29 +118,21 @@ const UploadPage = ({routeKey}: PropsPage) => {
       });
   }, [callApi]);
 
-  //affiche le titre de la page dans l' onglet
-  useEffect(() => {
-    setActiveLink()
-    setDocumentTitle();
-  }, [routeKey]);
-
   //si un utilisateur est connecté
   // Image editor sera remonte avec la valeur du plan de l'utilisateur connecte
   useEffect(() => {
-    if(!userLoged) return
-   setTypePlan(sessionSignal?.value?.plan?.code || "");
+    if (!userLoged) return;
+    setTypePlan(sessionSignal?.value?.plan?.code || "");
   }, [sessionSignal?.value?.plan?.code]);
-
 
   const shouldShowEditor =
     isCdnLoaded && responseApi !== "" && previewUrl !== null && !isProcessing;
-  
+
   //style par defaut de l' element planChoice
   useEffect(() => {
     if (!planChoiceEl?.current) return;
     choicePlan();
   }, [shouldShowEditor]);
-
 
   //scroll sur l' element principal
   useEffect(() => {
@@ -190,7 +146,6 @@ const UploadPage = ({routeKey}: PropsPage) => {
     }
   }, [shouldShowEditor]);
 
-
   return (
     <div className="page-container">
       <div
@@ -198,20 +153,14 @@ const UploadPage = ({routeKey}: PropsPage) => {
           "relative w-full mx-auto max-w-[1300px] py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px]"
         }
       >
-        <h1
-          className={
-            "text-center text-4xl font-bold lg:w-[40%] lg:text-6xl lg:text-left lg:self-start lg:leading-[60px]!"
-          }
-        >
-          {userLoged ? t("upload.title_h1_loged") : t("upload.title_h1")}
-        </h1>
+        
 
         <UploadImg
           setPreviewUrl={setPreviewUrl}
           previewUrl={previewUrl}
           setCallApi={setCallApi}
           setResponseApi={setResponseApi} // tu peux le retirer si tu déplaces toute la logique API dans le parent
-          content={textUploadImgComponent}
+          content={uploadTextContent}
         />
       </div>
       {!userLoged && shouldShowEditor ? (
@@ -265,20 +214,8 @@ const UploadPage = ({routeKey}: PropsPage) => {
 
         {isProcessing && <Loader top="0px" text="is processing..." />}
       </div>
-      {shouldShowEditor && (
-        <div className={"w-full bg-secondary/20"}>
-          <div
-            className={
-              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
-            }
-          >
-            <CtaStyled content={ctaContent} />
-          </div>
-        </div>
-      )}
     </div>
   );
-}
+};
 
-export { UploadPage };
-
+export { RemoveBg };
