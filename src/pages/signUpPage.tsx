@@ -14,7 +14,7 @@ function SignUpPage({routeKey}: PropsPage) {
    setDocumentTitle();
  }, [routeKey]);
   return (
-    <div className={"px-[10px] w-full mx-auto bg-page lg:px-[0px]"}>
+    <div className={"page-container"}>
       <FormSignUp />
     </div>
   );

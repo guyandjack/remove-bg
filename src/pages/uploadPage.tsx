@@ -192,7 +192,7 @@ const UploadPage = ({routeKey}: PropsPage) => {
 
 
   return (
-    <div className="px-[10px] w-full mx-auto pb-[100px] bg-base-200">
+    <div className="page-container">
       <div
         className={
           "relative w-full mx-auto max-w-[1300px] py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px]"

@@ -263,7 +263,7 @@ function HomePage({routeKey = ""}: PropsPage) {
   return (
     <div
       className={
-        "w-full px-[10px] mx-auto bg-page flex flex-col justify-start items-center"
+        "page-container"
       }
     >
       <div className={"w-full p-10"}>

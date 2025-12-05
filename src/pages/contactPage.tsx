@@ -60,7 +60,7 @@ function ContactPage({routeKey}: PropsPage) {
     textError: t("formContact.textError"),
   };
   return (
-    <div className="relative px-[10px] w-full mx-auto bg-page lg:px-[0px] flex flex-col justify-start items-center gap-[50px]">
+    <div className="page-container">
       
       <h1
         dangerouslySetInnerHTML={{

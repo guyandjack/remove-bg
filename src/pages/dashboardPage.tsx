@@ -89,7 +89,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
   };
 
   return (
-    <div className="px-4 mx-auto w-full max-w-[1200px] py-8">
+    <div className="page-container">
       <div className="mb-8">
         <h1 className="text-3xl lg:text-4xl font-bold">Tableau de bord</h1>
         <p className="text-base-content/70 mt-2">Gérez votre compte et vos abonnements.</p>

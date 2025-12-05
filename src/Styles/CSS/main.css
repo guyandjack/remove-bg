@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+
+
+/* stylelint-disable at-rule-no-unknown -- Tailwind CSS plugin syntax */
 @plugin "daisyui" {
   themes: winter --default, night --prefersdark;
 }
@@ -27,6 +30,7 @@
   --custom-bg-footer: #0A1120;
   --custom-bg-navbar: rgba(31, 42, 55, 0.9);
 }
+/* stylelint-enable at-rule-no-unknown */
 
 @font-face {
   font-family: "Roboto";
@@ -46,6 +50,23 @@ img {
 /***********************************************
 ****** custom css pour composant principaux *********
 **********************************************/
+.page-container {
+  display: flex;
+  flex-flow: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0px auto;
+  padding: 50px 10px;
+  width: 100%;
+  background-color: var(--custom-bg-page);
+  
+}
+@media screen and (min-width: 1024px) {
+  .page-container {
+    padding: 100px 0;
+  }
+}
+
 .bg-page {
   background-color: var(--custom-bg-page);
 }
