@@ -1,6 +1,6 @@
 // UploadPage.tsx
 //import des hooks
-import { useEffect, useRef, useState } from "preact/hooks";
+import {  useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 import { sessionSignal } from "@/stores/session";
 
@@ -11,7 +11,11 @@ import * as m from "motion/react-m";
 //import des composants enfants
 import { RemoveBg } from "@/components/services/RemoveBG";
 import { SocialPicture } from "@/components/services/socialPicture";
-import { BannerService } from "@/components/banner/bannerService";
+import { ServiceCard } from "@/components/card/ServiceCard";
+
+//import des images
+import iconSocial from "@/assets/images/icon/icon-reseau-opt.svg";
+import iconConvert from "@/assets/images/icon/convertir.png";
 
 //declaration des types
 type UploadImgType = {
@@ -40,7 +44,7 @@ type PropsPage = {
 
 const ServicesPage = ({ routeKey }: PropsPage) => {
   const [service, setService] = useState<
-    "remove" | "social" | "product" | "convert"
+    "remove" | "social" | "product" | "convert" 
   >();
   const { t } = useTranslation();
   const userLoged = sessionSignal?.value?.authentified || false;
@@ -66,6 +70,33 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
     isBtn_2: false,
   };
 
+  const contentCardService = [
+    {
+      id: t("serviceCardContent.card_1.id"),
+      src: t("serviceCardContent.card_1.src"),
+      title: t("serviceCardContent.card_1.title"),
+      description: t("serviceCardContent.card_1.description"),
+    },
+    {
+      id: t("serviceCardContent.card_2.id"),
+      src: iconSocial,
+      title: t("serviceCardContent.card_2.title"),
+      description: t("serviceCardContent.card_2.description"),
+    },
+    {
+      id: t("serviceCardContent.card_3.id"),
+      src: iconConvert,
+      title: t("serviceCardContent.card_3.title"),
+      description: t("serviceCardContent.card_3.description"),
+    },
+    {
+      id: t("serviceCardContent.card_4.id"),
+      src: t("serviceCardContent.card_4.src"),
+      title: t("serviceCardContent.card_4.title"),
+      description: t("serviceCardContent.card_4.description"),
+    },
+  ];
+
   return (
     <div className="page-container">
       <div
@@ -77,9 +108,19 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
           {userLoged ? t("upload.title_h1_loged") : t("upload.title_h1")}
         </h1>
       </div>
-      <div>
-        <BannerService selectService={setService} />
-      </div>
+      <ul
+        className={
+          "mt-16 w-full max-w-[1200px] flex flex-col justify-start items-center gap-y-5 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-10"
+        }
+      >
+        {contentCardService.map((cardContent) => {
+          return (
+            <li key={cardContent.id}>
+              <ServiceCard content={cardContent} selectService={setService} />
+            </li>
+          );
+        })}
+      </ul>
       <div>
         <LazyMotion features={domAnimation}>
           <AnimatePresence>

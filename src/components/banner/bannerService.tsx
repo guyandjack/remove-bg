@@ -3,43 +3,34 @@ import iconConvert from "@/assets/images/icon/convertir.png";
 
 
 type Id = "remove" | "social" | "product" | "convert";
+type Text = {
+  id: Id;
+  url: string;
+  title: string;
+  description: string;
+}
 
 type BannerProps = {
   selectService: React.Dispatch<
     React.SetStateAction<"remove" | "social" | "product" | "convert">
   >;
+  content: Text
 };
 
-const BannerService = ({ selectService }: BannerProps) => {
+const BannerService = ({ content, selectService }: BannerProps) => {
 
-  const handleClick = (e: MouseEvent) => {
-    e.preventDefault();
-
-    const target = e.currentTarget as HTMLElement;
-    console.log("target: ", target)
-    if (!target) return;
-    const id: Id = target.dataset.id;
-    console.log("id: ", id)
-    if (!id) return;
-
-    if (window.location.pathname.includes("services")) {
-      selectService(id);
-      return;
-    }
-
-    window.location.href = `/services`;
-  };
+  
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-12 xl:px-6">
-      <div className="mt-16 w-full max-w-[1300px] flex flex-col justify-start items-center gap-y-5 lg:flex-row lg:justify-evenly lg:gap-x-15">
+      <div className="mt-16 w-full max-w-[1300px] flex flex-col justify-start items-center gap-y-5 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-5">
         <a
           data-id="remove"
           href={"/services"}
           onClick={(e) => {
-             handleClick(e);
+            handleClick(e);
           }}
-          className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl  hover:shadow-gray-600/10"
+          className="w-[400px] h-[250px] group relative bg-component transition hover:z-[1] hover:shadow-2xl  hover:shadow-gray-600/10"
         >
           <div className="relative space-y-8 py-12 p-8">
             <img
@@ -62,9 +53,9 @@ const BannerService = ({ selectService }: BannerProps) => {
           data-id="social"
           href={"/services"}
           onClick={(e) => {
-             handleClick(e);
+            handleClick(e);
           }}
-          className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl  hover:shadow-gray-600/10"
+          className="w-[400px] h-[250px] group relative bg-component transition hover:z-[1] hover:shadow-2xl  hover:shadow-gray-600/10"
         >
           <div className="relative space-y-8 py-12 p-8">
             <img
@@ -80,7 +71,8 @@ const BannerService = ({ selectService }: BannerProps) => {
                 Social media
               </h5>
               <p className="">
-                Converti et formate vos images pour tes réseaux sociaux prefereés.
+                Converti et formate vos images pour tes réseaux sociaux
+                prefereés.
               </p>
             </div>
           </div>
@@ -89,9 +81,9 @@ const BannerService = ({ selectService }: BannerProps) => {
           data-id="product"
           href={"/services"}
           onClick={(e) => {
-             handleClick(e);
+            handleClick(e);
           }}
-          className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl  hover:shadow-gray-600/10"
+          className="w-[400px] h-[250px] group relative bg-component transition hover:z-[1] hover:shadow-2xl  hover:shadow-gray-600/10"
         >
           <div className="relative space-y-8 py-12 p-8">
             <img
@@ -117,9 +109,9 @@ const BannerService = ({ selectService }: BannerProps) => {
           data-id="convert"
           href={"/services"}
           onClick={(e) => {
-             handleClick(e);
+            handleClick(e);
           }}
-          className="w-[250px] lg:w-[300px] group relative bg-component transition hover:z-[1] hover:shadow-2xl hover:shadow-gray-600/10"
+          className="w-[400px] h-[250px] group relative bg-component transition hover:z-[1] hover:shadow-2xl hover:shadow-gray-600/10"
         >
           <div className="relative space-y-8 py-12 p-8">
             <img

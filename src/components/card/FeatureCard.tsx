@@ -1,4 +1,14 @@
-const FeatureCard = ({ content }) => {
+type Text = {
+  url: string;
+  title: string;
+  description: string;
+};
+
+type PropsCard = {
+  content: Text;
+}
+
+const FeatureCard = ({ content }: PropsCard) => {
   return (
     <a
       href={"/pricing"}

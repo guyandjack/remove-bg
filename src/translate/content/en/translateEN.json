@@ -164,6 +164,54 @@
   "label_choice": "I choose a plan",
   "label_test": "I want to test the quality"
 },
+"featureCardContent": {
+  "card_1": {
+    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5\" /></svg>",
+    "title": "Web developers",
+    "description": "Automate background removal and image editing directly inside your applications with a fast and simple API."
+  },
+  "card_2": {
+    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z\" /><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z\" /></svg>",
+    "title": "Photographers",
+    "description": "Save valuable time by automatically removing backgrounds and enhancing your shots in just a few seconds."
+  },
+  "card_3": {
+    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z\" /></svg>",
+    "title": "E-commerce stores",
+    "description": "Create clean, consistent product visuals ready to be published on your website or marketplace."
+  },
+  "card_4": {
+    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42\" /></svg>",
+    "title": "Designers & graphic artists",
+    "description": "Speed up your workflow with clean cutouts and realistic mockups, without time-consuming manual work."
+  },
+  "card_5": {
+    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z\" /></svg>",
+    "title": "Content creators",
+    "description": "Design thumbnails and eye-catching visuals without needing advanced image editing skills."
+  },
+  "card_6": {
+    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46\" /></svg>",
+    "title": "Marketing agencies",
+    "description": "Produce campaign-ready visuals optimized for ads and social media in just a few clicks."
+  },
+  "card_7": {
+    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75\" /></svg>",
+    "title": "Marketplace managers",
+    "description": "Standardize seller images by automatically removing backgrounds to match your visual guidelines."
+  },
+  "card_8": {
+    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z\" /></svg>",
+    "title": "Real estate",
+    "description": "Showcase your properties with clean visuals, free of distracting backgrounds, for listings and marketing materials."
+  },
+  "card_9": {
+    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z\" /></svg>",
+    "title": "Artisans & makers",
+    "description": "Highlight your creations with sharp, professional visuals without investing in expensive equipment."
+  }
+},
+
 
   "uploadImg": {
     "label": "Choose a file",
@@ -172,6 +220,56 @@
     "preview": "No preview available",
     "erase": "Cancel"
   },
+  "faqHome": {
+  "question_1": "Does the site comply with GDPR?",
+  "reponse_1": "Yes. Our service is fully GDPR compliant. Personal data is collected only when strictly necessary (account creation or contact form). You may access, modify, or delete your data at any time.",
+
+  "question_2": "Who is this background removal service for?",
+  "reponse_2": "Our tool is designed for content creators, online sellers, photographers, designers, students, and anyone who needs clean, ready-to-use images quickly, for personal or professional use.",
+
+  "question_3": "Is the site secure?",
+  "reponse_3": "Yes. No data is shared with third parties without your consent, no tracking cookies are used, and payments are processed by Stripe, a PCI-DSS certified provider ensuring high security standards.",
+
+  "question_4": "How do I use the service?",
+  "reponse_4": "Simply choose a plan (free or paid), create an account, and upload your images. Processing starts automatically, and you can download your result within seconds.",
+
+  "question_5": "Is the free plan really free?",
+  "reponse_5": "Yes, absolutely. Some advanced features are limited, but no credit card is required and you receive daily credits to use the service at no cost.",
+
+  "question_6": "Are my images used to train AI models?",
+  "reponse_6": "Only if you explicitly authorize it. With consent, images are anonymized and used to improve our models. Without consent, they are automatically deleted after processing.",
+
+  "question_7": "Are there risks to my personal data?",
+  "reponse_7": "There are no significant risks: we only collect your IP address and the information you voluntarily provide (account creation or contact form). No sensitive data is requested or stored.",
+
+  "question_8": "How long are my images stored?",
+  "reponse_8": "With your consent, images are stored only as long as needed to improve the AI model. Without consent, they are automatically deleted immediately after processing.",
+
+  "question_9": "Can I cancel my subscription at any time?",
+  "reponse_9": "Yes. You can cancel your subscription at any moment from your personal dashboard. Cancellation simply disables auto-renewal and does not interrupt your current access.",
+
+  "question_10": "Does cancellation entitle me to a refund?",
+  "reponse_10": "No. According to our subscription terms, periods already paid for remain due until their expiration, even in case of early cancellation.",
+
+  "question_11": "What is the quality of the results?",
+  "reponse_11": "Our AI model is trained to produce clean, precise, and professional-quality cutouts, even for complex images. Paid subscribers benefit from enhanced quality and advanced features.",
+
+  "question_12": "Is there a limit to how many images I can process?",
+  "reponse_12": "Yes. Each plan includes a daily credit quota corresponding to the number of images you can process. Your remaining credits are accessible at any time from your dashboard.",
+
+  "question_13": "Does the service work on mobile?",
+  "reponse_13": "Yes. Our PWA works on smartphones, tablets, and computers. You can even install it like a regular app.",
+
+  "question_14": "What if an image is poorly cut out?",
+  "reponse_14": "You can retry with a higher-quality image or use our editing tools (depending on your plan). If the issue persists, our support team is here to help.",
+
+  "question_15": "Do you offer an API?",
+  "reponse_15": "Yes. An API is available for professional plans, allowing you to integrate automatic background removal into your applications, workflows, or e-commerce platforms.",
+
+  "question_16": "Are my payment details stored?",
+  "reponse_16": "No. All payment data is processed exclusively by Stripe. We never have access to it and do not store it."
+},
+
   "faqPricing": {
     "question_1": "Can I cancel my subscription at any time?",
     "reponse_1": "Yes, you can cancel your subscription at any time from your personal account. Cancellation simply stops the automatic renewal. Your access remains active until the end of the period already paid for.",

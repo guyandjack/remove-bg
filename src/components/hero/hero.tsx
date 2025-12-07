@@ -29,11 +29,11 @@ type ContentProps = {
 
 const Hero = ({ content }: ContentProps) => {
   return (
-    <section className="hero w-full">
-      <div className=" hero-content flex-col lg:flex-row lg:h-[500px]">
+    <section className="w-full">
+      <div className="flex flex-col justify-start items-center lg:flex-row lg:justify-evenly lg:h-[calc(100vh-120px)]">
         <div
           className={
-            "w-full lg:w-[60%] flex flex-col justify-start items-left my-[30px]"
+            "w-full lg:w-[50%] flex-shrink flex flex-col justify-start items-left my-[0px]"
           }
         >
           <h1
@@ -44,10 +44,16 @@ const Hero = ({ content }: ContentProps) => {
             className="self-center text-center py-[20px] text-xl w-[80%] lg:self-start lg:text-left"
             dangerouslySetInnerHTML={{ __html: content.title_h2 }}
           ></h2>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href={"/pricing"} className={"btn btn-success p-5 w-[200px]"}>
+              je choisi un plan
+            </a>
+            <a href={"/services"} className={"btn btn-info p-5 w-[200px]"}>
+              je veux tester la qualité
+            </a>
+          </div>
         </div>
-        <div
-          className={"w-full max-w-[450px] lg:w-[50%]"}
-        >
+        <div className={"w-full max-w-[450px] lg:w-[50%]"}>
           <Diff tag={[]} />
         </div>
       </div>

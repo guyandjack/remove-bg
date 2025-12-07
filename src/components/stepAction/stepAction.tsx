@@ -16,7 +16,7 @@ type StepsContent = {
 
 const StepAction = ( {content} : StepsContent) => {
   return (
-    <section class="w-full py-10 bg-component sm:py-16 lg:py-18">
+    <section class="w-full bg-component lg:h-[500px] ">
       <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="max-w-2xl mx-auto text-center">
           <h2 class="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
