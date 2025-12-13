@@ -11,7 +11,6 @@ import { CtaStyled } from "@/components/cta/CtaStyled";
 import { FinalCTA } from "@/components/cta/ctaFinal";
 import { Hero } from "@/components/hero/hero";
 import { StepAction } from "@/components/stepAction/stepAction";
-import { ProblemSection } from "@/components/problemSection/problemSection";
 import { FeatureCard } from "../components/card/FeatureCard";
 import { Diff } from "../components/diff/diff";
 import { ServiceCard } from "../components/card/ServiceCard";
@@ -87,6 +86,15 @@ function HomePage({ routeKey = "" }: PropsPage) {
     privacy_2: t("heroHome.privacy_2"),
   };
 
+  const ctaFinalContent = {
+    title: t("ctaFinal.title_home"),
+    intro: t("ctaFinal.intro_home"),
+    btn_1: t("ctaFinal.btn_pricing"),
+    btn_2: t("ctaFinal.btn_service"),
+    info_1: t("ctaFinal.info_1"),
+    info_2: t("ctaFinal.info_2"),
+  }
+
   const ctaContent: CtaContent = {
     title_home_1: t("cta.title_home_1"),
     title_home_2: t("cta.title_home_1"),
@@ -98,16 +106,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
     isBtn_2: true,
   };
 
-  const ctaContent_2: CtaContent = {
-    title_home_1: t("cta.title_home_1"),
-    title_home_2: t("cta.title_home_2"),
-    label_choice: t("cta.label_choice"),
-    label_test: t("cta.label_test"),
-    color_choice: "btn-success",
-    color_test: "btn-primary",
-    bg: "",
-    isBtn_2: true,
-  };
+  
 
   //buton label
   const labels: Labels = [
@@ -257,7 +256,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
 
   return (
     <div className={"page-container"}>
-      <div className={"w-full"}>
+      <div className={"w-full mb-[100px] lg:mb-0"}>
         <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
@@ -299,7 +298,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
           <StepAction content={stepsContent} />
         </div>
       </div>
-      <div className={"w-full bg-component py-[50px]"}>
+      {/* <div className={"w-full bg-component py-[50px]"}>
         <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
@@ -307,14 +306,14 @@ function HomePage({ routeKey = "" }: PropsPage) {
         >
           <ProblemSection />
         </div>
-      </div>
+      </div> */}
       <div className={"w-full bg-component"}>
         <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
           }
         >
-          <FinalCTA />
+          <FinalCTA content={ctaFinalContent} />
         </div>
       </div>
 
@@ -356,7 +355,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
           </ul>
         </div>
       </div>
-      <div className={"w-full bg-secondary/20"}>
+      <div className={"w-full bg-secondary/80"}>
         <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"

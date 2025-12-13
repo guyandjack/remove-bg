@@ -158,12 +158,48 @@
     "description": "Upload your images, wait a few seconds, and your background is removed. Depending on your subscription, additional editing tools are available."
   }
 },
+"serviceCardContent": {
+  "card_1": {
+    "id": "remove",
+    "src": "",
+    "title": "Background removal",
+    "description": "Automatically removes the background from your images to create clean, ready-to-use visuals."
+  },
+  "card_2": {
+    "id": "social",
+    "src": "",
+    "title": "Social media images",
+    "description": "Formats and optimizes your images for major social networks to ensure a professional look."
+  },
+  "card_3": {
+    "id": "convert",
+    "src": "",
+    "title": "Image conversion",
+    "description": "Converts and resizes your images to the desired format and dimensions, with no noticeable quality loss."
+  },
+  "card_4": {
+    "id": "product",
+    "src": "",
+    "title": "Product showcasing",
+    "description": "Showcases your products in tailored scenes for selling or presenting them effectively."
+  }
+},
+
 
   "cta": {
   "title_home_1": "Start processing your images.",
   "label_choice": "I choose a plan",
   "label_test": "I want to test the quality"
 },
+"ctaFinal": {
+  "title_home": "Edit your images now",
+  "intro_home": "Join over 10,000 users who process their images in just a few seconds with professional-quality results.",
+  "btn_pricing": "I choose a plan",
+  "btn_service": "I want to test the quality",
+  "info_1": "No credit card required for the free plan",
+  "info_2": "Cancel your subscription at any time"
+},
+
 "featureCardContent": {
   "card_1": {
     "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5\" /></svg>",
@@ -221,84 +257,84 @@
     "erase": "Cancel"
   },
   "faqHome": {
-  "question_1": "Does the site comply with GDPR?",
+  "question_1": "Does the site comply with GDPR&nbsp;?",
   "reponse_1": "Yes. Our service is fully GDPR compliant. Personal data is collected only when strictly necessary (account creation or contact form). You may access, modify, or delete your data at any time.",
 
-  "question_2": "Who is this background removal service for?",
+  "question_2": "Who is this background removal service for&nbsp;?",
   "reponse_2": "Our tool is designed for content creators, online sellers, photographers, designers, students, and anyone who needs clean, ready-to-use images quickly, for personal or professional use.",
 
-  "question_3": "Is the site secure?",
+  "question_3": "Is the site secure&nbsp;?",
   "reponse_3": "Yes. No data is shared with third parties without your consent, no tracking cookies are used, and payments are processed by Stripe, a PCI-DSS certified provider ensuring high security standards.",
 
-  "question_4": "How do I use the service?",
+  "question_4": "How do I use the service&nbsp;?",
   "reponse_4": "Simply choose a plan (free or paid), create an account, and upload your images. Processing starts automatically, and you can download your result within seconds.",
 
-  "question_5": "Is the free plan really free?",
+  "question_5": "Is the free plan really free&nbsp;?",
   "reponse_5": "Yes, absolutely. Some advanced features are limited, but no credit card is required and you receive daily credits to use the service at no cost.",
 
-  "question_6": "Are my images used to train AI models?",
+  "question_6": "Are my images used to train AI models&nbsp;?",
   "reponse_6": "Only if you explicitly authorize it. With consent, images are anonymized and used to improve our models. Without consent, they are automatically deleted after processing.",
 
-  "question_7": "Are there risks to my personal data?",
+  "question_7": "Are there risks to my personal data&nbsp;?",
   "reponse_7": "There are no significant risks: we only collect your IP address and the information you voluntarily provide (account creation or contact form). No sensitive data is requested or stored.",
 
-  "question_8": "How long are my images stored?",
+  "question_8": "How long are my images stored&nbsp;?",
   "reponse_8": "With your consent, images are stored only as long as needed to improve the AI model. Without consent, they are automatically deleted immediately after processing.",
 
-  "question_9": "Can I cancel my subscription at any time?",
+  "question_9": "Can I cancel my subscription at any time&nbsp;?",
   "reponse_9": "Yes. You can cancel your subscription at any moment from your personal dashboard. Cancellation simply disables auto-renewal and does not interrupt your current access.",
 
-  "question_10": "Does cancellation entitle me to a refund?",
+  "question_10": "Does cancellation entitle me to a refund&nbsp;?",
   "reponse_10": "No. According to our subscription terms, periods already paid for remain due until their expiration, even in case of early cancellation.",
 
-  "question_11": "What is the quality of the results?",
+  "question_11": "What is the quality of the results&nbsp;?",
   "reponse_11": "Our AI model is trained to produce clean, precise, and professional-quality cutouts, even for complex images. Paid subscribers benefit from enhanced quality and advanced features.",
 
-  "question_12": "Is there a limit to how many images I can process?",
+  "question_12": "Is there a limit to how many images I can process&nbsp;?",
   "reponse_12": "Yes. Each plan includes a daily credit quota corresponding to the number of images you can process. Your remaining credits are accessible at any time from your dashboard.",
 
-  "question_13": "Does the service work on mobile?",
+  "question_13": "Does the service work on mobile&nbsp;?",
   "reponse_13": "Yes. Our PWA works on smartphones, tablets, and computers. You can even install it like a regular app.",
 
-  "question_14": "What if an image is poorly cut out?",
+  "question_14": "What if an image is poorly cut out&nbsp;?",
   "reponse_14": "You can retry with a higher-quality image or use our editing tools (depending on your plan). If the issue persists, our support team is here to help.",
 
-  "question_15": "Do you offer an API?",
+  "question_15": "Do you offer an API&nbsp;?",
   "reponse_15": "Yes. An API is available for professional plans, allowing you to integrate automatic background removal into your applications, workflows, or e-commerce platforms.",
 
-  "question_16": "Are my payment details stored?",
+  "question_16": "Are my payment details stored&nbsp;?",
   "reponse_16": "No. All payment data is processed exclusively by Stripe. We never have access to it and do not store it."
 },
 
   "faqPricing": {
-    "question_1": "Can I cancel my subscription at any time?",
+    "question_1": "Can I cancel my subscription at any time&nbsp;?",
     "reponse_1": "Yes, you can cancel your subscription at any time from your personal account. Cancellation simply stops the automatic renewal. Your access remains active until the end of the period already paid for.",
 
-    "question_2": "Does cancellation entitle me to a refund?",
+    "question_2": "Does cancellation entitle me to a refund&nbsp;?",
     "reponse_2": "No. In accordance with our policy and applicable legislation, subscriptions that have already begun are non-refundable. However, you keep access to the service until your current subscription expires.",
 
-    "question_3": "Can I change my plan (downgrade or upgrade)?",
+    "question_3": "Can I change my plan (downgrade or upgrade)&nbsp;?",
     "reponse_3": "Yes, you can change your subscription at any time. The new plan will take effect at the start of the next billing cycle. You may upgrade or downgrade depending on your needs.",
 
-    "question_4": "What happens if I upgrade to a higher plan?",
+    "question_4": "What happens if I upgrade to a higher plan&nbsp;?",
     "reponse_4": "If you upgrade to a higher plan, it will be applied at the next monthly renewal. You will then immediately benefit from the features of the new plan.",
 
-    "question_5": "What happens if I downgrade to a lower plan?",
+    "question_5": "What happens if I downgrade to a lower plan&nbsp;?",
     "reponse_5": "Downgrading to a lower plan will take effect at the next monthly billing cycle. You keep all features of your current plan until that date.",
 
-    "question_6": "How is the subscription payment processed?",
+    "question_6": "How is the subscription payment processed&nbsp;?",
     "reponse_6": "Payment is monthly and made by credit card through Stripe, a secure payment platform. We do not store any sensitive banking data.",
 
-    "question_7": "Can I try the service before subscribing?",
+    "question_7": "Can I try the service before subscribing&nbsp;?",
     "reponse_7": "Yes, a free plan is available and allows you to test the processing quality with a limited number of daily credits. No credit card is required to use it.",
 
-    "question_8": "What happens if I run out of daily credits?",
+    "question_8": "What happens if I run out of daily credits&nbsp;?",
     "reponse_8": "Your credits reset automatically each day. If you need more credits, you can upgrade to a higher plan at any time.",
 
-    "question_9": "Does the subscription renew automatically?",
+    "question_9": "Does the subscription renew automatically&nbsp;?",
     "reponse_9": "Yes, the subscription renews automatically every month to ensure uninterrupted service. You can disable automatic renewal from your personal account.",
 
-    "question_10": "Can I use the service on multiple devices?",
+    "question_10": "Can I use the service on multiple devices&nbsp;?",
     "reponse_10": "Yes, your subscription is linked to your account. You can use the service on any device as long as you are logged in."
   },
   "contact": {

@@ -12,29 +12,27 @@ type CtaProps = {
 
 const Cta = ({cta}:CtaProps) => {
     return (
-      <div className={`${cta.bg} w-full `}>
-        <div
-          className={`w-full mx-auto max-w-[1300px] py-[50px] flex flex-col justify-start items-center gap-5 lg:flex-row lg:justify-evenly `}
-        >
-          <a
-            data-id="/pricing"
-            href="/pricing"
-            className={`btn ${cta.color_choice} w-[60%] lg:w-[40%] text-m`}
-            dangerouslySetInnerHTML={{ __html: cta.label_choice }}
-            onClick={(e) => {
-              setActiveLink(e);
-            }}
-          ></a>
-          <a
-            data-id="/upload"
-            href="/upload"
-            className={`btn ${cta.color_test} w-[60%] lg:w-[40%] text-m`}
-            dangerouslySetInnerHTML={{ __html: cta.label_test }}
-            onClick={(e) => {
-              setActiveLink(e);
-            }}
-          ></a>
-        </div>
+      <div
+        className={`w-full mx-auto max-w-[1300px] py-[50px] flex flex-col justify-start items-center gap-5 lg:flex-row lg:justify-evenly `}
+      >
+        <a
+          data-id="/pricing"
+          href="/pricing"
+          className={`w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-success/80 hover:bg-success/50 transition duration-300 ease-in-out`}
+          dangerouslySetInnerHTML={{ __html: cta.label_choice }}
+          onClick={(e) => {
+            setActiveLink(e);
+          }}
+        ></a>
+        <a
+          data-id="/upload"
+          href="/upload"
+          className={`w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out`}
+          dangerouslySetInnerHTML={{ __html: cta.label_test }}
+          onClick={(e) => {
+            setActiveLink(e);
+          }}
+        ></a>
       </div>
     );
 };

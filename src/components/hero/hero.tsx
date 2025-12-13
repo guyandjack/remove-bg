@@ -2,8 +2,7 @@
 //import desfonctions
 import { setActiveLink } from "@/utils/setActiveLink";
 
-//import des images
-import heroImg from "@/assets/images/hero-img.jpg";
+
 
 //import des composant enfant
 import {Diff} from "@/components/diff/diff";
@@ -30,10 +29,10 @@ type ContentProps = {
 const Hero = ({ content }: ContentProps) => {
   return (
     <section className="w-full">
-      <div className="flex flex-col justify-start items-center lg:flex-row lg:justify-evenly lg:h-[calc(100vh-120px)]">
+      <div className="flex flex-col justify-start items-center gap-y-15 lg:flex-row lg:justify-evenly lg:h-[calc(100vh-120px)]">
         <div
           className={
-            "w-full lg:w-[50%] flex-shrink flex flex-col justify-start items-left my-[0px]"
+            "w-full lg:w-[50%] flex-shrink flex flex-col justify-start items-center my-[0px]"
           }
         >
           <h1
@@ -45,10 +44,16 @@ const Hero = ({ content }: ContentProps) => {
             dangerouslySetInnerHTML={{ __html: content.title_h2 }}
           ></h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href={"/pricing"} className={"btn btn-success p-5 w-[200px]"}>
+            <a
+            data-id="/pricing" 
+            onClick={(e)=> setActiveLink(e)}
+            href={"/pricing"} className={"w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-success/80 hover:bg-success/50 transition duration-300 ease-in-out"}>
               je choisi un plan
             </a>
-            <a href={"/services"} className={"btn btn-info p-5 w-[200px]"}>
+            <a
+            data-id="/services" 
+            onClick={(e)=> setActiveLink(e)}
+            href={"/services"} className={"w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out"}>
               je veux tester la qualité
             </a>
           </div>

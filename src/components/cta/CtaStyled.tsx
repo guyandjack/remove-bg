@@ -30,7 +30,7 @@ const CtaStyled = ({ content }: CtaProps) => {
         />
       
       <div class="mx-auto">
-        <div class="mx-auto flex flex-col justify-center items-center lg:flex-row lg:justify-between">
+        <div class="mx-auto flex flex-col justify-center items-center gap-y-10 lg:flex-row lg:justify-between">
           <div class="relative w-full lg:max-w-[60%]">
             <h1
               class="mt-0 mb-3 text-3xl text-center font-bold leading-tight sm:text-4xl sm:leading-tight md:text-[40px] md:leading-tight text-white lg:text-left lg:ml-[40px] "

@@ -65,7 +65,7 @@ const ServiceCard = ({ content, selectService }: BannerProps) => {
       data-id={"/services"}
       href={serviceHref}
       onClick={handleClick}
-      className="bg-component block w-[400px] h-[250px] border-service-card rounded-xl group  transition hover:z-[1] hover:shadow-lg hover:shadow-primary/50"
+      className="bg-component block w-[400px] h-[280px] border-service-card rounded-xl group  transition hover:z-[1] hover:shadow-lg hover:shadow-primary/50"
     >
       <div className="space-y-8 py-12 p-8">
         <div className={"flex flex-row justify-end items-center"}>
