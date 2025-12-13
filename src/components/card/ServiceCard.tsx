@@ -1,3 +1,8 @@
+import { useEffect, useRef } from "preact/hooks";
+
+//import des fonctions
+import { setActiveLink } from "@/utils/setActiveLink";
+
 type Id = "remove" | "social" | "product" | "convert" | string;
 type Text = {
   id: Id;
@@ -13,42 +18,64 @@ type BannerProps = {
 };
 
 const ServiceCard = ({ content, selectService }: BannerProps) => {
-  const handleClick = (e: MouseEvent) => {
-    e.preventDefault();
+  const cardContainer = useRef(null);
+  const cardElement = useRef(null);
+  const serviceHref = `/services?service=${encodeURIComponent(content.id)}`;
 
-    const target = e.currentTarget as HTMLElement;
-    console.log("target: ", target);
-    if (!target) return;
-    const id: Id = target.dataset.id || "remove";
-    console.log("id: ", id);
-    if (!id) return;
-
-    if (window.location.pathname.includes("services")) {
-      selectService ? selectService(id) : null;
-      return;
-    }
-
-    window.location.href = `/services`;
+  const setReverseAnimation = () => {
+    cardElement.current.classList.remove("animation-service-card");
+    cardElement.current.classList.add("animation-service-card-reverse");
   };
+  const setAnimation = () => {
+    cardElement.current.classList.remove("animation-service-card-reverse");
+    cardElement.current.classList.add("animation-service-card");
+  };
+
+  const handleClick = (e: MouseEvent) => {
+      setActiveLink(e);
+    if (!selectService) return;
+
+    e.preventDefault();
+    const target = e.currentTarget as HTMLElement | null;
+    if (!target) return;
+
+    const dataId = target.dataset?.service as Id | undefined;
+    const id: Id = dataId || "remove";
+    selectService(id);
+  };
+
+  useEffect(() => {
+    if (!cardContainer.current) return;
+
+    const el = cardContainer.current;
+
+    el.addEventListener("mouseleave", setReverseAnimation);
+    el.addEventListener("mouseover", setAnimation);
+
+    return () => {
+      el.removeEventListener("mouseleave", setReverseAnimation);
+      el.removeEventListener("mouseover", setAnimation);
+    };
+  }, []);
+
   return (
     <a
-      data-id={content.id}
-      href={"/services"}
-      onClick={(e) => {
-        handleClick(e);
-      }}
-      className="block w-[400px] h-[250px] group relative bg-component transition hover:z-[1] hover:shadow-2xl hover:shadow-gray-600/10"
+      ref={cardContainer}
+      data-service={content.id}
+      data-id={"/services"}
+      href={serviceHref}
+      onClick={handleClick}
+      className="bg-component block w-[400px] h-[250px] border-service-card rounded-xl group  transition hover:z-[1] hover:shadow-lg hover:shadow-primary/50"
     >
-      <div className="relative space-y-8 py-12 p-8">
+      <div className="space-y-8 py-12 p-8">
         <div className={"flex flex-row justify-end items-center"}>
-          <div className={"p-[10px] w-[20%] bg-info rounded-s-full group-hover:w-full group-hover:bg-info/80 transition-all duration-500 "}>
-            <img
-              src={content.src}
-              loading="lazy"
-              width="200"
-              height="200"
-              className="w-12 h-12"
-            />
+          <div
+            ref={cardElement}
+            className={
+              "flex flex-row justify-center items-center p-[10px] w-[20%] bg-info rounded-full"
+            }
+          >
+            <img src={content.src} loading="lazy" className="w-12 h-12" />
           </div>
         </div>
         <div className="space-y-2">

@@ -1,6 +1,6 @@
 // UploadPage.tsx
 //import des hooks
-import {  useState } from "preact/hooks";
+import { useState, useRef, useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 import { sessionSignal } from "@/stores/session";
 
@@ -14,8 +14,10 @@ import { SocialPicture } from "@/components/services/socialPicture";
 import { ServiceCard } from "@/components/card/ServiceCard";
 
 //import des images
+import iconBackground from "@/assets/images/icon/icon-arriere-plan-opt.svg";
 import iconSocial from "@/assets/images/icon/icon-reseau-opt.svg";
-import iconConvert from "@/assets/images/icon/convertir.png";
+import iconProduct from "@/assets/images/icon/icon-projecteurs-opt.svg";
+import iconConvert from "@/assets/images/icon/icon-convertir-opt.svg";
 
 //declaration des types
 type UploadImgType = {
@@ -44,10 +46,12 @@ type PropsPage = {
 
 const ServicesPage = ({ routeKey }: PropsPage) => {
   const [service, setService] = useState<
-    "remove" | "social" | "product" | "convert" 
-  >();
+    "remove" | "social" | "product" | "convert" | null | string
+  >(null);
   const { t } = useTranslation();
   const userLoged = sessionSignal?.value?.authentified || false;
+
+  const containerService = useRef();
 
   //contenu textuel du composant RemoveBG
   const textUploadImgComponent: UploadImgType = {
@@ -73,7 +77,7 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
   const contentCardService = [
     {
       id: t("serviceCardContent.card_1.id"),
-      src: t("serviceCardContent.card_1.src"),
+      src: iconBackground,
       title: t("serviceCardContent.card_1.title"),
       description: t("serviceCardContent.card_1.description"),
     },
@@ -91,11 +95,32 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
     },
     {
       id: t("serviceCardContent.card_4.id"),
-      src: t("serviceCardContent.card_4.src"),
+      src: iconProduct,
       title: t("serviceCardContent.card_4.title"),
       description: t("serviceCardContent.card_4.description"),
     },
   ];
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const paramValue = params.get("service");
+    if (!paramValue) return;
+    setService(paramValue);
+  }, []);
+
+  useEffect(() => {
+    if (service === null) return;
+    if (!containerService.current) return;
+    setTimeout(() => {
+      
+      containerService.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+        inline: "nearest",
+      });
+    }, 500);
+  }, [service]);
 
   return (
     <div className="page-container">
@@ -110,7 +135,7 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
       </div>
       <ul
         className={
-          "mt-16 w-full max-w-[1200px] flex flex-col justify-start items-center gap-y-5 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-10"
+          "my-16 w-full max-w-[1200px] flex flex-col justify-start items-center gap-y-10 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-10"
         }
       >
         {contentCardService.map((cardContent) => {
@@ -121,7 +146,9 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
           );
         })}
       </ul>
-      <div>
+      <div
+        id="container-service"
+        ref={containerService}>
         <LazyMotion features={domAnimation}>
           <AnimatePresence>
             {service === "remove" ? (

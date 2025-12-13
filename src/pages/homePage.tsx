@@ -21,6 +21,12 @@ import { Faq } from "../components/faq/Faq";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
 import { setActiveLink } from "@/utils/setActiveLink";
 
+//import des images
+import iconBackground from "@/assets/images/icon/icon-arriere-plan-opt.svg";
+import iconSocial from "@/assets/images/icon/icon-reseau-opt.svg";
+import iconProduct from "@/assets/images/icon/icon-projecteurs-opt.svg";
+import iconConvert from "@/assets/images/icon/icon-convertir-opt.svg";
+
 type Labels = string[];
 
 type HeroContentKey =
@@ -181,25 +187,25 @@ function HomePage({ routeKey = "" }: PropsPage) {
   const contentCardService = [
     {
       id: t("serviceCardContent.card_1.id"),
-      src: t("serviceCardContent.card_1.src"),
+      src: iconBackground,
       title: t("serviceCardContent.card_1.title"),
       description: t("serviceCardContent.card_1.description"),
     },
     {
       id: t("serviceCardContent.card_2.id"),
-      src: t("serviceCardContent.card_2.src"),
+      src: iconSocial,
       title: t("serviceCardContent.card_2.title"),
       description: t("serviceCardContent.card_2.description"),
     },
     {
       id: t("serviceCardContent.card_3.id"),
-      src: t("serviceCardContent.card_3.src"),
+      src: iconConvert,
       title: t("serviceCardContent.card_3.title"),
       description: t("serviceCardContent.card_3.description"),
     },
     {
       id: t("serviceCardContent.card_4.id"),
-      src: t("serviceCardContent.card_4.src"),
+      src: iconProduct,
       title: t("serviceCardContent.card_4.title"),
       description: t("serviceCardContent.card_4.description"),
     },
@@ -271,7 +277,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
           </h2>
           <ul
             className={
-              "mt-16 w-full max-w-[1300px] flex flex-col justify-start items-center gap-y-5 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-5"
+              "my-16 w-full max-w-[1200px] flex flex-col justify-start items-center gap-y-5 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-5"
             }
           >
             {contentCardService.map((cardContent) => {
