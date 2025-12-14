@@ -142,6 +142,11 @@
     "btn_test": "I want to test the quality",
     "btn_choice": "I choose a plan"
   },
+  "animationSection": {
+    "helper": "Live preview",
+    "title": "Watch your visuals morph in seconds",
+    "subtitle": "Each photo keeps the subject while the background fades into a blue and gray checkerboard so visitors instantly understand the transparent result."
+  },
   "stepsContent": {
   "title": "How does it work?",
   "intro": "Upload your image and let the AI do the work for you.",

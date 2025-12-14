@@ -1,5 +1,6 @@
 //import des hooks
 import { useTranslation } from "react-i18next";
+import {themeSignal} from "@/stores/theme";
 
 //import des composant enfant
 import { FooterBottom } from "./FooterBottom";
@@ -15,7 +16,8 @@ import { setActiveLink } from "@/utils/setActiveLink";
 //import des images
 import shape_1 from "@/assets/images/shape-1.svg";
 import shape_2 from "@/assets/images/shape-3.svg";
-import logo from "@/assets/images/logo/logo_2.svg";
+import logo from "@/assets/images/logo/logo_9.svg";
+import logo_white from "@/assets/images/logo/logo_9_white.svg";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -34,7 +36,11 @@ const Footer = () => {
       <nav className="footer md:footer-horizontal bg-base-300 p-10">
         <aside className={"relative z-10"}>
           <a href={"/"}>
-            <img src={logo} alt={"logo wizpix"} className={"w-[300px]"} />
+            {themeSignal.value === "winter" ? (
+              <img src={logo} alt={"logo wizpix"} className={"w-[200px]"} />
+            ) : (
+              <img src={logo_white} alt={"logo wizpix"} className={"w-[200px]"} />
+            )}
           </a>
           <p>L’intelligence artificielle au service de vos visuels.</p>
           <ThemeControler />

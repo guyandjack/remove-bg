@@ -2,7 +2,7 @@ const FooterBottom = () => {
   return (
     <div class="p-8 flex flex-col justify-center items-center gap-10 bg-base-100 md:flex-row justify-evenly lg:h-[30px]">
       <aside>
-        <p>Copyright © {new Date().getFullYear()} - All rights reserved</p>
+        <p>Wizard of pixels © {new Date().getFullYear()} - All rights reserved</p>
       </aside>
       {/* <nav className={"relative z-10"}>
         <div class="gap-10 flex flex-row ">

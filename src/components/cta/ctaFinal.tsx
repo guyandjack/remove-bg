@@ -20,7 +20,7 @@ const FinalCTA = ({content}) => {
              {content.intro}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="mx-auto flex flex-col justify-center items-center gap-4 sm:flex-row  ">
               <a
                 data-id="/pricing"
                 onClick={(e) => setActiveLink(e)}

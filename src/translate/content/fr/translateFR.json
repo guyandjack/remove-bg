@@ -138,6 +138,11 @@
     "privacy_1_link": "politique&nbsp;de&nbsp;confidentialité",
     "privacy_2": "Aucun numéro de carte n’est demandé pour le plan gratuit."
   },
+  "animationSection": {
+    "helper": "Demonstration en direct",
+    "title": "Voyez vos images se transformer en quelques secondes",
+    "subtitle": "Chaque photo garde son sujet pendant que le fond disparait, laissant place au damier bleu et gris qui symbolise la transparence."
+  },
   "stepsContent": {
     "title": "Comment utiliser nos services&nbsp;?",
     "intro": "Téléversez votre image et laissez l'IA travailler à votre place.",

@@ -6,6 +6,7 @@ import { api } from "@/utils/axiosConfig";
 //import des hooks
 import { useEffect, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
+import { themeSignal } from "@/stores/theme";
 
 //import des composants enfants
 import { SelectLanguage } from "./LangSwitcher";
@@ -23,7 +24,10 @@ import { setActiveLink } from "@/utils/setActiveLink";
 import { sessionSignal, initSessionFromLocalStorage } from "../stores/session";
 
 //import des images
-import logo from "@/assets/images/logo/logo_6.svg";
+import logo from "@/assets/images/logo/logo_9.svg";
+import logo_white from "@/assets/images/logo/logo_9_white.svg";
+import logo_tiny from "@/assets/images/logo/logo_9_tiny.svg";
+import logo_tiny_white from "@/assets/images/logo/logo_9_tiny_white.svg";
 
 //declarations des types
 type DisplayState = {
@@ -46,6 +50,8 @@ const NavBar = () => {
     plan: null,
     textLogout: t("navBar.logout"),
   });
+
+  const [tinyLogo, setTinyLogo] = useState(true);
 
   useEffect(() => {
     initSessionFromLocalStorage();
@@ -76,6 +82,21 @@ const NavBar = () => {
   useEffect(() => {
     setActiveLink();
   }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const widthScreen = window.innerWidth;
+      // On dérive directement l'état depuis la largeur
+      setTinyLogo(widthScreen < 1024);
+    };
+
+    // Appel initial au montage pour avoir le bon logo directement
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
 
   return (
     <nav className="navbar bg-navbar shadow-sm backdrop-blur-sm">
@@ -126,7 +147,31 @@ const NavBar = () => {
           </ul>
         </div>
 
-        <img src={logo} alt={"logo wizpix"} className={"w-[200px]"} />
+        {tinyLogo ? (
+          <a href={"/"}>
+            {themeSignal.value === "winter" ? (
+              <img src={logo_tiny} alt={"logo wizpix"} className={"w-[80px]"} />
+            ) : (
+              <img
+                src={logo_tiny_white}
+                alt={"logo wizpix"}
+                className={"w-[80px]"}
+              />
+            )}
+          </a>
+        ) : (
+          <a href={"/"}>
+            {themeSignal.value === "winter" ? (
+              <img src={logo} alt={"logo wizpix"} className={"w-[200px]"} />
+            ) : (
+              <img
+                src={logo_white}
+                alt={"logo wizpix"}
+                className={"w-[200px]"}
+              />
+            )}
+          </a>
+        )}
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu-horizontal gap-5 px-1">
@@ -172,19 +217,16 @@ const NavBar = () => {
               </li>
             ) : null;
           })}
-          
         </ul>
         <ThemeControler />
         <SelectLanguage />
         {isDisplay?.authentified ? (
-          
-            <ProfileDropDown
-              credit={isDisplay?.credit}
-              userName={isDisplay?.userName}
-              textCredit={isDisplay?.textCredit}
-              plan={isDisplay?.plan}
-            />
-          
+          <ProfileDropDown
+            credit={isDisplay?.credit}
+            userName={isDisplay?.userName}
+            textCredit={isDisplay?.textCredit}
+            plan={isDisplay?.plan}
+          />
         ) : null}
       </div>
     </nav>

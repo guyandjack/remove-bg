@@ -7,6 +7,10 @@ import { useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
 //import de compoants enfants
+import {
+  BackgroundRemovalAnimation,
+  type BackgroundRemovalFrame,
+} from "@/components/animation/BackgroundRemovalAnimation";
 import { CtaStyled } from "@/components/cta/CtaStyled";
 import { FinalCTA } from "@/components/cta/ctaFinal";
 import { Hero } from "@/components/hero/hero";
@@ -21,6 +25,14 @@ import { setDocumentTitle } from "@/utils/setDocumentTitle";
 import { setActiveLink } from "@/utils/setActiveLink";
 
 //import des images
+import friendImg from "@/assets/images/friend.jpg";
+import friendImgBGRemove from "@/assets/images/friend-removebg-preview.png";
+import petImg from "@/assets/images/pet.jpg";
+import petImgBGRemove from "@/assets/images/pet-removebg-preview.png";
+import sportImg from "@/assets/images/sport.jpg";
+import sportImgBGRemove from "@/assets/images/sport-removebg-preview.png";
+import vehiculeImg from "@/assets/images/vehicule.jpg";
+import vehiculeImgBGRemove from "@/assets/images/vehicule-removebg-preview.png";
 import iconBackground from "@/assets/images/icon/icon-arriere-plan-opt.svg";
 import iconSocial from "@/assets/images/icon/icon-reseau-opt.svg";
 import iconProduct from "@/assets/images/icon/icon-projecteurs-opt.svg";
@@ -105,6 +117,39 @@ function HomePage({ routeKey = "" }: PropsPage) {
     bg: "bg-base-200",
     isBtn_2: true,
   };
+
+  const animationContent = {
+    helper: t("animationSection.helper"),
+    title: t("animationSection.title"),
+    subtitle: t("animationSection.subtitle"),
+  };
+
+  const animationSequence: BackgroundRemovalFrame[] = [
+    {
+      id: "friend",
+      originalSrc: friendImg,
+      cutoutSrc: friendImgBGRemove,
+      alt: t("diff.friend_label"),
+    },
+    {
+      id: "pet",
+      originalSrc: petImg,
+      cutoutSrc: petImgBGRemove,
+      alt: t("diff.pet_label"),
+    },
+    {
+      id: "sport",
+      originalSrc: sportImg,
+      cutoutSrc: sportImgBGRemove,
+      alt: t("diff.sport_label"),
+    },
+    {
+      id: "vehicule",
+      originalSrc: vehiculeImg,
+      cutoutSrc: vehiculeImgBGRemove,
+      alt: t("diff.vehicule_label"),
+    },
+  ];
 
   
 
@@ -257,12 +302,37 @@ function HomePage({ routeKey = "" }: PropsPage) {
   return (
     <div className={"page-container"}>
       <div className={"w-full mb-[100px] lg:mb-0"}>
-        <div
+      <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
           }
         >
           <Hero content={heroContent} />
+        </div>
+      </div>
+      <div className={"w-full bg-page py-[120px]"}>
+        <div
+          className={
+            "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center gap-10 lg:flex-row lg:items-center"
+          }
+        >
+          <div className="w-full max-w-[600px] text-center lg:w-[40%] lg:text-left">
+            <p className="mb-6 text-sm font-semibold uppercase tracking-[0.35em] text-secondary">
+              {animationContent.helper}
+            </p>
+            <h2 className="mb-6 text-3xl font-bold leading-tight text-base-content lg:text-5xl">
+              {animationContent.title}
+            </h2>
+            <p className="text-lg text-base-content/80">
+              {animationContent.subtitle}
+            </p>
+          </div>
+          <div className="w-full lg:w-[60%]">
+            <BackgroundRemovalAnimation
+              sequence={animationSequence}
+              opacity={0.92}
+            />
+          </div>
         </div>
       </div>
       <div className={"w-full"}>
