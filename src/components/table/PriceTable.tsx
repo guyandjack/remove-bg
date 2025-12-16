@@ -1,6 +1,9 @@
+type CurrencyCode = "CHF" | "EUR" | "USD";
+
 type PlanOption = {
   name: string;
   price: number;
+  prices?: Record<CurrencyCode, number>;
   credit: number;
   format: string;
   remove_bg: boolean;
@@ -38,6 +41,7 @@ type TableLang = {
 type PricingComparisonTableProps = {
   option: PlanOption[]; // plans dynamiques depuis le backend
   lang: TableLang; // contenu textuel traduit
+  currency: CurrencyCode;
 };
 
 const renderBool = (val: boolean) =>
@@ -55,9 +59,17 @@ const renderBool = (val: boolean) =>
     <span className="text-base-content/50">-</span>
   );
 
-const PricingComparisonTable = ({ option, lang }: PricingComparisonTableProps) => {
+const currencySymbols: Record<CurrencyCode, string> = {
+  CHF: "CHF",
+  EUR: "€",
+  USD: "$",
+};
+
+const PricingComparisonTable = ({ option, lang, currency }: PricingComparisonTableProps) => {
   const plans = Array.isArray(option) ? option : [];
   if (!plans.length) return null;
+  const formatPrice = (plan: PlanOption) =>
+    plan.prices?.[currency] ?? plan.price ?? plan.prices?.CHF ?? 0;
 
    return (
      <section className="mt-12">
@@ -85,14 +97,14 @@ const PricingComparisonTable = ({ option, lang }: PricingComparisonTableProps) =
                </tr>
              </thead>
              <tbody>
-               <tr className="hover:bg-base-200/40">
-                 <td className="font-medium">{lang.price}</td>
-                 {plans.map((p) => (
-                   <td key={`price-${p.name}`} className="text-center">
-                     {p.price}
-                   </td>
-                 ))}
-               </tr>
+              <tr className="hover:bg-base-200/40">
+                <td className="font-medium">{lang.price}</td>
+                {plans.map((p) => (
+                  <td key={`price-${p.name}`} className="text-center">
+                    {currencySymbols[currency]} {formatPrice(p)}
+                  </td>
+                ))}
+              </tr>
                <tr className="hover:bg-base-200/40">
                  <td className="font-medium">{lang.credit}</td>
                  {plans.map((p) => (
@@ -216,4 +228,3 @@ const PricingComparisonTable = ({ option, lang }: PricingComparisonTableProps) =
 };
 
 export { PricingComparisonTable };
-

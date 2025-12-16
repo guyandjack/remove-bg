@@ -1,28 +1,83 @@
 import type { RequestHandler } from "express";
 import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
-import { connectDb } from "../DB/poolConnexion/poolConnexion.ts";
-import { getPlanByCode, getUserByEmail, createUser, createSubscription, updateSubscription } from "../DB/queriesSQL/queriesSQL.ts";
+import { connectDb } from "../../DB/poolConnexion/poolConnexion.ts";
+import { getPlanByCode, getUserByEmail, createUser, createSubscription, updateSubscription, markStripeCheckoutSessionCompleted, markStripeCheckoutSessionFailed } from "../../DB/queriesSQL/queriesSQL.ts";
 
 // Stripe webhook to finalize paid signups and activate subscriptions
 // Handles: checkout.session.completed, invoice.paid, invoice.payment_failed, customer.subscription.deleted
 // Note: For signature verification, ensure your server uses raw body middleware for this route
 
-const stripeWebhook: RequestHandler = async (req, res) => {
-  try {
-    const secret = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY_TEST;
-    const whSecret = process.env.STRIPE_WEBHOOK_SECRET; // optional but recommended
 
-    // Fallback processing without signature if not configured
-    let event: any = (req as any).body;
-    if (whSecret && secret) {
+const stripeWebhook: RequestHandler = async (req, res) => {
+  let currentCheckoutSessionId: string | null = null;
+  try {
+    const isProd =
+      process.env.NODE_ENV === "production" &&
+      process.env.STRIPE_MODE === "production";
+
+    const secret = isProd
+      ? process.env.STRIPE_SECRET_KEY_PROD ?? null
+      : process.env.STRIPE_SECRET_KEY_TEST ?? null;
+    
+    const whSecret = process.env.STRIPE_WEBHOOK_SECRET; 
+
+    // Capture raw payload (required by Stripe when validating signatures)
+    const resolveRawPayload = (): Buffer | string | null => {
+      if ((req as any).rawBody) return (req as any).rawBody;
+      if ((req as any).bodyRaw) return (req as any).bodyRaw;
+      const body = (req as any).body;
+      if (Buffer.isBuffer(body) || typeof body === "string") return body;
+      if (!body) return null;
+      try {
+        return JSON.stringify(body);
+      } catch {
+        return null;
+      }
+    };
+    const rawPayload = resolveRawPayload();
+
+    const parseJsonBody = (): any => {
+      const body = (req as any).body;
+      if (body && !Buffer.isBuffer(body) && typeof body !== "string") return body;
+      const source =
+        typeof body === "string"
+          ? body
+          : Buffer.isBuffer(body)
+          ? body.toString("utf8")
+          : rawPayload
+          ? Buffer.isBuffer(rawPayload)
+            ? rawPayload.toString("utf8")
+            : String(rawPayload)
+          : "";
+      if (!source) return null;
+      try {
+        return JSON.parse(source);
+      } catch {
+        return null;
+      }
+    };
+
+    let event: any = null;
+    const sig = req.headers["stripe-signature"] as string | undefined;
+    if (whSecret && sig && secret) {
       // @ts-ignore
       const StripeMod = await import("stripe");
       const Stripe = (StripeMod as any).default || StripeMod;
       const stripe = new Stripe(secret, { apiVersion: "2023-10-16" });
-      const sig = req.headers["stripe-signature"] as string | undefined;
-      if (!sig) return res.status(400).send("Missing signature");
-      const rawBody = (req as any).rawBody || (req as any).bodyRaw || JSON.stringify(req.body);
-      event = stripe.webhooks.constructEvent(rawBody, sig, whSecret);
+      const payloadBuffer = Buffer.isBuffer(rawPayload)
+        ? rawPayload
+        : rawPayload
+        ? Buffer.from(String(rawPayload), "utf8")
+        : null;
+      if (!payloadBuffer || !payloadBuffer.length) {
+        return res.status(400).send("No webhook payload was provided");
+      }
+      event = stripe.webhooks.constructEvent(payloadBuffer, sig, whSecret);
+    } else {
+      event = parseJsonBody();
+      if (!event) {
+        return res.status(400).send("No webhook payload was provided");
+      }
     }
 
     const type = event?.type;
@@ -32,6 +87,8 @@ const stripeWebhook: RequestHandler = async (req, res) => {
     const unixToDate = (v: any): Date | null => (typeof v === "number" ? new Date(v * 1000) : v ? new Date(v) : null);
 
     if (type === "checkout.session.completed") {
+      console.log("check session.completed est lancé");
+      currentCheckoutSessionId = typeof obj?.id === "string" ? obj.id : null;
       // On successful checkout, create user if pending and activate subscription
       const email: string | undefined = obj.customer_details?.email || obj.customer_email || obj.customer?.email || obj.metadata?.email;
       const planCode: string | undefined = obj.metadata?.plan_code;
@@ -105,6 +162,14 @@ const stripeWebhook: RequestHandler = async (req, res) => {
           stripe_subscription_id: stripeSubscriptionId ?? undefined,
           stripe_customer_id: stripeCustomerId ?? undefined,
         } as any);
+      }
+
+      if (currentCheckoutSessionId) {
+        await markStripeCheckoutSessionCompleted(currentCheckoutSessionId, {
+          userId: user!.id,
+          subscriptionId: subId,
+          planId: plan.id,
+        });
       }
 
       return res.status(200).send("ok");
@@ -254,6 +319,19 @@ const stripeWebhook: RequestHandler = async (req, res) => {
     return res.status(200).send("ok");
   } catch (err: any) {
     console.error("stripeWebhook error:", err?.message || err);
+    if (currentCheckoutSessionId) {
+      try {
+        await markStripeCheckoutSessionFailed(
+          currentCheckoutSessionId,
+          err?.message || String(err)
+        );
+      } catch (hookErr) {
+        console.error(
+          "stripeWebhook state update error:",
+          (hookErr as any)?.message || hookErr
+        );
+      }
+    }
     // Always 200 to avoid retries explosion unless you want retries
     return res.status(200).send("ok");
   }

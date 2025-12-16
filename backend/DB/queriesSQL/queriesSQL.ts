@@ -96,6 +96,22 @@ export interface Customer extends RowDataPacket {
   updated_at: Date;
 }
 
+export interface StripeCheckoutSessionState extends RowDataPacket {
+  id: ID;
+  session_id: string;
+  email: string;
+  plan_code: string;
+  plan_id: ID | null;
+  currency_code: string;
+  status: "pending" | "completed" | "failed";
+  user_id: ID | null;
+  subscription_id: ID | null;
+  last_error: string | null;
+  consumed_at: Date | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
 
 
 
@@ -523,6 +539,80 @@ export async function deleteCustomer(customerId: ID) {
     [customerId]
   );
   return res.affectedRows === 1;
+}
+
+// ===================================================================
+// Stripe checkout session state helpers
+// ===================================================================
+
+export async function createStripeCheckoutSessionState(params: {
+  sessionId: string;
+  email: string;
+  planCode: string;
+  planId?: ID | null;
+  currencyCode?: string;
+}): Promise<ID | null> {
+  const connexion = await connectDb();
+  const id = crypto.randomUUID();
+  const sql = `INSERT INTO StripeCheckoutSession (id, session_id, email, plan_code, plan_id, currency_code, status)
+               VALUES (?, ?, ?, ?, ?, ?, 'pending')
+               ON DUPLICATE KEY UPDATE email = VALUES(email), plan_code = VALUES(plan_code), plan_id = VALUES(plan_id), currency_code = VALUES(currency_code), status = 'pending', last_error = NULL, consumed_at = NULL, user_id = NULL, subscription_id = NULL`;
+  const [res] = await connexion.execute<ResultSetHeader>(sql, [
+    id,
+    params.sessionId,
+    params.email,
+    params.planCode,
+    params.planId ?? null,
+    params.currencyCode ?? "CHF",
+  ]);
+  return res.affectedRows >= 1 ? id : null;
+}
+
+export async function getStripeCheckoutSessionState(sessionId: string): Promise<StripeCheckoutSessionState | null> {
+  const connexion = await connectDb();
+  const [rows] = await connexion.execute<StripeCheckoutSessionState[]>(
+    `SELECT * FROM StripeCheckoutSession WHERE session_id = ? LIMIT 1`,
+    [sessionId]
+  );
+  return rows[0] ?? null;
+}
+
+export async function markStripeCheckoutSessionCompleted(sessionId: string, params: { userId?: ID | null; subscriptionId?: ID | null; planId?: ID | null }) {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE StripeCheckoutSession
+       SET status = 'completed',
+           user_id = COALESCE(?, user_id),
+           subscription_id = COALESCE(?, subscription_id),
+           plan_id = COALESCE(?, plan_id),
+           last_error = NULL
+     WHERE session_id = ?`,
+    [params.userId ?? null, params.subscriptionId ?? null, params.planId ?? null, sessionId]
+  );
+  return res.affectedRows >= 1;
+}
+
+export async function markStripeCheckoutSessionFailed(sessionId: string, errorMessage: string) {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE StripeCheckoutSession
+       SET status = 'failed',
+           last_error = ?
+     WHERE session_id = ?`,
+    [errorMessage, sessionId]
+  );
+  return res.affectedRows >= 1;
+}
+
+export async function markStripeCheckoutSessionConsumed(sessionId: string) {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE StripeCheckoutSession
+       SET consumed_at = NOW()
+     WHERE session_id = ? AND consumed_at IS NULL`,
+    [sessionId]
+  );
+  return res.affectedRows >= 1;
 }
 
 // ===================================================================

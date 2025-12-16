@@ -23,6 +23,7 @@ export const authSchema = z.object({
     .regex(/[^\w\s]/, "1 caractère spécial requis"),
   lang: z.enum(["fr", "de", "en", "it"]),
   plan: z.enum(["free","hobby","pro"], "Plan non reconnu"),
+  currency: z.enum(["CHF","EUR","USD"]).default("CHF"),
   id: z.literal("resend").optional(), // <-- propriété optionnelle
 });
 
@@ -61,6 +62,7 @@ const checkSignUpDataUser = (req: Request, res: Response, next: NextFunction)=> 
     confirm: data.confirm,
     lang: data.lang,
     plan: data.plan || "",
+    currency: data.currency || "CHF",
     id: data.id || ""
   };
   next();

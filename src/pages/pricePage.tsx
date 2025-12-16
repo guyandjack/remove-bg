@@ -1,9 +1,10 @@
 //import des hooks
-import { useEffect } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
 //import des instance
 import { api } from "@/utils/axiosConfig";
+import { setSessionFromApiResponse } from "@/stores/session";
 
 //import des composant enfants
 import { PriceCard } from "@/components/card/priceCard";
@@ -38,9 +39,19 @@ type PricePageProps = {
   isSignup?: boolean;
 };
 
+type CurrencyCode = "CHF" | "EUR" | "USD";
+const currencySymbols: Record<CurrencyCode, string> = {
+  CHF: "CHF",
+  EUR: "€",
+  USD: "$",
+};
+
 const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
   const { t } = useTranslation();
   const planOptions = planOptionsSignal.value;
+  const [currency, setCurrency] = useState<CurrencyCode>("CHF");
+  const [finalizeStatus, setFinalizeStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
+  const [finalizeMessage, setFinalizeMessage] = useState<string | null>(null);
 
   const IsCreateAccount = isSignup;
 
@@ -167,7 +178,74 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
   useEffect(() => {
     setActiveLink();
     setDocumentTitle();
+    const params = new URLSearchParams(window.location.search);
+    const requestedCurrency = params.get("currency");
+    if (
+      requestedCurrency &&
+      ["CHF", "EUR", "USD"].includes(requestedCurrency.toUpperCase())
+    ) {
+      setCurrency(requestedCurrency.toUpperCase() as CurrencyCode);
+    }
   }, [routeKey]);
+
+  const finalizeCheckout = async (sessionId: string, attempt = 0) => {
+    try {
+      setFinalizeStatus("pending");
+      setFinalizeMessage("Validation du paiement en cours...");
+      const { data } = await api.post(
+        "api/stripe/finalize",
+        { sessionId },
+        { withCredentials: true }
+      );
+
+      if (data?.status === "pending") {
+        if (attempt < 5) {
+          setTimeout(() => finalizeCheckout(sessionId, attempt + 1), 1500);
+        } else {
+          setFinalizeStatus("error");
+          setFinalizeMessage(
+            "La confirmation Stripe prend plus de temps que prévu. Réessayez dans quelques secondes."
+          );
+        }
+        return;
+      }
+
+      if (data?.status !== "success") {
+        setFinalizeStatus("error");
+        setFinalizeMessage(
+          data?.message ||
+            "Impossible de valider votre paiement. Merci de réessayer."
+        );
+        return;
+      }
+
+      setSessionFromApiResponse(data);
+      setFinalizeStatus("success");
+      setFinalizeMessage("Votre abonnement est actif, redirection en cours.");
+      const url = new URL(window.location.href);
+      url.searchParams.delete("session_id");
+      url.searchParams.delete("userValide");
+      window.history.replaceState({}, "", url.toString());
+      setTimeout(() => {
+        window.location.href = "/services";
+      }, 2000);
+    } catch (error) {
+      setFinalizeStatus("error");
+      setFinalizeMessage(
+        "Une erreur est survenue pendant la validation du paiement."
+      );
+    }
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("session_id");
+    const userValidated = params.get("userValide");
+
+    if (userValidated === "true" && sessionId && finalizeStatus === "idle") {
+      finalizeCheckout(sessionId);
+    }
+  }, [routeKey, finalizeStatus]);
 
   return (
     <div className={"page-container"}>
@@ -176,6 +254,22 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
           "relative w-full mx-auto max-w-[1300px] py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px] "
         }
       >
+        {finalizeStatus !== "idle" ? (
+          <div className={"absolute top-[-50px] left-0 right-0 mx-auto max-w-[600px]"}>
+            <div
+              role="alert"
+              className={`alert ${
+                finalizeStatus === "success"
+                  ? "alert-success"
+                  : finalizeStatus === "error"
+                  ? "alert-error"
+                  : "alert-info"
+              }`}
+            >
+              <span>{finalizeMessage}</span>
+            </div>
+          </div>
+        ) : null}
         <h1
           className={
             "text-center text-4xl font-bold lg:w-[40%] lg:text-6xl lg:text-left lg:self-start"
@@ -200,6 +294,30 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
             __html: t("pricing.intro").replace(/\n/g, "<br/>"),
           }}
         ></p>
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="text-base font-semibold">
+            {t("pricing.currency_label") || "Devise"}
+          </span>
+          <div className="join">
+            {(["CHF", "EUR", "USD"] as CurrencyCode[]).map((code) => (
+              <button
+                key={code}
+                type="button"
+                className={`btn btn-sm join-item ${
+                  currency === code ? "btn-primary" : "btn-outline"
+                }`}
+                onClick={() => {
+                  setCurrency(code);
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("currency", code);
+                  window.history.replaceState({}, "", url.toString());
+                }}
+              >
+                {currencySymbols[code]}
+              </button>
+            ))}
+          </div>
+        </div>
         {IsCreateAccount ? (
           <div className={"absolute top-[-10px] left-[10px] z-100"}>
             <div role="alert" className="alert alert-warning alert-outline">
@@ -218,7 +336,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         {planOptions.map((items) => {
           return (
             <li key={items.name} className={"max-w-[350px] min-w-[300px]"}>
-              <PriceCard lang={textLangCard} option={items} />
+              <PriceCard lang={textLangCard} option={items} currency={currency} />
             </li>
           );
         })}
@@ -235,7 +353,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         >
           {t("pricing.title_h2_tab")}
         </h2>
-        <PricingComparisonTable lang={textLangTab} option={planOptions} />
+        <PricingComparisonTable lang={textLangTab} option={planOptions} currency={currency} />
       </div>
 
       {/* FAQ*/}

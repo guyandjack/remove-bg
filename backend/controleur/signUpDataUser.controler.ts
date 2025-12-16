@@ -30,13 +30,13 @@ function resolveLocale(lang: unknown): string {
 
  const sendMailVerification: RequestHandler = async (req, res) => {
   try {
-    const { email, password, lang, plan, id } = (req as any).userValidated || {};
+    const { email, password, lang, plan, id, currency } = (req as any).userValidated || {};
 
     // Basic required fields
-    if (!email || !lang || !password || !plan) {
+    if (!email || !lang || !password || !plan || !currency) {
       return res.status(400).json({
         error: true,
-        message: "Missing required fields (email, password, lang, plan)",
+        message: "Missing required fields (email, password, lang, plan, currency)",
         code: "signup_missing_fields",
       });
     }
@@ -49,6 +49,12 @@ function resolveLocale(lang: unknown): string {
     const isResend = String(id || "").toLowerCase() === "resend";
     
     const planCode = String(plan).toLowerCase();
+    const normalizedCurrency = String(currency).toUpperCase();
+    const currencyCode: "CHF" | "EUR" | "USD" = ["CHF", "EUR", "USD"].includes(
+      normalizedCurrency
+    )
+      ? (normalizedCurrency as "CHF" | "EUR" | "USD")
+      : "CHF";
     // Validate plan against static config (no DB dependency)
     
    
@@ -78,9 +84,9 @@ function resolveLocale(lang: unknown): string {
       );
       const idNew = crypto.randomUUID();
       await conn.execute<ResultSetHeader>(
-        `INSERT INTO EmailVerification (id, email, code_hash, salt, password_hash, expires_at, plan_type, active, attempts, account)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0, 0)`,
-        [idNew, normalizedEmail, codeHash, salt, passwordHash, expiresAt, planCode]
+        `INSERT INTO EmailVerification (id, email, code_hash, salt, password_hash, expires_at, plan_type, currency_code, active, attempts, account)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 0, 0)`,
+        [idNew, normalizedEmail, codeHash, salt, passwordHash, expiresAt, planCode, currencyCode]
       );
       await conn.commit();
     } finally {

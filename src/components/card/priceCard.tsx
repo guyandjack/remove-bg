@@ -19,6 +19,7 @@ type PlanText = Record<PlanKey, string>;
 type PlanOption = {
   name: string;
   price: number;
+  prices?: Record<"CHF" | "EUR" | "USD", number>;
   credit: number;
   format: string;
   remove_bg: boolean;
@@ -36,12 +37,21 @@ type PlanOption = {
   api_external: boolean;
 };
 
+type CurrencyCode = "CHF" | "EUR" | "USD";
+
 type PriceCardProps = {
   lang: PlanText; // contenu textuel traduit (titres, libellés, CTA)
   option: PlanOption; // données dynamiques issues du backend
+  currency: CurrencyCode;
 };
 
-const PriceCard = ({ lang, option }: PriceCardProps) => {
+const currencySymbols: Record<CurrencyCode, string> = {
+  CHF: "CHF",
+  EUR: "€",
+  USD: "$",
+};
+
+const PriceCard = ({ lang, option, currency }: PriceCardProps) => {
   const borderColor =
     {
       hobby: "border-success",
@@ -53,6 +63,10 @@ const PriceCard = ({ lang, option }: PriceCardProps) => {
       hobby: "bg-success/90",
       pro: "bg-info/90",
     }[option.name] || "bg-secondary/90";
+
+  const priceValue =
+    option.prices?.[currency] ?? option.price ?? option.prices?.CHF ?? 0;
+  const symbol = currencySymbols[currency] || currency;
 
   return (
     <div
@@ -67,7 +81,7 @@ const PriceCard = ({ lang, option }: PriceCardProps) => {
 
         <div className="flex justify-between">
           <h2 className="text-3xl font-bold capitalize">{option.name}</h2>
-          <span className="text-xl">{`€${option.price} ${lang.price}`}</span>
+          <span className="text-xl">{`${symbol} ${priceValue} ${lang.price}`}</span>
         </div>
         <ul className="mt-6 flex flex-col gap-2 text-s">
           <li>
@@ -181,7 +195,7 @@ const PriceCard = ({ lang, option }: PriceCardProps) => {
         <div className="absolute bottom-[10px] left-[50%] w-[80%] translate-x-[-50%]  ">
           <a
             data-id={"/signup"}
-            href={`/signup?plan=${option.name}`}
+            href={`/signup?plan=${option.name}&currency=${currency}`}
             className={`transition-all btn ${bgColor} btn-block text-base text-black hover:opacity-60`}
             onClick={(e) => setActiveLink(e)}
           >

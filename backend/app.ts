@@ -71,6 +71,8 @@ const corsOptions: CorsOptions = {
 };
 app.use(cors(corsOptions));
 
+
+
 // ----------------------------------------------------
 // ⚙️ 2️⃣ Middlewares généraux
 // ----------------------------------------------------

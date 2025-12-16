@@ -1,6 +1,6 @@
 //import des hooks
 import { useRef, useState } from "preact/hooks";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 
 //import des librairies
 import axios from "axios";
@@ -23,23 +23,22 @@ export type FormValues = {
   lang: string;
   id?: string;
   plan: string | null;
+  currency: string | null;
 };
 
 type BgColor = {
   free: string | "";
   hobby: string | "";
   pro: string | "";
-}
+};
 
 //constante et variable globales
 const { urlApi } = localOrProd();
 
-
-
 //declarations des fonctions
 
 //recupere la valeur du parametre "plan"
-const getPlan = (): string | null  => {
+const getPlan = (): string | null => {
   // Récupérer la chaîne de requête
   const queryString = window.location.search;
 
@@ -50,6 +49,13 @@ const getPlan = (): string | null  => {
   const plan = urlParams.get("plan") || null;
 
   return plan;
+};
+const getCurrency = (): string => {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  const currency = urlParams.get("currency") || "CHF";
+  const normalized = currency.toUpperCase();
+  return ["CHF", "EUR", "USD"].includes(normalized) ? normalized : "CHF";
 };
 const FormSignUp = () => {
   const { t, i18n } = useTranslation();
@@ -71,14 +77,16 @@ const FormSignUp = () => {
   const dataUser = useRef<FormValues>();
 
   const plan = getPlan();
+  const currency = getCurrency();
   //class css dynamique
   let bgColor: string | null = null;
   if (plan) {
-     bgColor = {
-      free: "bg-secondary/80",
-      hobby: "bg-success/80",
-      pro: "bg-info/80",
-    }[plan] || null;
+    bgColor =
+      {
+        free: "bg-secondary/80",
+        hobby: "bg-success/80",
+        pro: "bg-info/80",
+      }[plan] || null;
   }
 
   const lang = i18n.resolvedLanguage || i18n.language;
@@ -97,6 +105,7 @@ const FormSignUp = () => {
       confirm: "qwertzuioP!789",
       lang: lang,
       plan: plan,
+      currency: currency,
     },
   });
 
@@ -124,29 +133,31 @@ const FormSignUp = () => {
           timeout: 10000,
         }
       );
-      const DATA:any = response.data;
-      let message = DATA.message;
-      console.log("DATA message: ", message);
-      setErrorMessage(message);
-      if (DATA.status === "success") {
-        setIsLoader(false);
-        setStatus("success");
-        
-      } else {
-        setIsLoader(false);
-        setErrorMessage(message);
+      if (!response) {
+        setErrorMessage(
+          "une erreur http c'est produite, veuillez verifier votre connexion."
+        );
         setStatus("error");
-        
+        return;
       }
+
+      const Data = response.data;
+      if (Data.status !== "success") {
+        setErrorMessage(Data.message);
+        setStatus("error");
+        return;
+      }
+
+      setIsLoader(false);
+      setStatus("success");
+      setDisplayOtp(true);
     } catch (error) {
       setIsLoader(false);
       setStatus("error");
-      
     } finally {
       setTimeout(() => {
         setStatus("idle");
       }, 3000);
-      
     }
   };
 
@@ -161,6 +172,9 @@ const FormSignUp = () => {
               style={{ textTransform: "capitalize" }}
             >
               {plan}
+            </span>
+            <span className="ml-2 text-sm uppercase text-info">
+              {currency}
             </span>
           </h1>
         </div>
@@ -326,27 +340,40 @@ const FormSignUp = () => {
                 </div>
               </div>
               <div>
-                <div className="mt-2">
-                  <input
-                    id="plan"
-                    type="text"
-                    hidden
-                    readOnly
-                    className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
-                  />
-                </div>
+              <div className="mt-2">
+                <input
+                  id="plan"
+                  type="text"
+                  hidden
+                  readOnly
+                  className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                  {...register("plan")}
+                />
               </div>
-              <div>
-                <div className="mt-2">
-                  <input
-                    id="lang"
-                    type="text"
-                    hidden
-                    readOnly
-                    className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
-                  />
-                </div>
+            </div>
+            <div>
+              <div className="mt-2">
+                <input
+                  id="lang"
+                  type="text"
+                  hidden
+                  readOnly
+                  className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                  {...register("lang")}
+                />
               </div>
+            </div>
+            <div>
+              <div className="mt-2">
+                <input
+                  id="currency"
+                  type="text"
+                  hidden
+                  readOnly
+                  {...register("currency")}
+                />
+              </div>
+            </div>
               <div className="relative flex flex-col justify-center items-center">
                 <button
                   type="submit"

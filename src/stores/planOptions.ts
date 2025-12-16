@@ -3,6 +3,8 @@ import { signal } from "@preact/signals";
 export type PlanOption = {
   name: string;
   price: number;
+  prices?: Record<"CHF" | "EUR" | "USD", number>;
+  stripePriceIds?: Record<"CHF" | "EUR" | "USD", string>;
   credit: number;
   format: string;
   remove_bg: boolean;

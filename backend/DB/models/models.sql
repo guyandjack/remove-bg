@@ -2,6 +2,20 @@
 CREATE DATABASE IF NOT EXISTS `remove_bg` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `remove_bg`;
 
+-- ================================================================
+-- Utility helper: drop any table safely (run manually when needed)
+-- Steps:
+--  1. Set @table_to_drop to the target table name (exact case)
+--  2. Execute this block; it drops the table if it exists
+-- ================================================================
+SET @table_to_drop = 'emailverification';
+SET @schema_name = 'remove_bg';
+SET @sql_drop = CONCAT('DROP TABLE IF EXISTS `', @schema_name, '`.`', @table_to_drop, '`;');
+PREPARE stmt_drop FROM @sql_drop;
+EXECUTE stmt_drop;
+DEALLOCATE PREPARE stmt_drop;
+-- ================================================================
+
 -- User
 CREATE TABLE IF NOT EXISTS `remove_bg`.`User` (
   id            VARCHAR(36)  NOT NULL PRIMARY KEY,
@@ -123,6 +137,7 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`EmailVerification` (
   password_hash  VARCHAR(72)   NOT NULL, -- bcrypt hash (typ. 60 chars)
   expires_at     DATETIME      NOT NULL,
   plan_type      VARCHAR(64)   NULL,     -- ex: 'free','hobby','pro' (option: référencer Plan.code)
+  currency_code  CHAR(3)       NOT NULL DEFAULT 'CHF',
   consumed_at    DATETIME      NULL,
   attempts       TINYINT UNSIGNED NOT NULL DEFAULT 0,
   active         TINYINT(1)    NOT NULL DEFAULT 1, -- 1 = actif
@@ -134,9 +149,32 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`EmailVerification` (
   UNIQUE KEY uniq_email_active (email, active)
 ) ENGINE=InnoDB;
 
--- Customer (profil + Stripe customer)
-CREATE TABLE IF NOT EXISTS `remove_bg`.`Customer` (
-  id                  VARCHAR(36)   NOT NULL PRIMARY KEY,
+-- Stripe checkout session state: keeps link between Stripe session and local user/account activation
+CREATE TABLE IF NOT EXISTS `remove_bg`.`StripeCheckoutSession` (
+  id               VARCHAR(36)   NOT NULL PRIMARY KEY,
+  session_id       VARCHAR(255)  NOT NULL,
+  email            VARCHAR(191)  NOT NULL,
+  plan_code        VARCHAR(64)   NOT NULL,
+  plan_id          VARCHAR(36)   NULL,
+  currency_code    CHAR(3)       NOT NULL DEFAULT 'CHF',
+  status           ENUM('pending','completed','failed') NOT NULL DEFAULT 'pending',
+  user_id          VARCHAR(36)   NULL,
+  subscription_id  VARCHAR(36)   NULL,
+  last_error       TEXT          NULL,
+  consumed_at      DATETIME      NULL,
+  created_at       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_stripe_session (session_id),
+  INDEX idx_stripe_session_email (email),
+  INDEX idx_stripe_session_status (status),
+  CONSTRAINT fk_stripe_session_user FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE SET NULL,
+  CONSTRAINT fk_stripe_session_subscription FOREIGN KEY (subscription_id) REFERENCES `Subscription`(id) ON DELETE SET NULL,
+  CONSTRAINT fk_stripe_session_plan FOREIGN KEY (plan_id) REFERENCES `Plan`(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+ 
+  -- Customer (profil + Stripe customer)
+  CREATE TABLE IF NOT EXISTS `remove_bg`.`Customer` (
+    id                  VARCHAR(36)   NOT NULL PRIMARY KEY,
   user_id             VARCHAR(36)   NOT NULL,
   email               VARCHAR(191)  NOT NULL,
   first_name          VARCHAR(100)  NULL,

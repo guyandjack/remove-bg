@@ -217,18 +217,22 @@ function OtpInput({
       );
 
       const result = response.data;
-      if (result.status === "success") {
+      if (result.status !== "success") {
+        alert("une erreur c'est produite, veuillez demander un autre code");
+        return
+      }
+      if (result.status === "success" && result.plan.code === "free") {
        
-        setSessionFromApiResponse(result)
+        setSessionFromApiResponse(result);
         setIsLoader(false);
         setStatus("success");
         
         setTimeout(() => {
-          //window.location.href = "/upload";
+          window.location.href = "/services";
         }, 2000);
-      } else {
-        setIsLoader(false);
-        setStatus("error");
+      } else if (result.status === "success" && result.redirect) {
+        //redirection vers le checkout de stripe
+        window.location.href = result.redirectUrl;
       }
     } catch (error) {
       setIsLoader(false);
