@@ -114,7 +114,7 @@ const login: RequestHandler = async (req, res, next) => {
       const selectedPlanCode = planAndCredit?.plan ?? "";
       const planRow = await getPlanByCode(selectedPlanCode);
       const planPrice = planRow?.price ?? 0;
-      const planCurrency = planRow?.currency ?? "EUR";
+      const planCurrency = planRow?.currency_code ?? "CHF";
       const planQuota = planRow?.daily_credit_quota ?? 0;
       const planName = planRow?.name ?? selectedPlanCode;
 

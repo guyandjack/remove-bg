@@ -1,7 +1,17 @@
 import type { RequestHandler } from "express";
 import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { connectDb } from "../../DB/poolConnexion/poolConnexion.ts";
-import { getPlanByCode, getUserByEmail, createUser, createSubscription, updateSubscription, markStripeCheckoutSessionCompleted, markStripeCheckoutSessionFailed } from "../../DB/queriesSQL/queriesSQL.ts";
+import {
+  getPlanByCode,
+  getUserByEmail,
+  createUser,
+  createSubscription,
+  updateSubscription,
+  markStripeCheckoutSessionCompleted,
+  markStripeCheckoutSessionFailed,
+  upsertPlanByCode,
+} from "../../DB/queriesSQL/queriesSQL.ts";
+import { planOption } from "../../data/planOption.ts";
 
 // Stripe webhook to finalize paid signups and activate subscriptions
 // Handles: checkout.session.completed, invoice.paid, invoice.payment_failed, customer.subscription.deleted
@@ -70,12 +80,14 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         ? Buffer.from(String(rawPayload), "utf8")
         : null;
       if (!payloadBuffer || !payloadBuffer.length) {
+        console.log("[stripeWebhook] Missing raw payload, rejecting request");
         return res.status(400).send("No webhook payload was provided");
       }
       event = stripe.webhooks.constructEvent(payloadBuffer, sig, whSecret);
     } else {
       event = parseJsonBody();
       if (!event) {
+        console.log("[stripeWebhook] Unable to parse payload without signature, rejecting request");
         return res.status(400).send("No webhook payload was provided");
       }
     }
@@ -92,15 +104,63 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       // On successful checkout, create user if pending and activate subscription
       const email: string | undefined = obj.customer_details?.email || obj.customer_email || obj.customer?.email || obj.metadata?.email;
       const planCode: string | undefined = obj.metadata?.plan_code;
+      const normalizedPlanCode = planCode ? String(planCode).toLowerCase() : undefined;
       const stripeSubscriptionId: string | undefined = obj.subscription as string | undefined;
       const stripeCustomerId: string | undefined = obj.customer as string | undefined;
       const customerDetails: any = obj.customer_details || {};
 
-      if (!email || !planCode) return res.status(200).send("ok"); // ignore if insufficient
+      if (!email || !normalizedPlanCode) {
+        console.log("[stripeWebhook] checkout.session.completed ignored: missing email or plan code");
+        return res.status(200).send("ok"); // ignore if insufficient
+      }
 
       // Try to load plan by code
-      const plan = await getPlanByCode(String(planCode).toLowerCase());
-      if (!plan) return res.status(200).send("ok");
+      let plan = await getPlanByCode(normalizedPlanCode);
+      if (!plan) {
+        const planConfig = planOption.find(
+          (config) => config.name === normalizedPlanCode
+        );
+        if (!planConfig) {
+          console.log(
+            "[stripeWebhook] checkout.session.completed ignored: unknown plan code",
+            normalizedPlanCode
+          );
+          return res.status(200).send("ok");
+        }
+        const basePrice =
+          planConfig.prices?.CHF ??
+          planConfig.price ??
+          planConfig.prices?.EUR ??
+          0;
+        const storedPrice = Number.isFinite(basePrice)
+          ? Math.round(Number(basePrice) * 100)
+          : 0;
+        try {
+          await upsertPlanByCode({
+            code: normalizedPlanCode,
+            name: planConfig.name,
+            price: storedPrice,
+            currency_code: "CHF",
+            billing_interval: "month",
+            daily_credit_quota: planConfig.credit ?? 0,
+            stripe_price_id: null,
+          });
+          plan = await getPlanByCode(normalizedPlanCode);
+        } catch (seedErr) {
+          console.error(
+            "[stripeWebhook] Failed to seed missing plan",
+            normalizedPlanCode,
+            seedErr
+          );
+        }
+        if (!plan) {
+          console.log(
+            "[stripeWebhook] checkout.session.completed ignored: unable to provision plan",
+            normalizedPlanCode
+          );
+          return res.status(200).send("ok");
+        }
+      }
 
       // Find or create user using stored password_hash in EmailVerification (pending account)
       const pool = await connectDb();
@@ -112,9 +172,15 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         );
         const rec = rows[0] as any;
         const hash = rec?.password_hash as string | undefined;
-        if (!hash) return res.status(200).send("ok"); // cannot finalize without password; leave pending
+        if (!hash) {
+          console.log("[stripeWebhook] checkout.session.completed: no password hash stored, leaving pending for", email);
+          return res.status(200).send("ok"); // cannot finalize without password; leave pending
+        }
         const newId = await createUser(email.toLowerCase(), hash);
-        if (!newId) return res.status(200).send("ok");
+        if (!newId) {
+          console.log("[stripeWebhook] checkout.session.completed: failed to create user", email);
+          return res.status(200).send("ok");
+        }
         user = await getUserByEmail(email.toLowerCase());
         // mark account created
         await pool.execute<ResultSetHeader>(
@@ -172,6 +238,7 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         });
       }
 
+      console.log("[stripeWebhook] checkout.session.completed processed for", email.toLowerCase());
       return res.status(200).send("ok");
     }
 
@@ -182,7 +249,7 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       const stripeSubscriptionId: string | undefined = inv.subscription as string | undefined;
       const amountPaid: number = inv.amount_paid ?? 0;
       const amountDue: number = inv.amount_due ?? amountPaid;
-      const currency: string = String(inv.currency || "EUR").toUpperCase();
+      const currencyCode: string = String(inv.currency || "CHF").toUpperCase();
       const hostedUrl: string | null = inv.hosted_invoice_url || null;
       const invoicePdf: string | null = inv.invoice_pdf || null;
       const periodStart = unixToDate(inv.period_start);
@@ -222,18 +289,21 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         planId = r?.plan_id || null;
         userId = userId || r?.user_id || null;
       }
-      if (!userId) return res.status(200).send("ok");
+      if (!userId) {
+        console.log("[stripeWebhook] invoice.paid ignored: unable to resolve user");
+        return res.status(200).send("ok");
+      }
 
       // Insert invoice (idempotent by uniq_stripe_invoice)
       try {
         const id = crypto.randomUUID();
         await pool.execute<ResultSetHeader>(
           `INSERT INTO Invoice (id, user_id, subscription_id, plan_id, stripe_invoice_id, stripe_payment_intent_id,
-                                amount_due_cents, amount_paid_cents, currency, status, hosted_invoice_url, invoice_pdf,
+                                amount_due_cents, amount_paid_cents, currency_code, status, hosted_invoice_url, invoice_pdf,
                                 period_start, period_end, issued_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'paid', ?, ?, ?, ?, ?)
            ON DUPLICATE KEY UPDATE amount_paid_cents=VALUES(amount_paid_cents), status='paid', hosted_invoice_url=VALUES(hosted_invoice_url), invoice_pdf=VALUES(invoice_pdf)`,
-          [id, userId, subId, planId, stripeInvoiceId, stripePaymentIntentId, amountDue, amountPaid, currency, hostedUrl, invoicePdf, periodStart, periodEnd, issuedAt]
+          [id, userId, subId, planId, stripeInvoiceId, stripePaymentIntentId, amountDue, amountPaid, currencyCode, hostedUrl, invoicePdf, periodStart, periodEnd, issuedAt]
         );
       } catch {}
 
@@ -245,6 +315,7 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         );
       } catch {}
 
+      console.log("[stripeWebhook] invoice.paid stored for user", userId);
       return res.status(200).send("ok");
     }
 
@@ -254,7 +325,7 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       const stripeCustomerId: string | undefined = inv.customer as string | undefined;
       const stripeSubscriptionId: string | undefined = inv.subscription as string | undefined;
       const amountDue: number = inv.amount_due ?? 0;
-      const currency: string = String(inv.currency || "EUR").toUpperCase();
+      const currencyCode: string = String(inv.currency || "CHF").toUpperCase();
       const stripeInvoiceId: string = inv.id;
       const pool = await connectDb();
 
@@ -282,10 +353,10 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       try {
         const id = crypto.randomUUID();
         await pool.execute<ResultSetHeader>(
-          `INSERT INTO Invoice (id, user_id, subscription_id, plan_id, stripe_invoice_id, amount_due_cents, amount_paid_cents, currency, status)
+          `INSERT INTO Invoice (id, user_id, subscription_id, plan_id, stripe_invoice_id, amount_due_cents, amount_paid_cents, currency_code, status)
            VALUES (?, ?, ?, NULL, ?, ?, 0, ?, 'unpaid')
            ON DUPLICATE KEY UPDATE status='unpaid'`,
-          [id, userId, subId, stripeInvoiceId, amountDue, currency]
+          [id, userId, subId, stripeInvoiceId, amountDue, currencyCode]
         );
       } catch {}
 
@@ -296,6 +367,7 @@ const stripeWebhook: RequestHandler = async (req, res) => {
           [stripeSubscriptionId]
         );
       }
+      console.log("[stripeWebhook] invoice.payment_failed recorded for user", userId ?? "unknown");
       return res.status(200).send("ok");
     }
 
@@ -313,9 +385,11 @@ const stripeWebhook: RequestHandler = async (req, res) => {
           [canceledAt, periodEnd, stripeSubscriptionId]
         );
       }
+      console.log("[stripeWebhook] customer.subscription.deleted processed for Stripe subscription", stripeSubscriptionId);
       return res.status(200).send("ok");
     }
 
+    console.log("[stripeWebhook] Unhandled event type received:", type);
     return res.status(200).send("ok");
   } catch (err: any) {
     console.error("stripeWebhook error:", err?.message || err);
@@ -333,6 +407,7 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       }
     }
     // Always 200 to avoid retries explosion unless you want retries
+    console.log("[stripeWebhook] Error handled, responding with 200 to avoid retries");
     return res.status(200).send("ok");
   }
 };

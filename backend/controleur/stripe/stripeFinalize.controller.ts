@@ -68,7 +68,7 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
 
     const planConfig = planOption.find((plan) => plan.name === record.plan_code);
     const planPrices = planConfig?.prices;
-    const currencyCodeRaw = record.currency_code || planRow?.currency || "EUR";
+    const currencyCodeRaw = record.currency_code || planRow?.currency_code || "CHF";
     const normalizedCurrency: "CHF" | "EUR" | "USD" =
       ["CHF", "EUR", "USD"].includes(String(currencyCodeRaw).toUpperCase())
         ? (String(currencyCodeRaw).toUpperCase() as "CHF" | "EUR" | "USD")
@@ -106,6 +106,8 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
       subscriptionId: record.subscription_id ?? null,
       hint: "",
     };
+
+    
 
     await markStripeCheckoutSessionConsumed(record.session_id);
     res.cookie("tokenRefresh", refreshToken, cookieOptions);

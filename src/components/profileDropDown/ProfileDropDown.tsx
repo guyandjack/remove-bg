@@ -9,6 +9,7 @@ import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
 import { Loader } from "@/components/loader/Loader";
 
 //import des functions
+import { navigateWithLink } from "@/utils/navigateWithLink";
 
 //constante et variable globale
 
@@ -56,7 +57,7 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
     } finally {
       setTimeout(() => {
         setIsStatus("idle")
-        window.location.href = "/";
+        navigateWithLink("/");
       }, 2000)
     }
   }

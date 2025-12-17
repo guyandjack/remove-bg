@@ -8,6 +8,7 @@ import { useEffect, useState } from "preact/hooks";
 //import des fonctions
 import { setActiveLink } from "@/utils/setActiveLink";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
+import { navigateWithLink } from "@/utils/navigateWithLink";
 
 type SubmitState = "idle" | "loading" | "success" | "error";
 
@@ -37,10 +38,10 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       const token = sessionSignal?.value?.token;
       if (!token) {
         const redirect = encodeURIComponent("/dashboard");
-        window.location.href = `/login?redirect=${redirect}`;
+        navigateWithLink(`/login?redirect=${redirect}`);
         return;
       }
-
+      
       // 2) Verify with API (uses axios interceptors for refresh)
       try {
         await isAuthentified();
@@ -52,7 +53,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       } catch {
         if (!mounted) return;
         const redirect = encodeURIComponent("/dashboard");
-        window.location.href = `/login?redirect=${redirect}`;
+        navigateWithLink(`/login?redirect=${redirect}`);
       }
     };
 

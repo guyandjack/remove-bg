@@ -57,13 +57,13 @@ const planOption: PlanOptionInput[] = [
     price: 5,
     prices: {
       CHF: 5,
-      EUR: 4.5,
-      USD: 5.5,
+      EUR: 5,
+      USD: 5,
     },
     stripePriceIds: {
       CHF: "price_1SeepuBaVLyPBDGsvlWmRxVS",
       EUR: "price_1SeepuBaVLyPBDGstF3a5O0B",
-      USD: "price_1SeepuBaVLyPBDGsqbUSD123",
+      USD: "price_1Sez7zBaVLyPBDGsMMgFL0D1",
     },
     credit: 50,
     format: ".png",
@@ -86,13 +86,13 @@ const planOption: PlanOptionInput[] = [
     price: 10,
     prices: {
       CHF: 10,
-      EUR: 9.5,
-      USD: 11,
+      EUR: 10,
+      USD: 10,
     },
     stripePriceIds: {
       CHF: "price_1SeesUBaVLyPBDGsDf8RNfE7",
       EUR: "price_1SefFxBaVLyPBDGsZ8puzEiW",
-      USD: "price_1SeesUBaVLyPBDGsUSD45678",
+      USD: "price_1Sez6YBaVLyPBDGsWE3ErOdv",
     },
     credit: 300,
     format: ".png .jpg .webp",

@@ -91,6 +91,7 @@ const privileges = computed(() => {
 // 3. Fonction pour mettre à jour la session : à appeler après login/signup
 // =========================
 function setSessionFromApiResponse(data: SessionData) {
+  
   sessionSignal.value = {
     user: {
       first_name: data?.user.first_name,
@@ -111,9 +112,11 @@ function setSessionFromApiResponse(data: SessionData) {
     subscriptionId: data?.subscriptionId || "",
     hint: data?.hint || "",
   };
-
+  
   // Optionnel : persister dans localStorage
   localStorage.setItem("session", JSON.stringify(sessionSignal.value));
+
+  
 }
 
 // =========================

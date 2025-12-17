@@ -15,6 +15,7 @@ import { Loader } from "@/components/loader/Loader";
 //import des fonctions
 import { axiosError } from "@/utils/axiosError";
 import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
+import { navigateWithLink } from "@/utils/navigateWithLink";
 
 //declarations des types
 export type FormValues = {
@@ -157,7 +158,7 @@ const FormLogin = () => {
         setIsLoader(false);
         setTimeout(() => {
           setStatus("idle");
-         window.location.href = "/upload"
+          navigateWithLink("/services");
         }, 2000);
 
         

@@ -1,6 +1,6 @@
 -- Schema: remove_bg (utf8mb4)
-CREATE DATABASE IF NOT EXISTS `remove_bg` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `remove_bg`;
+CREATE DATABASE IF NOT EXISTS `wiz_pix` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `wiz_pix`;
 
 -- ================================================================
 -- Utility helper: drop any table safely (run manually when needed)
@@ -9,7 +9,7 @@ USE `remove_bg`;
 --  2. Execute this block; it drops the table if it exists
 -- ================================================================
 SET @table_to_drop = 'emailverification';
-SET @schema_name = 'remove_bg';
+SET @schema_name = 'wiz_pix';
 SET @sql_drop = CONCAT('DROP TABLE IF EXISTS `', @schema_name, '`.`', @table_to_drop, '`;');
 PREPARE stmt_drop FROM @sql_drop;
 EXECUTE stmt_drop;
@@ -17,7 +17,7 @@ DEALLOCATE PREPARE stmt_drop;
 -- ================================================================
 
 -- User
-CREATE TABLE IF NOT EXISTS `remove_bg`.`User` (
+CREATE TABLE IF NOT EXISTS `wiz_pix`.`User` (
   id            VARCHAR(36)  NOT NULL PRIMARY KEY,
   email         VARCHAR(191) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`User` (
 ) ENGINE=InnoDB;
 
 -- TokenRefresh (stockage des refresh tokens)
-CREATE TABLE IF NOT EXISTS `remove_bg`.`TokenRefresh` (
+CREATE TABLE IF NOT EXISTS `wiz_pix`.`TokenRefresh` (
   id               VARCHAR(36)   NOT NULL PRIMARY KEY,
   jti              VARCHAR(191)  NOT NULL,                  -- JWT ID (identifiant unique du refresh token)
   user_id          VARCHAR(36)   NOT NULL,                  -- FK vers User
@@ -49,12 +49,12 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`TokenRefresh` (
 ) ENGINE=InnoDB;
 
 -- Plan (catalogue)
-CREATE TABLE IF NOT EXISTS `remove_bg`.`Plan` (
+CREATE TABLE IF NOT EXISTS `wiz_pix`.`Plan` (
   id                   VARCHAR(36)  NOT NULL PRIMARY KEY,
   code                 VARCHAR(64)  NOT NULL UNIQUE,           -- ex: 'free', 'hobby', 'pro'
   name                 VARCHAR(191) NOT NULL UNIQUE,
   price                INT          NOT NULL,                  -- compatible avec votre code
-  currency             CHAR(3)      NOT NULL DEFAULT 'EUR',
+  currency_code             CHAR(3)      NOT NULL DEFAULT 'CHF',
   billing_interval     ENUM('day','week','month','year') NOT NULL DEFAULT 'month',
   daily_credit_quota   INT UNSIGNED NOT NULL DEFAULT 0,
   stripe_price_id      VARCHAR(255) NULL,
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`Plan` (
 
 -- Subscription
 -- MySQL: ENUM pour le statut et "trick" is_active (NULL = inactif, TRUE = actif)
-CREATE TABLE IF NOT EXISTS `remove_bg`.`Subscription` (
+CREATE TABLE IF NOT EXISTS `wiz_pix`.`Subscription` (
   id                      VARCHAR(36) NOT NULL PRIMARY KEY,
   user_id                 VARCHAR(36) NOT NULL,
   plan_id                 VARCHAR(36) NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`Subscription` (
 ) ENGINE=InnoDB;
 
 -- Ledger d'usage de crédits (fenêtre 24h par requête)
-CREATE TABLE IF NOT EXISTS `remove_bg`.`CreditUsage` (
+CREATE TABLE IF NOT EXISTS `wiz_pix`.`CreditUsage` (
   id               VARCHAR(36)  NOT NULL PRIMARY KEY,
   subscription_id  VARCHAR(36)  NOT NULL,
   used             INT UNSIGNED NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`CreditUsage` (
 ) ENGINE=InnoDB;
 
 -- Vue pratique: consommation sur 24h et restant
-CREATE OR REPLACE VIEW `remove_bg`.`v_subscription_usage_24h` AS
+CREATE OR REPLACE VIEW `wiz_pix`.`v_subscription_usage_24h` AS
 SELECT
   s.id AS subscription_id,
   s.user_id,
@@ -129,7 +129,7 @@ WHERE s.is_active = 1
 GROUP BY s.id, s.user_id, s.plan_id, p.code, p.daily_credit_quota;
 
 -- EmailVerification (OTP)
-CREATE TABLE IF NOT EXISTS `remove_bg`.`EmailVerification` (
+CREATE TABLE IF NOT EXISTS `wiz_pix`.`EmailVerification` (
   id             VARCHAR(36)   NOT NULL PRIMARY KEY,
   email          VARCHAR(191)  NOT NULL,
   code_hash      VARBINARY(64) NOT NULL, -- scrypt/pbkdf2 hash (ex: 64 bytes)
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`EmailVerification` (
 ) ENGINE=InnoDB;
 
 -- Stripe checkout session state: keeps link between Stripe session and local user/account activation
-CREATE TABLE IF NOT EXISTS `remove_bg`.`StripeCheckoutSession` (
+CREATE TABLE IF NOT EXISTS `wiz_pix`.`StripeCheckoutSession` (
   id               VARCHAR(36)   NOT NULL PRIMARY KEY,
   session_id       VARCHAR(255)  NOT NULL,
   email            VARCHAR(191)  NOT NULL,
@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`StripeCheckoutSession` (
 ) ENGINE=InnoDB;
  
   -- Customer (profil + Stripe customer)
-  CREATE TABLE IF NOT EXISTS `remove_bg`.`Customer` (
+  CREATE TABLE IF NOT EXISTS `wiz_pix`.`Customer` (
     id                  VARCHAR(36)   NOT NULL PRIMARY KEY,
   user_id             VARCHAR(36)   NOT NULL,
   email               VARCHAR(191)  NOT NULL,
@@ -197,7 +197,7 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`StripeCheckoutSession` (
 ) ENGINE=InnoDB;
 
 -- Invoice / Payment records (Stripe)
-CREATE TABLE IF NOT EXISTS `remove_bg`.`Invoice` (
+CREATE TABLE IF NOT EXISTS `wiz_pix`.`Invoice` (
   id                        VARCHAR(36)   NOT NULL PRIMARY KEY,
   user_id                   VARCHAR(36)   NOT NULL,
   subscription_id           VARCHAR(36)   NULL,
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS `remove_bg`.`Invoice` (
   stripe_payment_intent_id  VARCHAR(255)  NULL,
   amount_due_cents          INT           NOT NULL DEFAULT 0,
   amount_paid_cents         INT           NOT NULL DEFAULT 0,
-  currency                  CHAR(3)       NOT NULL DEFAULT 'EUR',
+  currency_code                  CHAR(3)       NOT NULL DEFAULT 'CHF',
   status                    ENUM('draft','open','paid','uncollectible','void') NOT NULL DEFAULT 'open',
   hosted_invoice_url        VARCHAR(255)  NULL,
   invoice_pdf               VARCHAR(255)  NULL,

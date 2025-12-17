@@ -299,6 +299,8 @@ function HomePage({ routeKey = "" }: PropsPage) {
     setDocumentTitle();
   }, [routeKey]);
 
+  
+
   return (
     <div className={"page-container"}>
       <div className={"w-full mb-[100px] lg:mb-0"}>
@@ -412,7 +414,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
           </h2>
           <ul
             className={
-              "w-full flex flex-row flex-wrap justify-evenly items-center gap-y-8 "
+              "w-full flex flex-row flex-wrap justify-evenly items-center gap-8 "
             }
           >
             {cardFeatureContent.map((cardContent) => {

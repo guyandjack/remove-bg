@@ -13,6 +13,7 @@ import { Loader } from "@/components/loader/Loader";
 import { axiosError } from "@/utils/axiosError";
 import { localOrProd } from "@/utils/localOrProd";
 import { setSessionFromApiResponse, privileges } from "@/stores/session";
+import { navigateWithLink } from "@/utils/navigateWithLink";
 
 
 type OtpInputProps = {
@@ -228,7 +229,7 @@ function OtpInput({
         setStatus("success");
         
         setTimeout(() => {
-          window.location.href = "/services";
+          navigateWithLink("/services");
         }, 2000);
       } else if (result.status === "success" && result.redirect) {
         //redirection vers le checkout de stripe

@@ -73,8 +73,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
        LIMIT 1`,
       [email]
     );
-
-    const record = rows[0] as any;
+    const record = rows[0] as RowDataPacket | undefined;
     if (!record) {
       return res
         .status(400)
@@ -90,7 +89,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
     const expected = hashOtp(code, salt);
     const stored: Buffer = record.code_hash as Buffer;
     const planCode: string = String(record.plan_type || "free").toLowerCase();
-    const currencyCode = normalizeCurrency(record.currency_code);
+    const currencyCode = normalizeCurrency((record as any).currency_code);
     const match =
       stored.length === expected.length &&
       crypto.timingSafeEqual(stored, expected);
@@ -190,8 +189,8 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
             if (!prows[0]) {
               const pid = crypto.randomUUID();
               const [pres] = await cx.execute<ResultSetHeader>(
-                `INSERT INTO Plan (id, code, name, price, currency, billing_interval, daily_credit_quota, is_archived)
-               VALUES (?, ?, 'Free', 0, 'EUR', 'month',? , 0)`,
+                `INSERT INTO Plan (id, code, name, price, currency_code, billing_interval, daily_credit_quota, is_archived)
+               VALUES (?, ?, 'Free', 0, 'CHF', 'month',? , 0)`,
                 [pid, planCode, planDailyCredit]
               );
               if (pres.affectedRows !== 1)
@@ -260,7 +259,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
           planRow?.price ??
           planDefinition?.price ??
           0;
-        const planCurrency = currencyCode || planRow?.currency || "EUR";
+        const planCurrency = currencyCode || planRow?.currency_code || "CHF";
         const planQuota = planRow?.daily_credit_quota ?? planDailyCredit;
         const planName = planRow?.name ?? planDefinition?.name ?? planCode;
         const usedCredits = usage?.used_last_24h ?? 0;

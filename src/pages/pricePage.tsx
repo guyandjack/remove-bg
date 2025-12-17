@@ -19,6 +19,7 @@ import {
 } from "@/stores/planOptions";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
 import { setActiveLink } from "@/utils/setActiveLink";
+import { navigateWithLink } from "@/utils/navigateWithLink";
 
 
 type PlanKey =
@@ -227,7 +228,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
       url.searchParams.delete("userValide");
       window.history.replaceState({}, "", url.toString());
       setTimeout(() => {
-        window.location.href = "/services";
+        navigateWithLink("/services");
       }, 2000);
     } catch (error) {
       setFinalizeStatus("error");

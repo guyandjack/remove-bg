@@ -86,7 +86,16 @@ function resolveLocale(lang: unknown): string {
       await conn.execute<ResultSetHeader>(
         `INSERT INTO EmailVerification (id, email, code_hash, salt, password_hash, expires_at, plan_type, currency_code, active, attempts, account)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 0, 0)`,
-        [idNew, normalizedEmail, codeHash, salt, passwordHash, expiresAt, planCode, currencyCode]
+        [
+          idNew,
+          normalizedEmail,
+          codeHash,
+          salt,
+          passwordHash,
+          expiresAt,
+          planCode,
+          currencyCode,
+        ]
       );
       await conn.commit();
     } finally {

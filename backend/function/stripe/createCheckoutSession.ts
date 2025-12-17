@@ -44,7 +44,7 @@ const createCheckoutSession = async ({
 
   const base = buildBaseUrl();
   const successUrl = `${base}?userValide=true&currency=${currency}&session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl = `${base}?userValide=false&plan=${encodeURIComponent(
+  const cancelUrl = `${base}?userValide=false&session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(
     planCode
   )}&currency=${currency}`;
 

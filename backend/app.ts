@@ -78,8 +78,19 @@ app.use(cors(corsOptions));
 // ----------------------------------------------------
 
 // Parser JSON et URL-encoded (avec limite de taille)
-app.use(express.json({ limit: "5mb" }));
-app.use(express.urlencoded({ extended: true, limit: "5mb" }));
+const jsonParser = express.json({ limit: "5mb" });
+const urlEncodedParser = express.urlencoded({ extended: true, limit: "5mb" });
+const skipBodyParser = (req: Request) =>
+  req.originalUrl.startsWith("/api/stripe/webhook");
+
+app.use((req, res, next) => {
+  if (skipBodyParser(req)) return next();
+  return jsonParser(req, res, next);
+});
+app.use((req, res, next) => {
+  if (skipBodyParser(req)) return next();
+  return urlEncodedParser(req, res, next);
+});
 
 // Compression des réponses HTTP (gzip)
 app.use(compression());

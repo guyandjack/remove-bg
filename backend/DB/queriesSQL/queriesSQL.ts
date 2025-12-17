@@ -33,7 +33,7 @@ export interface Plan extends RowDataPacket {
   code: string; // e.g. 'free', 'hobby', 'pro'
   name: string;
   price: number; // cents or unit, matches schema column `price`
-  currency: string; // 'EUR', 'USD', ...
+  currency_code: string; // 'EUR', 'USD', ...
   billing_interval: "day" | "week" | "month" | "year";
   daily_credit_quota: number;
   stripe_price_id: string | null;
@@ -625,8 +625,8 @@ export async function markStripeCheckoutSessionConsumed(sessionId: string) {
 export async function createPlan(name: string, price: number, id?: ID) {
   const connexion = await connectDb();
   const theId = id ?? crypto.randomUUID();
-  const sql = `INSERT INTO Plan (id, code, name, price, currency, billing_interval, daily_credit_quota, is_archived)
-               VALUES (?, LOWER(REPLACE(?, ' ', '_')), ?, ?, 'EUR', 'month', 0, 0)`;
+  const sql = `INSERT INTO Plan (id, code, name, price, currency_code, billing_interval, daily_credit_quota, is_archived)
+               VALUES (?, LOWER(REPLACE(?, ' ', '_')), ?, ?, 'CHF', 'month', 0, 0)`;
   // code is derived from name by default (e.g., 'Pro Plan' -> 'pro_plan')
   const [res] = await connexion.execute<ResultSetHeader>(sql, [theId, name, name, price]);
   return res.affectedRows === 1 ? theId : null;
@@ -684,7 +684,7 @@ export async function listPlans(includeArchived = false): Promise<Plan[]> {
 
 export async function updatePlan(
   planId: ID,
-  fields: Partial<Pick<Plan, "name" | "price" | "currency" | "billing_interval" | "daily_credit_quota" | "stripe_price_id">>
+  fields: Partial<Pick<Plan, "name" | "price" | "currency_code" | "billing_interval" | "daily_credit_quota" | "stripe_price_id">>
 ) {
   /**
    * SQL (dynamic SET): UPDATE Plan SET ... WHERE id = ?
@@ -700,9 +700,9 @@ export async function updatePlan(
     sets.push(`price = ?`);
     values.push(fields.price);
   }
-  if (fields.currency !== undefined) {
-    sets.push(`currency = ?`);
-    values.push(fields.currency);
+  if (fields.currency_code !== undefined) {
+    sets.push(`currency_code = ?`);
+    values.push(fields.currency_code);
   }
   if (fields.billing_interval !== undefined) {
     sets.push(`billing_interval = ?`);
@@ -759,7 +759,7 @@ export async function upsertPlanByCode(input: {
   code: string;
   name: string;
   price: number;
-  currency?: string;
+  currency_code?: string;
   billing_interval?: "day" | "week" | "month" | "year";
   daily_credit_quota?: number;
   stripe_price_id?: string | null;
@@ -768,14 +768,14 @@ export async function upsertPlanByCode(input: {
   const existing = await getPlanByCode(input.code);
   if (!existing) {
     const id = crypto.randomUUID();
-    const sql = `INSERT INTO Plan (id, code, name, price, currency, billing_interval, daily_credit_quota, stripe_price_id, is_archived)
+    const sql = `INSERT INTO Plan (id, code, name, price, currency_code, billing_interval, daily_credit_quota, stripe_price_id, is_archived)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)`;
     const params = [
       id,
       input.code,
       input.name,
       input.price,
-      input.currency ?? "EUR",
+      input.currency_code ?? "CHF",
       input.billing_interval ?? "month",
       input.daily_credit_quota ?? 0,
       input.stripe_price_id ?? null,
@@ -787,7 +787,7 @@ export async function upsertPlanByCode(input: {
     await updatePlan(existing.id, {
       name: input.name,
       price: input.price,
-      currency: input.currency ?? existing.currency,
+      currency_code: input.currency_code ?? existing.currency_code,
       billing_interval: input.billing_interval ?? existing.billing_interval,
       daily_credit_quota: input.daily_credit_quota ?? existing.daily_credit_quota,
       stripe_price_id: input.stripe_price_id ?? existing.stripe_price_id ?? undefined,
@@ -803,9 +803,9 @@ export async function upsertPlanByCode(input: {
  * - pro: 29.99€, 1000 credits/day
  */
 export async function seedDefaultPlans() {
-  await upsertPlanByCode({ code: "free", name: "Free", price: 0, currency: "EUR", billing_interval: "month", daily_credit_quota: 10 });
-  await upsertPlanByCode({ code: "hobby", name: "Hobby", price: 500, currency: "EUR", billing_interval: "month", daily_credit_quota: 100 });
-  await upsertPlanByCode({ code: "pro", name: "Pro", price: 1500, currency: "EUR", billing_interval: "month", daily_credit_quota: 1000 });
+  await upsertPlanByCode({ code: "free", name: "Free", price: 0, currency_code: "CHF", billing_interval: "month", daily_credit_quota: 10 });
+  await upsertPlanByCode({ code: "hobby", name: "Hobby", price: 500, currency_code: "CHF", billing_interval: "month", daily_credit_quota: 100 });
+  await upsertPlanByCode({ code: "pro", name: "Pro", price: 1500, currency_code: "CHF", billing_interval: "month", daily_credit_quota: 1000 });
 }
 
 // ===================================================================
