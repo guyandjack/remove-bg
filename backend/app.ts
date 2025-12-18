@@ -35,6 +35,8 @@ import forgotPasswordRoute from "./routes/forgotPassword.route";
 import refreshRoute from "./routes/authRefresh.route";
 import usageRoute from "./routes/usage.route";
 import planOptionRoute from "./routes/planOption.route";
+import servicesRoute from "./routes/services.route";
+import socialRoute from "./routes/social.route";
 
 const app = express();
 
@@ -160,6 +162,12 @@ app.use("/api/usage", usageRoute);
 
 //route des options des plans
 app.use("/api/plan/option", planOptionRoute);
+
+//route des services
+app.use("/api/services", servicesRoute);
+
+//route pour la mise en forme des visuels sociaux
+app.use("/api/social", socialRoute);
 
 // ----------------------------------------------------
 // ⚠️ 6️⃣ Middleware de gestion d’erreurs global

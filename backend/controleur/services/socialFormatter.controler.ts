@@ -1,0 +1,123 @@
+import sharp from "sharp";
+import type { RequestHandler } from "express";
+
+import { logger } from "../../logger";
+import type { SanitizedSocialAsset } from "../../middelware/services/socialPicture.middleware";
+
+const mimeByFormat = {
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  avif: "image/avif",
+} as const;
+
+const extensionByFormat = {
+  jpeg: "jpg",
+  png: "png",
+  webp: "webp",
+  avif: "avif",
+} as const;
+
+const slugifyName = (value?: string) =>
+  (value || "image-social")
+    .toLowerCase()
+    .replace(/\.[^/.]+$/, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "image-social";
+
+const formatFilename = (asset: SanitizedSocialAsset) => {
+  const baseSlug = slugifyName(asset.file.name);
+  const suffix = asset.presetId ? `-${asset.presetId}` : "";
+  const ext = extensionByFormat[asset.format];
+  return `${baseSlug}${suffix}.${ext}`;
+};
+
+const formatAsset = async (asset: SanitizedSocialAsset) => {
+  let pipeline = sharp(asset.file.data, { failOnError: false }).resize(
+    asset.width,
+    asset.height,
+    {
+      fit: "cover",
+      position: "attention",
+      withoutEnlargement: false,
+    }
+  );
+
+  switch (asset.format) {
+    case "png":
+      pipeline = pipeline.png({
+        compressionLevel: 8,
+        adaptiveFiltering: true,
+      });
+      break;
+    case "webp":
+      pipeline = pipeline.webp({
+        quality: 90,
+        smartSubsample: true,
+      });
+      break;
+    case "avif":
+      pipeline = pipeline.avif({
+        quality: 85,
+        effort: 3,
+      });
+      break;
+    default:
+      pipeline = pipeline.jpeg({
+        quality: 92,
+        mozjpeg: true,
+        chromaSubsampling: "4:4:4",
+      });
+  }
+
+  const buffer = await pipeline.toBuffer();
+  const mimeType = mimeByFormat[asset.format];
+
+  return {
+    index: asset.index,
+    presetId: asset.presetId,
+    filename: formatFilename(asset),
+    mimeType,
+    width: asset.width,
+    height: asset.height,
+    size: buffer.length,
+    network: asset.network,
+    category: asset.category,
+    ratio: asset.ratio,
+    dataUrl: `data:${mimeType};base64,${buffer.toString("base64")}`,
+  };
+};
+
+const formatSocialPictures: RequestHandler = async (req, res) => {
+  try {
+    const assets = (req as any).socialAssets as SanitizedSocialAsset[] | undefined;
+    if (!assets?.length) {
+      return res.status(400).json({
+        error: true,
+        message: "Aucune image n'a ete fournie pour la mise au format.",
+      });
+    }
+
+    const results = await Promise.all(assets.map((asset) => formatAsset(asset)));
+
+    return res.status(200).json({
+      message: `${results.length} image(s) mise(s) a la dimension cible.`,
+      count: results.length,
+      assets: results,
+    });
+  } catch (error) {
+    logger.error("Social picture formatting failed", {
+      error: (error as Error).message,
+      stack: (error as Error).stack,
+      requestId: (req as any).requestId,
+    });
+    return res.status(500).json({
+      error: true,
+      message:
+        "Impossible de traiter les images pour les reseaux sociaux pour le moment.",
+      requestId: (req as any).requestId,
+    });
+  }
+};
+
+export { formatSocialPictures };

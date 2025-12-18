@@ -11,6 +11,7 @@ import * as m from "motion/react-m";
 //import des composants enfants
 import { RemoveBg } from "@/components/services/RemoveBG";
 import { SocialPicture } from "@/components/services/socialPicture";
+import { ImageConverter } from "@/components/services/ImageConverter";
 import { ServiceCard } from "@/components/card/ServiceCard";
 
 //import des images
@@ -174,6 +175,17 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
                 exit={{ opacity: 0 }}
               >
                 <SocialPicture />
+              </m.div>
+            ) : null}
+            {service === "convert" ? (
+              <m.div
+                key="image-converter"
+                className="w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <ImageConverter />
               </m.div>
             ) : null}
           </AnimatePresence>
