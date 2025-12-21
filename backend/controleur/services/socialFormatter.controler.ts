@@ -1,18 +1,12 @@
 import sharp from "sharp";
+import JSZip from "jszip";
 import type { RequestHandler } from "express";
 
 import { logger } from "../../logger";
 import type { SanitizedSocialAsset } from "../../middelware/services/socialPicture.middleware";
 
-const mimeByFormat = {
-  jpeg: "image/jpeg",
-  png: "image/png",
-  webp: "image/webp",
-  avif: "image/avif",
-} as const;
-
 const extensionByFormat = {
-  jpeg: "jpg",
+  jpeg: "jpeg",
   png: "png",
   webp: "webp",
   avif: "avif",
@@ -32,7 +26,7 @@ const formatFilename = (asset: SanitizedSocialAsset) => {
   return `${baseSlug}${suffix}.${ext}`;
 };
 
-const formatAsset = async (asset: SanitizedSocialAsset) => {
+const formatAssetBuffer = async (asset: SanitizedSocialAsset) => {
   let pipeline = sharp(asset.file.data, { failOnError: false }).resize(
     asset.width,
     asset.height,
@@ -71,21 +65,7 @@ const formatAsset = async (asset: SanitizedSocialAsset) => {
   }
 
   const buffer = await pipeline.toBuffer();
-  const mimeType = mimeByFormat[asset.format];
-
-  return {
-    index: asset.index,
-    presetId: asset.presetId,
-    filename: formatFilename(asset),
-    mimeType,
-    width: asset.width,
-    height: asset.height,
-    size: buffer.length,
-    network: asset.network,
-    category: asset.category,
-    ratio: asset.ratio,
-    dataUrl: `data:${mimeType};base64,${buffer.toString("base64")}`,
-  };
+  return { buffer, filename: formatFilename(asset) };
 };
 
 const formatSocialPictures: RequestHandler = async (req, res) => {
@@ -98,13 +78,50 @@ const formatSocialPictures: RequestHandler = async (req, res) => {
       });
     }
 
-    const results = await Promise.all(assets.map((asset) => formatAsset(asset)));
+    const formattedBuffers = await Promise.all(
+      assets.map(async (asset) => {
+        const result = await formatAssetBuffer(asset);
+        return {
+          ...result,
+          meta: {
+            presetId: asset.presetId,
+            width: asset.width,
+            height: asset.height,
+            network: asset.network,
+            category: asset.category,
+            ratio: asset.ratio,
+          },
+        };
+      })
+    );
 
-    return res.status(200).json({
-      message: `${results.length} image(s) mise(s) a la dimension cible.`,
-      count: results.length,
-      assets: results,
+    const zip = new JSZip();
+    formattedBuffers.forEach((item) => {
+      zip.file(item.filename, item.buffer);
     });
+    zip.file(
+      "manifest.json",
+      JSON.stringify(
+        formattedBuffers.map((item) => ({
+          filename: item.filename,
+          ...item.meta,
+        })),
+        null,
+        2
+      )
+    );
+
+    const archive = await zip.generateAsync({
+      type: "nodebuffer",
+      compression: "DEFLATE",
+      compressionOptions: { level: 9 },
+    });
+
+    const archiveName = `social-pictures-${Date.now()}.zip`;
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", `attachment; filename="${archiveName}"`);
+    res.setHeader("X-Asset-Count", String(formattedBuffers.length));
+    return res.status(200).send(archive);
   } catch (error) {
     logger.error("Social picture formatting failed", {
       error: (error as Error).message,

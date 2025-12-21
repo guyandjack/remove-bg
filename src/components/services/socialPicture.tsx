@@ -57,6 +57,22 @@ const useGroupedPresets = () =>
     };
   }, []);
 
+const parseFilenameFromDisposition = (header?: string | null) => {
+  if (!header) return null;
+  const match = /filename="?([^"]+)"?/i.exec(header);
+  return match?.[1] || null;
+};
+
+const triggerArchiveDownload = (blob: Blob, disposition?: string) => {
+  const filename = parseFilenameFromDisposition(disposition) || `social-pictures.zip`;
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+};
+
 const SocialPicture = () => {
   const [images, setImages] = useState<SelectedImage[]>([]);
   const [status, setStatus] = useState<SubmitStatus>({ state: "idle" });
@@ -126,6 +142,7 @@ const SocialPicture = () => {
     urlRegistry.current.forEach((url) => URL.revokeObjectURL(url));
     urlRegistry.current.clear();
     setImages([]);
+    setProcessedAssets([]);
     setStatus({ state: "idle" });
     setErrors({});
   };
@@ -208,12 +225,19 @@ const SocialPicture = () => {
 
     try {
       setStatus({ state: "loading", message: "Envoi en cours..." });
-      await api.post("/api/social/pictures", formData, {
+      const response = await api.post("/api/services/image-social", formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        responseType: "blob",
       });
+      const blob = response.data as Blob;
+      triggerArchiveDownload(
+        blob,
+        (response.headers?.["content-disposition"] as string) ||
+          (response.headers as any)?.["Content-Disposition"]
+      );
       setStatus({
         state: "success",
-        message: "Les images ont été envoyées pour traitement.",
+        message: "Tes images ont été formatées et téléchargées.",
       });
     } catch (error) {
       console.error("Erreur lors de l'envoi :", error);
@@ -244,6 +268,9 @@ const SocialPicture = () => {
         <div className="border border-dashed border-base-300 rounded-xl p-6 text-center">
           <p className="mb-4 font-medium">
             Fais glisser tes fichiers ici ou utilise le bouton.
+          </p>
+          <p className="text-sm text-base-content/70 mb-4">
+            Formats pris en charge : JPG/JPEG, PNG, WebP et AVIF (max 20&nbsp;MB par image).
           </p>
           <input
             ref={uploadRef}
@@ -292,10 +319,13 @@ const SocialPicture = () => {
                           Réseau social
                         </span>
                         <select
-                          className="select select-bordered select-sm"
+                          className="select select-bordered select-sm my-[10px]"
                           value={img.network || ""}
                           onChange={(event) =>
-                            handleNetworkChange(img.id, event.currentTarget.value)
+                            handleNetworkChange(
+                              img.id,
+                              event.currentTarget.value
+                            )
                           }
                         >
                           <option value="">Choisir...</option>
@@ -312,10 +342,13 @@ const SocialPicture = () => {
                           Catégorie / usage
                         </span>
                         <select
-                          className="select select-bordered select-sm"
+                          className="select select-bordered select-sm my-[10px]"
                           value={img.category || ""}
                           onChange={(event) =>
-                            handleCategoryChange(img.id, event.currentTarget.value)
+                            handleCategoryChange(
+                              img.id,
+                              event.currentTarget.value
+                            )
                           }
                           disabled={!img.network}
                         >
@@ -335,10 +368,13 @@ const SocialPicture = () => {
                           Format prédéfini
                         </span>
                         <select
-                          className="select select-bordered select-sm"
+                          className="select select-bordered select-sm my-[10px]"
                           value={img.presetId || ""}
                           onChange={(event) =>
-                            handlePresetChange(img.id, event.currentTarget.value)
+                            handlePresetChange(
+                              img.id,
+                              event.currentTarget.value
+                            )
                           }
                           disabled={!img.network || !img.category}
                         >
@@ -435,6 +471,7 @@ const SocialPicture = () => {
           </p>
         ) : null}
       </form>
+
     </section>
   );
 };

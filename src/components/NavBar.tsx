@@ -13,6 +13,7 @@ import { navigateWithLink } from "@/utils/navigateWithLink";
 import { SelectLanguage } from "./LangSwitcher";
 import { ProfileDropDown } from "./profileDropDown/ProfileDropDown";
 import { ThemeControler } from "./themeControler/ThemeControler";
+import { AnimatedLogo } from "./animation/AnimatedLogoNormalWhite";
 
 //import des data
 import { navBarContent } from "@/data/content/components/nav/navBarContent";
@@ -30,9 +31,10 @@ import {
 
 //import des images
 import logo from "@/assets/images/logo/logo_9.svg";
-import logo_white from "@/assets/images/logo/logo_9_white.svg";
+//import logo_white from "@/assets/images/logo/logo_9_white.svg";
 import logo_tiny from "@/assets/images/logo/logo_9_tiny.svg";
 import logo_tiny_white from "@/assets/images/logo/logo_9_tiny_white.svg";
+
 
 //declarations des types
 type DisplayState = {
@@ -325,17 +327,9 @@ const NavBar = () => {
               )}
             </a>
           ) : (
-            <a href={"/"}>
-              {themeSignal.value === "winter" ? (
-                <img src={logo} alt={"logo wizpix"} className={"w-[200px]"} />
-              ) : (
-                <img
-                  src={logo_white}
-                  alt={"logo wizpix"}
-                  className={"w-[200px]"}
-                />
-              )}
-            </a>
+            
+              <AnimatedLogo />
+              
           )}
         </div>
         <div className="navbar-center hidden lg:flex">
