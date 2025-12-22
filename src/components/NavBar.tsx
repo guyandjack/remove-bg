@@ -13,7 +13,10 @@ import { navigateWithLink } from "@/utils/navigateWithLink";
 import { SelectLanguage } from "./LangSwitcher";
 import { ProfileDropDown } from "./profileDropDown/ProfileDropDown";
 import { ThemeControler } from "./themeControler/ThemeControler";
-import { AnimatedLogo } from "./animation/AnimatedLogoNormalWhite";
+import { AnimatedLogoNormalWhite } from "./animation/AnimatedLogoNormalWhite";
+import { AnimatedLogoNormalBlack } from "./animation/AnimatedLogoNormalBlack";
+import { AnimatedLogoTinyWhite } from "./animation/AnimatedLogoTinyWhite";
+import { AnimatedLogoTinyBlack } from "./animation/AnimatedLogoTinyBlack";
 
 //import des data
 import { navBarContent } from "@/data/content/components/nav/navBarContent";
@@ -28,12 +31,6 @@ import {
   initSessionFromLocalStorage,
   setSessionFromApiResponse,
 } from "@/stores/session";
-
-//import des images
-import logo from "@/assets/images/logo/logo_9.svg";
-//import logo_white from "@/assets/images/logo/logo_9_white.svg";
-import logo_tiny from "@/assets/images/logo/logo_9_tiny.svg";
-import logo_tiny_white from "@/assets/images/logo/logo_9_tiny_white.svg";
 
 
 //declarations des types
@@ -311,25 +308,25 @@ const NavBar = () => {
           </div>
 
           {tinyLogo ? (
-            <a href={"/"}>
+            <a 
+            className={"block w-[50px]"}
+            href={"/"}>
               {themeSignal.value === "winter" ? (
-                <img
-                  src={logo_tiny}
-                  alt={"logo wizpix"}
-                  className={"w-[80px]"}
-                />
+                <AnimatedLogoTinyBlack />
               ) : (
-                <img
-                  src={logo_tiny_white}
-                  alt={"logo wizpix"}
-                  className={"w-[80px]"}
-                />
+                <AnimatedLogoTinyWhite />
               )}
             </a>
           ) : (
-            
-              <AnimatedLogo />
-              
+            <a 
+            className={"block w-[200px]"}
+            href={"/"}>
+                {themeSignal.value === "winter" ? (
+                  <AnimatedLogoNormalBlack />
+                ) : (
+                  <AnimatedLogoNormalWhite />
+                )}
+            </a>  
           )}
         </div>
         <div className="navbar-center hidden lg:flex">

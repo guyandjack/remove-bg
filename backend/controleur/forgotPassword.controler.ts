@@ -12,6 +12,8 @@ import {
 } from "../function/createToken.ts";
 
 
+
+
 function env(name: string, opts?: { required?: boolean; fallback?: string }) {
   const val = process.env[name] ?? opts?.fallback;
   if (opts?.required && (val === undefined || val === "")) {
@@ -75,10 +77,16 @@ export const forgotPassword: RequestHandler = async (req, res) => {
 
       // Construit le lien de réinitialisation côté front
       const baseUrl = isProd
-        ? process.env.VITE_BASE_PROD_URL || process.env.BASE_URL_PROD || "https://hidebackground.ch"
-        : process.env.VITE_BASE_DEV_URL || process.env.BASE_URL_DEV || "http://localhost:5173";
-      const resetPath = process.env.RESET_PASSWORD_PATH || "/reset-password";
+        ? process.env.DOMAIN_URL_PROD ||
+          "https://wizpix.ch"
+        : process.env.DOMAIN_URL_DEV ||
+          "http://localhost:5173";
+      const resetPath = "/reset-password";
       const resetUrl = `${baseUrl}${resetPath}?token=${encodeURIComponent(token)}`;
+
+      const baseUrlApi = isProd
+        ? process.env.BASE_URL_PROD
+        : process.env.BASE_URL_DEV;
 
       // Prépare l'envoi de l'email
       const name = String(user.email).split("@")[0];
@@ -125,16 +133,18 @@ export const forgotPassword: RequestHandler = async (req, res) => {
         ? process.env.MAILBOX_PROD_ADDRESS || process.env.MAILBOX_PROD_ADRESS
         : process.env.MAILBOX_DEV_ADDRESS || process.env.MAILBOX_DEV_ADRESS) ?? "";
 
-      const appName = process.env.MAIL_SENDER_NAME || "Removed BG";
+      const appName = process.env.MAIL_SENDER_NAME || "Wizard Pixel";
 
       const subject = isProd
         ? "Réinitialisation de votre mot de passe"
         : "[DEV] Réinitialisation de votre mot de passe";
+      
+      const logoUrl = `${baseUrlApi}/public/logo/logo_9_white.svg`;
 
       // Rendu MJML du template FR
       const { html: mjmlHtml } = await renderMjmlTemplate(
         "forgot.password.fr.mjml",
-        { email, resetUrl, appName, expiryMinutes: 15 },
+        { email, resetUrl, appName, logoUrl, expiryMinutes: 15 },
         lang
       );
 

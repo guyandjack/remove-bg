@@ -28,7 +28,11 @@ function resolveLocale(lang: unknown): string {
   return ["fr", "de", "en", "it"].includes(l) ? l : "en";
 }
 
- const sendMailVerification: RequestHandler = async (req, res) => {
+const sendMailVerification: RequestHandler = async (req, res) => {
+  const isProd = process.env.NODE_ENV === "production";
+  const baseUrlApi = isProd
+        ? process.env.BASE_URL_PROD
+        : process.env.BASE_URL_DEV;
   try {
     const { email, password, lang, plan, id, currency } = (req as any).userValidated || {};
 
@@ -110,10 +114,11 @@ function resolveLocale(lang: unknown): string {
     };
     const subject = subjects[locale] || subjects.en;
     const name = String(email).split("@")[0];
+   const logoUrl = `${baseUrlApi}/public/logo/logo_9_white.svg`;
 
     const { html } = await renderMjmlTemplate(
       `email.validation.${locale}.mjml`,
-      { code: otp, email: name, plan: planCode },
+      { code: otp, email: name, plan: planCode, urlLogo: logoUrl },
       locale
     );
 

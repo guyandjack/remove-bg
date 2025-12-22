@@ -84,6 +84,19 @@
     "btnSubmit": "Send the link",
     "btnCancel": "Cancel"
   },
+  "formReset": {
+    "title": "Choose a new password",
+    "info": "Create a strong password and confirm it below to secure your account.",
+    "password": "New password",
+    "confirm": "Confirm password",
+    "btnSubmit": "Update my password",
+    "btnBack": "Back to login",
+    "passwordError": "Password too weak",
+    "confirmError": "Passwords must match",
+    "missingToken": "This link is invalid or has expired.",
+    "textSuccess": "Password updated, redirecting...",
+    "textError": "Unable to update password"
+  },
 
   "loader": {
     "formContact": "loading..."

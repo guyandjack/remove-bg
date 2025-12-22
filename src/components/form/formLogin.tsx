@@ -87,8 +87,7 @@ const FormLogin = () => {
   });
 
   const onForgotSubmit = async (data:FormValuesForgot) => {
-    // Ici on pourrait appeler l'API de réinitialisation de mot de passe.
-    // Pour le moment, on ferme simplement la modale.
+    
     setIsLoader(true);
     const DATA = { ...data, lang: language };
     try {

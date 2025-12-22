@@ -102,39 +102,39 @@ const AnimatedLogoNormalBlack = () => {
     };
 
     return (
-        <div>
-            <LazyMotion features={domAnimation}>
-                <m.svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlSpace="preserve"
-                    id="Calque_1"
-                    x="0"
-                    y="0"
-                    style={{ enableBackground: "new 0 0 70 13.7" }}
-                    version="1.1"
-                    viewBox="0 0 70 13.7"
-                    variants={svgVariants}
-                    initial="hidden"
-                    animate="visible"
-                    width={300}
-                >
-                    {logoPaths.map((path, index) => (
-                        <m.path
-                            key={`${path.d}-${index}`}
-                            d={path.d}
-                            fill={path.fill}
-                            style={path.style}
-                            variants={pathVariants}
-                            custom={index}
-                            stroke={path.fill || path.style?.fill}
-                            strokeWidth={0.3}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    ))}
-                </m.svg>
-            </LazyMotion>
-        </div>
+      <div>
+        <LazyMotion features={domAnimation}>
+          <m.svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlSpace="preserve"
+            id="Calque_1"
+            x="0"
+            y="0"
+            style={{ enableBackground: "new 0 0 70 13.7" }}
+            version="1.1"
+            viewBox="0 0 70 13.7"
+            variants={svgVariants}
+            initial="hidden"
+            animate="visible"
+            
+          >
+            {logoPaths.map((path, index) => (
+              <m.path
+                key={`${path.d}-${index}`}
+                d={path.d}
+                fill={path.fill}
+                style={path.style}
+                variants={pathVariants}
+                custom={index}
+                stroke={path.fill || path.style?.fill}
+                strokeWidth={0.3}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            ))}
+          </m.svg>
+        </LazyMotion>
+      </div>
     );
 };
 

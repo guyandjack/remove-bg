@@ -15,6 +15,8 @@ import rateLimit from "express-rate-limit";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 // methode de journalsiation des evenements
 import { logger, httpLoggerStream, requestIdMiddleware } from "./logger";
@@ -36,6 +38,9 @@ import refreshRoute from "./routes/authRefresh.route";
 import usageRoute from "./routes/usage.route";
 import planOptionRoute from "./routes/planOption.route";
 import servicesRoute from "./routes/services.route";
+import resetPasswordRoute from "./routes/resetPassword.route";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
@@ -93,6 +98,11 @@ app.use((req, res, next) => {
   return urlEncodedParser(req, res, next);
 });
 
+//Static global (sert tout ./public à la racine → /images/... , /articles/...)
+const publicDir = path.join(__dirname, "public");
+app.use("/public", express.static(publicDir));
+app.use(express.static(publicDir));
+
 // Compression des réponses HTTP (gzip)
 app.use(compression());
 
@@ -119,12 +129,12 @@ app.use(morgan(morganFormat, { stream: httpLoggerStream }));
 // 🚦 4️⃣ Limitation du nombre de requêtes (anti-spam / brute-force)
 // ----------------------------------------------------
 
-/* const limiter = rateLimit({
+ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // max 100 requêtes / IP
   message: "Too many requests from this IP, please try again after 15 minutes",
 });
-app.use("/api/", limiter); */
+app.use("/api/", limiter); 
 
 // ----------------------------------------------------
 // 🧩 5️⃣ Routes principales
@@ -146,6 +156,7 @@ app.use("/api/logout", logOutRoute);
 app.use("/api/auth/me", verifyRoute);
 app.use("/api/auth/refresh", refreshRoute);
 app.use("/api/forgot", forgotPasswordRoute);
+app.use("/api/reset-password", resetPasswordRoute);
 
 //route pour formulaire de contact
 app.use("/api/contact", contactRoute);

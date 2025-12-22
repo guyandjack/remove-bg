@@ -1,13 +1,13 @@
 <mjml>
   <mj-body background-color="#ffffff">
-    <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
+    <mj-section background-color="#1e293b" padding-bottom="20px" padding-top="20px">
       <mj-column vertical-align="top" width="100%">
         <mj-image
-          src="http://localhost:5173/src/assets/images/sport.jpg"
+          src={{urlLogo}}
           alt=""
           align="center"
           border="none"
-          width="600px"
+          width="250px"
           padding-left="0px"
           padding-right="0px"
           padding-bottom="0px"
@@ -15,22 +15,7 @@
         ></mj-image>
       </mj-column>
     </mj-section>
-    <mj-section background-color="#1e293b" padding-bottom="0px" padding-top="0">
-      <mj-column vertical-align="top" width="100%">
-        <mj-text
-          align="left"
-          color="#ffffff"
-          font-size="45px"
-          font-weight="bold"
-          font-family="open Sans Helvetica, Arial, sans-serif"
-          padding-left="25px"
-          padding-right="25px"
-          padding-bottom="30px"
-          padding-top="50px"
-          >Removed BG</mj-text
-        >
-      </mj-column>
-    </mj-section>
+    
     <mj-section
       background-color="#1e293b"
       padding-bottom="20px"
@@ -45,7 +30,7 @@
           padding-left="25px"
           padding-right="25px"
           >Chère<span style="color: #f4bf51"> {{email}}</span><br /><br />
-          Bienvenue chez Removed BG</mj-text
+          Bienvenue chez Wiz Pix</mj-text
         >
         <mj-text
           align="left"
@@ -95,7 +80,7 @@
           padding-left="25px"
           padding-right="25px"
           >Merci, <br />
-          L' équipe de Removed BG</mj-text
+          L' équipe Wizard of Pixels</mj-text
         >
       </mj-column>
     </mj-section>

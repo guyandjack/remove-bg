@@ -18,6 +18,7 @@ import { CgvPage } from "./src/pages/cgvPage";
 import { DashboardPage } from "./src/pages/dashboardPage";
 //import { CguPage} from "./src/pages/cguPage";
 import { Page404 } from "./src/pages/404Page";
+import { ResetPasswordPage } from "./src/pages/reset-passwordPage";
 
 //import des composants
 import { NavBar } from "./src/components/navBar";
@@ -76,6 +77,10 @@ export function App() {
     const { url } = useLocation();
     return <Page404 routeKey={url}  />;
   }
+  const RoutedResetPasswordPage = () => {
+    const { url } = useLocation();
+    return <ResetPasswordPage routeKey={url} />;
+  };
   
 
   return (
@@ -100,6 +105,7 @@ export function App() {
               <Route path="/legal" component={RoutedLegalPage} />
               <Route path="/cgv" component={RoutedCgvPage} />
               <Route path="/dashboard" component={RoutedDashboardPage} />
+              <Route path="/reset-password" component={RoutedResetPasswordPage} />
               <Route path="*/*" component={RoutedPage404} />
             </Router>
           </ErrorBoundary>

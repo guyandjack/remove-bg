@@ -81,6 +81,19 @@
     "btnSubmit": "Envoyer le lien",
     "btnCancel": "Annuler"
   },
+  "formReset": {
+    "title": "Choisissez un nouveau mot de passe",
+    "info": "Créez un mot de passe robuste puis confirmez-le ci-dessous pour sécuriser votre compte.",
+    "password": "Nouveau mot de passe",
+    "confirm": "Confirmez le mot de passe",
+    "btnSubmit": "Mettre à jour mon mot de passe",
+    "btnBack": "Retour à la connexion",
+    "passwordError": "Mot de passe trop faible",
+    "confirmError": "Les mots de passe doivent correspondre",
+    "missingToken": "Ce lien est invalide ou a expiré.",
+    "textSuccess": "Mot de passe mis à jour, redirection...",
+    "textError": "Impossible de mettre à jour le mot de passe"
+  },
   "loader": {
     "formContact": "loading..."
   },

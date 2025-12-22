@@ -92,7 +92,7 @@ const AnimatedLogoTinyBlack = () => {
                     variants={svgVariants}
                     initial="hidden"
                     animate="visible"
-                    width={130}
+                    
                 >
                     {logoPaths.map((path, index) => (
                         <m.path
