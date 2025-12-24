@@ -147,10 +147,10 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
   }, [shouldShowEditor]);
 
   return (
-    <div className="">
+    <div className="w-full">
       <div
         className={
-          "relative w-full mx-auto max-w-[1300px] py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px]"
+          "relative w-full py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px]"
         }
       >
         
@@ -167,7 +167,7 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
         <ul
           ref={planChoiceEl}
           className={
-            "mx-auto max-w-[1300px] flex flex-col justify-start items-center gap-3 lg:flex-row lg:gap-5"
+            "w-full flex flex-col justify-start items-center gap-3 lg:flex-row lg:gap-5"
           }
         >
           <li>
@@ -203,7 +203,7 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
           </li>
         </ul>
       ) : null}
-      <div id="editor" className="mt-6 w-full pb-[200px]">
+      <div id="editor" className="mt-6 lg:grow pb-[200px]">
         {shouldShowEditor && (
           <ImgEditor
             src={responseApi}

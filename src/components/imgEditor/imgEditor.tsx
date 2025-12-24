@@ -59,6 +59,7 @@ type BgValue = Bg | null;
 // Miniatures locales (fallback si aucune recherche Pexels)
 const backgroundImages = [BgHero, BgDessert, BgFriend, BgSport];
 const MAX_PEXELS_PAGES = 5;
+const EDITOR_FADE_DURATION = 180;
 
 const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
   // Refs DOM/instances Filerobot
@@ -105,6 +106,9 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
   const eraserCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const eraserIsDrawingRef = useRef(false);
   const eraserLastPointRef = useRef<{ x: number; y: number } | null>(null);
+  const [isEditorTransitioning, setIsEditorTransitioning] = useState(false);
+  const editorFadeOutTimeoutRef = useRef<number | null>(null);
+  const editorFadeInTimeoutRef = useRef<number | null>(null);
 
   // Récupère des images de fond via le backend (Pexels)
   const fetchImages = async (theme: string, page = 1) => {
@@ -181,7 +185,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
       return () => document.removeEventListener("contextmenu", blockContext);
     }
     FIERef.current = FIE;
-    renderEditor(currentSource);
+    updateEditorSource(currentSource, { animate: false });
 
     return () => {
       document.removeEventListener("contextmenu", blockContext);
@@ -200,7 +204,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
     setHasPrevPage(false);
     setLastSearchTerm("");
     if (FIERef.current && containerRef.current) {
-      renderEditor(src);
+      updateEditorSource(src);
     }
   }, [src]);
 
@@ -208,6 +212,17 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
     return () => {
       if (debounceTimer.current !== null) {
         clearTimeout(debounceTimer.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (editorFadeOutTimeoutRef.current !== null) {
+        clearTimeout(editorFadeOutTimeoutRef.current);
+      }
+      if (editorFadeInTimeoutRef.current !== null) {
+        clearTimeout(editorFadeInTimeoutRef.current);
       }
     };
   }, []);
@@ -238,6 +253,40 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
     editor.render({ onClose: () => editor.terminate() });
   };
 
+  const clearEditorTransitionTimers = () => {
+    if (editorFadeOutTimeoutRef.current !== null) {
+      clearTimeout(editorFadeOutTimeoutRef.current);
+      editorFadeOutTimeoutRef.current = null;
+    }
+    if (editorFadeInTimeoutRef.current !== null) {
+      clearTimeout(editorFadeInTimeoutRef.current);
+      editorFadeInTimeoutRef.current = null;
+    }
+  };
+
+  const updateEditorSource = (
+    source: string,
+    options: { animate?: boolean } = {}
+  ) => {
+    const shouldAnimate = options.animate ?? true;
+    if (!FIERef.current || !containerRef.current) return;
+    if (!shouldAnimate) {
+      clearEditorTransitionTimers();
+      setIsEditorTransitioning(false);
+      renderEditor(source);
+      return;
+    }
+    setIsEditorTransitioning(true);
+    clearEditorTransitionTimers();
+    editorFadeOutTimeoutRef.current = window.setTimeout(() => {
+      renderEditor(source);
+      editorFadeInTimeoutRef.current = window.setTimeout(() => {
+        setIsEditorTransitioning(false);
+        editorFadeInTimeoutRef.current = null;
+      }, EDITOR_FADE_DURATION);
+    }, EDITOR_FADE_DURATION);
+  };
+
   const hidePreviewWindow = () => {
     previewRequestId.current += 1;
     setIsPreviewVisible(false);
@@ -250,7 +299,6 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
     setPreviewSelection(bg);
     setIsPreviewVisible(true);
     setIsPreviewLoading(true);
-    setPreviewImage(null);
     previewRequestId.current += 1;
     const requestId = previewRequestId.current;
     try {
@@ -444,7 +492,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
     if (!eraserResult) return;
     setCurrentSource(eraserResult);
     baseSubject.current = eraserResult;
-    renderEditor(eraserResult);
+    updateEditorSource(eraserResult);
     closeMagicEraser();
   };
 
@@ -464,7 +512,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
         composedResult = await composeBackground(subject, bg);
       }
       setCurrentSource(composedResult);
-      renderEditor(composedResult);
+      updateEditorSource(composedResult);
       return composedResult;
     } catch (e) {
       console.error("Erreur composition background", e);
@@ -478,7 +526,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
     handleCancelPreview();
     setSelectedBg(null);
     setCurrentSource(baseSubject.current);
-    renderEditor(baseSubject.current);
+    updateEditorSource(baseSubject.current);
   };
 
   const activeBackground =
@@ -652,9 +700,9 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
   };
 
   return (
-    <div className="max-w-[1300px] mx-auto min-h-[80vh] flex flex-col justify-between items-center gap-3 lg:flex-row lg:h-[80vh]">
+    <div className="w-full mx-auto min-h-[80vh] flex flex-col justify-between items-center gap-3 lg:flex-row lg:h-[80vh] ">
       {/* Zone éditeur Filerobot */}
-      <div className="relative w-full h-full rounded-xl ring-1 ring-base-200 bg-base-100/60 backdrop-blur-sm lg:w-[calc(100%-400px)]">
+      <div className="relative w-full h-full rounded-xl ring-1 ring-base-200 bg-base-100/60 backdrop-blur-sm lg:min-w-[550px]">
         {isComposing && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-base-100/50">
             <span className="loading loading-spinner loading-md text-primary" />
@@ -672,9 +720,9 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
               >
                 <m.div
                   className="w-full max-w-3xl rounded-2xl bg-base-100/95 p-6 shadow-2xl space-y-5"
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
                 >
                   <div className="space-y-2">
@@ -687,23 +735,33 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                     </p>
                   </div>
                   <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-base-200 bg-base-200/60">
-                    {isPreviewLoading ? (
+                    {previewImage ? (
+                      <div className="relative h-full w-full">
+                        <m.img
+                          key={previewImage}
+                          src={previewImage}
+                          alt="Aper?u du fond s?lectionn?"
+                          className={`h-full w-full object-contain transition-opacity duration-300 ${
+                            isPreviewLoading ? "opacity-70" : "opacity-100"
+                          }`}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                        />
+                        {isPreviewLoading && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-base-100/30 backdrop-blur-[1px]">
+                            <span className="loading loading-spinner loading-lg text-primary" />
+                          </div>
+                        )}
+                      </div>
+                    ) : isPreviewLoading ? (
                       <div className="flex h-full w-full items-center justify-center">
                         <span className="loading loading-spinner loading-lg text-primary" />
                       </div>
-                    ) : previewImage ? (
-                      <m.img
-                        src={previewImage}
-                        alt="Aperçu du fond sélectionné"
-                        className="h-full w-full object-contain"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-                      />
                     ) : (
                       <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-base-content/70">
-                        <span>Impossible de générer un aperçu.</span>
+                        <span>Impossible de g?n?rer un aper?u.</span>
                         <button
                           type="button"
                           className="btn btn-sm btn-outline"
@@ -713,11 +771,12 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                               : null
                           }
                         >
-                          Réessayer
+                          R?essayer
                         </button>
                       </div>
                     )}
                   </div>
+
                   <div className="flex flex-wrap items-center justify-end gap-3">
                     <button
                       type="button"
@@ -751,9 +810,9 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
               >
                 <m.div
                   className="w-full max-w-3xl rounded-2xl bg-base-100/95 p-6 shadow-2xl space-y-5"
-                  initial={{ scale: 0.95, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.95, opacity: 0 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
                 >
                   {eraserResult ? (
@@ -846,19 +905,23 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
             )}
           </AnimatePresence>
         </LazyMotion>
-        <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
+        <div
+          ref={containerRef}
+          className={`h-full w-full transition-opacity duration-300 ease-out ${
+            isEditorTransitioning ? "opacity-0" : "opacity-100"
+          }`}
+          style={{ willChange: "opacity" }}
+        />
       </div>
 
       <div
         className={
-          "bg-component rounded-lg w-full flex flex-col justify-between items-center lg:w-[400px] lg:h-[100%] p-[10px]"
+          "bg-component rounded-lg w-full flex flex-col justify-between items-center lg:w-[400px] lg:h-[100%] lg:shrink-0 p-[10px]"
         }
       >
         {/* Commandes: onglets, reset, téléchargement */}
         <div className={"lg:h-[25%] lg:w-full "}>
-          <h2 className={"p-[5px] text-xl text-center "}>
-            Outils de retouche
-          </h2>
+          <h2 className={"p-[5px] text-xl text-center "}>Outils de retouche</h2>
           <div className="my-4 border-b border-t py-[10px] border-white/30 flex flex-row justify-evenly flex-wrap items-center gap-y-2 ">
             <button
               type="button"
@@ -978,7 +1041,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
         </div>
 
         <div id="active-option" className="w-full lg:max-h-[65%] lg:w-full">
-          {renderActiveOptionContent()}
+          {renderActiveOptionContent(activePicker)}
         </div>
         <div className={"lg:w-full h-[15%]"}>
           <div className={"my-3"}>

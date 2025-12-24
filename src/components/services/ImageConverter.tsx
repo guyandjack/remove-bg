@@ -507,7 +507,7 @@ const ImageConverter = () => {
   }, [status.state]);
 
   return (
-    <section className="w-full max-w-[1200px] mx-auto py-12 px-4">
+    <section className="w-full max-w-[1300px] mx-auto py-12 px-4">
       <header className="text-center flex flex-col gap-2 mb-10">
         <p className="text-sm uppercase tracking-[0.3em] text-primary">
           Conversion d&apos;images

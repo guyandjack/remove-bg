@@ -52,7 +52,7 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
   const { t } = useTranslation();
   const userLoged = sessionSignal?.value?.authentified || false;
 
-  const containerService = useRef();
+  const containerService = useRef(null);
 
   //contenu textuel du composant RemoveBG
   const textUploadImgComponent: UploadImgType = {
@@ -113,6 +113,7 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
   useEffect(() => {
     if (service === null) return;
     if (!containerService.current) return;
+   
     setTimeout(() => {
       
       containerService.current.scrollIntoView({
@@ -149,7 +150,9 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
       </ul>
       <div
         id="container-service"
-        ref={containerService}>
+        ref={containerService}
+        className={"w-full max-w-[1300px]"}
+      >
         <LazyMotion features={domAnimation}>
           <AnimatePresence>
             {service === "remove" ? (
