@@ -1,0 +1,5 @@
+﻿fastapi==0.111.0
+uvicorn[standard]==0.30.0
+python-multipart==0.0.21
+rembg==2.0.69
+onnxruntime==1.23.2

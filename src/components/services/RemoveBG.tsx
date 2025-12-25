@@ -1,21 +1,21 @@
-// UploadPage.tsx
+﻿// UploadPage.tsx
 //import des hooks
 import { useEffect, useRef, useState } from "preact/hooks";
 import { sessionSignal } from "@/stores/session";
 
 //import des composants enfants
-import { UploadImg, UploadImgType } from "@/components/form/UploadImg";
+import { UploadImg, type UploadImgType } from "@/components/form/UploadImg";
 import { ImgEditor } from "@/components/imgEditor/imgEditor";
 import { Loader } from "@/components/loader/Loader";
 
 //import des fonctions
 import { loadScript } from "@/utils/loadScript";
+import { api } from "@/utils/axiosConfig";
+import type { AxiosError } from "axios";
 
-// CDN de l'éditeur
+// CDN de l'editeur
 const editorCdn =
   "https://scaleflex.cloudimg.io/v7/plugins/filerobot-image-editor/latest/filerobot-image-editor.min.js";
-
-
 
 type PropsPage = {
   removeTextContent: Record<string, string>;
@@ -24,17 +24,15 @@ type PropsPage = {
 
 const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  // true quand on doit lancer traitement + chargement CDN
-  const [callApi, setCallApi] = useState(false);
-
-  // ici tu stockeras la vraie réponse de ton API (URL ou base64)
+  const [fileToProcess, setFileToProcess] = useState<File | null>(null);
   const [responseApi, setResponseApi] = useState<string>("");
-
+  const [processingError, setProcessingError] = useState<string | null>(null);
   const [isCdnLoaded, setCdnLoaded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [typePlan, setTypePlan] = useState<string>(
-    sessionSignal?.value?.plan?.code || sessionSignal?.value?.plan?.name || ""
+    sessionSignal?.value?.plan?.code ||
+      sessionSignal?.value?.plan?.name ||
+      ""
   );
 
   const userLoged = sessionSignal?.value?.authentified;
@@ -83,50 +81,95 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
     }
   };
 
-  // Effet : quand callApi passe à true → on lance API + CDN
+  // Lance le traitement des que l'utilisateur a choisi un fichier
   useEffect(() => {
-    if (!callApi) return;
+    if (!fileToProcess) return;
+
+    let isCancelled = false;
+    const abortController = new AbortController();
+
+    const ensureEditor = isCdnLoaded
+      ? Promise.resolve()
+      : loadScript(editorCdn).then(() => {
+          setCdnLoaded(true);
+        });
+
+    const processImage = async () => {
+      const formData = new FormData();
+      formData.append("file", fileToProcess);
+
+      const { data } = await api.post<Blob>(
+        "api/services/remove-bg",
+        formData,
+        {
+          responseType: "blob",
+          signal: abortController.signal,
+        }
+      );
+
+      return URL.createObjectURL(data);
+    };
 
     setIsProcessing(true);
+    setProcessingError(null);
 
-    // 1) chargement CDN
-    const cdnPromise = loadScript(editorCdn).then(() => {
-      setCdnLoaded(true);
+    const apiPromise = processImage().then((processedUrl) => {
+      if (isCancelled) {
+        URL.revokeObjectURL(processedUrl);
+        return;
+      }
+      setResponseApi((previous) => {
+        if (previous) URL.revokeObjectURL(previous);
+        return processedUrl;
+      });
     });
 
-    // 2) ici tu mettras ton vrai appel à l’API de traitement
-    // pour l’instant on simule (tu peux aussi le laisser dans l’enfant, mais je trouve plus propre ici)
-    const apiPromise = new Promise<string>((resolve) => {
-      setTimeout(() => {
-        // TODO: remplacer par la vraie URL/base64 renvoyée par ton backend
-        import("@/assets/images/friend-removebg-preview.png").then((mod) => {
-          resolve(mod.default);
-        });
-      }, 2000);
-    }).then((result) => {
-      setResponseApi(result);
-    });
-
-    // on attend les deux en parallèle
-    Promise.all([cdnPromise, apiPromise])
+    Promise.all([ensureEditor, apiPromise])
       .catch((err) => {
-        console.error("Erreur pendant chargement éditeur ou API :", err);
+        if (isCancelled) return;
+        const axiosError = err as AxiosError<{ message?: string }>;
+        console.error("Erreur pendant chargement editeur ou API :", err);
+        const message =
+          axiosError.response?.data?.message ||
+          axiosError.message ||
+          "Impossible de traiter cette image pour le moment.";
+        setProcessingError(message);
+        setResponseApi((previous) => {
+          if (previous) URL.revokeObjectURL(previous);
+          return "";
+        });
       })
       .finally(() => {
-        setIsProcessing(false);
-        setCallApi(false); // on remet le flag à false
+        if (!isCancelled) {
+          setIsProcessing(false);
+        }
       });
-  }, [callApi]);
 
-  //si un utilisateur est connecté
+    return () => {
+      isCancelled = true;
+      abortController.abort();
+    };
+  }, [fileToProcess]);
+
+  //si un utilisateur est connecte
   // Image editor sera remonte avec la valeur du plan de l'utilisateur connecte
   useEffect(() => {
     if (!userLoged) return;
     setTypePlan(sessionSignal?.value?.plan?.code || "");
-  }, [sessionSignal?.value?.plan?.code]);
+  }, [sessionSignal?.value?.plan?.code, userLoged]);
+
+  useEffect(() => {
+    return () => {
+      if (responseApi) URL.revokeObjectURL(responseApi);
+    };
+  }, [responseApi]);
 
   const shouldShowEditor =
-    isCdnLoaded && responseApi !== "" && previewUrl !== null && !isProcessing;
+    isCdnLoaded &&
+    responseApi !== "" &&
+    previewUrl !== null &&
+    !isProcessing &&
+    !processingError;
 
   //style par defaut de l' element planChoice
   useEffect(() => {
@@ -140,11 +183,29 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
     if (planChoiceEl.current) {
       planChoiceEl.current.scrollIntoView({
         behavior: "smooth",
-        block: "center", // centre verticalement
-        inline: "center", // centre horizontalement (si utile)
+        block: "center",
+        inline: "center",
       });
     }
   }, [shouldShowEditor]);
+
+  const handleFileReady = (file: File | null) => {
+    if (!file) {
+      setFileToProcess(null);
+      setProcessingError(null);
+      setResponseApi((previous) => {
+        if (previous) URL.revokeObjectURL(previous);
+        return "";
+      });
+      return;
+    }
+    setFileToProcess(file);
+    setProcessingError(null);
+    setResponseApi((previous) => {
+      if (previous) URL.revokeObjectURL(previous);
+      return "";
+    });
+  };
 
   return (
     <div className="w-full">
@@ -153,15 +214,18 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
           "relative w-full py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px]"
         }
       >
-        
-
         <UploadImg
           setPreviewUrl={setPreviewUrl}
           previewUrl={previewUrl}
-          setCallApi={setCallApi}
-          setResponseApi={setResponseApi} // tu peux le retirer si tu déplaces toute la logique API dans le parent
+          onFileReady={handleFileReady}
           content={uploadTextContent}
         />
+
+        {processingError && (
+          <div className="alert alert-error mt-4 max-w-xl">
+            <span>{processingError}</span>
+          </div>
+        )}
       </div>
       {!userLoged && shouldShowEditor ? (
         <ul

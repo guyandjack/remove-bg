@@ -15,6 +15,14 @@ backend/private.key
 backend/public.key
 .env
 
+# Python service
+wizpix-ml-service/venv/
+*.py[cod]
+__pycache__/
+*.pyd
+*.pyo
+.Python
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -25,4 +33,3 @@ backend/public.key
 *.njsproj
 *.sln
 *.sw?
-

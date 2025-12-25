@@ -1,7 +1,6 @@
-// UploadImg.tsx
+﻿// UploadImg.tsx
 import { useEffect, useState } from "preact/hooks";
 
-//import des composant enfant
 import { InputFile } from "../input/InputFile";
 
 const MAX_SIZE_BYTES = 2 * 1024 * 1024;
@@ -13,39 +12,31 @@ const ACCEPTED_MIME = new Set([
 ]);
 const ACCEPTED_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 
-// simulation pour l’instant (image sans fond)
-import newImg from "@/assets/images/friend-removebg-preview.png";
-
-//declaration des types
-type UploadImgType = {
+export type UploadImgType = {
   label: string;
   placeholder: string;
   filename: string;
   preview: string;
   erase: string;
 };
-  
 
-
-type UploadImgProps = {
+export type UploadImgProps = {
   previewUrl: string | null;
   setPreviewUrl: (url: string | null) => void;
-  setCallApi: (value: boolean) => void;
-  setResponseApi: (url: string) => void;
-  content:UploadImgType 
+  onFileReady: (file: File | null) => void;
+  content: UploadImgType;
 };
 
 const UploadImg = ({
   setPreviewUrl,
   previewUrl,
-  setCallApi,
-  setResponseApi,
-  content
+  onFileReady,
+  content,
 }: UploadImgProps) => {
   const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string>("");
 
-  // cleanup de l’ancienne URL de preview
+  // Nettoie l'ancienne URL de preview
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -57,16 +48,17 @@ const UploadImg = ({
     setPreviewUrl(null);
     setFileName("");
     setError("");
+    onFileReady(null);
   };
 
   const validateFile = (file: File): string | null => {
-    if (!file) return "Aucun fichier sélectionné.";
-    if (file.size > MAX_SIZE_BYTES) return "Le fichier dépasse 2 Mo.";
+    if (!file) return "Aucun fichier selectionne.";
+    if (file.size > MAX_SIZE_BYTES) return "Le fichier depasse 2 Mo.";
 
     const isImageMime = file.type.startsWith("image/");
-    if (!isImageMime) return "Le fichier doit être une image.";
+    if (!isImageMime) return "Le fichier doit etre une image.";
     if (!ACCEPTED_MIME.has(file.type))
-      return "Format non supporté (JPEG, PNG, WEBP, GIF).";
+      return "Format non supporte (JPEG, PNG, WEBP, GIF).";
 
     const lower = file.name.toLowerCase();
     const hasValidExt = Array.from(ACCEPTED_EXT).some((ext) =>
@@ -95,14 +87,7 @@ const UploadImg = ({
 
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
-
-    // on indique au parent de lancer API + chargement CDN
-    setCallApi(true);
-
-    // 💡 OPTIONNEL : tu peux retirer cette simulation si tu déplaces tout dans le parent
-     setTimeout(() => {
-      setResponseApi(newImg);
-    }, 3000); 
+    onFileReady(file);
   };
 
   const onClear = () => {
@@ -123,7 +108,6 @@ const UploadImg = ({
           <legend className="fieldset-legend text-base-content"></legend>
 
           <div className="space-y-3">
-            
             <InputFile
               id="imageUpload"
               accept="image/jpeg,image/png,image/webp,image/gif"
@@ -134,7 +118,7 @@ const UploadImg = ({
             />
             <div className="label p-0">
               <span className="label-text text-base-content/70">
-                Formats: JPG, PNG, WEBP, GIF • Max 2 Mo
+                Formats: JPG, PNG, WEBP, GIF - Max 2 Mo
               </span>
             </div>
 
@@ -171,11 +155,11 @@ const UploadImg = ({
                   <figure className="flex flex-col items-center gap-3">
                     <img
                       src={previewUrl}
-                      alt="Aperçu de l'image uploadée"
+                      alt="Apercu de l'image uploadee"
                       className="max-h-64 w-auto rounded-lg shadow-md object-contain bg-base-100"
                     />
                     <figcaption className="text-xs text-base-content/60">
-                      Aperçu
+                      Apercu
                     </figcaption>
                   </figure>
                 ) : (
@@ -192,4 +176,5 @@ const UploadImg = ({
   );
 };
 
-export { UploadImg, UploadImgType };
+export { UploadImg };
+export type { UploadImgType, UploadImgProps };
