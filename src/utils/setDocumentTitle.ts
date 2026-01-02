@@ -4,7 +4,7 @@ const setDocumentTitle = (): void => {
   const segment: string =
     rawPath === "/" ? "home" : rawPath.split("/")[1] || "home";
 
-  document.title = `bg-${segment}`;
+  document.title = `wizpix-${segment}`;
 };
 
 export {setDocumentTitle}

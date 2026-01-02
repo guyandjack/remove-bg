@@ -12,6 +12,8 @@ import {
   upsertPlanByCode,
 } from "../../DB/queriesSQL/queriesSQL.ts";
 import { planOption } from "../../data/planOption.ts";
+import { logger } from "../../logger.ts";
+
 
 // Stripe webhook to finalize paid signups and activate subscriptions
 // Handles: checkout.session.completed, invoice.paid, invoice.payment_failed, customer.subscription.deleted
@@ -244,6 +246,7 @@ const stripeWebhook: RequestHandler = async (req, res) => {
 
     // invoice.paid — record invoice, increment customer's total_spent, ensure sub stays active
     if (type === "invoice.paid") {
+      console.log("check invoice paid est lancé");
       const inv = obj;
       const stripeCustomerId: string | undefined = inv.customer as string | undefined;
       const stripeSubscriptionId: string | undefined = inv.subscription as string | undefined;
@@ -321,6 +324,7 @@ const stripeWebhook: RequestHandler = async (req, res) => {
 
     // invoice.payment_failed — record or update invoice status, mark sub past_due
     if (type === "invoice.payment_failed") {
+      console.log("check invoice payement failed est lancé");
       const inv = obj;
       const stripeCustomerId: string | undefined = inv.customer as string | undefined;
       const stripeSubscriptionId: string | undefined = inv.subscription as string | undefined;
@@ -373,6 +377,7 @@ const stripeWebhook: RequestHandler = async (req, res) => {
 
     // customer.subscription.deleted — cancel local subscription
     if (type === "customer.subscription.deleted") {
+      console.log("check customer subscribtion deleted est lancé");
       const sub = obj;
       const stripeSubscriptionId: string | undefined = sub.id as string | undefined;
       const canceledAt = unixToDate(sub.canceled_at);

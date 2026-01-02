@@ -86,8 +86,10 @@ app.use(cors(corsOptions));
 // Parser JSON et URL-encoded (avec limite de taille)
 const jsonParser = express.json({ limit: "5mb" });
 const urlEncodedParser = express.urlencoded({ extended: true, limit: "5mb" });
+// Stripe webhooks rely on the raw request body, so bypass every parser on that route.
 const skipBodyParser = (req: Request) =>
   req.originalUrl.startsWith("/api/stripe/webhook");
+const fileUploadMiddleware = fileUpload();
 
 app.use((req, res, next) => {
   if (skipBodyParser(req)) return next();
@@ -110,7 +112,10 @@ app.use(compression());
 app.use(cookieParser());
 
 // Gestion de l'upload de fichiers
-app.use(fileUpload());
+app.use((req, res, next) => {
+  if (skipBodyParser(req)) return next();
+  return fileUploadMiddleware(req, res, next);
+});
 
 // Attribution d’un identifiant unique à chaque requête (utile pour le suivi des logs)
 app.use(requestIdMiddleware);

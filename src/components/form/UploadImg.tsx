@@ -3,7 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 
 import { InputFile } from "../input/InputFile";
 
-const MAX_SIZE_BYTES = 2 * 1024 * 1024;
+const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 const ACCEPTED_MIME = new Set([
   "image/jpeg",
   "image/png",

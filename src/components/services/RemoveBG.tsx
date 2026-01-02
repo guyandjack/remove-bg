@@ -104,6 +104,7 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
         {
           responseType: "blob",
           signal: abortController.signal,
+          timeout: 30000,
         }
       );
 

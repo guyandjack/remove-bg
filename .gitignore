@@ -17,6 +17,7 @@ backend/public.key
 
 # Python service
 wizpix-ml-service/venv/
+wizpix-ml-service/models/
 *.py[cod]
 __pycache__/
 *.pyd

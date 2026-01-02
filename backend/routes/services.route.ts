@@ -12,7 +12,10 @@ import { parseSocialPicturePayload } from "../middelware/services/socialPicture.
 import { imageConverter } from "../controleur/services/imageConverter.controler";
 import { formatSocialPictures } from "../controleur/services/socialFormatter.controler";
 import { removeBg } from "../controleur/services/removeBg.controler";
-import { validateRemoveBgUpload } from "../middelware/services/removeBg.middelware";
+import {
+  attachRemoveBgQuality,
+  validateRemoveBgUpload,
+} from "../middelware/services/removeBg.middelware";
 
 const router = express.Router();
 
@@ -27,6 +30,11 @@ router.post(
 
 //route image social
 router.post("/image-social", parseSocialPicturePayload, formatSocialPictures);
-router.post("/remove-bg", validateRemoveBgUpload, removeBg);
+router.post(
+  "/remove-bg",
+  validateRemoveBgUpload,
+  attachRemoveBgQuality,
+  removeBg
+);
 
 export default router;

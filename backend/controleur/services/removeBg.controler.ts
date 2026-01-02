@@ -1,4 +1,4 @@
-import type { RequestHandler } from "express";
+﻿import type { RequestHandler } from "express";
 import axios, { type AxiosError } from "axios";
 import FormData from "form-data";
 
@@ -10,7 +10,7 @@ const serviceBaseUrl =
   (process.env.REMOVE_BG_SERVICE_URL || DEFAULT_SERVICE_URL).replace(/\/+$/, "");
 
 const REQUEST_TIMEOUT =
-  Number(process.env.REMOVE_BG_TIMEOUT_MS ?? "20000") || 20000;
+  Number(process.env.REMOVE_BG_TIMEOUT_MS ?? "45000") || 45000;
 
 const sanitizeFilename = (name: string) =>
   name
@@ -22,6 +22,7 @@ const sanitizeFilename = (name: string) =>
 
 const removeBg: RequestHandler = async (req, res) => {
   const image = (req as any).imageValidated as ValidatedImage | undefined;
+  const quality = (req as any).removeBgOptions?.quality || "pro";
 
   if (!image) {
     return res.status(400).json({
@@ -32,6 +33,13 @@ const removeBg: RequestHandler = async (req, res) => {
   }
 
   try {
+    const startedAt = Date.now();
+    logger.info("removeBg::call_start", {
+      quality,
+      requestId: (req as any).requestId,
+      serviceBaseUrl,
+    });
+
     const formData = new FormData();
     formData.append("file", image.buffer, {
       filename: image.originalName,
@@ -45,6 +53,7 @@ const removeBg: RequestHandler = async (req, res) => {
         headers: formData.getHeaders(),
         responseType: "arraybuffer",
         timeout: REQUEST_TIMEOUT,
+        params: { quality },
       }
     );
 
@@ -56,6 +65,13 @@ const removeBg: RequestHandler = async (req, res) => {
 
     res.setHeader("Content-Type", contentType);
     res.setHeader("Content-Disposition", contentDisposition);
+
+    logger.info("removeBg::call_success", {
+      quality,
+      durationMs: Date.now() - startedAt,
+      requestId: (req as any).requestId,
+      headers: response.headers,
+    });
 
     return res.status(200).send(Buffer.from(response.data));
   } catch (error) {
