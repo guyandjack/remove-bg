@@ -3,11 +3,12 @@
     <mj-section padding-bottom="20px" padding-top="20px">
       <mj-column vertical-align="top" width="100%">
         <mj-image
-          src="{{urlLogo}}"
+          src="http://localhost:3000/public/logo/logo_9_white.svg"
           alt="Logo"
           align="center"
           border="none"
           width="200px"
+          height="50px"
           padding-left="0px"
           padding-right="0px"
           padding-bottom="0px"
@@ -29,7 +30,7 @@
           font-family="open Sans Helvetica, Arial, sans-serif"
           padding-left="25px"
           padding-right="25px"
-          >Chère<span style="color: #f4bf51"> {{email}}</span><br /><br />
+          >Bonjour<span style="color: #f4bf51"> {{email}}</span><br /><br />
           Bienvenue chez Wiz Pix</mj-text
         >
         <mj-text

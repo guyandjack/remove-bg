@@ -30,7 +30,17 @@ function resolveLocale(lang: unknown): string {
 }
 
 const sendMailVerification: RequestHandler = async (req, res) => {
-  const isProd = process.env.NODE_ENV === "production";
+  const nodEnv = process.env.NODE_ENV || null;
+  const baseUrlProd = process.env.BASE_URL_PROD || null;
+  const baseUrlDev = process.env.BASE_URL_DEV || null;
+  if (!baseUrlDev || !baseUrlProd || !nodEnv) {
+    return res.status(500).json({
+      error: true,
+      message: "Missing env values",
+      code: "signup_missing_env",})
+    }
+  const isProd = nodEnv === "production";
+  const baseUrlUsed = isProd ? baseUrlProd : baseUrlDev ;
   try {
     const { email, password, lang, plan, id, currency } = (req as any).userValidated || {};
 
@@ -112,7 +122,7 @@ const sendMailVerification: RequestHandler = async (req, res) => {
     };
     const subject = subjects[locale] || subjects.en;
     const name = String(email).split("@")[0];
-    const logoUrl = buildLogoUrl({ req, isProd });
+    const logoUrl = `${baseUrlUsed}/public/logo/logo_9_white.svg`;
 
     const { html } = await renderMjmlTemplate(
       `email.validation.${locale}.mjml`,

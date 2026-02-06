@@ -63,7 +63,7 @@ const FormSignUp = () => {
   const lang = i18n.resolvedLanguage || i18n.language;
   //state qui gere l' validite de la reponse.
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>("null");
+  const [errorMessage, setErrorMessage] = useState<string | null>("");
 
   //gere en partie l' affichage du loader
   const [isLoader, setIsLoader] = useState(false);
@@ -135,6 +135,9 @@ const FormSignUp = () => {
           timeout: 10000,
         }
       );
+
+      
+
       if (!response) {
         setErrorMessage(
           t("formSignup.httpError")
@@ -143,12 +146,7 @@ const FormSignUp = () => {
         return;
       }
 
-      const Data = response.data;
-      if (Data.error) {
-        setErrorMessage(Data.message);
-        setStatus("error");
-        return;
-      }
+      
 
       setIsLoader(false);
       setStatus("success");
@@ -157,6 +155,22 @@ const FormSignUp = () => {
       setIsLoader(false);
       setStatus("error");
       setDisplayOtp(false);
+      if (axios.isAxiosError(error)) {
+        const payload = error.response?.data;
+        console.log("signup error payload:", payload);
+        if (payload) {
+          const serverMessage =
+            typeof payload === "string"
+              ? payload
+              : payload.message || t("formSignUp.httpError");
+          setErrorMessage(serverMessage);
+        } else {
+          setErrorMessage(t("formSignUp.httpError"));
+        }
+      } else {
+        console.error("signup unexpected error:", error);
+        setErrorMessage(t("formSignUp.httpError"));
+      }
     } finally {
       setTimeout(() => {
         setStatus("idle");
