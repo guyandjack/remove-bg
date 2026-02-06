@@ -1,13 +1,24 @@
-﻿import type { RequestHandler } from "express";
+﻿//import des librairies
 import axios, { type AxiosError } from "axios";
+
+//import de class
 import FormData from "form-data";
 
+//import de fonction
 import { logger } from "../../logger";
+import { getEnv } from "../../utils/getEnv";
+
+//import des types
+import type { RequestHandler } from "express";
 import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload";
 
-const DEFAULT_SERVICE_URL = "http://localhost:8000";
-const serviceBaseUrl =
-  (process.env.REMOVE_BG_SERVICE_URL || DEFAULT_SERVICE_URL).replace(/\/+$/, "");
+
+const env = getEnv();
+const urlServiceDev = process.env.SERVICE_URL_DEV || null;
+const urlServiceProd = process.env.SERVICE_URL_PROD || null;
+
+const serviceBaseUrl = env.env === "dev" ? urlServiceDev : urlServiceProd
+  
 
 const REQUEST_TIMEOUT =
   Number(process.env.REMOVE_BG_TIMEOUT_MS ?? "45000") || 45000;
@@ -21,6 +32,14 @@ const sanitizeFilename = (name: string) =>
     .toLowerCase() || "image";
 
 const removeBg: RequestHandler = async (req, res) => {
+
+  if (!serviceBaseUrl) {
+    return res.status(500).json({
+      "satus": "error",
+      "message": "erreur 500 variable env default"
+    })
+  };
+
   const image = (req as any).imageValidated as ValidatedImage | undefined;
   const quality = (req as any).removeBgOptions?.quality || "pro";
 

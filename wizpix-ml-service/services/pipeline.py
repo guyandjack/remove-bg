@@ -1,9 +1,11 @@
-﻿import logging
+import logging
 import os
+import threading
+import time
+from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
-from threading import Event, Lock, Thread
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import cv2
 import numpy as np
@@ -12,24 +14,10 @@ import requests
 from PIL import Image
 from rembg import new_session, remove as rembg_remove
 
+from .settings import MODEL_DIR
+
 LOGGER = logging.getLogger(__name__)
 
-ISNET_FILENAME = "isnet-general-use.onnx"
-MODNET_FILENAME = "modnet_webcam_portrait_matting.onnx"
-ISNET_URL = os.getenv(
-    "ISNET_MODEL_URL",
-    "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx",
-)
-MODNET_URL = os.getenv(
-    "MODNET_MODEL_URL",
-    "https://huggingface.co/onnx-community/modnet-webnn/resolve/main/onnx/model.onnx",
-)
-DEFAULT_MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
-MODEL_DIR = Path(
-    os.getenv("MODEL_DIR")
-    or os.getenv("PIPELINE_MODEL_DIR")
-    or DEFAULT_MODEL_DIR
-)
 SUPPORTED_QUALITY = {"fast", "pro"}
 
 
@@ -40,108 +28,398 @@ def _env_bool(name: str, default: bool) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _normalize_name(name: str) -> str:
+    return name.replace("_", "-").replace(" ", "-").lower()
+
+
+PRO_MODEL_SPECS: Dict[str, Dict[str, object]] = {
+    "inspyrenet": {
+        "filename": os.getenv("INSPYRENET_MODEL_FILE", "isnet-general-use.onnx"),
+        "url": "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx",
+        "mean": (0.5, 0.5, 0.5),
+        "std": (1.0, 1.0, 1.0),
+        "size": (1024, 1024),
+        "activation": "linear",
+        "friendly_name": "InSPyReNet (isnet-general-use)",
+    },
+    "isnet-general-use": {"alias": "inspyrenet"},
+    "inspyre-net": {"alias": "inspyrenet"},
+    "birefnet-portrait": {
+        "filename": os.getenv(
+            "BIREFNET_MODEL_FILE", "BiRefNet-portrait-epoch_150.onnx"
+        ),
+        "url": "https://github.com/ZhengPeng7/BiRefNet/releases/download/v1.0/BiRefNet-portrait-epoch_150.onnx",
+        "mean": (0.485, 0.456, 0.406),
+        "std": (0.229, 0.224, 0.225),
+        "size": (1024, 1024),
+        "activation": "sigmoid",
+        "friendly_name": "BiRefNet Portrait",
+    },
+    "birefnet_portrait": {"alias": "birefnet-portrait"},
+    "birefnet": {"alias": "birefnet-portrait"},
+    "mock": {
+        "mock": True,
+        "friendly_name": "Mock model (tests only)",
+    },
+}
+
+
+def _select_providers(device_request: str) -> Tuple[str, ...]:
+    available = ort.get_available_providers()
+    device_request = device_request.lower()
+
+    if device_request == "cpu":
+        return ("CPUExecutionProvider",)
+
+    if device_request == "cuda":
+        if "CUDAExecutionProvider" in available:
+            return ("CUDAExecutionProvider", "CPUExecutionProvider")
+        LOGGER.warning("CUDA requested but not available; using CPUExecutionProvider.")
+        return ("CPUExecutionProvider",)
+
+    if "CUDAExecutionProvider" in available:
+        return ("CUDAExecutionProvider", "CPUExecutionProvider")
+    return ("CPUExecutionProvider",)
+
+
+def _default_description(name: str) -> str:
+    spec = PRO_MODEL_SPECS.get(name, {})
+    friendly = spec.get("friendly_name")
+    if isinstance(friendly, str):
+        return friendly
+    return name
+
+
+@dataclass
+class ModelStatus:
+    state: str = "idle"
+    ready: bool = False
+    warming: bool = False
+    message: Optional[str] = None
+    path: Optional[str] = None
+    device: Optional[str] = None
+
+
+class OnnxMaskModel:
+    """Loads a single ONNX model and predicts alpha masks."""
+
+    def __init__(
+        self,
+        name: str,
+        spec: Dict[str, object],
+        device_request: str,
+        allow_download: bool,
+    ) -> None:
+        self.name = name
+        self.spec = spec
+        self.device_request = device_request
+        self.allow_download = allow_download
+        filename_value = spec.get("filename")
+        if filename_value is None:
+            raise ValueError(f"No filename provided for model '{name}'")
+        file_path = Path(filename_value)
+        if file_path.is_absolute():
+            self.model_path = file_path
+        else:
+            filename_str = cast_str(filename_value, "")
+            if not filename_str:
+                raise ValueError(f"Invalid filename for model '{name}'")
+            self.model_path = MODEL_DIR / filename_str
+        self.session: Optional[ort.InferenceSession] = None
+        self.providers: Tuple[str, ...] = ()
+        self.status = ModelStatus(
+            state="idle",
+            ready=False,
+            warming=False,
+            path=str(self.model_path),
+        )
+
+    def ensure_loaded(self) -> None:
+        if self.session is not None:
+            return
+
+        if not self.model_path.exists():
+            if not self.allow_download:
+                raise FileNotFoundError(
+                    f"Model '{self.name}' introuvable dans {self.model_path}. "
+                    "Lancez scripts/fetch_models.py pour le telecharger."
+                )
+            self._download_model()
+
+        self.status.state = "loading"
+        self.status.warming = True
+        providers = _select_providers(self.device_request)
+        options = ort.SessionOptions()
+        try:
+            self.session = ort.InferenceSession(
+                str(self.model_path),
+                sess_options=options,
+                providers=list(providers),
+            )
+        finally:
+            self.status.warming = False
+        self.providers = providers
+        self.status.device = providers[0]
+        self.status.state = "ready"
+        self.status.ready = True
+
+    def predict_mask(self, image: Image.Image) -> np.ndarray:
+        if self.session is None:
+            raise RuntimeError("Model not loaded")
+
+        inputs = self._prepare_input(image)
+        input_name = self.session.get_inputs()[0].name
+        ort_outs = self.session.run(None, {input_name: inputs})
+
+        values = ort_outs[0]
+        if values.ndim == 4:
+            values = values[:, 0, :, :]
+
+        activation = self.spec.get("activation", "linear")
+        values = values.astype(np.float32)
+        if activation == "sigmoid":
+            values = 1.0 / (1.0 + np.exp(-values))
+
+        ma = float(np.max(values))
+        mi = float(np.min(values))
+        denom = ma - mi
+        if denom > 1e-6:
+            values = (values - mi) / denom
+        else:
+            values = np.zeros_like(values, dtype=np.float32)
+
+        mask = np.squeeze(values).astype(np.float32)
+        mask = cv2.resize(
+            mask,
+            (image.width, image.height),
+            interpolation=cv2.INTER_CUBIC,
+        )
+        return np.clip(mask, 0.0, 1.0)
+
+    def _prepare_input(self, image: Image.Image) -> np.ndarray:
+        mean = self.spec.get("mean", (0.5, 0.5, 0.5))
+        std = self.spec.get("std", (1.0, 1.0, 1.0))
+        size = self.spec.get("size", (1024, 1024))
+
+        pil = image.convert("RGB").resize(size, Image.Resampling.LANCZOS)
+        arr = np.asarray(pil).astype(np.float32)
+        arr = arr / max(float(np.max(arr)), 1e-6)
+
+        tmp = np.zeros_like(arr, dtype=np.float32)
+        for ch in range(3):
+            tmp[:, :, ch] = (arr[:, :, ch] - mean[ch]) / std[ch]
+        tmp = tmp.transpose(2, 0, 1)
+        return np.expand_dims(tmp, 0).astype(np.float32)
+
+    def _download_model(self) -> None:
+        url = self.spec.get("url")
+        if not isinstance(url, str):
+            raise FileNotFoundError(
+                f"Model '{self.name}' manquant et aucun URL n'est defini."
+            )
+        MODEL_DIR.mkdir(parents=True, exist_ok=True)
+        LOGGER.info("Telechargement du modele %s depuis %s", self.name, url)
+        response = requests.get(url, stream=True, timeout=180)
+        response.raise_for_status()
+        with self.model_path.open("wb") as f:
+            for chunk in response.iter_content(chunk_size=1024 * 256):
+                if chunk:
+                    f.write(chunk)
+        LOGGER.info(
+            "Modele %s telecharge (%.1f MB)",
+            self.name,
+            self.model_path.stat().st_size / (1024 * 1024),
+        )
+
+
+class MockMaskModel:
+    """Small helper used in unit tests – always returns a centered square."""
+
+    def __init__(self) -> None:
+        self.status = ModelStatus(state="ready", ready=True, path="mock", device="cpu")
+
+    def ensure_loaded(self) -> None:
+        return
+
+    def predict_mask(self, image: Image.Image) -> np.ndarray:
+        arr = np.zeros((image.height, image.width), dtype=np.float32)
+        h_slice = slice(image.height // 4, image.height - image.height // 4)
+        w_slice = slice(image.width // 4, image.width - image.width // 4)
+        arr[h_slice, w_slice] = 1.0
+        return arr
+
+
+def cast_str(value: object, default: str) -> str:
+    return value if isinstance(value, str) else default
+
+
 class WarmupPendingError(RuntimeError):
-    """Raised when pro quality is requested but models are still warming up."""
+    """Raised when pro quality is requested but the model is still warming up."""
 
 
 class ModelsUnavailableError(RuntimeError):
-    """Raised when pro quality models are missing locally."""
+    """Raised when mandatory models are missing and no fallback is allowed."""
+
+
+def composite_straight_alpha(rgb: np.ndarray, alpha: np.ndarray) -> bytes:
+    alpha_clamped = np.clip(alpha, 0.0, 1.0)
+    alpha_uint8 = (alpha_clamped * 255).astype(np.uint8)
+    rgba = np.dstack((rgb.astype(np.uint8), alpha_uint8))
+    buffer = BytesIO()
+    Image.fromarray(rgba, mode="RGBA").save(buffer, format="PNG")
+    buffer.seek(0)
+    return buffer.getvalue()
 
 
 class BackgroundRemovalPipeline:
-    """Two-stage background removal pipeline with warmup + fast fallback."""
+    """Background removal pipeline with rembg fast mode and ONNX-based pro mode."""
 
     def __init__(self, device: Optional[str] = None) -> None:
         MODEL_DIR.mkdir(parents=True, exist_ok=True)
+        os.environ.setdefault("U2NET_HOME", str(MODEL_DIR))
+
         self.device_request = (device or os.getenv("PIPELINE_DEVICE") or "auto").lower()
-        self.segmentation_session: Optional[ort.InferenceSession] = None
-        self.matting_session: Optional[ort.InferenceSession] = None
-        self._providers = self._select_providers()
         self.auto_fallback = _env_bool("AUTO_FALLBACK_FAST", True)
         self.allow_remote_download = _env_bool("ALLOW_REMOTE_DOWNLOAD", False)
-        self.segmentation_state = self._initial_state(ISNET_FILENAME)
-        self.matting_state = self._initial_state(MODNET_FILENAME)
-        self.rembg_fast_session = new_session("u2net")
-        self.rembg_hq_session = new_session("u2net_human_seg")
-        self._warmup_lock = Lock()
-        self._warmup_thread: Optional[Thread] = None
-        self._warmup_event = Event()
-        self._warmup_event.set()
-        self._warmup_in_progress = False
 
-    def _initial_state(self, filename: str) -> str:
-        destination = MODEL_DIR / filename
-        if not self.allow_remote_download and not destination.exists():
-            return "missing"
-        return "loading"
+        fast_model_name = os.getenv("FAST_MODEL_NAME", "u2net")
+        self.fast_model_name = fast_model_name
+        self.rembg_fast_session = new_session(fast_model_name)
+
+        pro_name_raw = os.getenv("PRO_MODEL_NAME", "inspyrenet")
+        pro_name = _normalize_name(pro_name_raw)
+        resolved = self._resolve_pro_name(pro_name)
+        self.pro_requested_name = pro_name_raw
+        self.pro_canonical_name = resolved
+        self.pro_label = _default_description(resolved)
+        spec = PRO_MODEL_SPECS.get(resolved)
+        if spec is None:
+            raise ModelsUnavailableError(f"Modele pro inconnu: {pro_name}")
+
+        if spec.get("mock"):
+            self.pro_model = MockMaskModel()
+        else:
+            self.pro_model = OnnxMaskModel(
+                name=resolved,
+                spec=spec,
+                device_request=self.device_request,
+                allow_download=self.allow_remote_download,
+            )
+        self.pro_status = (
+            self.pro_model.status
+            if hasattr(self.pro_model, "status")
+            else ModelStatus(state="ready", ready=True)
+        )
+
+        self._warmup_thread: Optional[threading.Thread] = None
+        self._warmup_running = False
+
+    def _resolve_pro_name(self, name: str) -> str:
+        spec = PRO_MODEL_SPECS.get(name)
+        if spec and "alias" in spec:
+            alias = spec["alias"]
+            if isinstance(alias, str):
+                return alias
+        if spec is None and name in {"mock"}:
+            return name
+        if spec is None and name not in PRO_MODEL_SPECS:
+            raise ModelsUnavailableError(
+                f"Modele pro '{name}' non supporte. "
+                f"Options: {', '.join(sorted({k for k in PRO_MODEL_SPECS if 'alias' not in PRO_MODEL_SPECS[k]}))}"
+            )
+        return name
 
     def start_warmup(self, blocking: bool = False) -> None:
-        with self._warmup_lock:
-            if not (self._warmup_thread and self._warmup_thread.is_alive()):
-                self._warmup_event.clear()
-                self._warmup_in_progress = True
+        def _run() -> None:
+            LOGGER.info("Demarrage du warmup des modeles pro.")
+            self._warmup_running = True
+            self.pro_status.warming = True
+            try:
+                self._ensure_pro_ready()
+            except Exception:  # noqa: BLE001
+                LOGGER.exception("Warmup pro echoue")
+            finally:
+                self.pro_status.warming = False
+                self._warmup_running = False
 
-                def _run() -> None:
-                    try:
-                        try:
-                            self._ensure_segmentation_session()
-                        except FileNotFoundError:
-                            LOGGER.warning(
-                                "Warmup: segmentation model missing at %s",
-                                MODEL_DIR / ISNET_FILENAME,
-                            )
-                        except Exception:  # noqa: BLE001
-                            LOGGER.exception("Warmup: segmentation model failed to load.")
-                        try:
-                            self._ensure_matting_session()
-                        except FileNotFoundError:
-                            LOGGER.warning(
-                                "Warmup: matting model missing at %s",
-                                MODEL_DIR / MODNET_FILENAME,
-                            )
-                        except Exception:  # noqa: BLE001
-                            LOGGER.exception("Warmup: matting model failed to load.")
-                    finally:
-                        self._warmup_in_progress = False
-                        self._warmup_event.set()
-
-                self._warmup_thread = Thread(target=_run, name="wizpix-warmup", daemon=True)
-                self._warmup_thread.start()
         if blocking:
-            self._warmup_event.wait()
+            _run()
+            return
+
+        if self._warmup_thread and self._warmup_thread.is_alive():
+            return
+
+        thread = threading.Thread(target=_run, daemon=True)
+        thread.start()
+        self._warmup_thread = thread
+
+    def _ensure_pro_ready(self) -> None:
+        if isinstance(self.pro_model, MockMaskModel):
+            self.pro_status.state = "ready"
+            self.pro_status.ready = True
+            return
+
+        if getattr(self.pro_model, "session", None) is not None:
+            self.pro_status.state = "ready"
+            self.pro_status.ready = True
+            return
+
+        if self.pro_status.state == "loading":
+            raise WarmupPendingError("Le modele pro est en cours de chargement.")
+
+        try:
+            self.pro_model.ensure_loaded()
+        except FileNotFoundError as exc:
+            message = str(exc)
+            self.pro_status.state = "missing"
+            self.pro_status.ready = False
+            self.pro_status.message = message
+            raise ModelsUnavailableError(message) from exc
+        except Exception as exc:  # noqa: BLE001
+            self.pro_status.state = "error"
+            self.pro_status.ready = False
+            self.pro_status.message = str(exc)
+            raise ModelsUnavailableError(
+                f"Echec chargement modele pro: {exc}"
+            ) from exc
+
+    def status_snapshot(self) -> dict:
+        pro_ready = bool(self.pro_status.ready)
+        state = self.pro_status.state or "idle"
+        if pro_ready:
+            status = "ok"
+        elif state in {"loading", "idle"}:
+            status = "warming_up"
+        else:
+            status = "degraded"
+
+        return {
+            "status": status,
+            "models": {
+                "fast": {"model": self.fast_model_name},
+                "pro": {
+                    "model": self.pro_label,
+                    "slug": self.pro_canonical_name,
+                    "state": state,
+                    "ready": pro_ready,
+                    "warming": bool(self.pro_status.warming or self._warmup_running),
+                    "message": self.pro_status.message,
+                    "path": self.pro_status.path,
+                    "device": self.pro_status.device,
+                },
+            },
+            "model_dir": str(MODEL_DIR.resolve()),
+        }
+
+    def health(self) -> dict:
+        return self.status_snapshot()
 
     def ensure_ready(self) -> dict:
         try:
-            self._ensure_segmentation_session()
+            self._ensure_pro_ready()
         except Exception:  # noqa: BLE001
-            LOGGER.exception("Unable to load segmentation model.")
-        try:
-            self._ensure_matting_session()
-        except Exception:  # noqa: BLE001
-            LOGGER.exception("Unable to load matting model.")
+            LOGGER.exception("ensure_ready a echoue")
         return self.status_snapshot()
-
-    def status_snapshot(self) -> dict:
-        models = {
-            "segmentation": self.segmentation_state,
-            "matting": self.matting_state,
-        }
-        ready = all(state == "ready" for state in models.values())
-        warming = self._warmup_in_progress or any(state == "loading" for state in models.values())
-        missing_models = [name for name, state in models.items() if state == "missing"]
-        status = "ok" if ready else ("warming_up" if warming else "degraded")
-        return {
-            "status": status,
-            "ready": ready,
-            "warming": warming,
-            "models": models,
-            "missing_models": missing_models,
-            "device": "cuda"
-            if any(provider.startswith("CUDA") for provider in self._providers)
-            else "cpu",
-            "model_dir": str(MODEL_DIR.resolve()),
-            "allow_remote_download": self.allow_remote_download,
-        }
 
     def remove_background(
         self,
@@ -155,33 +433,25 @@ class BackgroundRemovalPipeline:
         if quality == "fast":
             return self._remove_fast(image_bytes), False
 
-        readiness = self.ensure_ready()
-        if not readiness["ready"]:
-            missing = readiness.get("missing_models", [])
-            if readiness.get("warming"):
-                if self.auto_fallback:
-                    LOGGER.warning("Pro pipeline warming up, falling back to fast mode.")
-                    return self._remove_fast(image_bytes), True
-                raise WarmupPendingError("Models warming up")
-            if missing:
-                message = (
-                    "Models missing: "
-                    + ", ".join(missing)
-                    + f". Place the files in {readiness.get('model_dir')} or enable ALLOW_REMOTE_DOWNLOAD."
-                )
-                if self.auto_fallback:
-                    LOGGER.warning("%s Bascule sur fast.", message)
-                    return self._remove_fast(image_bytes), True
-                raise ModelsUnavailableError(message)
+        try:
+            self._ensure_pro_ready()
+        except WarmupPendingError as exc:
             if self.auto_fallback:
-                LOGGER.warning("Pro pipeline degrade, falling back to fast mode.")
+                LOGGER.warning("Modele pro en warmup: fallback fast.")
                 return self._remove_fast(image_bytes), True
-            raise RuntimeError("Pro pipeline indisponible")
+            raise
+        except ModelsUnavailableError as exc:
+            if self.auto_fallback:
+                LOGGER.warning("Modele pro indisponible: %s. Fallback fast.", exc)
+                return self._remove_fast(image_bytes), True
+            raise
 
         try:
             return self._remove_pro(image_bytes), False
+        except ModelsUnavailableError:
+            raise
         except Exception:  # noqa: BLE001
-            LOGGER.exception("Pro pipeline failed.")
+            LOGGER.exception("Echec pipeline pro; fallback fast.")
             if self.auto_fallback:
                 return self._remove_fast(image_bytes), True
             raise
@@ -190,247 +460,33 @@ class BackgroundRemovalPipeline:
         return rembg_remove(image_bytes, session=self.rembg_fast_session)
 
     def _remove_pro(self, image_bytes: bytes) -> bytes:
-        candidates = [
-            self._run_rembg_variant(
-                image_bytes,
-                session=self.rembg_hq_session,
-                label="human_hq",
-                alpha_matting=True,
-                alpha_matting_foreground_threshold=240,
-                alpha_matting_background_threshold=10,
-                alpha_matting_erode_structure_size=3,
-                alpha_matting_base_size=1000,
-                post_process_mask=True,
-            ),
-            self._run_rembg_variant(
-                image_bytes,
-                session=self.rembg_general_hq_session,
-                label="general_hq",
-                alpha_matting=True,
-                alpha_matting_foreground_threshold=220,
-                alpha_matting_background_threshold=20,
-                alpha_matting_erode_structure_size=3,
-                alpha_matting_base_size=800,
-                post_process_mask=True,
-            ),
-        ]
-        best = max(candidates, key=lambda item: item["score"])
+        image = Image.open(BytesIO(image_bytes)).convert("RGB")
+        rgb = np.array(image, dtype=np.uint8)
+
+        start = time.perf_counter()
+        mask = self.pro_model.predict_mask(image)
+        duration = (time.perf_counter() - start) * 1000
         LOGGER.info(
-            "Pro pipeline score comparison",
+            "pro.inference",
             extra={
-                "scores": {c["label"]: round(c["score"], 4) for c in candidates},
-                "chosen": best["label"],
+                "model": self.pro_canonical_name,
+                "duration_ms": round(duration, 2),
+                "size": [image.width, image.height],
             },
         )
-        if best["score"] < 0.15:
-            LOGGER.warning(
-                "Pro pipeline low score (%.3f). Falling back to fast rendering.",
-                best["score"],
-            )
-            return self._remove_fast(image_bytes)
-        return best["bytes"]
-
-    def _run_rembg_variant(
-        self,
-        image_bytes: bytes,
-        *,
-        session,
-        label: str,
-        **kwargs,
-    ) -> dict:
-        output = rembg_remove(image_bytes, session=session, **kwargs)
-        alpha = self._extract_alpha(output)
-        score = self._alpha_score(alpha)
-        return {"label": label, "bytes": output, "alpha": alpha, "score": score}
-
-    @staticmethod
-    def _extract_alpha(image_bytes: bytes) -> np.ndarray:
-        with Image.open(BytesIO(image_bytes)) as img:
-            alpha = np.array(img.convert("RGBA").split()[-1], dtype=np.float32) / 255.0
-        return alpha
-
-    @staticmethod
-    def _alpha_score(alpha: np.ndarray) -> float:
-        mean = float(alpha.mean())
-        std = float(alpha.std())
-        coverage = 1.0 - abs(mean - 0.5) * 2  # proche de 0.5 favorise un mix fg/bg
-        coverage = np.clip(coverage, 0.0, 1.0)
-        score = 0.65 * coverage + 0.35 * std
-        return float(np.clip(score, 0.0, 1.0))
-
-    def _run_segmentation(self, image: Image.Image) -> np.ndarray:
-        session = self._ensure_segmentation_session()
-
-        arr = np.array(image, dtype=np.uint8)
-        h, w = arr.shape[:2]
-        resized = cv2.resize(arr, (1024, 1024), interpolation=cv2.INTER_LINEAR)
-        normalized = resized.astype(np.float32) / 255.0
-        normalized = (normalized - 0.5) / 0.5
-        blob = np.transpose(normalized, (2, 0, 1))[None, ...]
-
-        input_name = session.get_inputs()[0].name
-        pred = session.run(None, {input_name: blob})[0].squeeze()
-        mask = cv2.resize(pred, (w, h), interpolation=cv2.INTER_LINEAR)
-        mask = (mask - mask.min()) / (mask.max() - mask.min() + 1e-6)
-        return mask.astype(np.float32)
-
-    def _run_modnet(self, image: Image.Image) -> np.ndarray:
-        session = self._ensure_matting_session()
-
-        arr = np.array(image, dtype=np.uint8)
-        h, w = arr.shape[:2]
-        ref_size = 512
-        im_h, im_w = h, w
-        scale = 1.0
-        if max(im_h, im_w) > ref_size:
-            scale = ref_size / max(im_h, im_w)
-        new_w = max(int(im_w * scale), 32)
-        new_h = max(int(im_h * scale), 32)
-        new_w = new_w - new_w % 32 or 32
-        new_h = new_h - new_h % 32 or 32
-        resized = cv2.resize(arr, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
-
-        normalized = resized.astype(np.float32) / 255.0
-        normalized = (normalized - 0.5) / 0.5
-        blob = np.transpose(normalized, (2, 0, 1))[None, ...]
-
-        pad_h = max(ref_size - new_h, 0)
-        pad_w = max(ref_size - new_w, 0)
-        padded = np.pad(
-            blob,
-            (
-                (0, 0),
-                (0, 0),
-                (pad_h // 2, pad_h - pad_h // 2),
-                (pad_w // 2, pad_w - pad_w // 2),
-            ),
-            mode="constant",
-        )
-
-        input_name = session.get_inputs()[0].name
-        pred = session.run(None, {input_name: padded})[0]
-        pred = pred[
-            :,
-            :,
-            pad_h // 2 : pad_h // 2 + new_h,
-            pad_w // 2 : pad_w // 2 + new_w,
-        ]
-        matte = pred.squeeze()
-        matte = cv2.resize(matte, (w, h), interpolation=cv2.INTER_LINEAR)
-        matte = np.clip(matte, 0.0, 1.0)
-        return matte.astype(np.float32)
-
-    @staticmethod
-    def _refine_alpha(coarse: np.ndarray, matte: np.ndarray) -> np.ndarray:
-        base = np.clip(matte * 0.9 + coarse * 0.1, 0.0, 1.0)
-        sure_fg = cv2.erode(base, np.ones((3, 3), np.uint8), iterations=1)
-        feather = cv2.GaussianBlur(base, (5, 5), 0.7)
-        combined = np.maximum(sure_fg, feather * 0.98)
-        combined = np.clip(combined ** 0.9, 0.0, 1.0)
-        return combined
-
-    @staticmethod
-    def _composite(image: Image.Image, alpha: np.ndarray) -> bytes:
-        rgb = np.array(image.convert("RGB"), dtype=np.float32)
-        alpha_channel = np.clip(alpha, 0.0, 1.0)
-        premultiplied = (rgb * alpha_channel[..., None]).astype(np.uint8)
-        alpha_uint8 = (alpha_channel * 255).astype(np.uint8)
-        rgba = np.dstack((premultiplied, alpha_uint8))
-        buffer = BytesIO()
-        Image.fromarray(rgba, mode="RGBA").save(buffer, format="PNG")
-        buffer.seek(0)
-        return buffer.getvalue()
-
-    def _ensure_segmentation_session(self) -> ort.InferenceSession:
-        if self.segmentation_session:
-            self.segmentation_state = "ready"
-            return self.segmentation_session
-        destination = MODEL_DIR / ISNET_FILENAME
-        if not destination.exists() and not self.allow_remote_download:
-            self.segmentation_state = "missing"
-            raise FileNotFoundError(
-                f"Model {ISNET_FILENAME} not found in {destination.parent}"
-            )
-        self.segmentation_state = "loading"
-        try:
-            self.segmentation_session = self._create_session(
-                ISNET_FILENAME,
-                ISNET_URL,
-            )
-            self.segmentation_state = "ready"
-        except FileNotFoundError:
-            self.segmentation_state = "missing"
-            raise
-        except Exception:  # noqa: BLE001
-            self.segmentation_state = "error"
-            raise
-        return self.segmentation_session
-
-    def _ensure_matting_session(self) -> ort.InferenceSession:
-        if self.matting_session:
-            self.matting_state = "ready"
-            return self.matting_session
-        destination = MODEL_DIR / MODNET_FILENAME
-        if not destination.exists() and not self.allow_remote_download:
-            self.matting_state = "missing"
-            raise FileNotFoundError(
-                f"Model {MODNET_FILENAME} not found in {destination.parent}"
-            )
-        self.matting_state = "loading"
-        try:
-            self.matting_session = self._create_session(
-                MODNET_FILENAME,
-                MODNET_URL,
-            )
-            self.matting_state = "ready"
-        except FileNotFoundError:
-            self.matting_state = "missing"
-            raise
-        except Exception:  # noqa: BLE001
-            self.matting_state = "error"
-            raise
-        return self.matting_session
-
-    def _create_session(self, filename: str, url: str) -> ort.InferenceSession:
-        model_path = self._resolve_model(filename, url)
-        return ort.InferenceSession(str(model_path), providers=self._providers)
-
-    def _resolve_model(self, filename: str, url: str) -> Path:
-        destination = MODEL_DIR / filename
-        if destination.exists():
-            return destination
-        if not self.allow_remote_download:
-            raise FileNotFoundError(
-                f"Model {filename} not found in {destination.parent}. "
-                "Run `python scripts/fetch_models.py` or set ALLOW_REMOTE_DOWNLOAD=true."
-            )
-        LOGGER.info("Downloading model %s", filename)
-        response = requests.get(url, timeout=120)
-        try:
-            response.raise_for_status()
-        except requests.HTTPError:
-            LOGGER.error(
-                "Unable to download %s from %s (status %s)",
-                filename,
-                url,
-                response.status_code,
-            )
-            raise
-        destination.write_bytes(response.content)
-        return destination
-
-    def _select_providers(self) -> list[str]:
-        available = ort.get_available_providers()
-        if self.device_request == "cuda" and "CUDAExecutionProvider" in available:
-            return ["CUDAExecutionProvider", "CPUExecutionProvider"]
-        if self.device_request == "cpu":
-            return ["CPUExecutionProvider"]
-        if self.device_request == "auto" and "CUDAExecutionProvider" in available:
-            return ["CUDAExecutionProvider", "CPUExecutionProvider"]
-        return ["CPUExecutionProvider"]
-
-    def health(self) -> dict:
-        return self.status_snapshot()
+        mask = cv2.GaussianBlur(mask, (3, 3), 0.5)
+        return composite_straight_alpha(rgb, mask)
 
 
-pipeline = BackgroundRemovalPipeline()
+if _env_bool("WIZPIX_SKIP_PIPELINE_INIT", False):
+    pipeline = None  # type: ignore[assignment]
+else:
+    pipeline = BackgroundRemovalPipeline()
+
+__all__ = [
+    "BackgroundRemovalPipeline",
+    "WarmupPendingError",
+    "ModelsUnavailableError",
+    "pipeline",
+    "composite_straight_alpha",
+]

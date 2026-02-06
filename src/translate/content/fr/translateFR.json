@@ -47,9 +47,10 @@
     "btnGoogle": "Continuer avec Google",
     "passwordError": "Mot de passe trop faible",
     "textSuccess": "Un mail de confirmation a été envoyé",
-    "textError": "Une erreur s'est produite",
+    "textError": "Une erreur s'est produite, compte annulé",
     "question": "Déjà membre",
-    "link": "Connectez-vous"
+    "link": "Connectez-vous",
+    "httpError": "Une erreur http c'est produite, veuillez vérifier votre connexion."
   },
 
   "otpInput": {

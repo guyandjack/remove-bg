@@ -1,18 +1,16 @@
+import crypto from "node:crypto";
 import type { RequestHandler } from "express";
+import type Stripe from "stripe";
 import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { connectDb } from "../../DB/poolConnexion/poolConnexion.ts";
 import {
-  getPlanByCode,
-  getUserByEmail,
-  createUser,
-  createSubscription,
-  updateSubscription,
-  markStripeCheckoutSessionCompleted,
   markStripeCheckoutSessionFailed,
-  upsertPlanByCode,
 } from "../../DB/queriesSQL/queriesSQL.ts";
-import { planOption } from "../../data/planOption.ts";
 import { logger } from "../../logger.ts";
+import {
+  CheckoutSessionPendingError,
+  finalizeCheckoutSessionFromStripeSession,
+} from "../../services/stripe/finalizeCheckoutSession.ts";
 
 
 // Stripe webhook to finalize paid signups and activate subscriptions
@@ -103,144 +101,28 @@ const stripeWebhook: RequestHandler = async (req, res) => {
     if (type === "checkout.session.completed") {
       console.log("check session.completed est lancé");
       currentCheckoutSessionId = typeof obj?.id === "string" ? obj.id : null;
-      // On successful checkout, create user if pending and activate subscription
-      const email: string | undefined = obj.customer_details?.email || obj.customer_email || obj.customer?.email || obj.metadata?.email;
-      const planCode: string | undefined = obj.metadata?.plan_code;
-      const normalizedPlanCode = planCode ? String(planCode).toLowerCase() : undefined;
-      const stripeSubscriptionId: string | undefined = obj.subscription as string | undefined;
-      const stripeCustomerId: string | undefined = obj.customer as string | undefined;
-      const customerDetails: any = obj.customer_details || {};
-
-      if (!email || !normalizedPlanCode) {
-        console.log("[stripeWebhook] checkout.session.completed ignored: missing email or plan code");
-        return res.status(200).send("ok"); // ignore if insufficient
+      if (!currentCheckoutSessionId) {
+        logger.warn("[stripeWebhook] Missing session id on checkout.session.completed event");
+        return res.status(200).send("ok");
       }
-
-      // Try to load plan by code
-      let plan = await getPlanByCode(normalizedPlanCode);
-      if (!plan) {
-        const planConfig = planOption.find(
-          (config) => config.name === normalizedPlanCode
-        );
-        if (!planConfig) {
-          console.log(
-            "[stripeWebhook] checkout.session.completed ignored: unknown plan code",
-            normalizedPlanCode
-          );
-          return res.status(200).send("ok");
-        }
-        const basePrice =
-          planConfig.prices?.CHF ??
-          planConfig.price ??
-          planConfig.prices?.EUR ??
-          0;
-        const storedPrice = Number.isFinite(basePrice)
-          ? Math.round(Number(basePrice) * 100)
-          : 0;
-        try {
-          await upsertPlanByCode({
-            code: normalizedPlanCode,
-            name: planConfig.name,
-            price: storedPrice,
-            currency_code: "CHF",
-            billing_interval: "month",
-            daily_credit_quota: planConfig.credit ?? 0,
-            stripe_price_id: null,
-          });
-          plan = await getPlanByCode(normalizedPlanCode);
-        } catch (seedErr) {
-          console.error(
-            "[stripeWebhook] Failed to seed missing plan",
-            normalizedPlanCode,
-            seedErr
-          );
-        }
-        if (!plan) {
-          console.log(
-            "[stripeWebhook] checkout.session.completed ignored: unable to provision plan",
-            normalizedPlanCode
-          );
-          return res.status(200).send("ok");
-        }
-      }
-
-      // Find or create user using stored password_hash in EmailVerification (pending account)
-      const pool = await connectDb();
-      let user = await getUserByEmail(email.toLowerCase());
-      if (!user) {
-        const [rows] = await pool.execute<RowDataPacket[]>(
-          `SELECT password_hash FROM EmailVerification WHERE email = ? AND account = 0 AND consumed_at IS NOT NULL ORDER BY created_at DESC LIMIT 1`,
-          [email.toLowerCase()]
-        );
-        const rec = rows[0] as any;
-        const hash = rec?.password_hash as string | undefined;
-        if (!hash) {
-          console.log("[stripeWebhook] checkout.session.completed: no password hash stored, leaving pending for", email);
-          return res.status(200).send("ok"); // cannot finalize without password; leave pending
-        }
-        const newId = await createUser(email.toLowerCase(), hash);
-        if (!newId) {
-          console.log("[stripeWebhook] checkout.session.completed: failed to create user", email);
-          return res.status(200).send("ok");
-        }
-        user = await getUserByEmail(email.toLowerCase());
-        // mark account created
-        await pool.execute<ResultSetHeader>(
-          `UPDATE EmailVerification SET account = 1 WHERE email = ? AND account = 0 AND consumed_at IS NOT NULL`,
-          [email.toLowerCase()]
-        );
-      }
-
-      // Upsert Customer profile with details
       try {
-        const fullName: string = customerDetails.name || "";
-        const [firstName, ...rest] = fullName.split(" ");
-        const lastName = rest.join(" ") || null;
-        const addr = customerDetails.address || {};
-        const phone: string | null = customerDetails.phone || null;
-        const id = crypto.randomUUID();
-        await pool.execute<ResultSetHeader>(
-          `INSERT INTO Customer (id, user_id, email, first_name, last_name, address_line1, address_line2, postal_code, city, country, phone, stripe_customer_id)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-           ON DUPLICATE KEY UPDATE
-             user_id=VALUES(user_id), email=VALUES(email), first_name=VALUES(first_name), last_name=VALUES(last_name),
-             address_line1=VALUES(address_line1), address_line2=VALUES(address_line2), postal_code=VALUES(postal_code),
-             city=VALUES(city), country=VALUES(country), phone=VALUES(phone), stripe_customer_id=VALUES(stripe_customer_id)`,
-          [
-            id,
-            user!.id,
-            email.toLowerCase(),
-            firstName || null,
-            lastName || null,
-            addr.line1 || null,
-            addr.line2 || null,
-            addr.postal_code || null,
-            addr.city || null,
-            addr.country || null,
-            phone,
-            stripeCustomerId || null,
-          ]
-        );
-      } catch {}
-
-      // Create an active subscription if none active; attach Stripe ids
-      const subId = await createSubscription({ userId: user!.id, planId: plan.id, isActive: true });
-      if (subId && (stripeSubscriptionId || stripeCustomerId)) {
-        await updateSubscription(subId, {
-          stripe_subscription_id: stripeSubscriptionId ?? undefined,
-          stripe_customer_id: stripeCustomerId ?? undefined,
-        } as any);
-      }
-
-      if (currentCheckoutSessionId) {
-        await markStripeCheckoutSessionCompleted(currentCheckoutSessionId, {
-          userId: user!.id,
-          subscriptionId: subId,
-          planId: plan.id,
+        await finalizeCheckoutSessionFromStripeSession({
+          session: obj as Stripe.Checkout.Session,
+          referer: (req.headers.referer as string | undefined) ?? null,
         });
+      } catch (sessionErr) {
+        if (sessionErr instanceof CheckoutSessionPendingError) {
+          logger.warn(
+            `[stripeWebhook] session ${currentCheckoutSessionId} pending: ${sessionErr.message}`
+          );
+          return res.status(200).send("ok");
+        }
+        throw sessionErr;
       }
-
-      console.log("[stripeWebhook] checkout.session.completed processed for", email.toLowerCase());
+      console.log(
+        "[stripeWebhook] checkout.session.completed processed for",
+        obj?.customer_details?.email || obj?.customer_email || "unknown email"
+      );
       return res.status(200).send("ok");
     }
 

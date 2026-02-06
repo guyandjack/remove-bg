@@ -3,7 +3,7 @@
      <mj-section background-color="#1e293b" padding-bottom="20px" padding-top="20px">
       <mj-column vertical-align="top" width="100%">
         <mj-image
-          src={{urlLogo}}
+          src="{{urlLogo}}"
           alt=""
           align="center"
           border="none"

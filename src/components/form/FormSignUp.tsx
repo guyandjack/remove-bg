@@ -15,6 +15,7 @@ import { Loader } from "@/components/loader/Loader";
 import { axiosError } from "@/utils/axiosError";
 import { localOrProd } from "@/utils/localOrProd";
 
+
 //declarations des types
 export type FormValues = {
   email: string;
@@ -59,9 +60,10 @@ const getCurrency = (): string => {
 };
 const FormSignUp = () => {
   const { t, i18n } = useTranslation();
+  const lang = i18n.resolvedLanguage || i18n.language;
   //state qui gere l' validite de la reponse.
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>("null");
 
   //gere en partie l' affichage du loader
   const [isLoader, setIsLoader] = useState(false);
@@ -89,7 +91,7 @@ const FormSignUp = () => {
       }[plan] || null;
   }
 
-  const lang = i18n.resolvedLanguage || i18n.language;
+  
 
   const {
     register,
@@ -135,14 +137,14 @@ const FormSignUp = () => {
       );
       if (!response) {
         setErrorMessage(
-          "une erreur http c'est produite, veuillez verifier votre connexion."
+          t("formSignup.httpError")
         );
         setStatus("error");
         return;
       }
 
       const Data = response.data;
-      if (Data.status !== "success") {
+      if (Data.error) {
         setErrorMessage(Data.message);
         setStatus("error");
         return;
@@ -154,10 +156,11 @@ const FormSignUp = () => {
     } catch (error) {
       setIsLoader(false);
       setStatus("error");
+      setDisplayOtp(false);
     } finally {
       setTimeout(() => {
         setStatus("idle");
-      }, 3000);
+      }, 5000);
     }
   };
 
@@ -173,9 +176,7 @@ const FormSignUp = () => {
             >
               {plan}
             </span>
-            <span className="ml-2 text-sm uppercase text-info">
-              {currency}
-            </span>
+            <span className="ml-2 text-sm uppercase text-info">{currency}</span>
           </h1>
         </div>
 
@@ -340,40 +341,40 @@ const FormSignUp = () => {
                 </div>
               </div>
               <div>
-              <div className="mt-2">
-                <input
-                  id="plan"
-                  type="text"
-                  hidden
-                  readOnly
-                  className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
-                  {...register("plan")}
-                />
+                <div className="mt-2">
+                  <input
+                    id="plan"
+                    type="text"
+                    hidden
+                    readOnly
+                    className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                    {...register("plan")}
+                  />
+                </div>
               </div>
-            </div>
-            <div>
-              <div className="mt-2">
-                <input
-                  id="lang"
-                  type="text"
-                  hidden
-                  readOnly
-                  className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
-                  {...register("lang")}
-                />
+              <div>
+                <div className="mt-2">
+                  <input
+                    id="lang"
+                    type="text"
+                    hidden
+                    readOnly
+                    className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                    {...register("lang")}
+                  />
+                </div>
               </div>
-            </div>
-            <div>
-              <div className="mt-2">
-                <input
-                  id="currency"
-                  type="text"
-                  hidden
-                  readOnly
-                  {...register("currency")}
-                />
+              <div>
+                <div className="mt-2">
+                  <input
+                    id="currency"
+                    type="text"
+                    hidden
+                    readOnly
+                    {...register("currency")}
+                  />
+                </div>
               </div>
-            </div>
               <div className="relative flex flex-col justify-center items-center">
                 <button
                   type="submit"
@@ -418,8 +419,9 @@ const FormSignUp = () => {
           }
         `}
                 >
-                  {status === "success" ? t("formSignUp.textSuccess") : ""}
-                  {status === "error" ? errorMessage : ""}
+                  {status === "success"
+                    ? t("formSignUp.textSuccess")
+                    : !errorMessage ? t("formSignUp.textError"): errorMessage}
                 </div>
               </div>
               {

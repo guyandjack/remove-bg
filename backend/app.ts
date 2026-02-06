@@ -58,7 +58,7 @@ const corsOptions: CorsOptions = {
     callback: (err: Error | null, allow?: boolean) => void
   ) {
     const allowedOrigins = [
-      "https://bgremoved.ch", // domaine de production
+      "https://wizpix.ch", // domaine de production
       "http://localhost:5173", // front-end Vite dev
       "http://localhost:4173", // autre port Vite preview
     ];

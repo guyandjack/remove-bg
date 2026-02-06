@@ -9,8 +9,8 @@ const ALLOWED_MIMES = new Set([
   "image/webp",
 ]);
 
-// Taille max par défaut (10 MB)
-const DEFAULT_MAX_SIZE_BYTES = 10 * 1024 * 1024;
+// Taille max par défaut (5 MB)
+const DEFAULT_MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 export type ImageValidationOptions = {
   maxSizeBytes?: number;

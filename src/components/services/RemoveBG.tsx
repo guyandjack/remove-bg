@@ -81,6 +81,27 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
     }
   };
 
+  const revokeIfBlobUrl = (url: string | null) => {
+    if (url && url.startsWith("blob:")) {
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  const blobToDataUrl = (blob: Blob): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result;
+        if (typeof result === "string") {
+          resolve(result);
+        } else {
+          reject(new Error("Impossible de convertir le blob en DataURL"));
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
   // Lance le traitement des que l'utilisateur a choisi un fichier
   useEffect(() => {
     if (!fileToProcess) return;
@@ -105,10 +126,10 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
           responseType: "blob",
           signal: abortController.signal,
           timeout: 30000,
-        }
+          }
       );
 
-      return URL.createObjectURL(data);
+      return blobToDataUrl(data);
     };
 
     setIsProcessing(true);
@@ -116,11 +137,11 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
 
     const apiPromise = processImage().then((processedUrl) => {
       if (isCancelled) {
-        URL.revokeObjectURL(processedUrl);
+        revokeIfBlobUrl(processedUrl);
         return;
       }
       setResponseApi((previous) => {
-        if (previous) URL.revokeObjectURL(previous);
+        revokeIfBlobUrl(previous);
         return processedUrl;
       });
     });
@@ -136,7 +157,7 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
           "Impossible de traiter cette image pour le moment.";
         setProcessingError(message);
         setResponseApi((previous) => {
-          if (previous) URL.revokeObjectURL(previous);
+          revokeIfBlobUrl(previous);
           return "";
         });
       })
@@ -161,7 +182,7 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
 
   useEffect(() => {
     return () => {
-      if (responseApi) URL.revokeObjectURL(responseApi);
+      revokeIfBlobUrl(responseApi);
     };
   }, [responseApi]);
 
@@ -195,7 +216,7 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
       setFileToProcess(null);
       setProcessingError(null);
       setResponseApi((previous) => {
-        if (previous) URL.revokeObjectURL(previous);
+        revokeIfBlobUrl(previous);
         return "";
       });
       return;
@@ -203,7 +224,7 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
     setFileToProcess(file);
     setProcessingError(null);
     setResponseApi((previous) => {
-      if (previous) URL.revokeObjectURL(previous);
+      revokeIfBlobUrl(previous);
       return "";
     });
   };

@@ -2,6 +2,10 @@
 import type { RequestHandler } from "express";
 import nodemailer, { TransportOptions } from "nodemailer";
 import "dotenv/config";
+import {
+  notifyContactSubmission,
+  safeNotify,
+} from "../utils/telegramNotification.ts";
 
 /** Utilitaire: lit une variable d'env, avec fallback et/ou obligation */
 function env(name: string, opts?: { required?: boolean; fallback?: string }) {
@@ -124,6 +128,15 @@ const sendContactEmail: RequestHandler = async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
+
+    await safeNotify(() =>
+      notifyContactSubmission(req, {
+        firstname,
+        lastname,
+        email,
+        message: message ?? "",
+      })
+    );
 
     res.status(200).json({
       status: "success",

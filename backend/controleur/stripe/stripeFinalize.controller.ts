@@ -1,4 +1,5 @@
 import type { RequestHandler } from "express";
+import Stripe from "stripe";
 import {
   getStripeCheckoutSessionState,
   markStripeCheckoutSessionConsumed,
@@ -14,6 +15,56 @@ import {
 } from "../../function/createToken.ts";
 import type { ObjectResponse } from "../loginDataUser.controler.ts";
 import { planOption } from "../../data/planOption.ts";
+import {
+  CheckoutSessionPendingError,
+  finalizeCheckoutSessionFromStripeSession,
+} from "../../services/stripe/finalizeCheckoutSession.ts";
+
+const buildStripeClient = (): Stripe | null => {
+  const isProd =
+    process.env.NODE_ENV === "production" &&
+    process.env.STRIPE_MODE === "production";
+  const secret = isProd
+    ? process.env.STRIPE_SECRET_KEY_PROD ?? null
+    : process.env.STRIPE_SECRET_KEY_TEST ?? null;
+  if (!secret) return null;
+  return new Stripe(secret, { apiVersion: "2023-10-16" });
+};
+
+const tryFinalizeDirectly = async (
+  sessionId: string,
+  referer?: string | null
+) => {
+  const stripe = buildStripeClient();
+  if (!stripe) return null;
+  try {
+    const checkoutSession = await stripe.checkout.sessions.retrieve(
+      sessionId,
+      {
+        expand: ["customer", "customer_details"],
+      }
+    );
+    if (
+      checkoutSession.payment_status !== "paid" &&
+      checkoutSession.status !== "complete"
+    ) {
+      return null;
+    }
+    return await finalizeCheckoutSessionFromStripeSession({
+      session: checkoutSession,
+      referer: referer ?? null,
+    });
+  } catch (err) {
+    if (err instanceof CheckoutSessionPendingError) {
+      return null;
+    }
+    console.error(
+      "tryFinalizeDirectly error:",
+      (err as any)?.message || err
+    );
+    return null;
+  }
+};
 
 const finalizeStripeCheckout: RequestHandler = async (req, res) => {
   try {
@@ -25,7 +76,8 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
       });
     }
 
-    const record = await getStripeCheckoutSessionState(sessionId.trim());
+    const normalizedSessionId = sessionId.trim();
+    let record = await getStripeCheckoutSessionState(normalizedSessionId);
     if (!record) {
       return res.status(404).json({
         status: "error",
@@ -38,6 +90,16 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
         status: "error",
         message: record.last_error || "payment_failed",
       });
+    }
+
+    if (record.status !== "completed" || !record.user_id) {
+      const refreshed = await tryFinalizeDirectly(
+        normalizedSessionId,
+        (req.headers.referer as string | undefined) ?? null
+      );
+      if (refreshed) {
+        record = refreshed;
+      }
     }
 
     if (record.status !== "completed" || !record.user_id) {

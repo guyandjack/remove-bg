@@ -1,13 +1,13 @@
 <mjml>
-  <mj-body background-color="#ffffff">
-    <mj-section background-color="#1e293b" padding-bottom="20px" padding-top="20px">
+  <mj-body background-color="#1e293b">
+    <mj-section padding-bottom="20px" padding-top="20px">
       <mj-column vertical-align="top" width="100%">
         <mj-image
-          src={{urlLogo}}
-          alt=""
+          src="{{urlLogo}}"
+          alt="Logo"
           align="center"
           border="none"
-          width="250px"
+          width="200px"
           padding-left="0px"
           padding-right="0px"
           padding-bottom="0px"
@@ -17,7 +17,7 @@
     </mj-section>
     
     <mj-section
-      background-color="#1e293b"
+      
       padding-bottom="20px"
       padding-top="20px"
     >

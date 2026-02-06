@@ -10,6 +10,7 @@ import {
   signRefreshToken,
   setCookieOptionsObject,
 } from "../function/createToken.ts";
+import { buildLogoUrl } from "../utils/publicAssetUrl.ts";
 
 
 
@@ -84,9 +85,7 @@ export const forgotPassword: RequestHandler = async (req, res) => {
       const resetPath = "/reset-password";
       const resetUrl = `${baseUrl}${resetPath}?token=${encodeURIComponent(token)}`;
 
-      const baseUrlApi = isProd
-        ? process.env.BASE_URL_PROD
-        : process.env.BASE_URL_DEV;
+      const logoUrl = buildLogoUrl({ req, isProd });
 
       // Prépare l'envoi de l'email
       const name = String(user.email).split("@")[0];
@@ -139,8 +138,6 @@ export const forgotPassword: RequestHandler = async (req, res) => {
         ? "Réinitialisation de votre mot de passe"
         : "[DEV] Réinitialisation de votre mot de passe";
       
-      const logoUrl = `${baseUrlApi}/public/logo/logo_9_white.svg`;
-
       // Rendu MJML du template FR
       const { html: mjmlHtml } = await renderMjmlTemplate(
         "forgot.password.fr.mjml",

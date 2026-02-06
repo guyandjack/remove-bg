@@ -49,9 +49,10 @@
     "btnGoogle": "Continue with Google",
     "passwordError": "Password too weak",
     "textSuccess": "A confirmation email has been sent",
-    "textError": "An error occurred",
+    "textError": "An error occurred, account canceled",
     "question": "Already a member?",
-    "link": "Log in"
+    "link": "Log in",
+    "httpError": "An HTTP error has occurred. Please check your connection."
   },
 
   "otpInput": {

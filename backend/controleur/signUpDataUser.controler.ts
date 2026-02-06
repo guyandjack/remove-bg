@@ -8,6 +8,7 @@ import { connectDb } from "../DB/poolConnexion/poolConnexion.ts";
 import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.ts";
 import { getUserByEmail } from "../DB/queriesSQL/queriesSQL.ts";
 import { planOption } from "../data/planOption.ts";
+import { buildLogoUrl } from "../utils/publicAssetUrl.ts";
 
 function generateOtp(): string {
   return crypto.randomInt(0, 1_000_000).toString().padStart(6, "0");
@@ -30,9 +31,6 @@ function resolveLocale(lang: unknown): string {
 
 const sendMailVerification: RequestHandler = async (req, res) => {
   const isProd = process.env.NODE_ENV === "production";
-  const baseUrlApi = isProd
-        ? process.env.BASE_URL_PROD
-        : process.env.BASE_URL_DEV;
   try {
     const { email, password, lang, plan, id, currency } = (req as any).userValidated || {};
 
@@ -114,7 +112,7 @@ const sendMailVerification: RequestHandler = async (req, res) => {
     };
     const subject = subjects[locale] || subjects.en;
     const name = String(email).split("@")[0];
-   const logoUrl = `${baseUrlApi}/public/logo/logo_9_white.svg`;
+    const logoUrl = buildLogoUrl({ req, isProd });
 
     const { html } = await renderMjmlTemplate(
       `email.validation.${locale}.mjml`,
@@ -122,7 +120,6 @@ const sendMailVerification: RequestHandler = async (req, res) => {
       locale
     );
 
-    const isProd = process.env.NODE_ENV === "production";
     const from = (
       isProd
         ? process.env.MAILBOX_PROD_ADDRESS || process.env.MAILBOX_PROD_ADRESS

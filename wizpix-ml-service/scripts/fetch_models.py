@@ -5,14 +5,14 @@ from typing import Iterable, Tuple
 import requests
 
 ISNET_FILENAME = "isnet-general-use.onnx"
-MODNET_FILENAME = "modnet_webcam_portrait_matting.onnx"
 ISNET_URL = os.getenv(
-    "ISNET_MODEL_URL",
+    "INSPYRENET_MODEL_URL",
     "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx",
 )
-MODNET_URL = os.getenv(
-    "MODNET_MODEL_URL",
-    "https://huggingface.co/onnx-community/modnet-webnn/resolve/main/onnx/model.onnx",
+BIREFNET_FILENAME = "BiRefNet-portrait-epoch_150.onnx"
+BIREFNET_URL = os.getenv(
+    "BIREFNET_MODEL_URL",
+    "https://github.com/ZhengPeng7/BiRefNet/releases/download/v1.0/BiRefNet-portrait-epoch_150.onnx",
 )
 ROOT_DIR = Path(__file__).resolve().parents[1]
 MODEL_DIR = Path(
@@ -23,7 +23,7 @@ MODEL_DIR = Path(
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 REQUIRED_MODELS: Iterable[Tuple[str, str]] = (
     (ISNET_FILENAME, ISNET_URL),
-    (MODNET_FILENAME, MODNET_URL),
+    (BIREFNET_FILENAME, BIREFNET_URL),
 )
 
 
