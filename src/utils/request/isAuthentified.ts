@@ -39,13 +39,16 @@ const isAuthentified = async () => {
     const data = response.data;
     const user = data?.user;
     const baseSession = sessionSignal.value ?? createFallbackSession();
+    if (!baseSession) {
+      throw Error("Session invalide.");
+    }
 
     const updatedSession: SessionData = {
       ...baseSession,
-      status: data?.status ?? baseSession.status,
-      authentified: user?.authentified ?? baseSession.authentified ?? false,
+      status: data?.status ?? baseSession?.status,
+      authentified: user?.authentified ?? baseSession?.authentified ?? false,
       user: {
-        ...baseSession.user,
+        ...baseSession?.user,
         ...user,
       },
     };

@@ -75,6 +75,7 @@ const triggerArchiveDownload = (blob: Blob, disposition?: string) => {
 
 const SocialPicture = () => {
   const [images, setImages] = useState<SelectedImage[]>([]);
+  const [processedAssets, setProcessedAssets] = useState<Blob[]>([]);
   const [status, setStatus] = useState<SubmitStatus>({ state: "idle" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const uploadRef = useRef<HTMLInputElement | null>(null);

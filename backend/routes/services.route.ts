@@ -12,10 +12,15 @@ import { parseSocialPicturePayload } from "../middelware/services/socialPicture.
 import { imageConverter } from "../controleur/services/imageConverter.controler";
 import { formatSocialPictures } from "../controleur/services/socialFormatter.controler";
 import { removeBg } from "../controleur/services/removeBg.controler";
+import { removeBgByReplicate } from "../controleur/services/removeBgByReplicate.controler";
+import { magicEraser } from "../controleur/services/magicEraser.controler";
 import {
   attachRemoveBgQuality,
   validateRemoveBgUpload,
 } from "../middelware/services/removeBg.middelware";
+import {
+  validateMagicEraserPayload,
+} from "../middelware/services/magicEraser.middleware";
 
 const router = express.Router();
 
@@ -36,5 +41,22 @@ router.post(
   attachRemoveBgQuality,
   removeBg
 );
+
+// route remove bg via Replicate (MVP)
+router.post(
+  "/remove-bg-replicate",
+  validateRemoveBgUpload,
+  attachRemoveBgQuality,
+  removeBgByReplicate
+);
+
+
+//route magiceraser via replicate (MVP)
+router.post(
+  "/magic-eraser",
+  validateMagicEraserPayload,
+  magicEraser
+);
+
 
 export default router;

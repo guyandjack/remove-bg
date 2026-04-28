@@ -103,6 +103,7 @@
     "formContact": "loading..."
   },
   "diff": {
+    "title":"A preview of how the images will look without a background.",
     "friend_label": "Friends",
     "vehicule_label": "Vehicule",
     "sport_label": "Sport",
@@ -159,7 +160,7 @@
   "animationSection": {
     "helper": "Live preview",
     "title": "Watch your visuals morph in seconds",
-    "subtitle": "Each photo keeps the subject while the background fades into a blue and gray checkerboard so visitors instantly understand the transparent result."
+    "subtitle": "Each photo keeps the subject while the background becomes transparent."
   },
   "stepsContent": {
   "title": "How does it work?",
@@ -178,6 +179,7 @@
   }
 },
 "serviceCardContent": {
+  "title":"Services",
   "card_1": {
     "id": "remove",
     "src": "",
@@ -276,86 +278,88 @@
     "erase": "Cancel"
   },
   "faqHome": {
-  "question_1": "Does the site comply with GDPR&nbsp;?",
-  "reponse_1": "Yes. Our service is fully GDPR compliant. Personal data is collected only when strictly necessary (account creation or contact form). You may access, modify, or delete your data at any time.",
+  "title": "Frequently Asked Questions",
 
-  "question_2": "Who is this background removal service for&nbsp;?",
-  "reponse_2": "Our tool is designed for content creators, online sellers, photographers, designers, students, and anyone who needs clean, ready-to-use images quickly, for personal or professional use.",
+  "question_1": "Is the website GDPR compliant?",
+  "reponse_1": "Yes. Our platform is fully GDPR compliant. Personal data is only collected when strictly necessary (account registration or contact forms). You have the right to access, modify, and delete your data at any time. <a class='faq-link' href='/privacy'>Read our privacy policy</a> to learn more about how images are handled.",
 
-  "question_3": "Is the site secure&nbsp;?",
-  "reponse_3": "Yes. No data is shared with third parties without your consent, no tracking cookies are used, and payments are processed by Stripe, a PCI-DSS certified provider ensuring high security standards.",
+  "question_2": "Who is this background removal service for?",
+  "reponse_2": "Our tool is designed for content creators, e-commerce sellers, photographers, designers, students, and anyone who needs fast, high-quality background removal for professional or personal use.",
 
-  "question_4": "How do I use the service&nbsp;?",
-  "reponse_4": "Simply choose a plan (free or paid), create an account, and upload your images. Processing starts automatically, and you can download your result within seconds.",
+  "question_3": "Is the website secure?",
+  "reponse_3": "Yes. No data is shared with third parties, no tracking cookies are used, and all payments are securely processed by Stripe, a PCI-DSS certified provider.",
 
-  "question_5": "Is the free plan really free&nbsp;?",
-  "reponse_5": "Yes, absolutely. Some advanced features are limited, but no credit card is required and you receive daily credits to use the service at no cost.",
+  "question_4": "How do I use the service?",
+  "reponse_4": "Simply choose a plan (free or paid), create an account, and upload your images. Processing starts automatically and results are available for download within seconds. <a class='faq-link' href='/privacy'>Read our privacy policy</a> for more details.",
 
-  "question_6": "Are my images used to train AI models&nbsp;?",
-  "reponse_6": "Only if you explicitly authorize it. With consent, images are anonymized and used to improve our models. Without consent, they are automatically deleted after processing.",
+  "question_5": "Is the free plan really free?",
+  "reponse_5": "Yes, completely. Some advanced features are limited, but no credit card is required and you receive monthly credits to use the service at no cost.",
 
-  "question_7": "Are there risks to my personal data&nbsp;?",
-  "reponse_7": "There are no significant risks: we only collect your IP address and the information you voluntarily provide (account creation or contact form). No sensitive data is requested or stored.",
+  "question_6": "Are my images used to train AI models?",
+  "reponse_6": "No. Our partner Replicate, which provides and hosts the AI models, states that images are not used for training purposes. <a class='faq-link' href='/privacy'>Read our privacy policy</a> for more details.",
 
-  "question_8": "How long are my images stored&nbsp;?",
-  "reponse_8": "With your consent, images are stored only as long as needed to improve the AI model. Without consent, they are automatically deleted immediately after processing.",
+  "question_7": "What are the risks for my personal data?",
+  "reponse_7": "There are no significant risks. We only collect your IP address (for API security) and the information you voluntarily provide (registration or contact form). No sensitive data is requested or stored.",
 
-  "question_9": "Can I cancel my subscription at any time&nbsp;?",
-  "reponse_9": "Yes. You can cancel your subscription at any moment from your personal dashboard. Cancellation simply disables auto-renewal and does not interrupt your current access.",
+  "question_8": "How long are my images stored?",
+  "reponse_8": "We do not store your images. We only act as an intermediary between you and the AI processing models.",
 
-  "question_10": "Does cancellation entitle me to a refund&nbsp;?",
-  "reponse_10": "No. According to our subscription terms, periods already paid for remain due until their expiration, even in case of early cancellation.",
+  "question_9": "Can I cancel my subscription at any time?",
+  "reponse_9": "Yes. You can cancel your subscription at any time from your account. Cancellation stops automatic renewal without affecting your current access period.",
 
-  "question_11": "What is the quality of the results&nbsp;?",
-  "reponse_11": "Our AI model is trained to produce clean, precise, and professional-quality cutouts, even for complex images. Paid subscribers benefit from enhanced quality and advanced features.",
+  "question_10": "Does cancellation include a refund?",
+  "reponse_10": "No. According to our subscription terms, already paid periods remain due until their end date, even if canceled early.",
 
-  "question_12": "Is there a limit to how many images I can process&nbsp;?",
-  "reponse_12": "Yes. Each plan includes a daily credit quota corresponding to the number of images you can process. Your remaining credits are accessible at any time from your dashboard.",
+  "question_11": "What is the quality of the results?",
+  "reponse_11": "Our AI models are trained to deliver clean, precise, and professional background removal, even for complex images. Paid plans benefit from enhanced quality and advanced features.",
 
-  "question_13": "Does the service work on mobile&nbsp;?",
-  "reponse_13": "Yes. Our PWA works on smartphones, tablets, and computers. You can even install it like a regular app.",
+  "question_12": "Is there a limit to how many images I can process?",
+  "reponse_12": "Yes. Each plan includes a monthly credit quota corresponding to the number of AI processing operations. You can check your balance anytime in your dashboard.",
 
-  "question_14": "What if an image is poorly cut out&nbsp;?",
-  "reponse_14": "You can retry with a higher-quality image or use our editing tools (depending on your plan). If the issue persists, our support team is here to help.",
+  "question_13": "Does the service work on mobile?",
+  "reponse_13": "Yes. The service works on smartphones, tablets, and desktops. However, for the best experience, we recommend using a larger screen for editing tools.",
 
-  "question_15": "Do you offer an API&nbsp;?",
-  "reponse_15": "Yes. An API is available for professional plans, allowing you to integrate automatic background removal into your applications, workflows, or e-commerce platforms.",
+  "question_14": "What if the result is not accurate?",
+  "reponse_14": "You can try again with a higher-quality image or use our editing tools (depending on your plan). If the issue persists, our support team can assist you.",
 
-  "question_16": "Are my payment details stored&nbsp;?",
-  "reponse_16": "No. All payment data is processed exclusively by Stripe. We never have access to it and do not store it."
+  "question_15": "Do you offer an API?",
+  "reponse_15": "An API will be available soon for professional plans, allowing integration into your apps, workflows, or e-commerce platforms.",
+
+  "question_16": "Are my payment details stored?",
+  "reponse_16": "No. All payment data is handled exclusively by Stripe. We never have access to it and do not store it."
 },
 
   "faqPricing": {
-    "question_1": "Can I cancel my subscription at any time&nbsp;?",
-    "reponse_1": "Yes, you can cancel your subscription at any time from your personal account. Cancellation simply stops the automatic renewal. Your access remains active until the end of the period already paid for.",
+  "question_1": "Can I cancel my subscription at any time?",
+  "reponse_1": "Yes. You can cancel your subscription at any time from your account. Cancellation simply disables automatic renewal. Your access remains active until the end of the already paid period.",
 
-    "question_2": "Does cancellation entitle me to a refund&nbsp;?",
-    "reponse_2": "No. In accordance with our policy and applicable legislation, subscriptions that have already begun are non-refundable. However, you keep access to the service until your current subscription expires.",
+  "question_2": "Does cancellation include a refund?",
+  "reponse_2": "No. In accordance with our policy and applicable laws, subscriptions already started are non-refundable. However, you retain access to the service until the end of your current billing period.",
 
-    "question_3": "Can I change my plan (downgrade or upgrade)&nbsp;?",
-    "reponse_3": "Yes, you can change your subscription at any time. The new plan will take effect at the start of the next billing cycle. You may upgrade or downgrade depending on your needs.",
+  "question_3": "Can I change my plan (upgrade or downgrade)?",
+  "reponse_3": "Yes. You can change your subscription at any time by upgrading or downgrading according to your needs.",
 
-    "question_4": "What happens if I upgrade to a higher plan&nbsp;?",
-    "reponse_4": "If you upgrade to a higher plan, it will be applied at the next monthly renewal. You will then immediately benefit from the features of the new plan.",
+  "question_4": "What happens if I upgrade my plan?",
+  "reponse_4": "If you upgrade, the new plan is applied immediately. You will instantly benefit from the new features. The billing date is updated to match the new subscription start date.",
 
-    "question_5": "What happens if I downgrade to a lower plan&nbsp;?",
-    "reponse_5": "Downgrading to a lower plan will take effect at the next monthly billing cycle. You keep all features of your current plan until that date.",
+  "question_5": "What happens if I downgrade my plan?",
+  "reponse_5": "Downgrades take effect at the next billing cycle. You will retain access to your current plan’s features until that date.",
 
-    "question_6": "How is the subscription payment processed&nbsp;?",
-    "reponse_6": "Payment is monthly and made by credit card through Stripe, a secure payment platform. We do not store any sensitive banking data.",
+  "question_6": "How does subscription payment work?",
+  "reponse_6": "Payments are made monthly by credit card via Stripe, a secure payment provider. We do not store any sensitive payment information.",
 
-    "question_7": "Can I try the service before subscribing&nbsp;?",
-    "reponse_7": "Yes, a free plan is available and allows you to test the processing quality with a limited number of daily credits. No credit card is required to use it.",
+  "question_7": "Can I try the service before subscribing?",
+  "reponse_7": "Yes. A free plan is available, allowing you to test the service with a limited number of monthly credits. No credit card is required.",
 
-    "question_8": "What happens if I run out of daily credits&nbsp;?",
-    "reponse_8": "Your credits reset automatically each day. If you need more credits, you can upgrade to a higher plan at any time.",
+  "question_8": "What happens if I run out of credits?",
+  "reponse_8": "Once your credits are used up, you won’t be able to use the service until they are automatically reset the following month. You can also upgrade your plan at any time to get more credits.",
 
-    "question_9": "Does the subscription renew automatically&nbsp;?",
-    "reponse_9": "Yes, the subscription renews automatically every month to ensure uninterrupted service. You can disable automatic renewal from your personal account.",
+  "question_9": "Does the subscription renew automatically?",
+  "reponse_9": "Yes. Subscriptions automatically renew every month to ensure uninterrupted service. You can disable renewal from your account settings.",
 
-    "question_10": "Can I use the service on multiple devices&nbsp;?",
-    "reponse_10": "Yes, your subscription is linked to your account. You can use the service on any device as long as you are logged in."
-  },
+  "question_10": "Can I use the service on multiple devices?",
+  "reponse_10": "Yes. Your subscription is linked to your account, so you can access the service from any device as long as you are logged in."
+},
   "contact": {
     "title": "Got questions&nbsp;?\nWe're here to help&nbsp;!",
     "intro": "Use the form below to contact us. Our team will get back to you as soon as possible, whether you need technical assistance, have an administrative question, or any other request related to our services."
@@ -366,7 +370,8 @@
     "title_h2_card": "Switch your subscription according to your&nbsp;needs.",
     "intro": "Choose an affordable plan that&nbsp;includes the best features for&nbsp;your&nbsp;needs.",
     "title_h2_tab": "Subscription comparison",
-    "title_h2_faq": "Frequently asked questions"
+    "title_h2_faq": "Frequently asked questions",
+    "currency":"Currency selection"
   },
 
   "terms": {
@@ -410,51 +415,58 @@
   },
 
   "privacy": {
-    "title": "Privacy Policy",
-    "intro": "This Privacy Policy explains how the Provider collects, uses, stores, and protects users’ personal data (hereinafter referred to as 'the User') when using the background removal progressive web application (PWA) and related services (hereinafter referred to as 'the Service').",
+  "title": "Privacy Policy",
 
-    "article1_title": "1. Data Controller",
-    "article1_text": "The data controller responsible for processing personal data is the operator of the Service (hereinafter referred to as 'the Provider'). The Provider ensures that all processing activities comply with the General Data Protection Regulation (GDPR – EU 2016/679) and the Swiss Federal Data Protection Act (FADP).",
+  "intro": "This privacy policy explains how Wizpix collects, uses, and protects personal data when providing its background removal service. Wizpix follows a data minimization and transparency approach (“privacy by design”).",
 
-    "article2_title": "2. Data Collected",
-    "article2_text": "The Provider collects only the data strictly necessary for the operation and improvement of the Service:\n\n- Contact data : first name, last name, email address, message (via the contact form)\n-  Payment data : first name, last name, postal address, email address (collected via Stripe). No sensitive data, such as full credit card numbers, is stored by the Provider.\n- Technical data : IP address, browser type, operating system, access time (for statistical and security purposes)\n- Uploaded images : images uploaded by the User are temporarily stored for processing. Some images may be retained in an anonymized and secure form to improve the algorithms and artificial intelligence models used by the Service.",
+  "article1_title": "1. Data Controller",
+  "article1_text": "Wizpix acts as the data controller under GDPR and applicable Swiss data protection laws.\n\nSome third-party providers act as independent controllers or processors as described below.",
 
-    "article3_title": "3. Purpose of Data Processing",
-    "article3_text": "The collected data are used exclusively for the following purposes:\n\n- To provide and operate the Service properly\n- To manage customer relationships and respond to contact requests\n- To process payments and billing through Stripe\n- To improve Service and AI performance (machine learning on anonymized images)\n- To ensure system security and legal compliance",
+  "article2_title": "2. Data Collected",
+  "article2_text": "Wizpix only collects data strictly necessary to provide the service:\n\n- Email address (account creation)\n- Password (securely hashed)\n- Information voluntarily submitted via contact form\n- IP address (for security purposes)\n\nNo payment data is collected or stored by Wizpix.\n\nNo images are stored on Wizpix servers.",
 
-    "article4_title": "4. Cookies and Authentication",
-    "article4_text": "The Service uses only one cookie, which is strictly necessary for its operation. It is used exclusively to maintain the User's secure authentication session. No advertising, tracking, or analytics cookies are used. This cookie is temporary and does not contain any direct personal data.",
+  "article3_title": "3. Payments (Stripe)",
+  "article3_text": "Payments are processed directly by Stripe, which acts as an independent data controller.\n\nUsers enter payment details directly on Stripe’s secure interface. Wizpix has no access to this data and does not store it.\n\nMore information: <a class='faq-link' href='https://stripe.com/privacy' target='_blank'>https://stripe.com/privacy</a>",
 
-    "article5_title": "5. Legal Basis for Processing",
-    "article5_text": "Data processing is based on the following legal grounds:\n- Performance of a contract (subscription or Service use)\n- Explicit consent of the User for processing uploaded images\n- Legitimate interest of the Provider to improve the Service and ensure system security",
+  "article4_title": "4. Image Processing (Replicate)",
+  "article4_text": "Wizpix acts as a technical intermediary between users and AI models provided by Replicate, Inc. (USA).\n\nImages are transmitted via a secure API solely for processing and are immediately returned to the user.\n\nNo user-identifying data (such as email or account information) is transmitted with the images.\n\nAccording to Replicate’s public documentation, API data is not used to train public models and is retained only as long as necessary for processing.\n\nWizpix does not control Replicate’s processing activities, which operates as a processor or technical provider.\n\nMore information: <a class='faq-link' href='https://replicate.com/privacy' target='_blank'>https://replicate.com/privacy</a>",
 
-    "article6_title": "6. Data Retention",
-    "article6_text": "Personal data are retained only for the time necessary to fulfill the purposes for which they were collected:\n- Contact data: 12 months after the last interaction\n- Payment data: retained for the statutory accounting period (10 years in Switzerland)\n- Uploaded images: automatically deleted after processing, unless the User consents to their use for AI improvement (in which case, they are anonymized and non-traceable)",
+  "article5_title": "5. Purpose of Processing",
+  "article5_text": "Data is used only to:\n\n- Provide and operate the service\n- Manage user accounts\n- Respond to support requests\n- Ensure service security and integrity\n\nNo data is used for advertising, tracking, or profiling.",
 
-    "article7_title": "7. Data Security",
-    "article7_text": "The Provider implements all appropriate technical and organizational measures to protect data against loss, theft, unauthorized access, disclosure, or alteration. All data exchanges are encrypted (HTTPS), and sensitive information is secured using international security standards.",
+  "article6_title": "6. Legal Basis",
+  "article6_text": "Processing is based on:\n\n- Service performance (contract)\n- User consent\n- Legitimate interest (security)",
 
-    "article8_title": "8. Data Sharing and Transfers",
-    "article8_text": "Data are never sold to third parties. They may be shared only with:\n- The payment processor **Stripe**, for transaction handling\n- Technical service providers responsible for hosting and maintaining the Service, under strict confidentiality obligations\n\nNo data transfer outside Switzerland or the European Economic Area takes place without adequate protection guarantees.",
+  "article7_title": "7. Cookies",
+  "article7_text": "Wizpix uses a single cookie strictly necessary for the service to function. It is used to maintain user sessions.\n\nNo tracking, analytics, or advertising cookies are used.",
 
-    "article9_title": "9. User Rights",
-    "article9_text": "In accordance with the GDPR and the FADP, the User has the following rights:\n- Right of access to their data\n- Right to rectification and erasure\n- Right to object to or restrict processing\n- Right to data portability\n- Right to withdraw consent at any time\n\nRequests to exercise these rights can be made via the contact form or by email to the Provider.",
+  "article8_title": "8. Data Retention",
+  "article8_text": "Data is retained only as long as necessary:\n\n- Account data: until account deletion\n- Contact data: limited to request handling\n- Images: not stored by Wizpix",
 
-    "article10_title": "10. Changes to the Privacy Policy",
-    "article10_text": "The Provider reserves the right to modify this Privacy Policy at any time, particularly to comply with legal or technical developments. Any change becomes effective upon publication on the website. Users are encouraged to review the latest version regularly.",
+  "article9_title": "9. Data Sharing",
+  "article9_text": "Personal data is never sold.\n\nThe only third-party interactions are:\n- Stripe: payment processing (handled directly by them)\n- Replicate: image processing only\n\nNo other personal data is shared.",
 
-    "article11_title": "11. Contact",
-    "article11_text": "For any questions regarding this Privacy Policy or the exercise of your rights, please contact the Provider through the website’s contact form.",
+  "article10_title": "10. International Transfers",
+  "article10_text": "Use of the service may involve data transfers outside the European Union, notably to the United States (Replicate).\n\nThese transfers are limited to strictly necessary data (images only) and occur through secure connections.",
 
-    "conclusion": "By using the Service, the User acknowledges having read and accepted this Privacy Policy."
-  },
+  "article11_title": "11. Security",
+  "article11_text": "Wizpix implements appropriate technical and organizational measures, including:\n\n- Encrypted communications (HTTPS)\n- Secure password storage\n- Restricted data access\n\nHowever, no system can guarantee absolute security.",
+
+  "article12_title": "12. User Rights",
+  "article12_text": "Under GDPR, you have the right to:\n\n- Access your data\n- Request correction or deletion\n- Restrict or object to processing\n\nYou can exercise these rights via the contact form.",
+
+  "article13_title": "13. Changes",
+  "article13_text": "Wizpix may update this policy at any time. The applicable version is the one published on the website.",
+
+  "conclusion": "Wizpix is committed to minimizing data collection, ensuring transparency, and protecting user privacy."
+},
 
   "legal": {
     "title": "Legal Notice",
-    "intro": "This legal notice aims to define the information related to the publisher, the hosting provider, and the general terms of use of the website and the progressive web application (PWA) for background removal (hereinafter referred to as 'the Service').",
+    "intro": "This legal notice aims to define the information related to the publisher, the hosting provider, and the general terms of use of the website for background removal (hereinafter referred to as 'the Service').",
 
     "article1_title": "1. Website Publisher",
-    "article1_text": "The website and the Service are published by:\n\nCompany name: Helveclick\nRegistered office address: Helveclick Dupanloup Guillaume, Chemin du Mont Paisible 1, 3963 Crans-Montana, Switzerland\nCompany identification or SIRET number:\nContact email address: info@helveclick.ch\nPublication manager: Dupanloup Guillaume\n\nThe publisher is responsible for the content published on the website and for managing the Service.",
+    "article1_text": "The website and the Service are published by:\n\nCompany name: Helveclick\nRegistered office address: Helveclick Dupanloup Guillaume, Chemin du Mont Paisible 1, 3963 Crans-Montana, Switzerland\nCompany identification or SIRET number:\nContact email address: <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>\nPublication manager: Dupanloup Guillaume\n\nThe publisher is responsible for the content published on the website and for managing the Service.",
 
     "article2_title": "2. Hosting Provider",
     "article2_text": "The website is hosted by:\n\nHosting provider: PlanetHoster\nAddress:\nWebsite:\nContact email:\n\nThe hosting provider ensures the technical availability of the Service in accordance with its general terms and conditions.",
@@ -466,7 +478,7 @@
     "article4_text": "The Provider strives to ensure the accuracy and regular updating of the information published on the website. However, the Provider cannot be held liable for any errors, omissions, interruptions, or temporary unavailability of the Service.\n\nThe User acknowledges that they use the Service at their own risk. The Provider shall not be held liable for any direct or indirect damages resulting from the use of the Service, including data loss or file corruption.\n\nThe User is solely responsible for the content they upload via the Service. Any illegal content (including but not limited to content of a pedopornographic, violent, hateful nature, or contrary to Swiss and European law) is strictly prohibited and may be reported to the competent authorities.",
 
     "article5_title": "5. Personal Data",
-    "article5_text": "The processing of personal data is governed by the <a class=\"link\" href=\"/privacy\">Privacy Policy</a>, which can be consulted at any time on the website. It details the nature of the data collected, the purposes of processing, retention periods, and the User’s rights in accordance with the GDPR and the Swiss Data Protection Act (FADP).",
+    "article5_text": "The processing of personal data is governed by the <a class=\"faq-link\" href=\"/privacy\">Privacy Policy</a>, which can be consulted at any time on the website. It details the nature of the data collected, the purposes of processing, retention periods, and the User’s rights in accordance with the GDPR and the Swiss Data Protection Act (FADP).",
     "article5_link": "Read our Privacy Policy",
 
     "article6_title": "6. External Links",
@@ -479,7 +491,7 @@
     "article8_text": "This legal notice is governed by Swiss law. In the event of a dispute, and unless otherwise required by mandatory legal provisions, the competent courts of the Canton of Valais shall have exclusive jurisdiction.",
 
     "article9_title": "9. Contact",
-    "article9_text": "For any questions regarding the website, its content, or its terms of use, you can contact the publisher via the <a class=\"link\" href=\"/contact\">website contact form</a> or by email at <a class=\"link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>.",
+    "article9_text": "For any questions regarding the website, its content, or its terms of use, you can contact the publisher via the <a class=\"faq-link\" href=\"/contact\">website contact form</a> or by email at <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>.",
 
     "conclusion": "By accessing the website and using the Service, the User acknowledges having read and accepted this legal notice without reservation."
   },
@@ -526,8 +538,8 @@
     "conclusion": "By validating their subscription, the Client acknowledges having read, understood, and unreservedly accepted these Terms and Conditions of Sale."
   },
 
-  "upload": {
-    "title_h1": "Upload your image to test the processing quality...",
-    "title_h1_loged": "Upload your image to remove its background"
+  "servicePageTitle": {
+    "title_h1": "Test the quality of our services",
+    "title_h1_loged": "Use our services"
   }
 }

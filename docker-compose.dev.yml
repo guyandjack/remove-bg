@@ -1,0 +1,59 @@
+services:
+  ml:
+    build:
+      context: ./wizpix-ml-service
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./wizpix-ml-service/app:/app/app
+      - ./wizpix-ml-service/services:/app/services
+      - ./wizpix-ml-service/scripts:/app/scripts
+      - ./wizpix-ml-service/tests:/app/tests
+      - ./wizpix-ml-service/models:/app/models
+      - ./wizpix-ml-service/requirements.txt:/app/requirements.txt
+    environment:
+      PYTHONUNBUFFERED: "1"
+      U2NET_HOME: "/app/models"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "python", "scripts/health_probe.py", "--url", "http://localhost:8000/health", "--timeout", "3"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: "development"
+      # Le backend Express appelle le service Python via SERVICE_URL_DEV (cf. backend/.env, removeBg.controler.ts)
+      SERVICE_URL_DEV: "http://ml:8000"
+      # utile si ton Express a des CORS
+      FRONT_ORIGIN: "http://localhost:5173"
+    depends_on:
+      ml:
+        condition: service_healthy
+    command: nodemon --config nodemon.json
+
+
+  frontend:
+    build:
+      context: .
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      VITE_API_URL: "http://localhost:3000"
+    depends_on:
+      - backend
+    command: npm run dev -- --host 0.0.0.0 --port 5173

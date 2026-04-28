@@ -84,12 +84,19 @@ app.use(cors(corsOptions));
 // ----------------------------------------------------
 
 // Parser JSON et URL-encoded (avec limite de taille)
-const jsonParser = express.json({ limit: "5mb" });
-const urlEncodedParser = express.urlencoded({ extended: true, limit: "5mb" });
+// Note: si tu envoies des dataURL/base64 (ex: masque PNG) en JSON, le payload grossit vite.
+// Pour un MVP on augmente la limite; pour la prod, préfère `multipart/form-data` (fichiers) pour l'image+mask.
+const jsonParser = express.json({ limit: "25mb" });
+const urlEncodedParser = express.urlencoded({ extended: true, limit: "25mb" });
 // Stripe webhooks rely on the raw request body, so bypass every parser on that route.
 const skipBodyParser = (req: Request) =>
   req.originalUrl.startsWith("/api/stripe/webhook");
-const fileUploadMiddleware = fileUpload();
+// Upload fichiers (express-fileupload)
+// `fileSize` protège contre des payloads abusifs. Ajuste selon ton besoin réel.
+const fileUploadMiddleware = fileUpload({
+  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB
+  abortOnLimit: true,
+});
 
 app.use((req, res, next) => {
   if (skipBodyParser(req)) return next();

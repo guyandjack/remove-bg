@@ -1,0 +1,224 @@
+Tu vas améliorer une page pricing EXISTANTE de mon SaaS de suppression d’arrière-plan.
+
+IMPORTANT :
+- La page contient déjà :
+  - un titre
+  - une introduction
+  - 3 cartes de pricing (Gratuit, Hobby, Pro)
+  - un tableau comparatif
+- Tu ne dois PAS tout recréer
+- Tu dois MODIFIER, AMÉLIORER et OPTIMISER pour la conversion
+- Garde la structure globale mais améliore :
+  - le copywriting
+  - la hiérarchie visuelle
+  - les CTA
+  - la clarté
+  - la perception de valeur
+
+---
+
+# 🎯 OBJECTIF
+
+Transformer la page actuelle en une page pricing optimisée conversion :
+
+- compréhension en < 5 secondes
+- donner envie d’essayer
+- pousser vers le plan Hobby
+- réduire les frictions
+- rassurer l’utilisateur
+
+---
+
+# 🧠 1. HERO (titre + intro existants)
+
+👉 Réécris le titre pour qu’il soit orienté bénéfice :
+
+Exemple attendu :
+“Supprimez l’arrière-plan de vos images en quelques secondes”
+
+👉 Réécris l’introduction pour qu’elle soit :
+- plus courte
+- orientée utilisateur (créateurs, e-commerce, marketing)
+- centrée sur :
+  - rapidité
+  - qualité
+  - simplicité
+
+👉 Ajoute juste sous le titre :
+- une micro-réassurance :
+  - “Sans engagement”
+  - “Résiliable à tout moment”
+
+👉 Ajoute un CTA principal visible :
+- “Commencer gratuitement”
+
+---
+
+# 💰 2. CARTES PRICING (déjà existantes)
+
+👉 NE PAS recréer les cartes  
+👉 AMÉLIORER les cartes existantes
+
+## Modifications à faire :
+
+### 🔵 Plan Hobby (le plus important)
+
+- Le mettre visuellement en avant :
+  - taille légèrement plus grande OU
+  - bordure OU
+  - ombre plus forte
+- Ajouter un badge :
+  👉 “Le plus populaire”
+- Le bouton doit être le plus visible :
+  👉 “Passer à Hobby”
+
+---
+
+### 🟢 Plan Gratuit
+
+- Clarifier qu’il sert à tester
+- Simplifier le texte
+- Ajouter limite claire :
+  - “10 images / mois”
+- CTA :
+  👉 “Commencer gratuitement”
+
+---
+
+### 🟣 Plan Pro
+
+- Positionner comme plan avancé
+- Mettre en avant :
+  - priorité
+  - qualité maximale
+- CTA :
+  👉 “Passer à Pro”
+
+---
+
+# 💸 3. PRIX (très important)
+
+👉 Améliorer la lisibilité du prix :
+
+- Mettre “5€ / mois” très visible
+- Ajouter sous le prix :
+  - “Sans engagement”
+  - “Résiliable à tout moment”
+
+👉 Ajouter une micro-valeur (si possible) :
+- ex : “jusqu’à 2000 images / mois”
+
+---
+
+# 📊 4. TABLEAU COMPARATIF (existant)
+
+👉 Ne pas supprimer  
+👉 Simplifier et optimiser :
+
+- réduire le texte
+- rendre chaque ligne claire et scannable
+- éviter les phrases longues
+
+👉 lignes recommandées :
+- Images / mois
+- Résolution
+- Vitesse
+- Watermark
+- Priorité
+
+👉 améliorer lisibilité mobile si nécessaire
+
+---
+
+# 🧠 5. AMÉLIORATIONS UX IMPORTANTES
+
+👉 Ajouter autour des CTA :
+- micro-réassurance :
+  - “Sans engagement”
+  - “Upgrade à tout moment”
+
+👉 Ajouter espace blanc (padding)
+👉 améliorer hiérarchie :
+- titres plus visibles
+- sections mieux séparées
+
+---
+
+# 🔥 6. AJOUTS À FAIRE (sans casser la page)
+
+## A. Section courte “Pourquoi choisir notre outil”
+
+Ajouter une petite section avec 3–4 points :
+
+- Suppression rapide
+- Détourage précis
+- Interface simple
+- Prix accessible
+
+---
+
+## B. FAQ simple (courte)
+
+Ajouter en bas :
+
+- Puis-je résilier à tout moment ?
+- Que se passe-t-il si j’atteins ma limite ?
+- Mes images sont-elles stockées ?
+- Quelle différence entre Hobby et Pro ?
+
+Réponses :
+- courtes
+- rassurantes
+
+---
+
+## C. CTA final
+
+Ajouter un bloc en bas :
+
+- texte :
+  “Commencez gratuitement et améliorez vos images en quelques secondes”
+- bouton :
+  👉 “Commencer gratuitement”
+
+---
+
+# ⚠️ RÈGLES IMPORTANTES
+
+- Ne pas ajouter trop de texte
+- Ne pas complexifier
+- Ne pas ajouter de nouveaux plans
+- Ne pas changer la logique métier
+- Ne pas casser le design existant
+- Améliorer, pas reconstruire
+
+---
+
+# 🎨 DESIGN
+
+- garder Tailwind
+- style moderne, propre, SaaS
+- améliorer :
+  - spacing
+  - contraste
+  - lisibilité
+- le plan Hobby doit ressortir immédiatement
+
+---
+
+# 🧠 COPYWRITING
+
+- phrases courtes
+- orientées bénéfices
+- pas de jargon technique
+- ton simple et professionnel
+
+---
+
+# 🎯 SORTIE ATTENDUE
+
+- code modifié (pas recréé)
+- page plus claire
+- meilleure hiérarchie visuelle
+- meilleur wording
+- meilleur focus conversion

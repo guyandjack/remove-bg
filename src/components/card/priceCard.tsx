@@ -21,7 +21,7 @@ type PlanOption = {
   price: number;
   prices?: Record<"CHF" | "EUR" | "USD", number>;
   credit: number;
-  format: string;
+  format?: string;
   remove_bg: boolean;
   change_bg_color: boolean;
   tools_qt: string;

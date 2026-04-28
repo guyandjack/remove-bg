@@ -297,7 +297,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         ></p>
         <div className="flex flex-wrap items-center gap-4">
           <span className="text-base font-semibold">
-            {t("pricing.currency_label") || "Devise"}
+            {t("pricing.currency")}
           </span>
           <div className="join">
             {(["CHF", "EUR", "USD"] as CurrencyCode[]).map((code) => (

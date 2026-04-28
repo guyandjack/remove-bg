@@ -120,7 +120,7 @@ const RemoveBg = ({ removeTextContent, uploadTextContent }: PropsPage) => {
       formData.append("file", fileToProcess);
 
       const { data } = await api.post<Blob>(
-        "api/services/remove-bg",
+        "api/services/remove-bg-replicate",
         formData,
         {
           responseType: "blob",

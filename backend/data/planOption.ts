@@ -5,14 +5,15 @@ type PlanOptionInput = {
   price: number;
   prices: Record<CurrencyCode, number>;
   stripePriceIds: Record<CurrencyCode, string>;
+  lower_plan_option?: string;
   credit: number;
-  format: string;
+  //format: string;
   remove_bg: boolean;
   change_bg_color: boolean;
   tools_qt: string;
   tool_name: string[];
   model_IA_ressource: string;
-  gomme_magique: boolean;
+  gomme_magique?: boolean;
   img_pexels: boolean;
   delay_improved: boolean;
   bg_IA_generation: boolean;
@@ -36,13 +37,14 @@ const planOption: PlanOptionInput[] = [
       EUR: "",
       USD: "",
     },
-    credit: 5,
-    format: ".png",
+
+    credit: 3,
+    //format: ".png",
     remove_bg: true,
     change_bg_color: true,
     tools_qt: "1/6",
     tool_name: ["resize", "ajust"],
-    model_IA_ressource: "50%",
+    model_IA_ressource: "Standard",
     gomme_magique: false,
     img_pexels: false,
     delay_improved: false,
@@ -54,24 +56,25 @@ const planOption: PlanOptionInput[] = [
   },
   {
     name: "hobby",
-    price: 5,
+    price: 4.99,
     prices: {
-      CHF: 5,
-      EUR: 5,
-      USD: 5,
+      CHF: 4.99,
+      EUR: 4.99,
+      USD: 4.99,
     },
     stripePriceIds: {
       CHF: "price_1SeepuBaVLyPBDGsvlWmRxVS",
       EUR: "price_1SeepuBaVLyPBDGstF3a5O0B",
       USD: "price_1Sez7zBaVLyPBDGsMMgFL0D1",
     },
-    credit: 50,
-    format: ".png",
+    lower_plan_option: "Options du plan Free",
+    credit: 150,
+    //format: ".png",
     remove_bg: true,
     change_bg_color: true,
     tools_qt: "3/6",
     tool_name: ["resize", "ajust", "finetune"],
-    model_IA_ressource: "80%",
+    model_IA_ressource: "Amélioré",
     gomme_magique: true,
     img_pexels: true,
     delay_improved: false,
@@ -95,7 +98,7 @@ const planOption: PlanOptionInput[] = [
       USD: "price_1Sez6YBaVLyPBDGsWE3ErOdv",
     },
     credit: 300,
-    format: ".png .jpg .webp",
+    //format: ".png .jpg .webp",
     remove_bg: true,
     change_bg_color: true,
     tools_qt: "6/6",

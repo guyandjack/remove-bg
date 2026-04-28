@@ -4,7 +4,20 @@ import { Cta } from "@/components/cta/Cta";
 //import des fonctions
 import { setActiveLink } from "@/utils/setActiveLink";
 
-const FinalCTA = ({content}) => {
+type FinalCTAContent = {
+  title: string;
+  intro: string;
+  btn_1: string;
+  btn_2: string;
+  info_1: string;
+  info_2: string;
+};
+
+type FinalCTAProps = {
+  content: FinalCTAContent;
+};
+
+const FinalCTA = ({ content }: FinalCTAProps) => {
   return (
     <section className="py-20 ">
       <div className="max-w-[1200px] mx-auto px-6">

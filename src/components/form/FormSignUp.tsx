@@ -76,7 +76,7 @@ const FormSignUp = () => {
   const [displayOtp, setDisplayOtp] = useState(false);
 
   //reference qui stocke les data user a transmetre au form OTP
-  const dataUser = useRef<FormValues>();
+  const dataUser = useRef<FormValues | null>(null);
 
   const plan = getPlan();
   const currency = getCurrency();
@@ -455,7 +455,7 @@ const FormSignUp = () => {
                 question={t("otpInput.question")}
                 action={t("otpInput.btnResend")}
                 emailUser={email}
-                onSubmit={onSubmit}
+                onResend={onSubmit}
                 dataUser={dataUser.current}
                 textSuccess={t("otpInput.textSuccess")}
                 textError={t("otpInput.textError")}

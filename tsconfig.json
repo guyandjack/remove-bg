@@ -1,6 +1,20 @@
 {
   "compilerOptions": {
-   
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["vite/client"],
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+
+    "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
       "react": ["./node_modules/preact/compat"],
@@ -8,17 +22,12 @@
       "react-dom/*": ["./node_modules/preact/compat/*"],
       "react/jsx-runtime": ["./node_modules/preact/jsx-runtime"]
     },
-    "ignoreDeprecations": "6.0",
-    "target": "ES2020",
-    "module": "ESNext",
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact",
-    "moduleResolution": "Bundler",
-    "baseUrl": ".",
-   
+
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
   "include": ["src", "vite.config.ts"],
-
+  "references": []
 }

@@ -46,13 +46,12 @@ type PropsPage = {
 };
 
 const ServicesPage = ({ routeKey }: PropsPage) => {
-  const [service, setService] = useState<
-    "remove" | "social" | "product" | "convert" | null | string
-  >(null);
+  type ServiceId = "remove" | "social" | "product" | "convert" | string;
+  const [service, setService] = useState<ServiceId | null>(null);
   const { t } = useTranslation();
   const userLoged = sessionSignal?.value?.authentified || false;
 
-  const containerService = useRef(null);
+  const containerService = useRef<HTMLDivElement | null>(null);
 
   //contenu textuel du composant RemoveBG
   const textUploadImgComponent: UploadImgType = {
@@ -112,11 +111,12 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
 
   useEffect(() => {
     if (service === null) return;
-    if (!containerService.current) return;
+    const el = containerService.current;
+    if (!el) return;
    
     setTimeout(() => {
       
-      containerService.current.scrollIntoView({
+      el.scrollIntoView({
         behavior: "smooth",
         block: "start",
         inline: "nearest",
@@ -132,7 +132,9 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
         }
       >
         <h1 className={"text-center text-4xl font-bold  lg:text-6xl"}>
-          {userLoged ? t("upload.title_h1_loged") : t("upload.title_h1")}
+          {userLoged
+            ? t("servicePageTitle.title_h1_loged")
+            : t("servicePageTitle.title_h1")}
         </h1>
       </div>
       <ul

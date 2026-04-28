@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 //import des librairies
 import axios from "axios";
-import { FormSubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 //import { signal, computed, effect } from "@preact/signals";
 
 //import des composnta enfants
@@ -15,6 +15,7 @@ import { localOrProd } from "@/utils/localOrProd";
 import { setSessionFromApiResponse, privileges } from "@/stores/session";
 import { navigateWithLink } from "@/utils/navigateWithLink";
 
+import type { FormValues as SignUpFormValues } from "./FormSignUp";
 
 type OtpInputProps = {
   length?: number; // par défaut 6
@@ -23,16 +24,17 @@ type OtpInputProps = {
   question: string;
   action: string;
   title: string;
-  dataUser: FormValues;
+  dataUser: SignUpFormValues | null;
   errorRequire: string;
   errorPattern: string;
-  onSubmit: FormSubmitHandler<FormValues>;
+  onResend: (data: SignUpFormValues) => void | Promise<void>;
   className?: string; // classes wrapper
   textSuccess: string;
   textError: string;
+  emailUser?: string;
 };
 
-type FormValues = {
+type OtpFormValues = {
   otp: string;
   email?: string;
   id?: string;
@@ -42,7 +44,7 @@ const { urlApi } = localOrProd();
 
 function OtpInput({
   length = 6,
-  onSubmit,
+  onResend,
   autoFocus = true,
   title,
   question,
@@ -53,6 +55,7 @@ function OtpInput({
   className = "",
   textSuccess,
   textError,
+  emailUser,
 }: OtpInputProps) {
   const {
     register,
@@ -61,7 +64,7 @@ function OtpInput({
     setValue,
     getValues,
     trigger,
-  } = useForm<FormValues>({ mode: "onChange", defaultValues: { otp: "" } });
+  } = useForm<OtpFormValues>({ mode: "onChange", defaultValues: { otp: "" } });
 
   const [values, setValues] = useState<string[]>(() => Array(length).fill(""));
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
@@ -95,9 +98,9 @@ function OtpInput({
       
     })
     inputsRef.current[0]?.focus();
+    if (!dataUser) return;
     const payload = { ...dataUser, id: idBtn };
-
-    onSubmit(payload);
+    onResend(payload);
   };
 
   const focusIndex = (i: number) => {
@@ -182,7 +185,7 @@ function OtpInput({
     e: React.ClipboardEvent<HTMLInputElement>
   ) => {
     e.preventDefault();
-    const text = e.clipboardData.getData("text").replace(/\D/g, "");
+    const text = (e.clipboardData?.getData("text") || "").replace(/\D/g, "");
     if (!text) return;
 
     setValues((prev) => {
@@ -201,10 +204,10 @@ function OtpInput({
     });
   };
 
-  const onSubmitOtp = async (data: FormValues) => {
+  const onSubmitOtp = async (data: OtpFormValues) => {
     setIsLoader(true);
     try {
-      const mailUser: any = dataUser.email;
+      const mailUser: any = emailUser || dataUser?.email;
       const payload = { ...data, email: mailUser };
 
       const response = await axios.post(
@@ -255,7 +258,9 @@ function OtpInput({
         {slots.map((idx) => (
           <input
             key={idx}
-            ref={(el) => (inputsRef.current[idx] = el)}
+            ref={(el) => {
+              inputsRef.current[idx] = el;
+            }}
             type="text"
             inputMode="numeric"
             autoComplete="one-time-code"

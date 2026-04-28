@@ -11,28 +11,31 @@ type Text = {
   description: string;
 };
 type BannerProps = {
-  selectService?: React.Dispatch<
-    React.SetStateAction<"remove" | "social" | "product" | "convert" | string>
-  >;
+  selectService?: (id: Id) => void;
   content: Text;
 };
 
 const ServiceCard = ({ content, selectService }: BannerProps) => {
-  const cardContainer = useRef(null);
-  const cardElement = useRef(null);
+  const cardContainer = useRef<HTMLAnchorElement | null>(null);
+  const cardElement = useRef<HTMLDivElement | null>(null);
+  //const serviceHref = `/services?service=${encodeURIComponent(content.id)}`;
   const serviceHref = `/services?service=${encodeURIComponent(content.id)}`;
 
   const setReverseAnimation = () => {
-    cardElement.current.classList.remove("animation-service-card");
-    cardElement.current.classList.add("animation-service-card-reverse");
+    const el = cardElement.current;
+    if (!el) return;
+    el.classList.remove("animation-service-card");
+    el.classList.add("animation-service-card-reverse");
   };
   const setAnimation = () => {
-    cardElement.current.classList.remove("animation-service-card-reverse");
-    cardElement.current.classList.add("animation-service-card");
+    const el = cardElement.current;
+    if (!el) return;
+    el.classList.remove("animation-service-card-reverse");
+    el.classList.add("animation-service-card");
   };
 
   const handleClick = (e: MouseEvent) => {
-      setActiveLink(e);
+    setActiveLink(e);
     if (!selectService) return;
 
     e.preventDefault();
@@ -45,9 +48,8 @@ const ServiceCard = ({ content, selectService }: BannerProps) => {
   };
 
   useEffect(() => {
-    if (!cardContainer.current) return;
-
     const el = cardContainer.current;
+    if (!el) return;
 
     el.addEventListener("mouseleave", setReverseAnimation);
     el.addEventListener("mouseover", setAnimation);

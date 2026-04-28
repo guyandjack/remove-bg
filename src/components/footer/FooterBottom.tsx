@@ -1,6 +1,6 @@
 const FooterBottom = () => {
   return (
-    <div class="p-8 flex flex-col justify-center items-center gap-10 bg-base-100 md:flex-row justify-evenly lg:h-[30px]">
+    <div class="p-4 flex flex-col justify-center items-center gap-10 bg-base-100 md:flex-row justify-evenly lg:h-[30px]">
       <aside>
         <p>Wizard of pixels © {new Date().getFullYear()} - All rights reserved</p>
       </aside>

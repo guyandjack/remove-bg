@@ -100,6 +100,7 @@
   },
 
   "diff": {
+    "title": "Un apperçu du rendu des images sans arrière plan.",
     "friend_label": "Amis",
     "vehicule_label": "Vehicule",
     "sport_label": "Sport",
@@ -150,12 +151,14 @@
     "info_list_3": "3 – Une fois connecté, vous pouvez utiliser le service.",
     "privacy_1": "Aucune donnée personnelle n’est collectée ni partagée avec des tiers.</br>Vous pouvez consulter notre ",
     "privacy_1_link": "politique&nbsp;de&nbsp;confidentialité",
-    "privacy_2": "Aucun numéro de carte n’est demandé pour le plan gratuit."
+    "privacy_2": "Aucun numéro de carte n’est demandé pour le plan gratuit.",
+    "btn_test": "Je veux tester la qualité",
+    "btn_choice": "Je choisi un plan"
   },
   "animationSection": {
     "helper": "Demonstration en direct",
     "title": "Voyez vos images se transformer en quelques secondes",
-    "subtitle": "Chaque photo garde son sujet pendant que le fond disparait, laissant place au damier bleu et gris qui symbolise la transparence."
+    "subtitle": "Chaque photo garde son sujet principal pendant que le fond disparait."
   },
   "stepsContent": {
     "title": "Comment utiliser nos services&nbsp;?",
@@ -175,6 +178,7 @@
   },
 
   "serviceCardContent": {
+    "title":"Nos services",
   "card_1": {
     "id": "remove",
     "src": "",
@@ -275,86 +279,88 @@
   },
 
   "faqHome": {
-    "question_1": "Le site respecte-t-il le RGPD&nbsp;?",
-    "reponse_1": "Oui. Notre service est entièrement conforme au RGPD. Les données personnelles ne sont collectées que lorsqu’elles sont strictement nécessaires (inscription ou formulaire de contact). Vous disposez à tout moment d’un droit d’accès, de rectification et de suppression de vos données.",
+  "title": "Questions fréquentes",
 
-    "question_2": "À qui s’adresse ce service de suppression d’arrière-plan&nbsp;?",
-    "reponse_2": "Notre outil s’adresse aux créateurs de contenu, e-commerçants, photographes, graphistes, étudiants, ainsi qu’à toute personne souhaitant obtenir rapidement des images détourées, prêtes pour un usage professionnel ou personnel.",
+  "question_1": "Le site respecte-t-il le RGPD&nbsp;?",
+  "reponse_1": "Oui. Notre plateforme est entièrement conforme au RGPD. Les données personnelles ne sont collectées que lorsqu’elles sont strictement nécessaires (inscription ou formulaire de contact). Vous disposez à tout moment d’un droit d’accès, de rectification et de suppression de vos données. <a class='faq-link' href='/privacy'>Consultez notre politique de confidentialité</a> pour en savoir plus sur l’utilisation des images avec nos services.",
 
-    "question_3": "Le site est-il sécurisé&nbsp;?",
-    "reponse_3": "Oui. Aucune donnée n’est partagée à des tiers sans votre consentement, aucun cookie de suivi n’est utilisé, et les paiements sont traités par Stripe, un prestataire certifié PCI-DSS garantissant un haut niveau de sécurité.",
+  "question_2": "À qui s’adresse ce service de suppression d’arrière-plan&nbsp;?",
+  "reponse_2": "Notre outil s’adresse aux créateurs de contenu, e-commerçants, photographes, graphistes, étudiants, ainsi qu’à toute personne souhaitant obtenir rapidement des images détourées, prêtes pour un usage professionnel ou personnel.",
 
-    "question_4": "Comment utiliser le service&nbsp;?",
-    "reponse_4": "Il vous suffit de choisir un plan (gratuit ou payant), de créer un compte, puis d’importer vos images. Le traitement démarre automatiquement et vous pouvez télécharger le résultat en quelques secondes.",
+  "question_3": "Le site est-il sécurisé&nbsp;?",
+  "reponse_3": "Oui. Aucune donnée n’est partagée avec des tiers, aucun cookie de suivi n’est utilisé sur notre site, et les paiements sont traités par Stripe, un prestataire certifié PCI-DSS garantissant un haut niveau de sécurité.",
 
-    "question_5": "Le plan gratuit est-il vraiment gratuit&nbsp;?",
-    "reponse_5": "Oui, totalement. Certaines fonctionnalités avancées sont limitées, mais aucune carte bancaire n’est requise et vous disposez de crédits quotidiens pour utiliser le service sans frais.",
+  "question_4": "Comment utiliser le service&nbsp;?",
+  "reponse_4": "Il vous suffit de choisir un plan (gratuit ou payant), de créer un compte, puis d’importer vos images. Le traitement démarre automatiquement et vous pouvez télécharger le résultat en quelques secondes. <a class='faq-link' href='/privacy'>Consultez notre politique de confidentialité</a> pour plus d’informations sur l’utilisation des images.",
 
-    "question_6": "Mes images servent-elles à entraîner les modèles d’IA&nbsp;?",
-    "reponse_6": "Uniquement si vous l’autorisez explicitement. Avec votre consentement, les images sont anonymisées et utilisées pour améliorer nos modèles. Sans consentement, elles sont automatiquement supprimées après traitement.",
+  "question_5": "Le plan gratuit est-il vraiment gratuit&nbsp;?",
+  "reponse_5": "Oui, totalement. Certaines fonctionnalités avancées sont limitées, mais aucune carte bancaire n’est requise et vous disposez de crédits mensuels pour utiliser le service sans frais.",
 
-    "question_7": "Quels risques existent pour mes données personnelles&nbsp;?",
-    "reponse_7": "Aucun risque notable : nous ne collectons que votre adresse IP et les informations que vous fournissez volontairement (inscription ou formulaire de contact). Aucune donnée sensible n’est demandée ou stockée.",
+  "question_6": "Mes images servent-elles à entraîner les modèles d’IA&nbsp;?",
+  "reponse_6": "Non. Notre partenaire Replicate, qui fournit et héberge les modèles d’IA de traitement d’images, indique que les images ne sont pas utilisées pour entraîner des modèles. <a class='faq-link' href='/privacy'>Consultez notre politique de confidentialité</a> pour plus de détails.",
 
-    "question_8": "Combien de temps mes images sont-elles conservées&nbsp;?",
-    "reponse_8": "Avec votre consentement, les images sont conservées uniquement le temps nécessaire à l’amélioration du modèle d’IA. Sans consentement, elles sont automatiquement supprimées une fois le traitement terminé.",
+  "question_7": "Quels risques existent pour mes données personnelles&nbsp;?",
+  "reponse_7": "Aucun risque notable. Nous collectons uniquement votre adresse IP (pour la sécurisation de notre API) ainsi que les informations que vous fournissez volontairement (inscription ou formulaire de contact). Aucune donnée sensible n’est demandée ni stockée.",
 
-    "question_9": "Puis-je annuler mon abonnement à tout moment&nbsp;?",
-    "reponse_9": "Oui. Vous pouvez annuler votre abonnement librement depuis votre espace personnel. L’annulation désactive simplement le renouvellement automatique, sans interrompre votre accès actuel.",
+  "question_8": "Combien de temps mes images sont-elles conservées&nbsp;?",
+  "reponse_8": "Notre service ne conserve pas vos images. Nous agissons uniquement comme intermédiaire entre vous et les modèles d’IA de traitement.",
 
-    "question_10": "L’annulation donne-t-elle droit à un remboursement&nbsp;?",
-    "reponse_10": "Non. Conformément à nos conditions d’abonnement, les périodes déjà réglées restent dues jusqu’à leur échéance, même en cas d’annulation anticipée.",
+  "question_9": "Puis-je annuler mon abonnement à tout moment&nbsp;?",
+  "reponse_9": "Oui. Vous pouvez annuler votre abonnement à tout moment depuis votre espace personnel. L’annulation désactive le renouvellement automatique sans interrompre votre accès jusqu’à la fin de la période en cours.",
 
-    "question_11": "Quelle est la qualité des résultats obtenus&nbsp;?",
-    "reponse_11": "Notre modèle d’IA est entraîné pour produire un détourage propre, précis et professionnel, même pour des images complexes. Les abonnés payants bénéficient d’une qualité optimisée et d’options avancées.",
+  "question_10": "L’annulation donne-t-elle droit à un remboursement&nbsp;?",
+  "reponse_10": "Non. Conformément à nos conditions d’abonnement, les périodes déjà réglées restent dues jusqu’à leur échéance, même en cas d’annulation anticipée.",
 
-    "question_12": "Y a-t-il une limite au nombre d’images que je peux traiter&nbsp;?",
-    "reponse_12": "Oui. Chaque plan inclut un quota quotidien de crédits correspondant au nombre d’images que vous pouvez traiter. Votre solde est consultable à tout moment dans votre tableau de bord.",
+  "question_11": "Quelle est la qualité des résultats obtenus&nbsp;?",
+  "reponse_11": "Les modèles d’IA utilisés ont été entraînés pour produire un détourage propre, précis et professionnel, même sur des images complexes. Les abonnés payants bénéficient d’une qualité optimisée et d’options avancées.",
 
-    "question_13": "Le service fonctionne-t-il sur mobile&nbsp;?",
-    "reponse_13": "Oui. Notre PWA est compatible avec smartphones, tablettes et ordinateurs. Vous pouvez même l’installer comme une application traditionnelle.",
+  "question_12": "Y a-t-il une limite au nombre d’images que je peux traiter&nbsp;?",
+  "reponse_12": "Oui. Chaque plan inclut un quota mensuel de crédits correspondant au nombre d’utilisations des outils d’IA. Votre solde est consultable à tout moment dans votre tableau de bord.",
 
-    "question_14": "Que faire si une image est mal détourée&nbsp;?",
-    "reponse_14": "Vous pouvez réessayer avec une image de meilleure qualité ou utiliser nos outils de retouche (selon votre plan). En cas de problème persistant, notre support peut vous accompagner.",
+  "question_13": "Le service fonctionne-t-il sur mobile&nbsp;?",
+  "reponse_13": "Oui. Notre service est compatible avec smartphones, tablettes et ordinateurs. Toutefois, pour une meilleure expérience utilisateur, nous recommandons l’utilisation sur un écran suffisamment large pour exploiter pleinement les outils de retouche.",
 
-    "question_15": "Proposez-vous une API&nbsp;?",
-    "reponse_15": "Oui. Une API est disponible pour les plans professionnels afin d’intégrer la suppression d’arrière-plan dans vos applications, workflows ou boutiques e-commerce.",
+  "question_14": "Que faire si une image est mal détourée&nbsp;?",
+  "reponse_14": "Vous pouvez réessayer avec une image de meilleure qualité ou utiliser nos outils de retouche (selon votre plan). En cas de problème persistant, notre support est disponible pour vous accompagner.",
 
-    "question_16": "Mes informations de paiement sont-elles stockées&nbsp;?",
-    "reponse_16": "Non. Toutes les données de paiement sont traitées exclusivement par Stripe. Nous n’y avons jamais accès et ne les conservons pas."
-  },
+  "question_15": "Proposez-vous une API&nbsp;?",
+  "reponse_15": "Une API sera prochainement disponible pour les plans professionnels afin d’intégrer la suppression d’arrière-plan dans vos applications, workflows ou boutiques e-commerce.",
+
+  "question_16": "Mes informations de paiement sont-elles stockées&nbsp;?",
+  "reponse_16": "Non. Toutes les données de paiement sont traitées exclusivement par Stripe. Nous n’y avons jamais accès et ne les conservons pas."
+},
 
   "faqPricing": {
-    "question_1": "Puis-je annuler mon abonnement à tout moment&nbsp;?",
-    "reponse_1": "Oui, vous pouvez annuler votre abonnement à tout moment depuis votre espace personnel. L’annulation stoppe simplement le renouvellement automatique. Votre accès reste actif jusqu'à la fin de la période déjà payée.",
+  "question_1": "Puis-je annuler mon abonnement à tout moment&nbsp;?",
+  "reponse_1": "Oui. Vous pouvez annuler votre abonnement à tout moment depuis votre espace personnel. L’annulation désactive simplement le renouvellement automatique. Votre accès reste actif jusqu’à la fin de la période déjà payée.",
 
-    "question_2": "L’annulation donne-t-elle droit à un remboursement&nbsp;?",
-    "reponse_2": "Non, conformément à notre politique et à la législation applicable, les abonnements déjà commencés ne sont pas remboursables. Vous conservez toutefois l’accès au service jusqu’à l’échéance de votre abonnement en cours.",
+  "question_2": "L’annulation donne-t-elle droit à un remboursement&nbsp;?",
+  "reponse_2": "Non. Conformément à notre politique et à la législation applicable, les abonnements déjà commencés ne sont pas remboursables. Vous conservez toutefois l’accès au service jusqu’à l’échéance de votre abonnement en cours.",
 
-    "question_3": "Puis-je changer de formule (downgrade ou upgrade)&nbsp;?",
-    "reponse_3": "Oui, vous pouvez modifier votre abonnement à tout moment. La nouvelle formule sera appliquée au début du prochain cycle de facturation. Vous pouvez passer à une offre supérieure ou inférieure selon vos besoins.",
+  "question_3": "Puis-je changer de formule (upgrade ou downgrade)&nbsp;?",
+  "reponse_3": "Oui. Vous pouvez modifier votre abonnement à tout moment en choisissant une formule supérieure ou inférieure selon vos besoins.",
 
-    "question_4": "Que se passe-t-il si je passe à une formule supérieure&nbsp;?",
-    "reponse_4": "Si vous choisissez une formule supérieure, celle-ci sera appliquée au prochain renouvellement mensuel. Vous profiterez alors immédiatement des avantages liés à votre nouveau plan.",
+  "question_4": "Que se passe-t-il si je passe à une formule supérieure&nbsp;?",
+  "reponse_4": "Si vous choisissez une formule supérieure, elle est appliquée immédiatement. Vous bénéficiez alors des avantages du nouveau plan. La date de facturation est ajustée à la date de souscription du nouvel abonnement.",
 
-    "question_5": "Que se passe-t-il si je rétrograde vers une formule inférieure&nbsp;?",
-    "reponse_5": "Le changement vers une formule inférieure sera appliqué au prochain cycle mensuel. Vous conservez jusqu'à cette date les fonctionnalités de votre formule actuelle.",
+  "question_5": "Que se passe-t-il si je rétrograde vers une formule inférieure&nbsp;?",
+  "reponse_5": "Le passage à une formule inférieure prend effet au prochain cycle de facturation mensuel. Vous conservez jusqu’à cette date les fonctionnalités de votre formule actuelle.",
 
-    "question_6": "Comment fonctionne le paiement de l’abonnement&nbsp;?",
-    "reponse_6": "Le paiement est mensuel et s’effectue par carte bancaire via Stripe, une plateforme sécurisée. Nous ne conservons aucune donnée bancaire sensible.",
+  "question_6": "Comment fonctionne le paiement de l’abonnement&nbsp;?",
+  "reponse_6": "Le paiement est mensuel et s’effectue par carte bancaire via Stripe, une plateforme sécurisée. Nous ne conservons aucune donnée bancaire sensible.",
 
-    "question_7": "Puis-je tester le service avant de m’abonner&nbsp;?",
-    "reponse_7": "Oui, un plan gratuit est disponible et vous permet de tester la qualité du traitement avec un nombre limité de crédits par jour. Aucun numéro de carte n’est requis pour l’utiliser.",
+  "question_7": "Puis-je tester le service avant de m’abonner&nbsp;?",
+  "reponse_7": "Oui. Un plan gratuit est disponible et vous permet de tester la qualité du service avec un nombre limité de crédits mensuels. Aucun numéro de carte bancaire n’est requis.",
 
-    "question_8": "Que se passe-t-il si mes crédits quotidiens sont épuisés&nbsp;?",
-    "reponse_8": "Vos crédits sont réinitialisés automatiquement chaque jour. Si vous avez besoin de plus de crédits, vous pouvez passer à un abonnement supérieur à tout moment.",
+  "question_8": "Que se passe-t-il si mes crédits mensuels sont épuisés&nbsp;?",
+  "reponse_8": "Lorsque vos crédits sont épuisés, vous ne pouvez plus utiliser le service jusqu’à leur réinitialisation automatique le mois suivant. Vous pouvez également passer à une formule supérieure à tout moment pour obtenir plus de crédits.",
 
-    "question_9": "L'abonnement se renouvelle-t-il automatiquement&nbsp;?",
-    "reponse_9": "Oui, l’abonnement se renouvelle automatiquement chaque mois pour garantir la continuité du service. Vous pouvez désactiver le renouvellement dans votre espace personnel.",
+  "question_9": "L’abonnement se renouvelle-t-il automatiquement&nbsp;?",
+  "reponse_9": "Oui. L’abonnement se renouvelle automatiquement chaque mois afin d’assurer la continuité du service. Vous pouvez désactiver le renouvellement depuis votre espace personnel.",
 
-    "question_10": "Puis-je utiliser le service sur plusieurs appareils&nbsp;?",
-    "reponse_10": "Oui, votre abonnement est lié à votre compte. Vous pouvez utiliser le service sur n’importe quel appareil, tant que vous êtes connecté."
-  },
+  "question_10": "Puis-je utiliser le service sur plusieurs appareils&nbsp;?",
+  "reponse_10": "Oui. Votre abonnement est lié à votre compte. Vous pouvez accéder au service depuis n’importe quel appareil, à condition d’être connecté."
+},
 
   "contact": {
     "title": "Vous avez des questions&nbsp;?\nNous vous répondons&nbsp;!",
@@ -366,7 +372,8 @@
     "title_h2_card": "Changez d’abonnement en fonction de vos&nbsp;attentes.",
     "intro": "Choisissez un forfait abordable qui&nbsp;comprend les meilleures fonctionnalités pour&nbsp;vos&nbsp;besoins.",
     "title_h2_tab": "Comparatif des abonnements",
-    "title_h2_faq": "Questions fréquentes"
+    "title_h2_faq": "Questions fréquentes",
+    "currency":"Choix de la devise"
   },
 
   "terms": {
@@ -410,51 +417,58 @@
   },
 
   "privacy": {
-    "title": "Politique de Confidentialité",
-    "intro": "La présente Politique de Confidentialité décrit la manière dont le Prestataire collecte, utilise, conserve et protège les données personnelles des utilisateurs (ci-après « l’Utilisateur ») dans le cadre de l’utilisation du site et de l’application web progressive (PWA) de suppression d’arrière-plan d’images (ci-après « le Service »).",
+  "title": "Politique de confidentialité",
 
-    "article1_title": "1. Responsable du traitement",
-    "article1_text": "Le responsable du traitement des données personnelles est l’éditeur du Service (ci-après « le Prestataire »). Le Prestataire s’engage à assurer la conformité du traitement des données avec le Règlement Général sur la Protection des Données (RGPD – UE 2016/679) et la Loi fédérale suisse sur la protection des données (LPD).",
+  "intro": "La présente politique de confidentialité décrit la manière dont Wizpix collecte, utilise et protège les données personnelles dans le cadre de l’utilisation de son service de suppression d’arrière-plan d’images. Wizpix adopte une approche de minimisation des données et de transparence (« privacy by design »).",
 
-    "article2_title": "2. Données collectées",
-    "article2_text": "Le Prestataire collecte uniquement les données strictement nécessaires à la fourniture et à l’amélioration du Service :\n\nDonnées de contact : nom, prénom, adresse e-mail, message (formulaire de contact)\n Données de paiement : nom, prénom, adresse postale, adresse e-mail (collectées via Stripe). Aucune donnée sensible, telle que le numéro complet de carte bancaire, n’est stockée par le Prestataire.\nDonnées techniques : adresse IP, type de navigateur, système d’exploitation, temps d’accès (à des fins statistiques et de sécurité)\nImages téléversées : les images envoyées par l’Utilisateur sont temporairement stockées pour traitement. Certaines images peuvent être conservées de manière anonyme et sécurisée afin d’améliorer les algorithmes et modèles d’intelligence artificielle utilisés pour le Service.",
+  "article1_title": "1. Responsable du traitement",
+  "article1_text": "Wizpix agit en tant que responsable du traitement des données personnelles au sens du Règlement Général sur la Protection des Données (RGPD) et de la législation suisse applicable (LPD).\n\nCertains prestataires interviennent en tant que responsables de traitement indépendants ou sous-traitants, tels que décrits ci-dessous.",
 
-    "article3_title": "3. Utilisation des données",
-    "article3_text": "Les données collectées sont utilisées uniquement dans les finalités suivantes :\n\n- Fournir le Service et assurer son bon fonctionnement\n- Gérer la relation client et répondre aux demandes via le formulaire de contact\n- Traiter les paiements et la facturation via Stripe\n- Améliorer les performances du Service et de l’IA (apprentissage automatique sur images anonymisées)\n- Garantir la sécurité et la conformité légale du Service",
+  "article2_title": "2. Données collectées",
+  "article2_text": "Wizpix collecte uniquement les données strictement nécessaires à la fourniture du service :\n\n- Adresse e-mail (création de compte)\n- Mot de passe (stocké sous forme chiffrée)\n- Données transmises volontairement via le formulaire de contact\n- Adresse IP (à des fins de sécurité)\n\nAucune donnée de paiement n’est collectée ni stockée par Wizpix.\n\nAucune image n’est stockée sur les serveurs de Wizpix.",
 
-    "article4_title": "4. Cookies et authentification",
-    "article4_text": "Le Service n’utilise qu’un seul cookie, strictement nécessaire à son fonctionnement.Il est utilisé exclusivement pour maintenir la session d’authentification sécurisée de l’Utilisateur. Aucun cookie publicitaire, de suivi ou d’analyse n’est utilisé. Ce cookie est temporaire et ne contient aucune donnée personnelle directe.",
+  "article3_title": "3. Paiement (Stripe)",
+  "article3_text": "Les paiements sont traités directement par Stripe, qui agit en tant que responsable de traitement indépendant.\n\nLes informations de paiement sont saisies directement par l’utilisateur sur l’interface sécurisée de Stripe. Wizpix n’a aucun accès à ces données et ne les conserve pas.\n\nPour plus d’informations : <a class='faq-link' href='https://stripe.com/privacy'>https://stripe.com.privacy</a>",
 
-    "article5_title": "5. Base légale du traitement",
-    "article5_text": "Le traitement des données repose sur :\n- L’exécution d’un contrat (abonnement ou utilisation du Service)\n- Le consentement explicite de l’Utilisateur pour le traitement de ses images\n- L’intérêt légitime du Prestataire à améliorer ses services et assurer la sécurité du système",
+  "article4_title": "4. Traitement des images (Replicate)",
+  "article4_text": "Wizpix agit comme un intermédiaire technique entre l’utilisateur et des modèles d’intelligence artificielle fournis par Replicate, Inc. (États-Unis).\n\nLes images sont transmises via une API sécurisée exclusivement pour leur traitement, puis immédiatement renvoyées à l’utilisateur.\n\nAucune donnée permettant d’identifier l’utilisateur (telle que l’adresse e-mail ou les informations de compte) n’est transmise avec les images.\n\nSelon la documentation publique de Replicate, les données traitées via leur API ne sont pas utilisées pour entraîner des modèles publics et sont conservées uniquement le temps nécessaire au traitement.\n\nWizpix ne contrôle pas les traitements effectués par Replicate, qui agit en tant que sous-traitant ou prestataire technique.\n\nPour plus d’informations : <a class='faq-link' href='https://replicate.com/privacy'>https://replicate.com/privacy</a>",
 
-    "article6_title": "6. Conservation des données",
-    "article6_text": "Les données personnelles sont conservées pour une durée limitée, proportionnelle à la finalité du traitement :\n- Données de contact : 12 mois après le dernier échange\n- Données de paiement : selon la durée légale de conservation comptable (10 ans en Suisse)\n- Images téléversées : supprimées automatiquement après traitement, sauf si l’Utilisateur consent à leur utilisation pour l’amélioration du modèle d’IA (dans ce cas, elles sont anonymisées et non traçables)",
+  "article5_title": "5. Finalités du traitement",
+  "article5_text": "Les données sont utilisées exclusivement pour :\n\n- Fournir et faire fonctionner le service\n- Gérer les comptes utilisateurs\n- Répondre aux demandes via le support\n- Assurer la sécurité et l’intégrité du service\n\nAucune donnée n’est utilisée à des fins publicitaires, de profilage ou de suivi.",
 
-    "article7_title": "7. Sécurité des données",
-    "article7_text": "Le Prestataire met en œuvre toutes les mesures techniques et organisationnelles nécessaires pour protéger les données contre la perte, le vol, l’accès non autorisé, la divulgation ou la modification. Les échanges de données sont chiffrés (HTTPS) et les informations sensibles sont protégées via des protocoles de sécurité conformes aux standards internationaux.",
+  "article6_title": "6. Base légale",
+  "article6_text": "Le traitement repose sur :\n\n- L’exécution du service (contrat)\n- Le consentement de l’utilisateur (création de compte, contact)\n- L’intérêt légitime (sécurité du service)",
 
-    "article8_title": "8. Partage et transfert de données",
-    "article8_text": "Les données ne sont jamais vendues à des tiers. Elles peuvent toutefois être partagées avec :\n- Le prestataire de paiement **Stripe**, dans le cadre des transactions financières\n- Les prestataires techniques intervenant pour l’hébergement ou la maintenance du Service, soumis à des obligations strictes de confidentialité\n\nAucun transfert de données n’a lieu en dehors de la Suisse ou de l’Espace Économique Européen sans garanties de protection adéquates.",
+  "article7_title": "7. Cookies",
+  "article7_text": "Wizpix utilise uniquement un cookie strictement nécessaire au fonctionnement du service. Ce cookie permet de maintenir la session utilisateur.\n\nAucun cookie de suivi, d’analyse ou publicitaire n’est utilisé.",
 
-    "article9_title": "9. Droits de l’utilisateur",
-    "article9_text": "Conformément au RGPD et à la LPD, l’Utilisateur dispose des droits suivants :\n- Droit d’accès à ses données\n- Droit de rectification et de suppression\n- Droit d’opposition et de limitation du traitement\n- Droit à la portabilité des données\n- Droit de retirer son consentement à tout moment\n\nToute demande d’exercice de ces droits peut être adressée au Prestataire via le formulaire de contact ou par e-mail.",
+  "article8_title": "8. Conservation des données",
+  "article8_text": "Les données sont conservées uniquement pendant la durée nécessaire :\n\n- Données de compte : jusqu’à suppression du compte\n- Données de contact : durée limitée au traitement de la demande\n- Images : aucune conservation par Wizpix",
 
-    "article10_title": "10. Modifications de la politique de confidentialité",
-    "article10_text": "Le Prestataire se réserve le droit de modifier la présente Politique de Confidentialité à tout moment, notamment pour se conformer à toute évolution légale ou technique. Les modifications prennent effet dès leur publication sur le site. L’Utilisateur est invité à consulter régulièrement la version en vigueur.",
+  "article9_title": "9. Partage des données",
+  "article9_text": "Les données personnelles ne sont jamais vendues.\n\nLes seules interactions avec des tiers sont :\n- Stripe : traitement des paiements (directement via leur interface)\n- Replicate : traitement des images uniquement\n\nAucune autre donnée personnelle n’est transmise à des tiers.",
 
-    "article11_title": "11. Contact",
-    "article11_text": "Pour toute question relative à la présente Politique de Confidentialité ou à l’exercice de vos droits, vous pouvez contacter le Prestataire via le formulaire de contact du site.",
+  "article10_title": "10. Transferts internationaux",
+  "article10_text": "L’utilisation du service peut impliquer un transfert de données vers des prestataires situés hors de l’Union européenne, notamment aux États-Unis (Replicate).\n\nCes transferts sont limités aux données strictement nécessaires au traitement technique (images uniquement) et s’effectuent via des connexions sécurisées.",
 
-    "conclusion": "En utilisant le Service, l’Utilisateur reconnaît avoir pris connaissance et accepté les termes de la présente Politique de Confidentialité."
-  },
+  "article11_title": "11. Sécurité",
+  "article11_text": "Wizpix met en œuvre des mesures techniques et organisationnelles adaptées, notamment :\n\n- Chiffrement des communications (HTTPS)\n- Stockage sécurisé des mots de passe\n- Accès limité aux données\n\nToutefois, aucun système ne peut garantir une sécurité absolue.",
+
+  "article12_title": "12. Droits de l’utilisateur",
+  "article12_text": "Conformément au RGPD, vous disposez des droits suivants :\n\n- Accès à vos données\n- Rectification ou suppression\n- Limitation ou opposition au traitement\n\nVous pouvez exercer ces droits via le formulaire de contact.",
+
+  "article13_title": "13. Modifications",
+  "article13_text": "Wizpix peut modifier cette politique à tout moment. La version applicable est celle publiée sur le site.",
+
+  "conclusion": "Wizpix s’engage à collecter le minimum de données, à être transparent sur leur utilisation et à protéger la vie privée de ses utilisateurs."
+},
 
   "legal": {
     "title": "Mentions Légales",
-    "intro": "Les présentes mentions légales ont pour objet de définir les informations relatives à l’éditeur, à l’hébergeur et aux conditions générales d’utilisation du site et de l’application web progressive (PWA) de suppression d’arrière-plan d’images (ci-après « le Service »).",
+    "intro": "Les présentes mentions légales ont pour objet de définir les informations relatives à l’éditeur, à l’hébergeur et aux conditions générales d’utilisation du site 'wizpix' de suppression d’arrière-plan d’images (ci-après « le Service »).",
 
     "article1_title": "1. Éditeur du site",
-    "article1_text": "Le site et le Service sont édités par :\n\nRaison sociale : Helveclick \nAdresse du siège social : Helveclick Dupanloup Guillaume Chemin du Mont Paisible 1 3963 Crans-Montana\nNuméro d’identification ou SIRET :\nAdresse e-mail de contact : info@helveclick.ch \nResponsable de la publication : Dupanloup Guillaume \n\nL’éditeur est responsable du contenu publié sur le site et de la gestion du Service.",
+    "article1_text": "Le site et le Service sont édités par :\n\nRaison sociale : Helveclick \nAdresse du siège social : Helveclick Dupanloup Guillaume Chemin du Mont Paisible 1 3963 Crans-Montana\nNuméro d’identification ou SIRET :\nAdresse e-mail de contact : <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a> \nResponsable de la publication : Dupanloup Guillaume \n\nL’éditeur est responsable du contenu publié sur le site et de la gestion du Service.",
 
     "article2_title": "2. Hébergeur du site",
     "article2_text": "Le site est hébergé par :\n\nNom de l’hébergeur : PlanetHoster \nAdresse :  \nSite web : \n E-mail de contact :  \n\nL’hébergeur assure la disponibilité technique du Service conformément à ses conditions générales.",
@@ -466,7 +480,7 @@
     "article4_text": "Le Prestataire s’efforce d’assurer l’exactitude et la mise à jour des informations publiées sur le site. Toutefois, il ne saurait être tenu responsable des erreurs, omissions, interruptions ou indisponibilités temporaires du Service.\n\nL’utilisateur reconnaît utiliser le Service sous sa responsabilité exclusive. Le Prestataire ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service, y compris la perte de données ou la détérioration de fichiers.\n\nL’utilisateur est seul responsable du contenu qu’il téléverse via le Service. Tout contenu illicite (notamment à caractère pédopornographique, violent, haineux ou contraire aux lois suisses et européennes) est strictement interdit et pourra faire l’objet d’un signalement aux autorités compétentes.",
 
     "article5_title": "5. Données personnelles",
-    "article5_text": "Le traitement des données personnelles est régi par la <a class=\"link\" href=\"/privacy\">Politique de Confidentialité</a>, consultable à tout moment sur le site. Celle-ci détaille la nature des données collectées, leur finalité, leur durée de conservation ainsi que les droits de l’utilisateur conformément au RGPD et à la LPD.",
+    "article5_text": "Le traitement des données personnelles est régi par la <a class=\"faq-link\" href=\"/privacy\">Politique de Confidentialité</a>, consultable à tout moment sur le site. Celle-ci détaille la nature des données collectées, leur finalité, leur durée de conservation ainsi que les droits de l’utilisateur conformément au RGPD et à la LPD.",
     "article5_link": "Consultez notre politique de confidentialité",
 
     "article6_title": "6. Liens externes",
@@ -479,7 +493,7 @@
     "article8_text": "Les présentes mentions légales sont régies par le droit suisse. En cas de litige, et sauf disposition légale impérative contraire, les tribunaux compétents du canton du Valais seront seuls compétents.",
 
     "article9_title": "9. Contact",
-    "article9_text": "Pour toute question relative au site, à son contenu ou à ses conditions d’utilisation, vous pouvez contacter l’éditeur via le <a class=\"link\" href=\"/contact\">formulaire de contact du site </a> ou par e-mail à <a class=\"link\" href=\"mailto:info@helveclick.ch\"> info@helveclick.ch </a>.",
+    "article9_text": "Pour toute question relative au site, à son contenu ou à ses conditions d’utilisation, vous pouvez contacter l’éditeur via le <a class=\"faq-link\" href=\"/contact\">formulaire de contact du site </a> ou par e-mail à <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\"> info@helveclick.ch </a>.",
 
     "conclusion": "En accédant au site et en utilisant le Service, l’utilisateur reconnaît avoir pris connaissance des présentes mentions légales et les accepte sans réserve."
   },
@@ -525,8 +539,8 @@
 
     "conclusion": "En validant son abonnement, le Client reconnaît avoir lu, compris et accepté sans réserve les présentes Conditions Générales de Vente."
   },
-  "upload": {
-    "title_h1": "Téléversez votre image pour tester la qualité du traitement...",
-    "title_h1_loged": "Téléversez votre image pour supprimer son arrière-plan"
+  "servicePageTitle": {
+    "title_h1": "Testez la qualité des services",
+    "title_h1_loged": "Utilisez nos services"
   }
 }

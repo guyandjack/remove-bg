@@ -454,6 +454,21 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
     updateMaskSnapshot();
   };
 
+  const blobToDataUrl = (blob: Blob): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result;
+        if (typeof result === "string") {
+          resolve(result);
+        } else {
+          reject(new Error("Impossible de convertir le blob en DataURL"));
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
   const sendMagicEraseRequest = async () => {
     if (!eraserMaskData) {
       setEraserError(
@@ -464,17 +479,27 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
     try {
       setIsSendingEraser(true);
       setEraserError("");
-      const response = await api.post("/api/magic-eraser", {
-        image: currentSource,
-        mask: eraserMaskData,
-      });
-      const newImage =
-        response?.data?.imageBase64 ||
-        response?.data?.result ||
-        response?.data?.image;
-      if (!newImage) {
-        throw new Error("Réponse du serveur invalide.");
-      }
+
+      // IMPORTANT: envoi en multipart pour éviter les limites JSON/base64
+      // et coller au backend: init_image + mask_image.
+      const initBlob = await fetch(currentSource).then((r) => r.blob());
+      const maskBlob = await fetch(eraserMaskData).then((r) => r.blob());
+
+      const formData = new FormData();
+      formData.append("init_image", initBlob, "init_image.png");
+      formData.append("mask_image", maskBlob, "mask_image.png");
+
+      // Ne pas forcer "multipart/form-data" ici: Axios/le navigateur ajoutera le boundary automatiquement.
+      const { data } = await api.post<Blob>(
+        "api/services/magic-eraser",
+        formData,
+        {
+          responseType: "blob",
+          timeout: 60000,
+        }
+      );
+
+      const newImage = await blobToDataUrl(data);
       setEraserResult(newImage);
     } catch (error: any) {
       console.error("Erreur magic erase", error);
@@ -532,7 +557,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
   const activeBackground =
     isPreviewVisible && previewSelection ? previewSelection : selectedBg;
 
-  const renderActiveOptionContent = (activePiker) => {
+  const renderActiveOptionContent = (activePiker:any) => {
     if (activePicker === "color") {
       return (
         <div

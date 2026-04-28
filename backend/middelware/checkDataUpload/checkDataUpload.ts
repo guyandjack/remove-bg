@@ -108,9 +108,12 @@ export function validateImageUpload(
       | Record<string, UploadedFile | UploadedFile[]>;
 
     if (!files || !files[fieldName]) {
+      const availableFields = files ? Object.keys(files) : [];
       return res.status(400).json({
         error: true,
         message: `Aucun fichier reçu dans le champ "${fieldName}".`,
+        availableFields,
+        contentType: req.headers["content-type"] || null,
         requestId: (req as any).requestId,
       });
     }

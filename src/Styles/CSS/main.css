@@ -227,6 +227,15 @@ img {
   color: var(--color-secondary);
 }
 
+.faq-link{
+  text-decoration: underline;
+  transition:all 0.2s linear;
+}
+
+.faq-link:hover{
+  color: var(--color-info);
+}
+
 /***********************************************
 ****** custom css pour pattern cube *********
 **********************************************/

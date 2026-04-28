@@ -177,4 +177,3 @@ const UploadImg = ({
 };
 
 export { UploadImg };
-export type { UploadImgType, UploadImgProps };

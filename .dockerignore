@@ -1,0 +1,36 @@
+# deps & builds
+node_modules
+**/node_modules
+dist
+**/dist
+build
+**/build
+coverage
+**/coverage
+
+# python venv/cache
+venv
+**/venv
+.venv
+**/.venv
+__pycache__
+**/__pycache__
+.pytest_cache
+**/.pytest_cache
+*.pyc
+
+# git & editor
+.git
+**/.git
+.vscode
+.idea
+
+# OS / logs
+.DS_Store
+Thumbs.db
+*.log
+
+# docker misc
+**/.docker
+tree-project.txt
+

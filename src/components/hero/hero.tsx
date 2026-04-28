@@ -19,7 +19,9 @@ type HeroContentKey =
   | "info_list_3"
   | "privacy_1"
   | "privacy_1_link"
-  | "privacy_2";
+  | "privacy_2"
+  | "btn_test"
+  | "btn_choice";
 
 type Content = Record<HeroContentKey, string>;
 type ContentProps = {
@@ -45,16 +47,23 @@ const Hero = ({ content }: ContentProps) => {
           ></h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-            data-id="/pricing" 
-            onClick={(e)=> setActiveLink(e)}
-            href={"/pricing"} className={"w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-success/80 hover:bg-success/50 transition duration-300 ease-in-out"}>
-              je choisi un plan
-            </a>
+              data-id="/pricing"
+              onClick={(e) => setActiveLink(e)}
+              href={"/pricing"}
+              className={
+                "w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-success/80 hover:bg-success/50 transition duration-300 ease-in-out"
+              }
+              dangerouslySetInnerHTML={{ __html: content.btn_choice }}
+            ></a>
             <a
-            data-id="/services" 
-            onClick={(e)=> setActiveLink(e)}
-            href={"/services"} className={"w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out"}>
-              je veux tester la qualité
+              data-id="/services"
+              onClick={(e) => setActiveLink(e)}
+              href={"/services"}
+              className={
+                "w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out"
+              }
+              dangerouslySetInnerHTML={{ __html: content.btn_test }}
+            >
             </a>
           </div>
         </div>

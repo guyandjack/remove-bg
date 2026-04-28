@@ -1,10 +1,10 @@
-import { useState } from "react";
+/* import { useState } from "react";
 /* import Icon from "../../../components/AppIcon";
 import Image from "../../../components/AppImage";
 import Button from "../../../components/ui/Button";
 import { BeforeAfterImage } from "../types"; */
 
-interface HeroSectionProps {
+/*interface HeroSectionProps {
   heroImages: BeforeAfterImage[];
   photosProcessed: number;
 }
@@ -38,8 +38,7 @@ const HeroSection = ({ heroImages, photosProcessed }: HeroSectionProps) => {
 
   return (
     <section id="hero"
-      className="relative min-h-screen flex items-center bg-gradient-to-br from-background via-muted to-background pt-[60px]"
-    >
+      className="relative min-h-screen flex items-center bg-gradient-to-br from-background via-muted to-background pt-[60px]">
       <div className="max-w-[1200px] mx-auto px-6 py-16 w-full">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
@@ -202,3 +201,4 @@ const HeroSection = ({ heroImages, photosProcessed }: HeroSectionProps) => {
 };
 
 export default HeroSection;
+ */

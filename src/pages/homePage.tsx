@@ -6,11 +6,11 @@ import { useEffect } from "preact/hooks";
 //import des librairies
 import { useTranslation } from "react-i18next";
 
-//import de compoants enfants
+/* //import de compoants enfants
 import {
   BackgroundRemovalAnimation,
   type BackgroundRemovalFrame,
-} from "@/components/animation/BackgroundRemovalAnimation";
+} from "@/components/animation/BackgroundRemovalAnimation"; */
 import { CtaStyled } from "@/components/cta/CtaStyled";
 import { FinalCTA } from "@/components/cta/ctaFinal";
 import { Hero } from "@/components/hero/hero";
@@ -51,7 +51,9 @@ type HeroContentKey =
   | "info_list_3"
   | "privacy_1"
   | "privacy_1_link"
-  | "privacy_2";
+  | "privacy_2"
+  | "btn_test"
+  | "btn_choice";
 
 type CtaContent = {
   title_home_1: string;
@@ -96,6 +98,9 @@ function HomePage({ routeKey = "" }: PropsPage) {
     privacy_1: t("heroHome.privacy_1"),
     privacy_1_link: t("heroHome.privacy_1_link"),
     privacy_2: t("heroHome.privacy_2"),
+    btn_test: t("heroHome.btn_test"),
+    btn_choice: t("heroHome.btn_choice"),
+    
   };
 
   const ctaFinalContent = {
@@ -124,7 +129,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
     subtitle: t("animationSection.subtitle"),
   };
 
-  const animationSequence: BackgroundRemovalFrame[] = [
+  /* const animationSequence: BackgroundRemovalFrame[] = [
     {
       id: "friend",
       originalSrc: friendImg,
@@ -149,7 +154,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
       cutoutSrc: vehiculeImgBGRemove,
       alt: t("diff.vehicule_label"),
     },
-  ];
+  ]; */
 
   
 
@@ -161,6 +166,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
     t("diff.vehicule_label"),
     t("diff.logo_label"),
   ];
+   const contentDiffTitle = t("diff.title");
 
   //contenu textuel du composant stepsAction
   const stepsContent: stepsContent = {
@@ -228,6 +234,9 @@ function HomePage({ routeKey = "" }: PropsPage) {
     },
   ];
 
+  const contentCardServiceTitle = t("serviceCardContent.title");
+ 
+
   const contentCardService = [
     {
       id: t("serviceCardContent.card_1.id"),
@@ -254,6 +263,8 @@ function HomePage({ routeKey = "" }: PropsPage) {
       description: t("serviceCardContent.card_4.description"),
     },
   ];
+
+  const faqTitle = t("faqHome.title");
 
   const faqContent = [
     {
@@ -304,7 +315,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
   return (
     <div className={"page-container"}>
       <div className={"w-full mb-[100px] lg:mb-0"}>
-      <div
+        <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
           }
@@ -312,7 +323,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
           <Hero content={heroContent} />
         </div>
       </div>
-      <div className={"w-full bg-page py-[120px]"}>
+      {/* <div className={"w-full bg-page py-[120px]"}>
         <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center gap-10 lg:flex-row lg:items-center"
@@ -329,14 +340,14 @@ function HomePage({ routeKey = "" }: PropsPage) {
               {animationContent.subtitle}
             </p>
           </div>
-          <div className="w-full lg:w-[60%]">
+          {/* <div className="w-full lg:w-[60%]">
             <BackgroundRemovalAnimation
               sequence={animationSequence}
               opacity={0.92}
             />
-          </div>
+          </div> }
         </div>
-      </div>
+      </div> */}
       <div className={"w-full"}>
         <div
           className={
@@ -344,7 +355,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
           }
         >
           <h2 className="mb-[50px] text-center text-3xl font-bold lg:w-[60%] lg:text-5xl">
-            Nos services
+            {contentCardServiceTitle}
           </h2>
           <ul
             className={
@@ -396,7 +407,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
           }
         >
           <h2 className="mb-[50px] self-center text-center text-3xl font-bold lg:w-[60%] lg:text-5xl lg:self-start lg:text-left">
-            {"Un aperçu du rendu des images sans arrière plan."}
+            {contentDiffTitle}
           </h2>
           <div className={"w-full max-w-[800px] lg:w-[50%]"}>
             <Diff tag={labels} />
@@ -444,7 +455,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
           }
         >
           <h2 className="mb-[50px] text-center text-3xl font-bold lg:w-[60%] lg:text-5xl">
-            Questions frequentes
+            {faqTitle}
           </h2>
           <div className={"mb-[100px]"}>
             <Faq text={faqContent} />

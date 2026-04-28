@@ -15,13 +15,14 @@ const normalizedBaseURL = urlApi.replace(/\/+$/, "");
 //instance api qui aura des interceptor
 const api = axios.create({
   baseURL: normalizedBaseURL,
-  timeout: 10000,
+  // Replicate (US) + file d'attente + traitement image => latence possible
+  timeout: 20000,
 });
 
 //instance login sans interceptor
 const login = axios.create({
   baseURL: normalizedBaseURL,
-  timeout: 10000,
+  timeout: 20000,
 });
 
 
@@ -62,7 +63,7 @@ const onRefreshed = (token: string | null) => {
 /// ---- Instance sans interceptors pour appeler /auth/refresh ----
 const refreshClient = axios.create({
   baseURL: normalizedBaseURL,
-  timeout: 10000,
+  timeout: 20000,
   withCredentials: true,
 });
 
@@ -129,7 +130,24 @@ api.interceptors.response.use(
       objectSessionParsed.token = newAccessToken;
       //mise a jour de la session dans le localstorage et signalSession
       localStorage.setItem("session", JSON.stringify(objectSessionParsed));
-      sessionSignal.value.token = newAccessToken;
+      const currentSession = sessionSignal.value;
+      if (currentSession) {
+        sessionSignal.value = { ...currentSession, token: newAccessToken };
+      } else {
+        // Fallback si la session a ete remise a null (ex: logout/refresh fail)
+        sessionSignal.value = {
+          user: { email: "" },
+          status: null,
+          authentified: false,
+          redirect: false,
+          redirectUrl: null,
+          plan: { code: "" },
+          token: newAccessToken,
+          credits: { used_last_24h: 0, remaining_last_24h: 0 },
+          subscriptionId: null,
+          hint: null,
+        };
+      }
 
       // 2) On réveille toutes les requêtes en attente
       onRefreshed(newAccessToken);

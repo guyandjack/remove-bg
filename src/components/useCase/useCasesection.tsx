@@ -1,7 +1,11 @@
-import { useState } from "react";
-import Icon from "../../../components/AppIcon";
-import Image from "../../../components/AppImage";
-import { UseCase } from "../types";
+import { useState } from "preact/hooks";
+import type { UseCase } from "./types";
+
+// Placeholders typés (les anciens composants AppIcon/AppImage n'existent pas dans ce repo).
+const Icon = (_props: { name: string; size?: number; color?: string }) => null;
+const Image = (props: { src: string; alt: string; className?: string }) => (
+  <img src={props.src} alt={props.alt} className={props.className} />
+);
 
 interface UseCasesSectionProps {
   useCases: UseCase[];
