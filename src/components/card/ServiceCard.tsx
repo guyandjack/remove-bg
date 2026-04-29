@@ -5,6 +5,7 @@ import { setActiveLink } from "@/utils/setActiveLink";
 
 type Id = "remove" | "social" | "product" | "convert" | string;
 type Text = {
+  active: boolean;
   id: Id;
   src: string;
   title: string;
@@ -48,6 +49,7 @@ const ServiceCard = ({ content, selectService }: BannerProps) => {
   };
 
   useEffect(() => {
+    if (!content.active) return;
     const el = cardContainer.current;
     if (!el) return;
 
@@ -65,11 +67,18 @@ const ServiceCard = ({ content, selectService }: BannerProps) => {
       ref={cardContainer}
       data-service={content.id}
       data-id={"/services"}
-      href={serviceHref}
-      onClick={handleClick}
-      className="bg-component block w-[400px] h-[280px] border-service-card rounded-xl group  transition hover:z-[1] hover:shadow-lg hover:shadow-primary/50"
+      href={content.active ? serviceHref : ""}
+      onClick={content.active ? handleClick : undefined}
+      className={
+        `relative bg-component block w-[400px] h-[280px] border-service-card rounded-xl ${content.active?"group  transition hover:z-[1] hover:shadow-lg hover:shadow-primary/50":"cursor-default"}`
+      }
     >
-      <div className="space-y-8 py-12 p-8">
+      {content.active? null :<div className={"soon-service"}>Prochainement service suplementaire</div>}
+      <div
+        className={
+          content.active ? "space-y-8 py-12 p-8" : "space-y-8 py-12 p-8 opacity-[0.4]"
+        }
+      >
         <div className={"flex flex-row justify-end items-center"}>
           <div
             ref={cardElement}

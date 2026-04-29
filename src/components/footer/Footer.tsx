@@ -28,10 +28,7 @@ const Footer = () => {
   const company = t(`footer.company`);
   const legal = t(`footer.legal`);
 
-  const terms = t("footer.terms");
-  const privacy = t(`footer.privacy`);
-  const cookie = t(`footer.cookie`);
-
+  
   return (
     <div className={"relative overflow-hidden"}>
       <nav className="footer md:footer-horizontal bg-base-300 p-10">
@@ -114,7 +111,7 @@ const Footer = () => {
                       setActiveLink(e);
                     }}
                   >
-                    {label}
+                    {label === "legalLink" ? t("footer.legalLink") : label }
                   </a>
                 </li>
               ) : null;

@@ -17,7 +17,7 @@
     "terms": "Conditions générales d'utilisation (CGU)",
     "privacy": "Politique de confidentialité",
     "legalLink": "Mentions légales",
-    "cgv": "Conditions générales de vente"
+    "cgv": "Conditions générales de vente (CGV)"
   },
 
   "formContact": {
@@ -377,44 +377,51 @@
   },
 
   "terms": {
-    "title": "Conditions Générales d’Utilisation (CGU)",
-    "intro": "Les présentes Conditions Générales d’Utilisation (ci-après « CGU ») régissent l’accès et l’utilisation du site et de l’application PWA de suppression d’arrière-plan d’images (ci-après « le Service »), édités par le Prestataire. En accédant au Service, l’utilisateur reconnaît avoir lu, compris et accepté sans réserve les présentes conditions.",
+  "title": "Conditions Générales d’Utilisation (CGU)",
 
-    "article1_title": "1. Objet du Service",
-    "article1_text": "Le Service permet à l’utilisateur d’uploader des images afin d’en supprimer automatiquement l’arrière-plan à l’aide d’un algorithme de traitement d’images. Le Service est accessible via une application web progressive (PWA) et peut proposer des fonctionnalités additionnelles dans le cadre d’abonnements payants.",
+  "intro": "Les présentes Conditions Génales d’Utilisation (ci-après « CGU »)<br> régissent l’accès et l’utilisation du service Wizpix (ci-après « le Service »).<br> En utilisant le Service, l’utilisateur reconnaît avoir pris connaissance des présentes conditions <br>et les accepter sans réserve.",
 
-    "article2_title": "2. Accès au Service",
-    "article2_text": "L’accès au Service est ouvert à toute personne majeure ou disposant de l’autorisation légale de son représentant légal. Certaines fonctionnalités peuvent nécessiter la création d’un compte utilisateur et/ou la souscription à un abonnement payant. L’utilisateur s’engage à fournir des informations exactes lors de l’inscription et à maintenir leur mise à jour.",
+  "article1_title": "1. Objet du Service",
+  "article1_text": "Wizpix fournit un service en ligne permettant de traiter des images via des modèles d’intelligence artificielle afin de supprimer ou modifier l’arrière-plan.\n\nLe Service agit comme un intermédiaire technique entre l’utilisateur et des prestataires tiers fournissant des modèles d’IA.",
 
-    "article3_title": "3. Contenu et responsabilité de l’utilisateur",
-    "article3_text": "L’utilisateur est seul responsable du contenu (images, textes, métadonnées) qu’il transfère, téléverse ou traite via le Service. Il s’interdit strictement d’uploader tout contenu :\n- à caractère pédopornographique, violent, haineux, diffamatoire, obscène ou contraire aux bonnes mœurs,\n- violant le droit à l’image, le droit d’auteur ou tout autre droit de propriété intellectuelle,\n- contraire aux lois et règlements en vigueur en Suisse, dans l’Union Européenne ou dans le pays de l’utilisateur.\n\nLe Prestataire se réserve le droit de suspendre ou supprimer, sans préavis, tout compte ou contenu suspecté d’enfreindre la loi ou ces conditions, et de signaler toute activité illégale aux autorités compétentes. Le Prestataire décline toute responsabilité quant au contenu traité par les utilisateurs.",
+  "article2_title": "2. Accès au Service",
+  "article2_text": "L’accès au Service est réservé aux personnes majeures ou disposant d’une autorisation légale.\n\nLa création d’un compte est nécessaire pour accéder à certaines fonctionnalités. L’utilisateur s’engage à fournir des informations exactes et à assurer la confidentialité de ses identifiants.\n\nToute activité effectuée via le compte de l’utilisateur est réputée avoir été réalisée par celui-ci.",
 
-    "article4_title": "4. Utilisation du Service et limitations",
-    "article4_text": "L’utilisateur s’engage à utiliser le Service uniquement dans un cadre légal et personnel. Il est interdit d’utiliser le Service à des fins de fraude, de spamming, de formation de modèles d’intelligence artificielle sans autorisation écrite, ou d’exploitation commerciale non autorisée. Le Prestataire peut limiter ou interrompre l’accès au Service pour maintenance, sécurité ou abus constaté.",
+  "article3_title": "3. Contenu et responsabilité de l’utilisateur",
+  "article3_text": "L’utilisateur est seul responsable des contenus qu’il utilise via le Service.\n\nIl s’interdit strictement d’utiliser le Service pour traiter des contenus :\n- illégaux, violents, haineux ou contraires à l’ordre public,\n- portant atteinte aux droits de tiers (droit à l’image, droit d’auteur, propriété intellectuelle),\n- non conformes aux lois applicables.\n\nWizpix peut suspendre ou supprimer tout compte en cas de violation des présentes conditions et signaler toute activité illégale aux autorités compétentes.",
 
-    "article5_title": "5. Abonnements et paiement",
-    "article5_text": "Certaines fonctionnalités du Service sont accessibles via des abonnements payants. Les tarifs, durées et conditions sont indiqués clairement avant toute souscription. Les paiements sont traités de manière sécurisée via un prestataire tiers. Aucun remboursement ne sera effectué sauf en cas d’erreur imputable au Prestataire ou conformément à la législation en vigueur sur la protection des consommateurs.",
+  "article4_title": "4. Traitement des images",
+  "article4_text": "Les images sont transmises à des prestataires tiers spécialisés (notamment Replicate, États-Unis) via une API sécurisée afin d’être traitées.\n\nWizpix ne stocke aucune image et n’en conserve aucune copie après traitement.\n\nAucune donnée permettant d’identifier l’utilisateur n’est transmise avec les images.\n\nL’utilisateur reconnaît que le traitement est automatisé et que les résultats peuvent varier selon la qualité des images et les modèles utilisés.",
 
-    "article6_title": "6. Protection des données personnelles",
-    "article6_text": "Les données collectées (informations de compte, facturation, images uploadées) sont traitées conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi suisse sur la protection des données (LPD). Les images uploadées sont temporairement stockées pour traitement et supprimées automatiquement après un délai raisonnable. L’utilisateur conserve l’intégralité de ses droits sur ses fichiers.",
+  "article5_title": "5. Droits sur les images",
+  "article5_text": "L’utilisateur conserve l’intégralité des droits sur les images qu’il soumet ainsi que sur les résultats générés.\n\nIl est libre d’utiliser les images traitées sans restriction, y compris à des fins commerciales (site e-commerce, marketing, communication, etc.).\n\nWizpix ne revendique aucun droit de propriété sur les contenus traités.",
 
-    "article7_title": "7. Propriété intellectuelle",
-    "article7_text": "Le Service, son interface, ses algorithmes et ses marques sont la propriété exclusive du Prestataire. Toute reproduction, modification ou exploitation non autorisée est strictement interdite. L’utilisateur conserve la propriété intellectuelle sur les images qu’il téléverse.",
+  "article6_title": "6. Utilisation du Service",
+  "article6_text": "Le Service est fourni pour un usage légal.\n\nToute utilisation abusive, notamment automatisée, frauduleuse ou visant à contourner les limitations du Service, est interdite.\n\nWizpix se réserve le droit de limiter, suspendre ou interrompre l’accès au Service en cas d’abus ou pour des raisons techniques.",
 
-    "article8_title": "8. Responsabilités et garanties",
-    "article8_text": "Le Prestataire met tout en œuvre pour assurer la fiabilité et la disponibilité du Service mais ne garantit pas un fonctionnement ininterrompu ou exempt d’erreur. Le Prestataire ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service, y compris en cas de perte de données, sauf faute grave prouvée.",
+  "article7_title": "7. Abonnements et paiement",
+  "article7_text": "Certaines fonctionnalités du Service sont accessibles via des abonnements payants.\n\nLes paiements sont traités par un prestataire tiers (Stripe). Wizpix n’a aucun accès aux données de paiement.\n\nLes abonnements sont reconduits automatiquement sauf résiliation.\n\nSauf disposition légale contraire, les sommes versées ne sont pas remboursables.",
 
-    "article9_title": "9. Suspension et résiliation",
-    "article9_text": "Le Prestataire se réserve le droit de suspendre ou de résilier un compte utilisateur en cas de non-respect des présentes CGU, de suspicion d’activité illégale ou d’abus du Service. En cas de résiliation, aucun remboursement partiel d’abonnement ne sera effectué.",
+  "article8_title": "8. Données personnelles",
+  "article8_text": "Wizpix collecte uniquement les données nécessaires au fonctionnement du Service (email, mot de passe chiffré, données de contact).\n\nAucune image n’est stockée.\n\nPour plus d’informations, l’utilisateur est invité à consulter la <a class='faq-link' href='/privacy'>Politique de confidentialité.</a>",
 
-    "article10_title": "10. Droit applicable et juridiction compétente",
-    "article10_text": "Les présentes conditions sont soumises au droit suisse. En cas de litige, et sauf disposition légale impérative contraire, les tribunaux compétents du canton de Vaud seront seuls compétents.",
+  "article9_title": "9. Propriété intellectuelle",
+  "article9_text": "Le Service, son code, son interface et ses technologies sont protégés par les lois sur la propriété intellectuelle.\n\nToute reproduction, modification ou exploitation non autorisée est interdite.\n\nL’utilisateur conserve ses droits sur ses contenus.",
 
-    "article11_title": "11. Modifications des CGU",
-    "article11_text": "Le Prestataire se réserve le droit de modifier à tout moment les présentes CGU. Toute modification prend effet dès sa publication sur le site. Il appartient à l’utilisateur de consulter régulièrement la dernière version en vigueur.",
+  "article10_title": "10. Responsabilité",
+  "article10_text": "Le Service est fourni « tel quel ».\n\nWizpix ne garantit pas un fonctionnement ininterrompu ou exempt d’erreur.\n\nDans les limites autorisées par la loi, Wizpix ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service, y compris en cas de perte de données ou de résultats non conformes.",
 
-    "conclusion": "En utilisant le Service, l’utilisateur reconnaît avoir pris connaissance et accepté sans réserve les présentes Conditions Générales d’Utilisation."
-  },
+  "article11_title": "11. Suspension et résiliation",
+  "article11_text": "Wizpix peut suspendre ou résilier un compte en cas de violation des présentes CGU ou d’utilisation abusive du Service.\n\nLa résiliation ne donne lieu à aucun remboursement des périodes déjà payées.",
+
+  "article12_title": "12. Droit applicable",
+  "article12_text": "Les présentes CGU sont régies par le droit suisse.\n\nEn cas de litige, les tribunaux compétents du canton de Vaud sont seuls compétents, sauf disposition légale impérative contraire.",
+
+  "article13_title": "13. Modifications",
+  "article13_text": "Wizpix se réserve le droit de modifier les présentes CGU à tout moment. La version applicable est celle publiée sur le site.",
+
+  "conclusion": "En utilisant le Service, l’utilisateur reconnaît accepter pleinement les présentes CGU."
+},
 
   "privacy": {
   "title": "Politique de confidentialité",
@@ -498,47 +505,51 @@
     "conclusion": "En accédant au site et en utilisant le Service, l’utilisateur reconnaît avoir pris connaissance des présentes mentions légales et les accepte sans réserve."
   },
   "cgv": {
-    "title": "Conditions Générales de Vente (CGV)",
-    "intro": "Les présentes Conditions Générales de Vente (ci-après « CGV ») régissent les relations contractuelles entre le Prestataire et tout utilisateur (ci-après « le Client ») souscrivant à une offre d’abonnement payant sur le site ou l’application web progressive (PWA) de suppression d’arrière-plan d’images (ci-après « le Service »). En souscrivant un abonnement, le Client accepte sans réserve les présentes conditions.",
+  "title": "Conditions Générales de Vente (CGV)",
 
-    "article1_title": "1. Objet du contrat",
-    "article1_text": "Le présent contrat a pour objet de définir les conditions dans lesquelles le Prestataire met à disposition du Client un Service en ligne de suppression automatique d’arrière-plan d’images, accessible via abonnement annuel. Le Service est fourni en mode SaaS (Software as a Service), hébergé et maintenu par le Prestataire.",
+  "intro": "Les présentes Conditions Générales de Vente (ci-après « CGV »)<br> régissent les relations contractuelles entre Wizpix (ci-après « le Prestataire »)<br> et tout utilisateur souscrivant à une offre payante (ci-après « le Client »).<br> En souscrivant un abonnement, le Client accepte les présentes CGV sans réserve.",
 
-    "article2_title": "2. Conditions d’abonnement",
-    "article2_text": "L’accès aux fonctionnalités payantes du Service nécessite la souscription d’un abonnement annuel. L’abonnement est nominatif, personnel et non transférable.\n\nLe Client peut souscrire, gérer ou résilier son abonnement depuis son espace personnel. La résiliation met fin au renouvellement automatique, mais n’entraîne pas de remboursement pour la période déjà entamée.",
+  "article1_title": "1. Objet",
+  "article1_text": "Wizpix propose un service en ligne de traitement d’images via intelligence artificielle, accessible sous forme d’abonnement (Software as a Service).",
 
-    "article3_title": "3. Durée et renouvellement",
-    "article3_text": "L’abonnement est conclu pour une durée d’un (1) an à compter de la date de souscription. À l’expiration de cette période, il est renouvelé automatiquement pour une période équivalente, sauf résiliation préalable par le Client.\n\nLe Client peut résilier son abonnement à tout moment depuis son compte. La résiliation prend effet à la date d’échéance de l’abonnement en cours, sans remboursement de la période restante.",
+  "article2_title": "2. Abonnement",
+  "article2_text": "Le Service est proposé sous forme d’abonnements mensuels.\n\nChaque abonnement donne accès à un certain nombre de crédits mensuels permettant d’utiliser les fonctionnalités du Service.\n\nLes crédits sont personnels, non transférables et non cumulables d’un mois sur l’autre.",
 
-    "article4_title": "4. Prix et modalités de paiement",
-    "article4_text": "Les tarifs applicables sont ceux en vigueur au moment de la souscription, exprimés en francs suisses (CHF) ou en euros (EUR), toutes taxes comprises.\n\nLe paiement s’effectue en ligne par carte bancaire via la plateforme sécurisée Stripe. Le Prestataire ne conserve aucune donnée bancaire sensible. Le paiement complet de la période d’abonnement est exigé au moment de la souscription.",
+  "article3_title": "3. Crédits et limitations",
+  "article3_text": "Chaque action de traitement consomme un crédit.\n\nUne fois le quota mensuel de crédits épuisé, les fonctionnalités payantes ne sont plus accessibles jusqu’à la réinitialisation mensuelle.\n\nLe Client peut toutefois continuer à utiliser les fonctionnalités gratuites éventuellement disponibles.",
 
-    "article5_title": "5. Absence de droit de rétractation et remboursement",
-    "article5_text": "Conformément à la législation applicable en matière de prestations de services numériques, le Client reconnaît que l’exécution du Service débute immédiatement après la validation de l’abonnement.\n\nEn conséquence, aucun remboursement, total ou partiel, ne pourra être exigé en cas d’annulation ou de résiliation anticipée. Le Client conserve toutefois la possibilité de résilier son abonnement pour éviter son renouvellement futur.",
+  "article4_title": "4. Durée et renouvellement",
+  "article4_text": "L’abonnement est conclu pour une durée mensuelle et est renouvelé automatiquement à chaque échéance, sauf résiliation par le Client.\n\nLe Client peut résilier à tout moment. La résiliation prend effet à la fin de la période en cours.\n\nLe Service reste accessible jusqu’à cette date.",
 
-    "article6_title": "6. Suspension et résiliation par le Prestataire",
-    "article6_text": "Le Prestataire se réserve le droit de suspendre ou de résilier un abonnement en cas de non-respect des présentes CGV, de fraude, de comportement abusif ou d’utilisation du Service contraire à la loi ou à l’éthique.\n\nAucune indemnisation ne pourra être réclamée par le Client en cas de suspension ou de résiliation justifiée par un manquement contractuel.",
+  "article5_title": "5. Modification d’abonnement",
+  "article5_text": "Le Client peut modifier son abonnement à tout moment.\n\n- En cas de passage à une formule supérieure (upgrade) :\nLe nouvel abonnement prend effet immédiatement. Une nouvelle période de facturation commence à la date du changement.\nLes crédits restants de l’ancien abonnement sont perdus.\n\n- En cas de passage à une formule inférieure (downgrade) :\nLe changement prend effet à la fin de la période de facturation en cours.\nLe Client conserve les fonctionnalités de son abonnement actuel jusqu’à cette échéance.",
 
-    "article7_title": "7. Accès au Service",
-    "article7_text": "Le Prestataire met tout en œuvre pour assurer la disponibilité continue du Service. Toutefois, l’accès peut être temporairement suspendu pour maintenance, mise à jour, ou en cas de défaillance technique indépendante de la volonté du Prestataire.\n\nAucune compensation ne sera due en cas d’interruption temporaire du Service.",
+  "article6_title": "6. Prix et paiement",
+  "article6_text": "Les prix sont indiqués au moment de la souscription.\n\nLes paiements sont traités par un prestataire tiers (Stripe). Wizpix n’a aucun accès aux données de paiement.\n\nLe paiement est exigible à chaque période de facturation.",
 
-    "article8_title": "8. Responsabilité",
-    "article8_text": "Le Prestataire n’est tenu qu’à une obligation de moyens. Il ne saurait être responsable des dommages directs ou indirects résultant de l’utilisation du Service, notamment la perte de données, la non-conformité d’une image traitée, ou un dysfonctionnement temporaire du site.\n\nLe Client demeure responsable des fichiers et contenus qu’il téléverse sur la plateforme.",
+  "article7_title": "7. Absence de remboursement",
+  "article7_text": "Les abonnements ne sont pas remboursables.\n\nAucun remboursement total ou partiel ne sera effectué en cas de résiliation en cours de période.\n\nLe Client conserve l’accès au Service jusqu’à la fin de la période déjà payée.",
 
-    "article9_title": "9. Données personnelles",
-    "article9_text": "Le Prestataire collecte et traite certaines données personnelles nécessaires à la gestion des abonnements et au fonctionnement du Service. Ces traitements sont réalisés conformément à la <a class=\"link\" href=\"/privacy\">Politique de Confidentialité</a> du site et dans le respect du RGPD et de la LPD (Suisse).",
+  "article8_title": "8. Accès au service",
+  "article8_text": "Wizpix met en œuvre des moyens raisonnables pour assurer l’accès au Service.\n\nLe Service peut être temporairement suspendu pour maintenance, mise à jour ou en cas de problème technique.\n\nAucune compensation ne sera due en cas d’interruption temporaire.",
 
-    "article10_title": "10. Propriété intellectuelle",
-    "article10_text": "Le Service, ses algorithmes, son interface et son contenu sont la propriété exclusive du Prestataire. Toute reproduction, modification ou utilisation non autorisée est strictement interdite.\n\nLe Client conserve la propriété intellectuelle sur les images qu’il téléverse et traite via le Service.",
+  "article9_title": "9. Responsabilité",
+  "article9_text": "Le Service est fourni « tel quel ».\n\nWizpix ne garantit pas un fonctionnement ininterrompu ni des résultats parfaits.\n\nDans les limites autorisées par la loi, Wizpix ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service.",
 
-    "article11_title": "11. Force majeure",
-    "article11_text": "Aucune des parties ne pourra être tenue pour responsable en cas d’inexécution due à un événement de force majeure tel que défini par la jurisprudence suisse : catastrophe naturelle, panne électrique majeure, attaque informatique, guerre, ou décision gouvernementale empêchant l’exécution du contrat.",
+  "article10_title": "10. Données personnelles",
+  "article10_text": "Le traitement des données personnelles est régi par la <a href=\"/privacy\">Politique de confidentialité</a>.",
 
-    "article12_title": "12. Droit applicable et juridiction compétente",
-    "article12_text": "Les présentes CGV sont régies par le droit suisse. En cas de litige, et sauf disposition légale impérative contraire, les tribunaux compétents du canton du Valais seront seuls compétents.",
+  "article11_title": "11. Suspension et résiliation",
+  "article11_text": "Wizpix peut suspendre ou résilier un compte en cas de violation des CGV ou d’utilisation abusive.\n\nAucun remboursement ne sera dû dans ce cas.",
 
-    "conclusion": "En validant son abonnement, le Client reconnaît avoir lu, compris et accepté sans réserve les présentes Conditions Générales de Vente."
-  },
+  "article12_title": "12. Droit applicable",
+  "article12_text": "Les présentes CGV sont régies par le droit suisse.\n\nEn cas de litige, les tribunaux compétents du canton de Vaud sont seuls compétents, sauf disposition légale contraire.",
+
+  "article13_title": "13. Modifications",
+  "article13_text": "Wizpix se réserve le droit de modifier les présentes CGV à tout moment. La version applicable est celle publiée sur le site.",
+
+  "conclusion": "En souscrivant un abonnement, le Client reconnaît accepter les présentes CGV."
+},
   "servicePageTitle": {
     "title_h1": "Testez la qualité des services",
     "title_h1_loged": "Utilisez nos services"

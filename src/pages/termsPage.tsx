@@ -11,13 +11,12 @@ type PropsPage = {
   routeKey: string;
 };
 
-
-const TermsPage = ({routeKey}: PropsPage) => {
+const TermsPage = ({ routeKey }: PropsPage) => {
   const { t } = useTranslation();
   useEffect(() => {
-     setActiveLink();
-     setDocumentTitle();
-   }, [routeKey]);
+    setActiveLink();
+    setDocumentTitle();
+  }, [routeKey]);
   return (
     <div className="page-container">
       <div className={"max-w-4xl"}>
@@ -25,7 +24,14 @@ const TermsPage = ({routeKey}: PropsPage) => {
           <h1 className="text-3xl md:text-4xl font-semibold text-primary">
             {t("terms.title")}
           </h1>
-          <p className="text-base-content/70">{t("terms.intro")}</p>
+          <p
+            className="legal-intro text-base-content/70"
+            dangerouslySetInnerHTML={{
+              __html: t("terms.intro"),
+            }}
+          >
+            {}
+          </p>
         </header>
 
         <ul className="space-y-6">
@@ -162,13 +168,12 @@ const TermsPage = ({routeKey}: PropsPage) => {
           </li>
         </ul>
 
-        <p className="mt-8 text-sm text-base-content/70">
+        {/* <p className="mt-8 text-sm text-base-content/70">
           {t("terms.conclusion")}
-        </p>
+        </p> */}
       </div>
     </div>
   );
 };
 
 export { TermsPage };
-

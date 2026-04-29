@@ -4,7 +4,7 @@
     "service": "Services",
     "pricing": "Pricing",
     "contact": "Contact",
-    "signup": "Create an account",
+    "signup": "Signup",
     "login": "Login"
   },
 
@@ -12,11 +12,11 @@
     "cookie": "Cookies",
     "services": "Services",
     "company": "Entreprise",
-    "legal": "Mentions",
-    "terms": "Conditions générales d'utilisation (CGU)",
-    "privacy": "Politique de confidentialité",
-    "legalLink": "Mentions légales",
-    "cgv": "Conditions générales de vente"
+    "legal": "Legal",
+    "terms": "Terms of service",
+    "privacy": "Privacy policy",
+    "legalLink": "Legal notice",
+    "cgv": "Terms of sale"
   },
   "auth": {
     "signup": "Sign up",
@@ -375,44 +375,51 @@
   },
 
   "terms": {
-    "title": "Terms of Service (ToS)",
-    "intro": "These Terms of Service (hereinafter referred to as 'ToS') govern access to and use of the website and the progressive web application (PWA) for background removal (hereinafter referred to as 'the Service'), operated by the Provider. By accessing or using the Service, the user acknowledges having read, understood, and accepted these terms without reservation.",
+  "title": "Terms of Service",
 
-    "article1_title": "1. Purpose of the Service",
-    "article1_text": "The Service allows users to upload images to automatically remove their background using an image-processing algorithm. The Service is accessible via a progressive web application (PWA) and may include additional features available through paid subscription plans.",
+  "intro": "These Terms of Service (the “Terms”) govern access to and use of the Wizpix service (the “Service”).<br> By using the Service, the user acknowledges that they have read, understood, and agreed to be bound by these Terms.",
 
-    "article2_title": "2. Access to the Service",
-    "article2_text": "Access to the Service is open to any person of legal age or with the legal authorization of their guardian. Some features may require the creation of a user account and/or the purchase of a paid subscription. The user agrees to provide accurate information during registration and to keep it up to date.",
+  "article1_title": "1. Service Description",
+  "article1_text": "Wizpix provides an online service that allows users to process images using artificial intelligence models to remove or modify backgrounds.\n\nThe Service acts as a technical intermediary between the user and third-party AI providers.",
 
-    "article3_title": "3. User Content and Responsibility",
-    "article3_text": "The user is solely responsible for the content (images, text, metadata) they upload, transfer, or process via the Service. The user is strictly prohibited from uploading any content that:\n- is pedopornographic, violent, hateful, defamatory, obscene, or otherwise offensive,\n- infringes any image rights, copyrights, or intellectual property rights,\n- violates the laws and regulations in force in Switzerland, the European Union, or the user’s country.\n\nThe Provider reserves the right to suspend or delete, without prior notice, any account or content suspected of violating these terms or applicable laws, and to report any illegal activity to the competent authorities. The Provider declines any liability for content processed by users.",
+  "article2_title": "2. Access to the Service",
+  "article2_text": "Access to the Service is limited to individuals who are legally capable or have obtained authorization from a legal guardian.\n\nCreating an account may be required to access certain features. Users agree to provide accurate information and to maintain the confidentiality of their login credentials.\n\nAny activity performed through a user account is deemed to have been carried out by that user.",
 
-    "article4_title": "4. Use of the Service and Limitations",
-    "article4_text": "The user agrees to use the Service only for lawful and personal purposes. The Service may not be used for fraud, spamming, AI model training without written authorization, or any unauthorized commercial exploitation. The Provider may limit or suspend access to the Service for maintenance, security, or in cases of detected abuse.",
+  "article3_title": "3. User Content and Responsibility",
+  "article3_text": "Users are solely responsible for the content they process using the Service.\n\nUsers agree not to use the Service to process content that is:\n- illegal, violent, hateful, or against public order,\n- infringing third-party rights (image rights, copyright, intellectual property),\n- in violation of applicable laws.\n\nWizpix reserves the right to suspend or terminate any account violating these Terms and to report illegal activities to the appropriate authorities.",
 
-    "article5_title": "5. Subscriptions and Payment",
-    "article5_text": "Certain Service features are available through paid subscriptions. Prices, durations, and conditions are clearly displayed before any purchase. Payments are processed securely through a third-party provider. Refunds are only issued in case of an error attributable to the Provider or in accordance with applicable consumer protection laws.",
+  "article4_title": "4. Image Processing",
+  "article4_text": "Images are transmitted to third-party providers (including Replicate, USA) via a secure API for processing.\n\nWizpix does not store images and does not retain any copies after processing.\n\nNo user-identifying data (such as email or account information) is transmitted with the images.\n\nUsers acknowledge that processing is automated and that results may vary depending on image quality and the models used.",
 
-    "article6_title": "6. Personal Data Protection",
-    "article6_text": "The data collected (account information, billing data, uploaded images) are processed in accordance with the General Data Protection Regulation (GDPR) and the Swiss Federal Data Protection Act (FADP). Uploaded images are temporarily stored for processing and automatically deleted after a reasonable period. The user retains full ownership of their files.",
+  "article5_title": "5. Rights to Images",
+  "article5_text": "Users retain full ownership of the images they submit and the processed results.\n\nUsers are free to use the processed images without restriction, including for commercial purposes (e-commerce, marketing, communication, etc.).\n\nWizpix does not claim any ownership rights over user content.",
 
-    "article7_title": "7. Intellectual Property",
-    "article7_text": "The Service, its interface, algorithms, and trademarks are the exclusive property of the Provider. Any unauthorized reproduction, modification, or exploitation is strictly prohibited. The user retains intellectual property rights over the images they upload.",
+  "article6_title": "6. Acceptable Use",
+  "article6_text": "The Service must be used in compliance with applicable laws.\n\nAny abusive use, including automated misuse, fraud, or attempts to bypass service limitations, is strictly prohibited.\n\nWizpix reserves the right to limit, suspend, or terminate access to the Service in case of abuse or for technical reasons.",
 
-    "article8_title": "8. Liability and Warranties",
-    "article8_text": "The Provider makes every effort to ensure the reliability and availability of the Service but does not guarantee uninterrupted or error-free operation. The Provider shall not be held liable for any direct or indirect damages resulting from the use of the Service, including data loss, except in cases of proven gross negligence.",
+  "article7_title": "7. Subscriptions and Payments",
+  "article7_text": "Some features of the Service are available through paid subscriptions.\n\nPayments are processed by a third-party provider (Stripe). Wizpix does not have access to payment data.\n\nSubscriptions automatically renew unless canceled.\n\nExcept where required by law, payments are non-refundable.",
 
-    "article9_title": "9. Suspension and Termination",
-    "article9_text": "The Provider reserves the right to suspend or terminate a user account in case of violation of these ToS, suspected illegal activity, or abuse of the Service. In case of termination, no partial refund of a subscription will be granted.",
+  "article8_title": "8. Personal Data",
+  "article8_text": "Wizpix collects only the data necessary to operate the Service (email address, hashed password, contact information).\n\nNo images are stored.\n\nFor more details, users should refer to the <a class='faq-link' href='/privacy'>Privacy Policy</a>.",
 
-    "article10_title": "10. Governing Law and Jurisdiction",
-    "article10_text": "These Terms are governed by Swiss law. In the event of a dispute, and unless otherwise required by mandatory legal provisions, the competent courts of the Canton of Vaud shall have exclusive jurisdiction.",
+  "article9_title": "9. Intellectual Property",
+  "article9_text": "The Service, including its code, interface, and technologies, is protected by intellectual property laws.\n\nAny unauthorized reproduction, modification, or exploitation is strictly prohibited.\n\nUsers retain their rights to their own content.",
 
-    "article11_title": "11. Amendments to the Terms",
-    "article11_text": "The Provider reserves the right to modify these ToS at any time. Any modification becomes effective upon publication on the website. It is the user’s responsibility to regularly review the latest version of the Terms in force.",
+  "article10_title": "10. Liability",
+  "article10_text": "The Service is provided “as is.”\n\nWizpix does not guarantee uninterrupted or error-free operation.\n\nTo the extent permitted by law, Wizpix shall not be held liable for any direct or indirect damages resulting from the use of the Service, including data loss or unsatisfactory results.",
 
-    "conclusion": "By using the Service, the user acknowledges having read and accepted these Terms of Service without reservation."
-  },
+  "article11_title": "11. Suspension and Termination",
+  "article11_text": "Wizpix may suspend or terminate a user account in case of violation of these Terms or misuse of the Service.\n\nTermination does not entitle the user to any refund for already paid periods.",
+
+  "article12_title": "12. Governing Law",
+  "article12_text": "These Terms are governed by Swiss law.\n\nIn case of dispute, the courts of the canton of Vaud shall have exclusive jurisdiction, unless mandatory legal provisions provide otherwise.",
+
+  "article13_title": "13. Modifications",
+  "article13_text": "Wizpix reserves the right to modify these Terms at any time. The applicable version is the one published on the website.",
+
+  "conclusion": "By using the Service, the user agrees to be bound by these Terms of Service."
+},
 
   "privacy": {
   "title": "Privacy Policy",
@@ -496,47 +503,51 @@
     "conclusion": "By accessing the website and using the Service, the User acknowledges having read and accepted this legal notice without reservation."
   },
   "cgv": {
-    "title": "Terms and Conditions of Sale (TCS)",
-    "intro": "These Terms and Conditions of Sale (hereinafter “TCS”) govern the contractual relationship between the Provider and any user (hereinafter “the Client”) subscribing to a paid subscription offer on the website or progressive web application (PWA) for image background removal (hereinafter “the Service”). By subscribing to a plan, the Client unreservedly accepts these terms.",
+  "title": "Terms of Sale",
 
-    "article1_title": "1. Purpose of the Agreement",
-    "article1_text": "The purpose of this agreement is to define the conditions under which the Provider makes available to the Client an online automatic image background removal Service, accessible through an annual subscription. The Service is provided in SaaS (Software as a Service) mode, hosted and maintained by the Provider.",
+  "intro": "These Terms of Sale govern the contractual relationship between Wizpix (the “Provider”) and any user subscribing to a paid plan (the “Customer”). By subscribing, the Customer agrees to these terms.",
 
-    "article2_title": "2. Subscription Conditions",
-    "article2_text": "Access to the paid features of the Service requires an annual subscription. The subscription is nominative, personal, and non-transferable.\n\nThe Client may subscribe, manage, or cancel their subscription from their personal account. Cancellation stops the automatic renewal but does not entitle the Client to a refund for the period already started.",
+  "article1_title": "1. Purpose",
+  "article1_text": "Wizpix provides an online AI-powered image processing service offered as a subscription (Software as a Service).",
 
-    "article3_title": "3. Duration and Renewal",
-    "article3_text": "The subscription is concluded for a period of one (1) year from the subscription date. At the end of this period, it is automatically renewed for an equivalent duration unless cancelled beforehand by the Client.\n\nThe Client may cancel their subscription at any time from their account. The cancellation takes effect at the subscription’s expiration date, with no refund for the remaining period.",
+  "article2_title": "2. Subscription",
+  "article2_text": "The Service is offered as monthly subscriptions.\n\nEach subscription includes a monthly allocation of credits allowing access to paid features.\n\nCredits are personal, non-transferable, and do not roll over.",
 
-    "article4_title": "4. Pricing and Payment Terms",
-    "article4_text": "The applicable prices are those in effect at the time of subscription, expressed in Swiss francs (CHF) or euros (EUR), all taxes included.\n\nPayment is made online by credit card through the secure Stripe platform. The Provider does not store any sensitive banking information. Full payment for the subscription period is required at the time of subscription.",
+  "article3_title": "3. Credits and Limits",
+  "article3_text": "Each processing action consumes one credit.\n\nOnce the monthly quota is reached, paid features are no longer accessible until the next billing cycle.\n\nThe Customer may continue using any available free features.",
 
-    "article5_title": "5. No Withdrawal Right and Refund Policy",
-    "article5_text": "In accordance with applicable legislation regarding digital service provision, the Client acknowledges that the Service begins immediately after the subscription is validated.\n\nConsequently, no refund—full or partial—may be claimed in case of cancellation or early termination. However, the Client may cancel their subscription to prevent future renewal.",
+  "article4_title": "4. Duration and Renewal",
+  "article4_text": "Subscriptions are billed monthly and automatically renew unless canceled.\n\nCustomers may cancel at any time. Cancellation takes effect at the end of the current billing period.\n\nAccess remains active until that date.",
 
-    "article6_title": "6. Suspension and Termination by the Provider",
-    "article6_text": "The Provider reserves the right to suspend or terminate a subscription in case of breach of these TCS, fraud, abusive behavior, or use of the Service contrary to law or ethics.\n\nNo compensation may be claimed by the Client in case of suspension or termination justified by a contractual breach.",
+  "article5_title": "5. Plan Changes",
+  "article5_text": "Customers may change their subscription at any time.\n\n- Upgrade:\nThe new plan takes effect immediately. A new billing period begins on the upgrade date.\nRemaining credits from the previous plan are lost.\n\n- Downgrade:\nThe new plan takes effect at the end of the current billing period.\nThe Customer retains access to current features until then.",
 
-    "article7_title": "7. Access to the Service",
-    "article7_text": "The Provider makes every effort to ensure continuous availability of the Service. However, access may be temporarily suspended for maintenance, updates, or technical failures beyond the Provider’s control.\n\nNo compensation will be due for temporary interruptions of the Service.",
+  "article6_title": "6. Pricing and Payment",
+  "article6_text": "Prices are displayed at the time of subscription.\n\nPayments are processed by a third-party provider (Stripe). Wizpix does not access payment data.\n\nPayment is due at each billing cycle.",
 
-    "article8_title": "8. Liability",
-    "article8_text": "The Provider is bound by a best-effort obligation. The Provider cannot be held liable for direct or indirect damages resulting from the use of the Service, including data loss, non-compliant processed images, or temporary website malfunction.\n\nThe Client remains responsible for the files and content they upload to the platform.",
+  "article7_title": "7. No Refund Policy",
+  "article7_text": "Subscriptions are non-refundable.\n\nNo full or partial refunds are granted in case of early cancellation.\n\nAccess remains available until the end of the paid period.",
 
-    "article9_title": "9. Personal Data",
-    "article9_text": "The Provider collects and processes certain personal data necessary for managing subscriptions and operating the Service. These processes are carried out in accordance with the website’s <a class=\"link\" href=\"/privacy\">Privacy Policy</a> and in compliance with GDPR and LPD (Switzerland).",
+  "article8_title": "8. Service Availability",
+  "article8_text": "Wizpix makes reasonable efforts to ensure service availability.\n\nThe Service may be temporarily unavailable due to maintenance or technical issues.\n\nNo compensation is provided for temporary interruptions.",
 
-    "article10_title": "10. Intellectual Property",
-    "article10_text": "The Service, its algorithms, interface, and content are the exclusive property of the Provider. Any reproduction, modification, or unauthorized use is strictly prohibited.\n\nThe Client retains intellectual property rights over the images they upload and process through the Service.",
+  "article9_title": "9. Liability",
+  "article9_text": "The Service is provided “as is.”\n\nWizpix does not guarantee uninterrupted service or perfect results.\n\nTo the extent permitted by law, Wizpix shall not be liable for any direct or indirect damages.",
 
-    "article11_title": "11. Force Majeure",
-    "article11_text": "Neither party shall be held liable for failure to perform due to an event of force majeure as defined under Swiss case law: natural disaster, major power outage, cyberattack, war, or government decision preventing contract execution.",
+  "article10_title": "10. Personal Data",
+  "article10_text": "Personal data processing is governed by the <a href=\"/privacy\">Privacy Policy</a>.",
 
-    "article12_title": "12. Governing Law and Jurisdiction",
-    "article12_text": "These TCS are governed by Swiss law. In case of dispute, and unless otherwise required by mandatory legal provisions, the competent courts of the canton of Valais shall have exclusive jurisdiction.",
+  "article11_title": "11. Suspension and Termination",
+  "article11_text": "Wizpix may suspend or terminate accounts in case of misuse or violation of these terms.\n\nNo refunds will be issued in such cases.",
 
-    "conclusion": "By validating their subscription, the Client acknowledges having read, understood, and unreservedly accepted these Terms and Conditions of Sale."
-  },
+  "article12_title": "12. Governing Law",
+  "article12_text": "These Terms are governed by Swiss law.\n\nThe courts of the canton of Vaud have exclusive jurisdiction, unless otherwise required by law.",
+
+  "article13_title": "13. Changes",
+  "article13_text": "Wizpix may update these Terms at any time. The applicable version is the one published on the website.",
+
+  "conclusion": "By subscribing, the Customer agrees to these Terms of Sale."
+},
 
   "servicePageTitle": {
     "title_h1": "Test the quality of our services",

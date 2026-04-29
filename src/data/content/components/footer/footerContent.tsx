@@ -9,7 +9,7 @@ type NavLink = {
 //declaration des data
 
 const footerContent: NavLink[] = [
-  { key: "legal", href: "/legal" },
+  { key: "legalLink", href: "/legal" },
   { key: "terms", href: "/terms" },
   { key: "privacy", href: "/privacy" },
   { key: "cgv", href: "/cgv" },

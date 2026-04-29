@@ -181,6 +181,19 @@ img {
 
 }
 
+.soon-service{
+  position:absolute;
+  padding: 1.5rem;
+  background-color: var(--color-warning);
+  color: black;
+  width:100%;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+  opacity:0.9;
+  
+
+}
+
 
 /***********************************************
 ****** custom css pour composant diff *********
@@ -285,4 +298,20 @@ img {
     radial-gradient(var(--color-warning) 10%, transparent 1%);
 
   background-size: 20px 20px;
+}
+
+
+/***********************************************
+****** custom css pour page mention *********
+***********************************************/
+
+.legal-intro,
+.legal-conclusion{
+  padding:1rem;
+  font-size: 1.1rem;
+ /*  color: var(--text-base-content); */
+ font-style: italic;
+ margin: 1.5rem auto;
+ text-align: center;
+
 }

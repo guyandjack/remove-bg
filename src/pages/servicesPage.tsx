@@ -76,24 +76,28 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
 
   const contentCardService = [
     {
+      active:true,
       id: t("serviceCardContent.card_1.id"),
       src: iconBackground,
       title: t("serviceCardContent.card_1.title"),
       description: t("serviceCardContent.card_1.description"),
     },
     {
+      active: false,
       id: t("serviceCardContent.card_2.id"),
       src: iconSocial,
       title: t("serviceCardContent.card_2.title"),
       description: t("serviceCardContent.card_2.description"),
     },
     {
+      active:true,
       id: t("serviceCardContent.card_3.id"),
       src: iconConvert,
       title: t("serviceCardContent.card_3.title"),
       description: t("serviceCardContent.card_3.description"),
     },
     {
+      active: false,
       id: t("serviceCardContent.card_4.id"),
       src: iconProduct,
       title: t("serviceCardContent.card_4.title"),

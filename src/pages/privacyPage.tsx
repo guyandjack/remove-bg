@@ -24,7 +24,11 @@ function PrivacyPage({routeKey}: PropsPage) {
           <h1 className="text-3xl md:text-4xl font-semibold text-primary">
             {t("privacy.title")}
           </h1>
-          <p className="text-base-content/70">{t("privacy.intro")}</p>
+          <p className="legal-intro text-base-content/70"
+            dangerouslySetInnerHTML={{
+              __html: t("privacy.intro")
+            }}
+          >{}</p>
         </header>
 
         <ul className="space-y-6">
@@ -161,7 +165,7 @@ function PrivacyPage({routeKey}: PropsPage) {
           </li>
         </ul>
 
-        <p className="mt-8 text-sm text-base-content/70">
+        <p className="legal-conclusion text-base-content/70">
           {t("privacy.conclusion")}
         </p>
       </div>
