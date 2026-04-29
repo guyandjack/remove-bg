@@ -1,4 +1,4 @@
-//import des hooks
+﻿//import des hooks
 import { useEffect, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
@@ -24,9 +24,14 @@ import { navigateWithLink } from "@/utils/navigateWithLink";
 
 type PlanKey =
   | "remove_bg"
+  | "conversion"
   | "tag"
   | "price"
   | "credit"
+  | "conversions_suffix"
+  | "unlimited"
+  | "size_max"
+  | "tools"
   | "gomme_magique"
   | "Image_pexels"
   | "api"
@@ -50,6 +55,9 @@ const currencySymbols: Record<CurrencyCode, string> = {
 const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
   const { t } = useTranslation();
   const planOptions = planOptionsSignal.value;
+  const activePlanOptions = planOptions.filter(
+    (plan) => plan.active !== false
+  );
   const [currency, setCurrency] = useState<CurrencyCode>("CHF");
   const [finalizeStatus, setFinalizeStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [finalizeMessage, setFinalizeMessage] = useState<string | null>(null);
@@ -59,8 +67,13 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
   const textLangCard: PlanText = {
     tag: t("priceCard.tag"),
     remove_bg: t("priceCard.remove_bg"),
+    conversion: t("priceCard.conversion"),
     price: t("priceCard.price"),
     credit: t("priceCard.credit"),
+    conversions_suffix: t("priceCard.conversions_suffix"),
+    unlimited: t("priceCard.unlimited"),
+    size_max: t("priceCard.size_max"),
+    tools: t("priceCard.tools"),
     gomme_magique: t("priceCard.gomme_magique"),
     Image_pexels: t("priceCard.img_pexels"),
     api: t("priceCard.api"),
@@ -77,6 +90,10 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
     credit: t("priceTab.credit"),
     formats: t("priceTab.formats"),
     remove_bg: t("priceTab.remove_bg"),
+    conversion: t("priceTab.conversion"),
+    size_max: t("priceTab.size_max"),
+    per_month: t("priceTab.per_month"),
+    conversions_suffix: t("priceTab.conversions_suffix"),
     change_bg_color: t("priceTab.change_bg_color"),
     tools: t("priceTab.tools"),
     model_IA_ressource: t("priceTab.model_IA_ressource"),
@@ -146,12 +163,36 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
          console.log("L' objet parsed n' est pas un tableau ou sa longeur est nulle code_price_2 ");
          return false;
         }
-        setPlanOptions(parsed as PlanOption[]);
-        console.log("Le tableau arrayOption a ete mis à jour avec le localstorage! ");
+        const isCompatible = parsed.every((plan) => {
+          if (!plan || typeof plan !== "object") return false;
+          return (
+            typeof plan.name === "string" &&
+            typeof plan.price === "number" &&
+            typeof plan.credit_IA === "number" &&
+            typeof plan.credit_conversion === "string" &&
+            typeof plan.active === "boolean"
+          );
+        });
+
+        if (!isCompatible) {
+          console.log(
+            "Cache plans incompatible (schema obsolète), suppression… code_price_2b"
+          );
+          localStorage.removeItem("option");
+          return false;
+        }
+
+        const normalizedPlans = (parsed as PlanOption[]).map((plan) => ({
+          ...plan,
+          active: plan.active ?? true,
+        }));
+
+        setPlanOptions(normalizedPlans);
+        console.log("Le tableau arrayOption a ete mis Ã  jour avec le localstorage! ");
         
         return true;
       } catch (error) {
-        console.warn("Option cache invalide, suppression… code_price_3", error);
+        console.warn("Option cache invalide, suppressionâ€¦ code_price_3", error);
         localStorage.removeItem("option");
         return false;
       }
@@ -163,17 +204,22 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         if (data?.status !== "success" || !Array.isArray(data?.plans)) {
           return;
         }
-        localStorage.setItem("option", JSON.stringify(data.plans));
-        setPlanOptions(data.plans);
+                const normalizedPlans = (data.plans as PlanOption[]).map((plan) => ({
+          ...plan,
+          active: plan.active ?? true,
+        }));
+        localStorage.setItem("option", JSON.stringify(normalizedPlans));
+        setPlanOptions(normalizedPlans);
         
       } catch (error) {
-        console.error("Erreur lors de la récupération des plans", error);
+        console.error("Erreur lors de la rÃ©cupÃ©ration des plans", error);
       }
     };
 
-    if (!hydrateFromCache()) {
-      fetchOptions();
-    }
+    // Hydrate quickly from cache, then always refresh from API so plan updates
+    // propagate without forcing users to clear localStorage.
+    hydrateFromCache();
+    fetchOptions();
   }, [routeKey]);
 
   useEffect(() => {
@@ -205,7 +251,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         } else {
           setFinalizeStatus("error");
           setFinalizeMessage(
-            "La confirmation Stripe prend plus de temps que prévu. Réessayez dans quelques secondes."
+            "La confirmation Stripe prend plus de temps que prÃ©vu. RÃ©essayez dans quelques secondes."
           );
         }
         return;
@@ -215,7 +261,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         setFinalizeStatus("error");
         setFinalizeMessage(
           data?.message ||
-            "Impossible de valider votre paiement. Merci de réessayer."
+            "Impossible de valider votre paiement. Merci de rÃ©essayer."
         );
         return;
       }
@@ -331,10 +377,10 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
 
       <ul
         className={
-          "relative w-full max-w-[1300px] mx-auto py-[50px] flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-between lg:gap-[0px]"
+          "relative w-full max-w-[1300px] mx-auto py-[50px] flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-evenly lg:gap-[0px]"
         }
       >
-        {planOptions.map((items) => {
+        {activePlanOptions.map((items) => {
           return (
             <li key={items.name} className={"max-w-[350px] min-w-[300px]"}>
               <PriceCard lang={textLangCard} option={items} currency={currency} />
@@ -354,7 +400,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         >
           {t("pricing.title_h2_tab")}
         </h2>
-        <PricingComparisonTable lang={textLangTab} option={planOptions} currency={currency} />
+        <PricingComparisonTable lang={textLangTab} option={activePlanOptions} currency={currency} />
       </div>
 
       {/* FAQ*/}

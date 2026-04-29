@@ -131,7 +131,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
     const planDefinition =
       planOption.find((option) => option.name === planCode) ||
       planOption.find((option) => option.name === "free");
-    const planDailyCredit = planDefinition?.credit ?? 0;
+    const planDailyCredit = planDefinition?.credit_IA ?? 0;
 
     if (planCode === "free") {
       // Tokens will be created AFTER user creation to ensure DB persistence of refresh token

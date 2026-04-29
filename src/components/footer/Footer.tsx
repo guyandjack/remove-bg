@@ -34,7 +34,7 @@ const Footer = () => {
       <nav className="footer md:footer-horizontal bg-base-300 p-10">
         <aside className={"relative z-10"}>
           <a href={"/"}
-          className={"block w-[200px]"}
+          className={"block w-[150px]"}
           >
             {themeSignal.value === "winter" ? (
               <AnimatedLogoNormalBlack />

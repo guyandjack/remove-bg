@@ -321,7 +321,7 @@ const NavBar = () => {
             </a>
           ) : (
             <a 
-            className={"block w-[200px]"}
+            className={"block w-[150px] pl-8"}
             href={"/"}>
                 {themeSignal.value === "winter" ? (
                   <AnimatedLogoNormalBlack />

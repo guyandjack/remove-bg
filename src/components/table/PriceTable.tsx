@@ -1,23 +1,25 @@
-type CurrencyCode = "CHF" | "EUR" | "USD";
+﻿type CurrencyCode = "CHF" | "EUR" | "USD";
 
 type PlanOption = {
+  active?: boolean;
   name: string;
   price: number;
   prices?: Record<CurrencyCode, number>;
-  credit: number;
-  format: string;
+  credit_IA: number;
+  credit_conversion: string;
+  size_max?: string;
   remove_bg: boolean;
   change_bg_color: boolean;
   tools_qt: string;
   tool_name: string[];
   model_IA_ressource: string;
-  gomme_magique: boolean;
+  gomme_magique?: boolean;
   img_pexels: boolean;
-  delay_improved: boolean;
-  bg_IA_generation: boolean;
-  bundle: boolean;
-  api: boolean;
-  api_external: boolean;
+  delay_improved?: boolean;
+  bg_IA_generation?: boolean;
+  bundle?: boolean;
+  api?: boolean;
+  api_external?: boolean;
 };
 
 type TableLang = {
@@ -26,6 +28,10 @@ type TableLang = {
   credit: string;
   formats: string;
   remove_bg: string;
+  conversion: string;
+  size_max: string;
+  per_month: string;
+  conversions_suffix: string;
   change_bg_color: string;
   tools: string;
   model_IA_ressource: string;
@@ -66,10 +72,31 @@ const currencySymbols: Record<CurrencyCode, string> = {
 };
 
 const PricingComparisonTable = ({ option, lang, currency }: PricingComparisonTableProps) => {
-  const plans = Array.isArray(option) ? option : [];
+  const plans = (Array.isArray(option) ? option : []).filter(
+    (plan) => plan.active !== false
+  );
   if (!plans.length) return null;
   const formatPrice = (plan: PlanOption) =>
     plan.prices?.[currency] ?? plan.price ?? plan.prices?.CHF ?? 0;
+
+const normalizeConversionCredits = (value: string): string => {
+  const normalized = value.trim().toLowerCase();
+  if (
+    ["infiny", "infinity", "infinite", "illimite", "illimité", "unlimited"].includes(
+      normalized
+    )
+  ) {
+    return "∞";
+  }
+  return value.trim();
+};
+
+const normalizeSizeMax = (sizeMax: string | undefined): string | null => {
+  if (!sizeMax) return null;
+  const trimmed = sizeMax.trim();
+  const mbNormalized = trimmed.replace(/mb/gi, "MB");
+  return mbNormalized.replace(/(\d)(MB)\b/i, "$1 $2");
+};
 
    return (
      <section className="mt-12">
@@ -87,8 +114,8 @@ const PricingComparisonTable = ({ option, lang, currency }: PricingComparisonTab
                      p.name === "hobby"
                        ? "text-success"
                        : p.name === "pro"
-                       ? "text-info"
-                       : "text-secondary"
+                         ? "text-info"
+                         : "text-secondary"
                    } `}
                    >
                      {p.name}
@@ -97,27 +124,19 @@ const PricingComparisonTable = ({ option, lang, currency }: PricingComparisonTab
                </tr>
              </thead>
              <tbody>
-              <tr className="hover:bg-base-200/40">
-                <td className="font-medium">{lang.price}</td>
-                {plans.map((p) => (
-                  <td key={`price-${p.name}`} className="text-center">
-                    {currencySymbols[currency]} {formatPrice(p)}
-                  </td>
-                ))}
-              </tr>
                <tr className="hover:bg-base-200/40">
-                 <td className="font-medium">{lang.credit}</td>
+                 <td className="font-medium">{lang.price}</td>
                  {plans.map((p) => (
-                   <td key={`credit-${p.name}`} className="text-center">
-                     {p.credit}
+                   <td key={`price-${p.name}`} className="text-center">
+                     {currencySymbols[currency]} {formatPrice(p)}
                    </td>
                  ))}
                </tr>
                <tr className="hover:bg-base-200/40">
-                 <td className="font-medium">{lang.formats}</td>
+                 <td className="font-medium">{lang.model_IA_ressource}</td>
                  {plans.map((p) => (
-                   <td key={`format-${p.name}`} className="text-center">
-                     {p.format}
+                   <td key={`model-${p.name}`} className="text-center">
+                     {p.model_IA_ressource}
                    </td>
                  ))}
                </tr>
@@ -125,7 +144,49 @@ const PricingComparisonTable = ({ option, lang, currency }: PricingComparisonTab
                  <td className="font-medium">{lang.remove_bg}</td>
                  {plans.map((p) => (
                    <td key={`remove_bg-${p.name}`} className="text-center">
-                     {renderBool(p.remove_bg)}
+                     {p.remove_bg ? (
+                       <span>
+                         {p.credit_IA} {lang.per_month}
+                       </span>
+                     ) : (
+                       <span className="text-base-content/50">-</span>
+                     )}
+                   </td>
+                 ))}
+               </tr>
+                <tr className="hover:bg-base-200/40">
+                  <td className="font-medium">{lang.conversion}</td>
+                  {plans.map((p) => (
+                    <td key={`conversion-${p.name}`} className="text-center">
+                      {(() => {
+                        const normalized = normalizeConversionCredits(p.credit_conversion);
+                        return normalized === "∞"
+                          ? normalized
+                          : `${normalized} ${lang.conversions_suffix}`;
+                      })()}
+                    </td>
+                  ))}
+                </tr>
+                <tr className="hover:bg-base-200/40">
+                  <td className="font-medium">{lang.size_max}</td>
+                  {plans.map((p) => (
+                    <td key={`size_max-${p.name}`} className="text-center">
+                      {normalizeSizeMax(p.size_max) ?? (
+                        <span className="text-base-content/50">-</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+                <tr className="hover:bg-base-200/40">
+                  <td
+                    className="font-medium"
+                    dangerouslySetInnerHTML={{
+                     __html: lang.tools.replace(/\n/g, "<br/>"),
+                   }}
+                 ></td>
+                 {plans.map((p) => (
+                   <td key={`tools_qt-${p.name}`} className="text-center">
+                     {p.tools_qt}
                    </td>
                  ))}
                </tr>
@@ -140,62 +201,42 @@ const PricingComparisonTable = ({ option, lang, currency }: PricingComparisonTab
                    </td>
                  ))}
                </tr>
-               <tr className="hover:bg-base-200/40">
-                 <td
-                   className="font-medium"
-                   dangerouslySetInnerHTML={{
-                     __html: lang.tools.replace(/\n/g, "<br/>"),
-                   }}
-                 >
-                   
-                 </td>
-                 {plans.map((p) => (
-                   <td key={`tools_qt-${p.name}`} className="text-center">
-                     {p.tools_qt}
-                   </td>
-                 ))}
-               </tr>
-               <tr className="hover:bg-base-200/40">
-                 <td className="font-medium">{lang.model_IA_ressource}</td>
-                 {plans.map((p) => (
-                   <td key={`model-${p.name}`} className="text-center">
-                     {p.model_IA_ressource}
-                   </td>
-                 ))}
-               </tr>
-               <tr className="hover:bg-base-200/40">
+
+               {/* <tr className="hover:bg-base-200/40">
                  <td className="font-medium">{lang.gomme_magique}</td>
                  {plans.map((p) => (
                    <td key={`gomme-${p.name}`} className="text-center">
                      {renderBool(p.gomme_magique)}
                    </td>
                  ))}
-               </tr>
-               <tr className="hover:bg-base-200/40">
-                 <td className="font-medium">{lang.img_pexels}</td>
-                 {plans.map((p) => (
-                   <td key={`pexels-${p.name}`} className="text-center">
-                     {renderBool(p.img_pexels)}
-                   </td>
-                 ))}
-               </tr>
-               <tr className="hover:bg-base-200/40">
+               </tr> */}
+               {
+                 <tr className="hover:bg-base-200/40">
+                   <td className="font-medium">{lang.img_pexels}</td>
+                   {plans.map((p) => (
+                     <td key={`pexels-${p.name}`} className="text-center">
+                       {renderBool(p.img_pexels)}
+                     </td>
+                   ))}
+                 </tr>
+               }
+               {/* <tr className="hover:bg-base-200/40">
                  <td className="font-medium">{lang.delay_improved}</td>
                  {plans.map((p) => (
                    <td key={`delay-${p.name}`} className="text-center">
                      {renderBool(p.delay_improved)}
                    </td>
                  ))}
-               </tr>
-               <tr className="hover:bg-base-200/40">
+               </tr> */}
+               {/* <tr className="hover:bg-base-200/40">
                  <td className="font-medium">{lang.bg_IA_generation}</td>
                  {plans.map((p) => (
                    <td key={`bg-${p.name}`} className="text-center">
                      {renderBool(p.bg_IA_generation)}
                    </td>
                  ))}
-               </tr>
-               <tr className="hover:bg-base-200/40">
+               </tr> */}
+               {/* <tr className="hover:bg-base-200/40">
                  <td className="font-medium">{lang.bundle}</td>
                  {plans.map((p) => (
                    <td key={`bundle-${p.name}`} className="text-center">
@@ -218,7 +259,7 @@ const PricingComparisonTable = ({ option, lang, currency }: PricingComparisonTab
                      {renderBool(p.api_external)}
                    </td>
                  ))}
-               </tr>
+               </tr> */}
              </tbody>
            </table>
          </div>
@@ -228,3 +269,4 @@ const PricingComparisonTable = ({ option, lang, currency }: PricingComparisonTab
 };
 
 export { PricingComparisonTable };
+

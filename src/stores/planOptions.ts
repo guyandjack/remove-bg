@@ -1,16 +1,19 @@
 import { signal } from "@preact/signals";
 
 export type PlanOption = {
+  active?: boolean;
   name: string;
   price: number;
   prices?: Record<"CHF" | "EUR" | "USD", number>;
   stripePriceIds?: Record<"CHF" | "EUR" | "USD", string>;
-  credit: number;
+  credit_IA: number;
+  credit_conversion: string;
+  size_max?: string;
+  tools_qt: string;
+  tool_name: string[];
   format: string;
   remove_bg: boolean;
   change_bg_color: boolean;
-  tools_qt: string;
-  tool_name: string[];
   model_IA_ressource: string;
   gomme_magique: boolean;
   img_pexels: boolean;

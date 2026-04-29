@@ -119,7 +119,7 @@ export const finalizeCheckoutSessionFromStripeSession = async ({
         price: storedPrice,
         currency_code: "CHF",
         billing_interval: "month",
-        daily_credit_quota: planConfig.credit ?? 0,
+        daily_credit_quota: planConfig.credit_IA ?? 0,
       });
     } catch (err) {
       logger.error("[stripe] Failed to seed plan", planCode, err);
