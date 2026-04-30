@@ -9,6 +9,13 @@
     "logout": "Déconnexion"
   },
 
+  "dropDownProfile":{
+    "credits": "Crédits",
+    "dashboard":"Tableau de board",
+    "logout":"Déconnexion"
+
+  },
+
   "footer": {
     "cookie": "Cookies",
     "services": "Services",
@@ -173,7 +180,7 @@
     "intro": "Téléversez votre image et laissez l'IA travailler à votre place.",
     "step_1": {
       "title": "Choisissez un plan",
-      "description": "Le plan sélectionné vous permet de bénéficier d’un nombre de crédits limité toutes les 24 heures."
+      "description": "Le plan sélectionné vous permet de bénéficier d’un nombre de crédits limité par mois."
     },
     "step_2": {
       "title": "Créez un compte",
@@ -284,6 +291,121 @@
     "fileName": "Aucun fichier sélectionné",
     "preview": "Aucun aperçu disponible",
     "erase": "Effacer"
+  },
+
+  "removeBg": {
+    "confirmLabelIdle": "Traiter",
+    "confirmLabelProcessing": "Traitement…",
+    "planSimulation": "Simule un abonnement et évalue les outils de retouche que tu souhaites",
+    "planFree": "Free plan",
+    "planHobby": "Hobby plan",
+    "planPro": "Pro plan",
+    "loaderProcessing": "Traitement en cours…",
+    "defaultProcessingError": "Impossible de traiter cette image pour le moment."
+  },
+
+  "imageConverter": {
+    "headerTagline": "Conversion d'images",
+    "headerTitle": "Prépare ton image, ajuste et convertis",
+    "headerDescription": "Téléverse un fichier, choisis les dimensions, l’extension finale et applique quelques filtres avant d’envoyer la conversion. Tout le rendu final sera assuré par Sharp côté serveur.",
+    "dropzonePrompt": "Dépose ton image ici ou utilise le bouton.",
+    "dropzoneButton": "Sélectionner une image",
+    "dimensionsTitle": "Dimensions",
+    "dimensionsDescription": "Ajuste la largeur et la hauteur désirées.",
+    "dimensionsReset": "Réinitialiser",
+    "dimensionsWidth": "Largeur (px)",
+    "dimensionsHeight": "Hauteur (px)",
+    "dimensionsLockAspect": "Verrouiller les proportions",
+    "dimensionsOriginalPrefix": "Original :",
+    "formatTitle": "Format & qualité",
+    "formatDescription": "Choisis l’extension finale et ajuste la compression.",
+    "formatExtension": "Extension",
+    "qualityLabel": "Qualité",
+    "qualityPriorityWeight": "Priorité au poids",
+    "qualityPriorityQuality": "Priorité à la qualité",
+    "filtersTitle": "Filtres rapides",
+    "filtersDescription": "Ajuste l’image avant de lancer la conversion de fichier.",
+    "filtersReset": "Par défaut",
+    "actionClear": "Effacer",
+    "actionConvert": "Convertir",
+    "previewTitle": "Aperçu",
+    "previewAlt": "Aperçu converti",
+    "previewEmpty": "Aucun aperçu pour l’instant. Ajoute un fichier pour voir le rendu de tes réglages.",
+    "previewHint": "Cette prévisualisation donne un aperçu instantané de tes réglages.",
+    "summaryDimensions": "Dimensions ciblées",
+    "summaryFormat": "Format",
+    "summaryQuality": "Qualité",
+    "changeImage": "Changer d'image",
+    "downloadConverted": "Télécharger l'image convertie",
+    "deleteConverted": "Supprimer l'image convertie",
+    "assetReadyPrefix": "Fichier prêt :",
+    "finalAlt": "Résultat final",
+    "finalDescription": "Visualise ci-dessus l’image calculée par le serveur. Tu peux la télécharger ou la supprimer si le rendu ne correspond pas à tes attentes.",
+    "emptyConversionHint": "La conversion côté serveur générera un lien de téléchargement sécurisé.",
+    "needPlanLink": "Choisis un plan pour utiliser le service",
+    "statusDeleted": "L'image convertie a été supprimée.",
+    "statusNoFile": "Ajoute une image pour démarrer.",
+    "statusLoading": "Conversion en cours…",
+    "statusSuccess": "Image convertie. Télécharge le fichier pour récupérer le résultat.",
+    "statusError": "Impossible de convertir l'image pour le moment. Vérifie ta connexion ou réessaie plus tard.",
+    "statusParamsModified": "Paramètres modifiés. Relance la conversion pour mettre à jour le fichier.",
+    "previewError": "Impossible de générer l’aperçu :",
+    "filters": {
+      "brightness": "Luminosité",
+      "contrast": "Contraste",
+      "saturation": "Saturation",
+      "hue": "Teinte",
+      "grayscale": "Niveaux de gris",
+      "blur": "Flou",
+      "blurHelper": "Appliquer un léger flou pour adoucir les bords."
+    }
+  },
+
+  "imgEditor": {
+    "title": "Outils de retouche",
+    "tabColorPicker": "Sélecteur de couleurs",
+    "tabImagePicker": "Images (Pexels)",
+    "resetBackground": "Annuler le fond",
+    "restrictedOption": "Cette option est réservée aux abonnements supérieurs.",
+    "imageSearchIntro": "Recherche d'images libres de droit.",
+    "imageSearchPlaceholder": "Images en ligne (ex: nature, city, people, animals...)",
+    "imageSearchAriaLabel": "Rechercher dans la bibliothèque d'images Pexels",
+    "imageSearchButton": "Rechercher",
+    "imageSearchLoading": "...",
+    "imageSearchError": "Erreur lors de la recherche d'images.",
+    "imageRoyaltyFreeLabel": "Images libres de droit.",
+    "paginationPrev": "Précédent",
+    "paginationNext": "Suivant",
+    "paginationPageLabel": "Page {current}/{total}",
+    "paginationPageEmpty": "Page -",
+    "backgroundAlt": "Fond",
+    "previewTitle": "Prévisualisation du fond",
+    "previewDescription": "Seule cette fenêtre applique le fond choisi. Validez pour mettre à jour l'éditeur principal.",
+    "previewAlt": "Aperçu du fond sélectionné",
+    "previewError": "Impossible de générer un aperçu.",
+    "previewRetry": "Réessayer",
+    "previewCancel": "Annuler",
+    "previewConfirm": "Valider ce fond",
+    "eraserCancel": "Annuler",
+    "eraserRetry": "Recommencer",
+    "eraserClearMask": "Effacer l'empreinte",
+    "eraserConfirmMask": "Valider l'empreinte",
+    "eraserProcessing": "Traitement...",
+    "eraserApplyToEditor": "Appliquer à l'éditeur",
+    "eraserResultIntro": "Nouveau rendu généré. Vérifiez-le avant de l'appliquer à l'éditeur.",
+    "eraserResultAlt": "Résultat gomme magique",
+    "eraserDrawIntro": "Dessinez directement sur l'image pour marquer les zones à effacer. Maintenez le clic pour créer votre masque.",
+    "eraserZoneAlt": "Zone à retoucher"
+  },
+
+  "downloadLink": {
+    "pending": "En cours...",
+    "download": "Télécharger",
+    "noCredits": "Choisis un plan pour utiliser le service",
+    "errorPrefix": "Une erreur est survenue :",
+    "invalidSource": "Source de téléchargement invalide.",
+    "retrieveError": "Impossible de récupérer le fichier.",
+    "fileTypeDescription": "Image"
   },
 
   "faqHome": {

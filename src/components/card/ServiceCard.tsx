@@ -62,6 +62,8 @@ const ServiceCard = ({ content, selectService }: BannerProps) => {
     };
   }, []);
 
+  if (!content.active) return null;
+
   return (
     <a
       ref={cardContainer}

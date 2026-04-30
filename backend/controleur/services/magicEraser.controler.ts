@@ -6,6 +6,11 @@ import type { RequestHandler } from "express";
 import { logger } from "../../logger";
 
 import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload";
+import {
+  getActiveUsageBillingPeriod,
+  getUserByEmail,
+  recordCreditUsage,
+} from "../../DB/queriesSQL/queriesSQL.ts";
 
 const REPLICATE_TIMEOUT_MS =
   Number(process.env.REPLICATE_TIMEOUT_MS ?? "120000") || 120000;
@@ -95,6 +100,15 @@ function pickNumber(
 }
 
 const magicEraser: RequestHandler = async (req, res) => {
+  const { email } = (req as any).payload as { email?: string } | undefined || {};
+  if (!email) {
+    return res.status(401).json({
+      error: true,
+      message: "Unauthorized: missing user payload",
+      requestId: (req as any).requestId,
+    });
+  }
+
   const replicateToken =
     process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_KEY_WIZPIX;
   if (!replicateToken) {
@@ -161,6 +175,35 @@ const magicEraser: RequestHandler = async (req, res) => {
     0,
     1
   );
+
+  // Credits check (monthly billing period)
+  const user = await getUserByEmail(String(email).toLowerCase());
+  if (!user) {
+    return res.status(404).json({
+      error: true,
+      message: "User not found",
+      requestId: (req as any).requestId,
+    });
+  }
+  const usage = await getActiveUsageBillingPeriod(user.id);
+  if (!usage) {
+    return res.status(403).json({
+      error: true,
+      message: "No active subscription or plan",
+      requestId: (req as any).requestId,
+    });
+  }
+  if (usage.remaining_in_period <= 0) {
+    return res.status(429).json({
+      error: true,
+      message: "No more credits available for this billing period",
+      requestId: (req as any).requestId,
+      credits: {
+        used_last_24h: usage.used_in_period,
+        remaining_last_24h: usage.remaining_in_period,
+      },
+    });
+  }
 
   const replicate = new Replicate({
     auth: replicateToken,
@@ -238,6 +281,45 @@ const magicEraser: RequestHandler = async (req, res) => {
       durationMs: Date.now() - startedAt,
       outputBytes: buffer.length,
     });
+
+    // Decrement credits only on successful Replicate output.
+    // For a robust MVP, if we can't persist usage, we fail the request: otherwise
+    // you'd be delivering paid output without accounting.
+    const recordedId = await recordCreditUsage(
+      usage.subscription_id,
+      1,
+      "replicate_magic_eraser",
+      (req as any).requestId
+    );
+    if (!recordedId) {
+      throw new Error("Credit usage insert returned null");
+    }
+    logger.info("magicEraser::credit_decrement_success", {
+      requestId: (req as any).requestId,
+      subscriptionId: usage.subscription_id,
+      usageId: recordedId,
+    });
+
+    // Expose updated credits to the frontend (binary response)
+    try {
+      const refreshed = await getActiveUsageBillingPeriod(user.id);
+      if (refreshed) {
+        res.setHeader(
+          "Access-Control-Expose-Headers",
+          "X-Wizpix-Credits-Remaining,X-Wizpix-Credits-Used"
+        );
+        res.setHeader(
+          "X-Wizpix-Credits-Remaining",
+          String(refreshed.remaining_in_period)
+        );
+        res.setHeader("X-Wizpix-Credits-Used", String(refreshed.used_in_period));
+      }
+    } catch (headerErr: any) {
+      logger.warn("magicEraser::credits_header_failed", {
+        requestId: (req as any).requestId,
+        message: headerErr?.message ?? String(headerErr),
+      });
+    }
 
     return res.status(200).send(buffer);
   } catch (error) {

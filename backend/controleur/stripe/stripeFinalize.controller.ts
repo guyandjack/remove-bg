@@ -4,7 +4,7 @@ import {
   getStripeCheckoutSessionState,
   markStripeCheckoutSessionConsumed,
   getUserByEmail,
-  getActiveUsage24h,
+  getActiveUsageBillingPeriod,
   getPlanByCode,
   getCustomerByUserId,
 } from "../../DB/queriesSQL/queriesSQL.ts";
@@ -124,7 +124,7 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
     });
     const cookieOptions = setCookieOptionsObject();
 
-    const usage = await getActiveUsage24h(user.id);
+    const usage = await getActiveUsageBillingPeriod(user.id);
     const planRow = await getPlanByCode(record.plan_code);
     const customer = await getCustomerByUserId(user.id);
 
@@ -140,8 +140,8 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
     const planCurrency = normalizedCurrency;
     const planQuota = planRow?.daily_credit_quota ?? 0;
     const planName = planRow?.name ?? record.plan_code;
-    const usedCredits = usage?.used_last_24h ?? 0;
-    const remainingCredits = usage?.remaining_last_24h ?? planQuota;
+    const usedCredits = usage?.used_in_period ?? 0;
+    const remainingCredits = usage?.remaining_in_period ?? planQuota;
 
     const payload: ObjectResponse = {
       user: {

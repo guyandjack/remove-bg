@@ -78,6 +78,19 @@ export interface SubscriptionUsage24h extends RowDataPacket {
   remaining_last_24h: number;
 }
 
+export interface SubscriptionUsageBillingPeriod extends RowDataPacket {
+  subscription_id: ID;
+  user_id: ID;
+  plan_id: ID;
+  period_start: Date;
+  period_end: Date;
+  // Keeping the column name for backward compatibility in existing code/DB.
+  // Semantics: monthly credit quota (billing period), not "daily".
+  daily_credit_quota: number;
+  used_in_period: number;
+  remaining_in_period: number;
+}
+
 export interface Customer extends RowDataPacket {
   id: ID;
   user_id: ID;
@@ -147,6 +160,17 @@ export async function withTransaction<T>(fn: (conn: PoolConnection) => Promise<T
 // -----------------------------
 export function addDays(d: Date, days: number) {
   return new Date(d.getTime() + days * 24 * 60 * 60 * 1000);
+}
+
+export function addMonthsKeepingDay(d: Date, months: number) {
+  const date = new Date(d.getTime());
+  const day = date.getDate();
+  date.setMonth(date.getMonth() + months);
+  // If month overflowed (e.g. Jan 31 -> Mar 3), clamp to last day of target month.
+  if (date.getDate() !== day) {
+    date.setDate(0);
+  }
+  return date;
 }
 
 // ===================================================================
@@ -1118,16 +1142,46 @@ export async function recordCreditUsage(
 ) {
   const connexion = await connectDb();
   const id = crypto.randomUUID();
-  const sql = `INSERT INTO CreditUsage (id, subscription_id, used, reason, request_id)
+  const sql = `INSERT INTO \`wiz_pix\`.\`CreditUsage\` (id, subscription_id, used, reason, request_id)
                VALUES (?, ?, ?, ?, ?)`;
-  const [res] = await connexion.execute<ResultSetHeader>(sql, [
-    id,
-    subscriptionId,
-    used,
-    reason,
-    requestId ?? null,
-  ]);
-  return res.affectedRows === 1 ? id : null;
+  try {
+    const [res] = await connexion.execute<ResultSetHeader>(sql, [
+      id,
+      subscriptionId,
+      used,
+      reason,
+      requestId ?? null,
+    ]);
+    // Extra debug: helps validate which DB/schema this code is actually writing to.
+    try {
+      const [dbRows] = await connexion.query<RowDataPacket[]>(
+        `SELECT DATABASE() AS db`
+      );
+      const currentDb = (dbRows[0] as any)?.db ?? null;
+      console.log("[recordCreditUsage] insert ok", {
+        id,
+        subscriptionId,
+        used,
+        reason,
+        requestId: requestId ?? null,
+        db: currentDb,
+      });
+    } catch {}
+    return res.affectedRows === 1 ? id : null;
+  } catch (err: any) {
+    // Make this extremely visible during MVP hardening.
+    console.error("[recordCreditUsage] insert failed", {
+      subscriptionId,
+      used,
+      reason,
+      requestId: requestId ?? null,
+      message: err?.message || String(err),
+      code: err?.code,
+      errno: err?.errno,
+      sqlState: err?.sqlState,
+    });
+    throw err;
+  }
 }
 
 /**
@@ -1140,6 +1194,73 @@ export async function getActiveUsage24h(userId: ID): Promise<SubscriptionUsage24
     `SELECT * FROM v_subscription_usage_24h WHERE user_id = ? LIMIT 1`,
     [userId]
   );
+  return rows[0] ?? null;
+}
+
+/**
+ * Get usage and remaining credits for the CURRENT billing period (monthly).
+ * - For Stripe subscriptions, period_start/period_end must be kept in sync by Stripe webhooks.
+ * - For "free" subscriptions (no Stripe), we auto-roll the period forward when it expires.
+ *
+ * Note: We keep Plan.daily_credit_quota as the stored quota field to avoid DB migrations,
+ * but it now represents the quota per billing period ("month") for this MVP.
+ */
+export async function getActiveUsageBillingPeriod(
+  userId: ID,
+  now: Date = new Date()
+): Promise<SubscriptionUsageBillingPeriod | null> {
+  const connexion = await connectDb();
+
+  // Load active subscription first (we may need to roll the period forward).
+  const [subs] = await connexion.execute<Subscription[]>(
+    `SELECT * FROM Subscription WHERE user_id = ? AND is_active = TRUE LIMIT 1`,
+    [userId]
+  );
+  const sub = subs[0];
+  if (!sub) return null;
+
+  const hasStripe = Boolean(sub.stripe_subscription_id);
+  const subPeriodEnd = new Date(sub.period_end);
+  if (!hasStripe && subPeriodEnd.getTime() <= now.getTime()) {
+    // Free plan: roll forward by whole months until the current time is inside [start, end).
+    // This avoids users getting stuck with an expired period and never seeing credits renew.
+    let newStart = new Date(sub.period_start);
+    let newEnd = new Date(sub.period_end);
+    let safety = 0;
+    while (newEnd.getTime() <= now.getTime() && safety < 24) {
+      newStart = newEnd;
+      newEnd = addMonthsKeepingDay(newEnd, 1);
+      safety += 1;
+    }
+    await connexion.execute<ResultSetHeader>(
+      `UPDATE Subscription SET period_start = ?, period_end = ? WHERE id = ?`,
+      [newStart, newEnd, sub.id]
+    );
+  }
+
+  const sql = `
+    SELECT
+      s.id AS subscription_id,
+      s.user_id,
+      s.plan_id,
+      s.period_start,
+      s.period_end,
+      p.daily_credit_quota,
+      COALESCE(SUM(cu.used), 0) AS used_in_period,
+      GREATEST(p.daily_credit_quota - COALESCE(SUM(cu.used), 0), 0) AS remaining_in_period
+    FROM Subscription s
+    JOIN Plan p ON p.id = s.plan_id
+    LEFT JOIN CreditUsage cu
+      ON cu.subscription_id = s.id
+      AND cu.occurred_at >= s.period_start
+      AND cu.occurred_at < s.period_end
+    WHERE s.user_id = ? AND s.is_active = TRUE
+    GROUP BY s.id, s.user_id, s.plan_id, s.period_start, s.period_end, p.daily_credit_quota
+    LIMIT 1
+  `;
+  const [rows] = await connexion.execute<SubscriptionUsageBillingPeriod[]>(sql, [
+    userId,
+  ]);
   return rows[0] ?? null;
 }
 
@@ -1185,4 +1306,31 @@ export async function getUserPlanAndCredits24h(
     }
     throw err;
   }
+}
+
+// -------------------------------------------------------------------
+// Plan + crédits restants sur la période de facturation (mensuelle)
+// -------------------------------------------------------------------
+export async function getUserPlanAndCreditsBillingPeriod(
+  userId: ID
+): Promise<{ plan: string; remaining_credits_in_period: number } | null> {
+  const usage = await getActiveUsageBillingPeriod(userId);
+  if (!usage) return null;
+
+  const connexion = await connectDb();
+  const [rows] = await connexion.execute<RowDataPacket[]>(
+    `SELECT p.code AS plan_code
+     FROM Subscription s
+     JOIN Plan p ON p.id = s.plan_id
+     WHERE s.user_id = ? AND s.is_active = TRUE
+     LIMIT 1`,
+    [userId]
+  );
+  const planCode = rows[0] ? String((rows[0] as any).plan_code) : "";
+  if (!planCode) return null;
+
+  return {
+    plan: planCode,
+    remaining_credits_in_period: usage.remaining_in_period,
+  };
 }

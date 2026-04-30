@@ -7,7 +7,7 @@ import crypto from "node:crypto";
 import { connectDb } from "../DB/poolConnexion/poolConnexion.ts";
 import {
   getUserByEmail,
-  getActiveUsage24h,
+  getActiveUsageBillingPeriod,
   withTransaction,
   getPlanByCode,
   getCustomerByUserId,
@@ -246,7 +246,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
               errorCode: "otp6b",
             });
         }
-        const usage = await getActiveUsage24h(user.id);
+        const usage = await getActiveUsageBillingPeriod(user.id);
         const planRow = await getPlanByCode(planCode);
         const customer = await getCustomerByUserId(user.id);
         const options = setCookieOptionsObject();
@@ -262,8 +262,8 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         const planCurrency = currencyCode || planRow?.currency_code || "CHF";
         const planQuota = planRow?.daily_credit_quota ?? planDailyCredit;
         const planName = planRow?.name ?? planDefinition?.name ?? planCode;
-        const usedCredits = usage?.used_last_24h ?? 0;
-        const remainingCredits = usage?.remaining_last_24h ?? planQuota;
+        const usedCredits = usage?.used_in_period ?? 0;
+        const remainingCredits = usage?.remaining_in_period ?? planQuota;
         res.cookie("tokenRefresh", refreshToken, options);
         const formatedObject: ObjectResponse = {
           user: {

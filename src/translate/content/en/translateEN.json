@@ -8,6 +8,12 @@
     "login": "Login"
   },
 
+  "dropDownProfile": {
+    "credits": "Credits",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
+
   "footer": {
     "cookie": "Cookies",
     "services": "Services",
@@ -103,7 +109,7 @@
     "formContact": "loading..."
   },
   "diff": {
-    "title":"A preview of how the images will look without a background.",
+    "title": "A preview of how the images will look without a background.",
     "friend_label": "Friends",
     "vehicule_label": "Vehicule",
     "sport_label": "Sport",
@@ -172,112 +178,110 @@
     "subtitle": "Each photo keeps the subject while the background becomes transparent."
   },
   "stepsContent": {
-  "title": "How does it work?",
-  "intro": "Upload your image and let the AI do the work for you.",
-  "step_1": {
-    "title": "Choose a plan",
-    "description": "The plan you select determines the number of credits available every 24 hours."
+    "title": "How does it work?",
+    "intro": "Upload your image and let the AI do the work for you.",
+    "step_1": {
+      "title": "Choose a plan",
+      "description": "The plan you select determines the number of credits available every months."
+    },
+    "step_2": {
+      "title": "Create an account",
+      "description": "A valid email address and a secure password are all you need. No credit card is required for the free plan."
+    },
+    "step_3": {
+      "title": "Use our service",
+      "description": "Upload your images, wait a few seconds, and your background is removed. Depending on your subscription, additional editing tools are available."
+    }
   },
-  "step_2": {
-    "title": "Create an account",
-    "description": "A valid email address and a secure password are all you need. No credit card is required for the free plan."
+  "serviceCardContent": {
+    "title": "Services",
+    "card_1": {
+      "id": "remove",
+      "src": "",
+      "title": "Background removal",
+      "description": "Automatically removes the background from your images to create clean, ready-to-use visuals."
+    },
+    "card_2": {
+      "id": "social",
+      "src": "",
+      "title": "Social media images",
+      "description": "Formats and optimizes your images for major social networks to ensure a professional look."
+    },
+    "card_3": {
+      "id": "convert",
+      "src": "",
+      "title": "Image conversion",
+      "description": "Converts and resizes your images to the desired format and dimensions, with no noticeable quality loss."
+    },
+    "card_4": {
+      "id": "product",
+      "src": "",
+      "title": "Product showcasing",
+      "description": "Showcases your products in tailored scenes for selling or presenting them effectively."
+    }
   },
-  "step_3": {
-    "title": "Use our service",
-    "description": "Upload your images, wait a few seconds, and your background is removed. Depending on your subscription, additional editing tools are available."
-  }
-},
-"serviceCardContent": {
-  "title":"Services",
-  "card_1": {
-    "id": "remove",
-    "src": "",
-    "title": "Background removal",
-    "description": "Automatically removes the background from your images to create clean, ready-to-use visuals."
-  },
-  "card_2": {
-    "id": "social",
-    "src": "",
-    "title": "Social media images",
-    "description": "Formats and optimizes your images for major social networks to ensure a professional look."
-  },
-  "card_3": {
-    "id": "convert",
-    "src": "",
-    "title": "Image conversion",
-    "description": "Converts and resizes your images to the desired format and dimensions, with no noticeable quality loss."
-  },
-  "card_4": {
-    "id": "product",
-    "src": "",
-    "title": "Product showcasing",
-    "description": "Showcases your products in tailored scenes for selling or presenting them effectively."
-  }
-},
-
 
   "cta": {
-  "title_home_1": "Start processing your images.",
-  "label_choice": "I choose a plan",
-  "label_test": "I want to test the quality"
-},
-"ctaFinal": {
-  "title_home": "Edit your images now",
-  "intro_home": "Join hundreds of users who process their images in just a few seconds with professional-quality results.",
-  "btn_pricing": "I choose a plan",
-  "btn_service": "I want to test the quality",
-  "info_1": "No credit card required for the free plan",
-  "info_2": "Cancel your subscription at any time"
-},
+    "title_home_1": "Start processing your images.",
+    "label_choice": "I choose a plan",
+    "label_test": "I want to test the quality"
+  },
+  "ctaFinal": {
+    "title_home": "Edit your images now",
+    "intro_home": "Join hundreds of users who process their images in just a few seconds with professional-quality results.",
+    "btn_pricing": "I choose a plan",
+    "btn_service": "I want to test the quality",
+    "info_1": "No credit card required for the free plan",
+    "info_2": "Cancel your subscription at any time"
+  },
 
-"featureCardContent": {
-  "card_1": {
-    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5\" /></svg>",
-    "title": "Web developers",
-    "description": "Automate background removal and image editing directly inside your applications with a fast and simple API."
+  "featureCardContent": {
+    "card_1": {
+      "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5\" /></svg>",
+      "title": "Web developers",
+      "description": "Automate background removal and image editing directly inside your applications with a fast and simple API."
+    },
+    "card_2": {
+      "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z\" /><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z\" /></svg>",
+      "title": "Photographers",
+      "description": "Save valuable time by automatically removing backgrounds and enhancing your shots in just a few seconds."
+    },
+    "card_3": {
+      "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z\" /></svg>",
+      "title": "E-commerce stores",
+      "description": "Create clean, consistent product visuals ready to be published on your website or marketplace."
+    },
+    "card_4": {
+      "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42\" /></svg>",
+      "title": "Designers & graphic artists",
+      "description": "Speed up your workflow with clean cutouts and realistic mockups, without time-consuming manual work."
+    },
+    "card_5": {
+      "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z\" /></svg>",
+      "title": "Content creators",
+      "description": "Design thumbnails and eye-catching visuals without needing advanced image editing skills."
+    },
+    "card_6": {
+      "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46\" /></svg>",
+      "title": "Marketing agencies",
+      "description": "Produce campaign-ready visuals optimized for ads and social media in just a few clicks."
+    },
+    "card_7": {
+      "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75\" /></svg>",
+      "title": "Marketplace managers",
+      "description": "Standardize seller images by automatically removing backgrounds to match your visual guidelines."
+    },
+    "card_8": {
+      "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z\" /></svg>",
+      "title": "Real estate",
+      "description": "Showcase your properties with clean visuals, free of distracting backgrounds, for listings and marketing materials."
+    },
+    "card_9": {
+      "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z\" /></svg>",
+      "title": "Artisans & makers",
+      "description": "Highlight your creations with sharp, professional visuals without investing in expensive equipment."
+    }
   },
-  "card_2": {
-    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z\" /><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z\" /></svg>",
-    "title": "Photographers",
-    "description": "Save valuable time by automatically removing backgrounds and enhancing your shots in just a few seconds."
-  },
-  "card_3": {
-    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z\" /></svg>",
-    "title": "E-commerce stores",
-    "description": "Create clean, consistent product visuals ready to be published on your website or marketplace."
-  },
-  "card_4": {
-    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42\" /></svg>",
-    "title": "Designers & graphic artists",
-    "description": "Speed up your workflow with clean cutouts and realistic mockups, without time-consuming manual work."
-  },
-  "card_5": {
-    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z\" /></svg>",
-    "title": "Content creators",
-    "description": "Design thumbnails and eye-catching visuals without needing advanced image editing skills."
-  },
-  "card_6": {
-    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46\" /></svg>",
-    "title": "Marketing agencies",
-    "description": "Produce campaign-ready visuals optimized for ads and social media in just a few clicks."
-  },
-  "card_7": {
-    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75\" /></svg>",
-    "title": "Marketplace managers",
-    "description": "Standardize seller images by automatically removing backgrounds to match your visual guidelines."
-  },
-  "card_8": {
-    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z\" /></svg>",
-    "title": "Real estate",
-    "description": "Showcase your properties with clean visuals, free of distracting backgrounds, for listings and marketing materials."
-  },
-  "card_9": {
-    "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z\" /></svg>",
-    "title": "Artisans & makers",
-    "description": "Highlight your creations with sharp, professional visuals without investing in expensive equipment."
-  }
-},
-
 
   "uploadImg": {
     "label": "Choose a file",
@@ -286,89 +290,204 @@
     "preview": "No preview available",
     "erase": "Cancel"
   },
+
+  "removeBg": {
+    "confirmLabelIdle": "Process",
+    "confirmLabelProcessing": "Processing…",
+    "planSimulation": "Simulate a subscription and evaluate the editing tools you need",
+    "planFree": "Free plan",
+    "planHobby": "Hobby plan",
+    "planPro": "Pro plan",
+    "loaderProcessing": "Processing…",
+    "defaultProcessingError": "Unable to process this image right now."
+  },
+
+  "imageConverter": {
+    "headerTagline": "Image conversion",
+    "headerTitle": "Prepare your image, adjust and convert",
+    "headerDescription": "Upload a file, choose target dimensions and output format, then apply a few filters before sending the conversion. The final output is produced server-side with Sharp.",
+    "dropzonePrompt": "Drop your image here or use the button.",
+    "dropzoneButton": "Select an image",
+    "dimensionsTitle": "Dimensions",
+    "dimensionsDescription": "Adjust the desired width and height.",
+    "dimensionsReset": "Reset",
+    "dimensionsWidth": "Width (px)",
+    "dimensionsHeight": "Height (px)",
+    "dimensionsLockAspect": "Lock aspect ratio",
+    "dimensionsOriginalPrefix": "Original:",
+    "formatTitle": "Format & quality",
+    "formatDescription": "Choose the output extension and adjust compression.",
+    "formatExtension": "Extension",
+    "qualityLabel": "Quality",
+    "qualityPriorityWeight": "Smaller file",
+    "qualityPriorityQuality": "Better quality",
+    "filtersTitle": "Quick filters",
+    "filtersDescription": "Adjust the image before starting the file conversion.",
+    "filtersReset": "Default",
+    "actionClear": "Clear",
+    "actionConvert": "Convert",
+    "previewTitle": "Preview",
+    "previewAlt": "Converted preview",
+    "previewEmpty": "No preview yet. Add a file to see how your settings look.",
+    "previewHint": "This preview gives an instant look at your settings.",
+    "summaryDimensions": "Target dimensions",
+    "summaryFormat": "Format",
+    "summaryQuality": "Quality",
+    "changeImage": "Change image",
+    "downloadConverted": "Download converted image",
+    "deleteConverted": "Delete converted image",
+    "assetReadyPrefix": "File ready:",
+    "finalAlt": "Final result",
+    "finalDescription": "Preview above the image computed by the server. You can download it or delete it if it doesn't match your expectations.",
+    "emptyConversionHint": "Server-side conversion will generate a secure download link.",
+    "needPlanLink": "Choose a plan to use this service",
+    "statusDeleted": "Converted image deleted.",
+    "statusNoFile": "Add an image to get started.",
+    "statusLoading": "Converting…",
+    "statusSuccess": "Image converted. Download the file to retrieve the result.",
+    "statusError": "Unable to convert the image right now. Check your connection and try again later.",
+    "statusParamsModified": "Settings changed. Run the conversion again to update the file.",
+    "previewError": "Unable to generate preview:",
+    "filters": {
+      "brightness": "Brightness",
+      "contrast": "Contrast",
+      "saturation": "Saturation",
+      "hue": "Hue",
+      "grayscale": "Grayscale",
+      "blur": "Blur",
+      "blurHelper": "Apply a slight blur to soften edges."
+    }
+  },
+
+  "imgEditor": {
+    "title": "Editing tools",
+    "tabColorPicker": "Color picker",
+    "tabImagePicker": "Images (Pexels)",
+    "resetBackground": "Remove background",
+    "restrictedOption": "This option is available on higher plans.",
+    "imageSearchIntro": "Search royalty-free images.",
+    "imageSearchPlaceholder": "Online images (e.g.: nature, city, people, animals...)",
+    "imageSearchAriaLabel": "Search in the Pexels image library",
+    "imageSearchButton": "Search",
+    "imageSearchLoading": "...",
+    "imageSearchError": "Error while searching images.",
+    "imageRoyaltyFreeLabel": "Royalty-free images.",
+    "paginationPrev": "Prev",
+    "paginationNext": "Next",
+    "paginationPageLabel": "Page {current}/{total}",
+    "paginationPageEmpty": "Page -",
+    "backgroundAlt": "Background",
+    "previewTitle": "Background preview",
+    "previewDescription": "Only this window applies the selected background. Confirm to update the main editor.",
+    "previewAlt": "Selected background preview",
+    "previewError": "Unable to generate a preview.",
+    "previewRetry": "Try again",
+    "previewCancel": "Cancel",
+    "previewConfirm": "Apply this background",
+    "eraserCancel": "Cancel",
+    "eraserRetry": "Start over",
+    "eraserClearMask": "Clear mask",
+    "eraserConfirmMask": "Confirm mask",
+    "eraserProcessing": "Processing...",
+    "eraserApplyToEditor": "Apply to editor",
+    "eraserResultIntro": "New render generated. Review it before applying it to the editor.",
+    "eraserResultAlt": "Magic eraser result",
+    "eraserDrawIntro": "Draw directly on the image to mark areas to erase. Hold the pointer to create your mask.",
+    "eraserZoneAlt": "Retouch area"
+  },
+
+  "downloadLink": {
+    "pending": "In progress...",
+    "download": "Download",
+    "noCredits": "Choose a plan to use the service",
+    "errorPrefix": "An error occurred:",
+    "invalidSource": "Invalid download source.",
+    "retrieveError": "Unable to retrieve the file.",
+    "fileTypeDescription": "Image"
+  },
   "faqHome": {
-  "title": "Frequently Asked Questions",
+    "title": "Frequently Asked Questions",
 
-  "question_1": "Is the website GDPR compliant?",
-  "reponse_1": "Yes. Our platform is fully GDPR compliant. Personal data is only collected when strictly necessary (account registration or contact forms). You have the right to access, modify, and delete your data at any time. <a class='faq-link' href='/privacy'>Read our privacy policy</a> to learn more about how images are handled.",
+    "question_1": "Is the website GDPR compliant?",
+    "reponse_1": "Yes. Our platform is fully GDPR compliant. Personal data is only collected when strictly necessary (account registration or contact forms). You have the right to access, modify, and delete your data at any time. <a class='faq-link' href='/privacy'>Read our privacy policy</a> to learn more about how images are handled.",
 
-  "question_2": "Who is this background removal service for?",
-  "reponse_2": "Our tool is designed for content creators, e-commerce sellers, photographers, designers, students, and anyone who needs fast, high-quality background removal for professional or personal use.",
+    "question_2": "Who is this background removal service for?",
+    "reponse_2": "Our tool is designed for content creators, e-commerce sellers, photographers, designers, students, and anyone who needs fast, high-quality background removal for professional or personal use.",
 
-  "question_3": "Is the website secure?",
-  "reponse_3": "Yes. No data is shared with third parties, no tracking cookies are used, and all payments are securely processed by Stripe, a PCI-DSS certified provider.",
+    "question_3": "Is the website secure?",
+    "reponse_3": "Yes. No data is shared with third parties, no tracking cookies are used, and all payments are securely processed by Stripe, a PCI-DSS certified provider.",
 
-  "question_4": "How do I use the service?",
-  "reponse_4": "Simply choose a plan (free or paid), create an account, and upload your images. Processing starts automatically and results are available for download within seconds. <a class='faq-link' href='/privacy'>Read our privacy policy</a> for more details.",
+    "question_4": "How do I use the service?",
+    "reponse_4": "Simply choose a plan (free or paid), create an account, and upload your images. Processing starts automatically and results are available for download within seconds. <a class='faq-link' href='/privacy'>Read our privacy policy</a> for more details.",
 
-  "question_5": "Is the free plan really free?",
-  "reponse_5": "Yes, completely. Some advanced features are limited, but no credit card is required and you receive monthly credits to use the service at no cost.",
+    "question_5": "Is the free plan really free?",
+    "reponse_5": "Yes, completely. Some advanced features are limited, but no credit card is required and you receive monthly credits to use the service at no cost.",
 
-  "question_6": "Are my images used to train AI models?",
-  "reponse_6": "No. Our partner Replicate, which provides and hosts the AI models, states that images are not used for training purposes. <a class='faq-link' href='/privacy'>Read our privacy policy</a> for more details.",
+    "question_6": "Are my images used to train AI models?",
+    "reponse_6": "No. Our partner Replicate, which provides and hosts the AI models, states that images are not used for training purposes. <a class='faq-link' href='/privacy'>Read our privacy policy</a> for more details.",
 
-  "question_7": "What are the risks for my personal data?",
-  "reponse_7": "There are no significant risks. We only collect your IP address (for API security) and the information you voluntarily provide (registration or contact form). No sensitive data is requested or stored.",
+    "question_7": "What are the risks for my personal data?",
+    "reponse_7": "There are no significant risks. We only collect your IP address (for API security) and the information you voluntarily provide (registration or contact form). No sensitive data is requested or stored.",
 
-  "question_8": "How long are my images stored?",
-  "reponse_8": "We do not store your images. We only act as an intermediary between you and the AI processing models.",
+    "question_8": "How long are my images stored?",
+    "reponse_8": "We do not store your images. We only act as an intermediary between you and the AI processing models.",
 
-  "question_9": "Can I cancel my subscription at any time?",
-  "reponse_9": "Yes. You can cancel your subscription at any time from your account. Cancellation stops automatic renewal without affecting your current access period.",
+    "question_9": "Can I cancel my subscription at any time?",
+    "reponse_9": "Yes. You can cancel your subscription at any time from your account. Cancellation stops automatic renewal without affecting your current access period.",
 
-  "question_10": "Does cancellation include a refund?",
-  "reponse_10": "No. According to our subscription terms, already paid periods remain due until their end date, even if canceled early.",
+    "question_10": "Does cancellation include a refund?",
+    "reponse_10": "No. According to our subscription terms, already paid periods remain due until their end date, even if canceled early.",
 
-  "question_11": "What is the quality of the results?",
-  "reponse_11": "Our AI models are trained to deliver clean, precise, and professional background removal, even for complex images. Paid plans benefit from enhanced quality and advanced features.",
+    "question_11": "What is the quality of the results?",
+    "reponse_11": "Our AI models are trained to deliver clean, precise, and professional background removal, even for complex images. Paid plans benefit from enhanced quality and advanced features.",
 
-  "question_12": "Is there a limit to how many images I can process?",
-  "reponse_12": "Yes. Each plan includes a monthly credit quota corresponding to the number of AI processing operations. You can check your balance anytime in your dashboard.",
+    "question_12": "Is there a limit to how many images I can process?",
+    "reponse_12": "Yes. Each plan includes a monthly credit quota corresponding to the number of AI processing operations. You can check your balance anytime in your dashboard.",
 
-  "question_13": "Does the service work on mobile?",
-  "reponse_13": "Yes. The service works on smartphones, tablets, and desktops. However, for the best experience, we recommend using a larger screen for editing tools.",
+    "question_13": "Does the service work on mobile?",
+    "reponse_13": "Yes. The service works on smartphones, tablets, and desktops. However, for the best experience, we recommend using a larger screen for editing tools.",
 
-  "question_14": "What if the result is not accurate?",
-  "reponse_14": "You can try again with a higher-quality image or use our editing tools (depending on your plan). If the issue persists, our support team can assist you.",
+    "question_14": "What if the result is not accurate?",
+    "reponse_14": "You can try again with a higher-quality image or use our editing tools (depending on your plan). If the issue persists, our support team can assist you.",
 
-  "question_15": "Do you offer an API?",
-  "reponse_15": "An API will be available soon for professional plans, allowing integration into your apps, workflows, or e-commerce platforms.",
+    "question_15": "Do you offer an API?",
+    "reponse_15": "An API will be available soon for professional plans, allowing integration into your apps, workflows, or e-commerce platforms.",
 
-  "question_16": "Are my payment details stored?",
-  "reponse_16": "No. All payment data is handled exclusively by Stripe. We never have access to it and do not store it."
-},
+    "question_16": "Are my payment details stored?",
+    "reponse_16": "No. All payment data is handled exclusively by Stripe. We never have access to it and do not store it."
+  },
 
   "faqPricing": {
-  "question_1": "Can I cancel my subscription at any time?",
-  "reponse_1": "Yes. You can cancel your subscription at any time from your account. Cancellation simply disables automatic renewal. Your access remains active until the end of the already paid period.",
+    "question_1": "Can I cancel my subscription at any time?",
+    "reponse_1": "Yes. You can cancel your subscription at any time from your account. Cancellation simply disables automatic renewal. Your access remains active until the end of the already paid period.",
 
-  "question_2": "Does cancellation include a refund?",
-  "reponse_2": "No. In accordance with our policy and applicable laws, subscriptions already started are non-refundable. However, you retain access to the service until the end of your current billing period.",
+    "question_2": "Does cancellation include a refund?",
+    "reponse_2": "No. In accordance with our policy and applicable laws, subscriptions already started are non-refundable. However, you retain access to the service until the end of your current billing period.",
 
-  "question_3": "Can I change my plan (upgrade or downgrade)?",
-  "reponse_3": "Yes. You can change your subscription at any time by upgrading or downgrading according to your needs.",
+    "question_3": "Can I change my plan (upgrade or downgrade)?",
+    "reponse_3": "Yes. You can change your subscription at any time by upgrading or downgrading according to your needs.",
 
-  "question_4": "What happens if I upgrade my plan?",
-  "reponse_4": "If you upgrade, the new plan is applied immediately. You will instantly benefit from the new features. The billing date is updated to match the new subscription start date.",
+    "question_4": "What happens if I upgrade my plan?",
+    "reponse_4": "If you upgrade, the new plan is applied immediately. You will instantly benefit from the new features. The billing date is updated to match the new subscription start date.",
 
-  "question_5": "What happens if I downgrade my plan?",
-  "reponse_5": "Downgrades take effect at the next billing cycle. You will retain access to your current plan’s features until that date.",
+    "question_5": "What happens if I downgrade my plan?",
+    "reponse_5": "Downgrades take effect at the next billing cycle. You will retain access to your current plan’s features until that date.",
 
-  "question_6": "How does subscription payment work?",
-  "reponse_6": "Payments are made monthly by credit card via Stripe, a secure payment provider. We do not store any sensitive payment information.",
+    "question_6": "How does subscription payment work?",
+    "reponse_6": "Payments are made monthly by credit card via Stripe, a secure payment provider. We do not store any sensitive payment information.",
 
-  "question_7": "Can I try the service before subscribing?",
-  "reponse_7": "Yes. A free plan is available, allowing you to test the service with a limited number of monthly credits. No credit card is required.",
+    "question_7": "Can I try the service before subscribing?",
+    "reponse_7": "Yes. A free plan is available, allowing you to test the service with a limited number of monthly credits. No credit card is required.",
 
-  "question_8": "What happens if I run out of credits?",
-  "reponse_8": "Once your credits are used up, you won’t be able to use the service until they are automatically reset the following month. You can also upgrade your plan at any time to get more credits.",
+    "question_8": "What happens if I run out of credits?",
+    "reponse_8": "Once your credits are used up, you won’t be able to use the service until they are automatically reset the following month. You can also upgrade your plan at any time to get more credits.",
 
-  "question_9": "Does the subscription renew automatically?",
-  "reponse_9": "Yes. Subscriptions automatically renew every month to ensure uninterrupted service. You can disable renewal from your account settings.",
+    "question_9": "Does the subscription renew automatically?",
+    "reponse_9": "Yes. Subscriptions automatically renew every month to ensure uninterrupted service. You can disable renewal from your account settings.",
 
-  "question_10": "Can I use the service on multiple devices?",
-  "reponse_10": "Yes. Your subscription is linked to your account, so you can access the service from any device as long as you are logged in."
-},
+    "question_10": "Can I use the service on multiple devices?",
+    "reponse_10": "Yes. Your subscription is linked to your account, so you can access the service from any device as long as you are logged in."
+  },
   "contact": {
     "title": "Got questions&nbsp;?\nWe're here to help&nbsp;!",
     "intro": "Use the form below to contact us. Our team will get back to you as soon as possible, whether you need technical assistance, have an administrative question, or any other request related to our services."
@@ -380,102 +499,102 @@
     "intro": "Choose an affordable plan that&nbsp;includes the best features for&nbsp;your&nbsp;needs.",
     "title_h2_tab": "Subscription comparison",
     "title_h2_faq": "Frequently asked questions",
-    "currency":"Currency selection"
+    "currency": "Currency selection"
   },
 
   "terms": {
-  "title": "Terms of Service",
+    "title": "Terms of Service",
 
-  "intro": "These Terms of Service (the “Terms”) govern access to and use of the Wizpix service (the “Service”).<br> By using the Service, the user acknowledges that they have read, understood, and agreed to be bound by these Terms.",
+    "intro": "These Terms of Service (the “Terms”) govern access to and use of the Wizpix service (the “Service”).<br> By using the Service, the user acknowledges that they have read, understood, and agreed to be bound by these Terms.",
 
-  "article1_title": "1. Service Description",
-  "article1_text": "Wizpix provides an online service that allows users to process images using artificial intelligence models to remove or modify backgrounds.\n\nThe Service acts as a technical intermediary between the user and third-party AI providers.",
+    "article1_title": "1. Service Description",
+    "article1_text": "Wizpix provides an online service that allows users to process images using artificial intelligence models to remove or modify backgrounds.\n\nThe Service acts as a technical intermediary between the user and third-party AI providers.",
 
-  "article2_title": "2. Access to the Service",
-  "article2_text": "Access to the Service is limited to individuals who are legally capable or have obtained authorization from a legal guardian.\n\nCreating an account may be required to access certain features. Users agree to provide accurate information and to maintain the confidentiality of their login credentials.\n\nAny activity performed through a user account is deemed to have been carried out by that user.",
+    "article2_title": "2. Access to the Service",
+    "article2_text": "Access to the Service is limited to individuals who are legally capable or have obtained authorization from a legal guardian.\n\nCreating an account may be required to access certain features. Users agree to provide accurate information and to maintain the confidentiality of their login credentials.\n\nAny activity performed through a user account is deemed to have been carried out by that user.",
 
-  "article3_title": "3. User Content and Responsibility",
-  "article3_text": "Users are solely responsible for the content they process using the Service.\n\nUsers agree not to use the Service to process content that is:\n- illegal, violent, hateful, or against public order,\n- infringing third-party rights (image rights, copyright, intellectual property),\n- in violation of applicable laws.\n\nWizpix reserves the right to suspend or terminate any account violating these Terms and to report illegal activities to the appropriate authorities.",
+    "article3_title": "3. User Content and Responsibility",
+    "article3_text": "Users are solely responsible for the content they process using the Service.\n\nUsers agree not to use the Service to process content that is:\n- illegal, violent, hateful, or against public order,\n- infringing third-party rights (image rights, copyright, intellectual property),\n- in violation of applicable laws.\n\nWizpix reserves the right to suspend or terminate any account violating these Terms and to report illegal activities to the appropriate authorities.",
 
-  "article4_title": "4. Image Processing",
-  "article4_text": "Images are transmitted to third-party providers (including Replicate, USA) via a secure API for processing.\n\nWizpix does not store images and does not retain any copies after processing.\n\nNo user-identifying data (such as email or account information) is transmitted with the images.\n\nUsers acknowledge that processing is automated and that results may vary depending on image quality and the models used.",
+    "article4_title": "4. Image Processing",
+    "article4_text": "Images are transmitted to third-party providers (including Replicate, USA) via a secure API for processing.\n\nWizpix does not store images and does not retain any copies after processing.\n\nNo user-identifying data (such as email or account information) is transmitted with the images.\n\nUsers acknowledge that processing is automated and that results may vary depending on image quality and the models used.",
 
-  "article5_title": "5. Rights to Images",
-  "article5_text": "Users retain full ownership of the images they submit and the processed results.\n\nUsers are free to use the processed images without restriction, including for commercial purposes (e-commerce, marketing, communication, etc.).\n\nWizpix does not claim any ownership rights over user content.",
+    "article5_title": "5. Rights to Images",
+    "article5_text": "Users retain full ownership of the images they submit and the processed results.\n\nUsers are free to use the processed images without restriction, including for commercial purposes (e-commerce, marketing, communication, etc.).\n\nWizpix does not claim any ownership rights over user content.",
 
-  "article6_title": "6. Acceptable Use",
-  "article6_text": "The Service must be used in compliance with applicable laws.\n\nAny abusive use, including automated misuse, fraud, or attempts to bypass service limitations, is strictly prohibited.\n\nWizpix reserves the right to limit, suspend, or terminate access to the Service in case of abuse or for technical reasons.",
+    "article6_title": "6. Acceptable Use",
+    "article6_text": "The Service must be used in compliance with applicable laws.\n\nAny abusive use, including automated misuse, fraud, or attempts to bypass service limitations, is strictly prohibited.\n\nWizpix reserves the right to limit, suspend, or terminate access to the Service in case of abuse or for technical reasons.",
 
-  "article7_title": "7. Subscriptions and Payments",
-  "article7_text": "Some features of the Service are available through paid subscriptions.\n\nPayments are processed by a third-party provider (Stripe). Wizpix does not have access to payment data.\n\nSubscriptions automatically renew unless canceled.\n\nExcept where required by law, payments are non-refundable.",
+    "article7_title": "7. Subscriptions and Payments",
+    "article7_text": "Some features of the Service are available through paid subscriptions.\n\nPayments are processed by a third-party provider (Stripe). Wizpix does not have access to payment data.\n\nSubscriptions automatically renew unless canceled.\n\nExcept where required by law, payments are non-refundable.",
 
-  "article8_title": "8. Personal Data",
-  "article8_text": "Wizpix collects only the data necessary to operate the Service (email address, hashed password, contact information).\n\nNo images are stored.\n\nFor more details, users should refer to the <a class='faq-link' href='/privacy'>Privacy Policy</a>.",
+    "article8_title": "8. Personal Data",
+    "article8_text": "Wizpix collects only the data necessary to operate the Service (email address, hashed password, contact information).\n\nNo images are stored.\n\nFor more details, users should refer to the <a class='faq-link' href='/privacy'>Privacy Policy</a>.",
 
-  "article9_title": "9. Intellectual Property",
-  "article9_text": "The Service, including its code, interface, and technologies, is protected by intellectual property laws.\n\nAny unauthorized reproduction, modification, or exploitation is strictly prohibited.\n\nUsers retain their rights to their own content.",
+    "article9_title": "9. Intellectual Property",
+    "article9_text": "The Service, including its code, interface, and technologies, is protected by intellectual property laws.\n\nAny unauthorized reproduction, modification, or exploitation is strictly prohibited.\n\nUsers retain their rights to their own content.",
 
-  "article10_title": "10. Liability",
-  "article10_text": "The Service is provided “as is.”\n\nWizpix does not guarantee uninterrupted or error-free operation.\n\nTo the extent permitted by law, Wizpix shall not be held liable for any direct or indirect damages resulting from the use of the Service, including data loss or unsatisfactory results.",
+    "article10_title": "10. Liability",
+    "article10_text": "The Service is provided “as is.”\n\nWizpix does not guarantee uninterrupted or error-free operation.\n\nTo the extent permitted by law, Wizpix shall not be held liable for any direct or indirect damages resulting from the use of the Service, including data loss or unsatisfactory results.",
 
-  "article11_title": "11. Suspension and Termination",
-  "article11_text": "Wizpix may suspend or terminate a user account in case of violation of these Terms or misuse of the Service.\n\nTermination does not entitle the user to any refund for already paid periods.",
+    "article11_title": "11. Suspension and Termination",
+    "article11_text": "Wizpix may suspend or terminate a user account in case of violation of these Terms or misuse of the Service.\n\nTermination does not entitle the user to any refund for already paid periods.",
 
-  "article12_title": "12. Governing Law",
-  "article12_text": "These Terms are governed by Swiss law.\n\nIn case of dispute, the courts of the canton of Vaud shall have exclusive jurisdiction, unless mandatory legal provisions provide otherwise.",
+    "article12_title": "12. Governing Law",
+    "article12_text": "These Terms are governed by Swiss law.\n\nIn case of dispute, the courts of the canton of Vaud shall have exclusive jurisdiction, unless mandatory legal provisions provide otherwise.",
 
-  "article13_title": "13. Modifications",
-  "article13_text": "Wizpix reserves the right to modify these Terms at any time. The applicable version is the one published on the website.",
+    "article13_title": "13. Modifications",
+    "article13_text": "Wizpix reserves the right to modify these Terms at any time. The applicable version is the one published on the website.",
 
-  "conclusion": "By using the Service, the user agrees to be bound by these Terms of Service."
-},
+    "conclusion": "By using the Service, the user agrees to be bound by these Terms of Service."
+  },
 
   "privacy": {
-  "title": "Privacy Policy",
+    "title": "Privacy Policy",
 
-  "intro": "This privacy policy explains how Wizpix collects, uses, and protects personal data when providing its background removal service. Wizpix follows a data minimization and transparency approach (“privacy by design”).",
+    "intro": "This privacy policy explains how Wizpix collects, uses, and protects personal data when providing its background removal service. Wizpix follows a data minimization and transparency approach (“privacy by design”).",
 
-  "article1_title": "1. Data Controller",
-  "article1_text": "Wizpix acts as the data controller under GDPR and applicable Swiss data protection laws.\n\nSome third-party providers act as independent controllers or processors as described below.",
+    "article1_title": "1. Data Controller",
+    "article1_text": "Wizpix acts as the data controller under GDPR and applicable Swiss data protection laws.\n\nSome third-party providers act as independent controllers or processors as described below.",
 
-  "article2_title": "2. Data Collected",
-  "article2_text": "Wizpix only collects data strictly necessary to provide the service:\n\n- Email address (account creation)\n- Password (securely hashed)\n- Information voluntarily submitted via contact form\n- IP address (for security purposes)\n\nNo payment data is collected or stored by Wizpix.\n\nNo images are stored on Wizpix servers.",
+    "article2_title": "2. Data Collected",
+    "article2_text": "Wizpix only collects data strictly necessary to provide the service:\n\n- Email address (account creation)\n- Password (securely hashed)\n- Information voluntarily submitted via contact form\n- IP address (for security purposes)\n\nNo payment data is collected or stored by Wizpix.\n\nNo images are stored on Wizpix servers.",
 
-  "article3_title": "3. Payments (Stripe)",
-  "article3_text": "Payments are processed directly by Stripe, which acts as an independent data controller.\n\nUsers enter payment details directly on Stripe’s secure interface. Wizpix has no access to this data and does not store it.\n\nMore information: <a class='faq-link' href='https://stripe.com/privacy' target='_blank'>https://stripe.com/privacy</a>",
+    "article3_title": "3. Payments (Stripe)",
+    "article3_text": "Payments are processed directly by Stripe, which acts as an independent data controller.\n\nUsers enter payment details directly on Stripe’s secure interface. Wizpix has no access to this data and does not store it.\n\nMore information: <a class='faq-link' href='https://stripe.com/privacy' target='_blank'>https://stripe.com/privacy</a>",
 
-  "article4_title": "4. Image Processing (Replicate)",
-  "article4_text": "Wizpix acts as a technical intermediary between users and AI models provided by Replicate, Inc. (USA).\n\nImages are transmitted via a secure API solely for processing and are immediately returned to the user.\n\nNo user-identifying data (such as email or account information) is transmitted with the images.\n\nAccording to Replicate’s public documentation, API data is not used to train public models and is retained only as long as necessary for processing.\n\nWizpix does not control Replicate’s processing activities, which operates as a processor or technical provider.\n\nMore information: <a class='faq-link' href='https://replicate.com/privacy' target='_blank'>https://replicate.com/privacy</a>",
+    "article4_title": "4. Image Processing (Replicate)",
+    "article4_text": "Wizpix acts as a technical intermediary between users and AI models provided by Replicate, Inc. (USA).\n\nImages are transmitted via a secure API solely for processing and are immediately returned to the user.\n\nNo user-identifying data (such as email or account information) is transmitted with the images.\n\nAccording to Replicate’s public documentation, API data is not used to train public models and is retained only as long as necessary for processing.\n\nWizpix does not control Replicate’s processing activities, which operates as a processor or technical provider.\n\nMore information: <a class='faq-link' href='https://replicate.com/privacy' target='_blank'>https://replicate.com/privacy</a>",
 
-  "article5_title": "5. Purpose of Processing",
-  "article5_text": "Data is used only to:\n\n- Provide and operate the service\n- Manage user accounts\n- Respond to support requests\n- Ensure service security and integrity\n\nNo data is used for advertising, tracking, or profiling.",
+    "article5_title": "5. Purpose of Processing",
+    "article5_text": "Data is used only to:\n\n- Provide and operate the service\n- Manage user accounts\n- Respond to support requests\n- Ensure service security and integrity\n\nNo data is used for advertising, tracking, or profiling.",
 
-  "article6_title": "6. Legal Basis",
-  "article6_text": "Processing is based on:\n\n- Service performance (contract)\n- User consent\n- Legitimate interest (security)",
+    "article6_title": "6. Legal Basis",
+    "article6_text": "Processing is based on:\n\n- Service performance (contract)\n- User consent\n- Legitimate interest (security)",
 
-  "article7_title": "7. Cookies",
-  "article7_text": "Wizpix uses a single cookie strictly necessary for the service to function. It is used to maintain user sessions.\n\nNo tracking, analytics, or advertising cookies are used.",
+    "article7_title": "7. Cookies",
+    "article7_text": "Wizpix uses a single cookie strictly necessary for the service to function. It is used to maintain user sessions.\n\nNo tracking, analytics, or advertising cookies are used.",
 
-  "article8_title": "8. Data Retention",
-  "article8_text": "Data is retained only as long as necessary:\n\n- Account data: until account deletion\n- Contact data: limited to request handling\n- Images: not stored by Wizpix",
+    "article8_title": "8. Data Retention",
+    "article8_text": "Data is retained only as long as necessary:\n\n- Account data: until account deletion\n- Contact data: limited to request handling\n- Images: not stored by Wizpix",
 
-  "article9_title": "9. Data Sharing",
-  "article9_text": "Personal data is never sold.\n\nThe only third-party interactions are:\n- Stripe: payment processing (handled directly by them)\n- Replicate: image processing only\n\nNo other personal data is shared.",
+    "article9_title": "9. Data Sharing",
+    "article9_text": "Personal data is never sold.\n\nThe only third-party interactions are:\n- Stripe: payment processing (handled directly by them)\n- Replicate: image processing only\n\nNo other personal data is shared.",
 
-  "article10_title": "10. International Transfers",
-  "article10_text": "Use of the service may involve data transfers outside the European Union, notably to the United States (Replicate).\n\nThese transfers are limited to strictly necessary data (images only) and occur through secure connections.",
+    "article10_title": "10. International Transfers",
+    "article10_text": "Use of the service may involve data transfers outside the European Union, notably to the United States (Replicate).\n\nThese transfers are limited to strictly necessary data (images only) and occur through secure connections.",
 
-  "article11_title": "11. Security",
-  "article11_text": "Wizpix implements appropriate technical and organizational measures, including:\n\n- Encrypted communications (HTTPS)\n- Secure password storage\n- Restricted data access\n\nHowever, no system can guarantee absolute security.",
+    "article11_title": "11. Security",
+    "article11_text": "Wizpix implements appropriate technical and organizational measures, including:\n\n- Encrypted communications (HTTPS)\n- Secure password storage\n- Restricted data access\n\nHowever, no system can guarantee absolute security.",
 
-  "article12_title": "12. User Rights",
-  "article12_text": "Under GDPR, you have the right to:\n\n- Access your data\n- Request correction or deletion\n- Restrict or object to processing\n\nYou can exercise these rights via the contact form.",
+    "article12_title": "12. User Rights",
+    "article12_text": "Under GDPR, you have the right to:\n\n- Access your data\n- Request correction or deletion\n- Restrict or object to processing\n\nYou can exercise these rights via the contact form.",
 
-  "article13_title": "13. Changes",
-  "article13_text": "Wizpix may update this policy at any time. The applicable version is the one published on the website.",
+    "article13_title": "13. Changes",
+    "article13_text": "Wizpix may update this policy at any time. The applicable version is the one published on the website.",
 
-  "conclusion": "Wizpix is committed to minimizing data collection, ensuring transparency, and protecting user privacy."
-},
+    "conclusion": "Wizpix is committed to minimizing data collection, ensuring transparency, and protecting user privacy."
+  },
 
   "legal": {
     "title": "Legal Notice",
@@ -512,51 +631,51 @@
     "conclusion": "By accessing the website and using the Service, the User acknowledges having read and accepted this legal notice without reservation."
   },
   "cgv": {
-  "title": "Terms of Sale",
+    "title": "Terms of Sale",
 
-  "intro": "These Terms of Sale govern the contractual relationship between Wizpix (the “Provider”) and any user subscribing to a paid plan (the “Customer”). By subscribing, the Customer agrees to these terms.",
+    "intro": "These Terms of Sale govern the contractual relationship between Wizpix (the “Provider”) and any user subscribing to a paid plan (the “Customer”). By subscribing, the Customer agrees to these terms.",
 
-  "article1_title": "1. Purpose",
-  "article1_text": "Wizpix provides an online AI-powered image processing service offered as a subscription (Software as a Service).",
+    "article1_title": "1. Purpose",
+    "article1_text": "Wizpix provides an online AI-powered image processing service offered as a subscription (Software as a Service).",
 
-  "article2_title": "2. Subscription",
-  "article2_text": "The Service is offered as monthly subscriptions.\n\nEach subscription includes a monthly allocation of credits allowing access to paid features.\n\nCredits are personal, non-transferable, and do not roll over.",
+    "article2_title": "2. Subscription",
+    "article2_text": "The Service is offered as monthly subscriptions.\n\nEach subscription includes a monthly allocation of credits allowing access to paid features.\n\nCredits are personal, non-transferable, and do not roll over.",
 
-  "article3_title": "3. Credits and Limits",
-  "article3_text": "Each processing action consumes one credit.\n\nOnce the monthly quota is reached, paid features are no longer accessible until the next billing cycle.\n\nThe Customer may continue using any available free features.",
+    "article3_title": "3. Credits and Limits",
+    "article3_text": "Each processing action consumes one credit.\n\nOnce the monthly quota is reached, paid features are no longer accessible until the next billing cycle.\n\nThe Customer may continue using any available free features.",
 
-  "article4_title": "4. Duration and Renewal",
-  "article4_text": "Subscriptions are billed monthly and automatically renew unless canceled.\n\nCustomers may cancel at any time. Cancellation takes effect at the end of the current billing period.\n\nAccess remains active until that date.",
+    "article4_title": "4. Duration and Renewal",
+    "article4_text": "Subscriptions are billed monthly and automatically renew unless canceled.\n\nCustomers may cancel at any time. Cancellation takes effect at the end of the current billing period.\n\nAccess remains active until that date.",
 
-  "article5_title": "5. Plan Changes",
-  "article5_text": "Customers may change their subscription at any time.\n\n- Upgrade:\nThe new plan takes effect immediately. A new billing period begins on the upgrade date.\nRemaining credits from the previous plan are lost.\n\n- Downgrade:\nThe new plan takes effect at the end of the current billing period.\nThe Customer retains access to current features until then.",
+    "article5_title": "5. Plan Changes",
+    "article5_text": "Customers may change their subscription at any time.\n\n- Upgrade:\nThe new plan takes effect immediately. A new billing period begins on the upgrade date.\nRemaining credits from the previous plan are lost.\n\n- Downgrade:\nThe new plan takes effect at the end of the current billing period.\nThe Customer retains access to current features until then.",
 
-  "article6_title": "6. Pricing and Payment",
-  "article6_text": "Prices are displayed at the time of subscription.\n\nPayments are processed by a third-party provider (Stripe). Wizpix does not access payment data.\n\nPayment is due at each billing cycle.",
+    "article6_title": "6. Pricing and Payment",
+    "article6_text": "Prices are displayed at the time of subscription.\n\nPayments are processed by a third-party provider (Stripe). Wizpix does not access payment data.\n\nPayment is due at each billing cycle.",
 
-  "article7_title": "7. No Refund Policy",
-  "article7_text": "Subscriptions are non-refundable.\n\nNo full or partial refunds are granted in case of early cancellation.\n\nAccess remains available until the end of the paid period.",
+    "article7_title": "7. No Refund Policy",
+    "article7_text": "Subscriptions are non-refundable.\n\nNo full or partial refunds are granted in case of early cancellation.\n\nAccess remains available until the end of the paid period.",
 
-  "article8_title": "8. Service Availability",
-  "article8_text": "Wizpix makes reasonable efforts to ensure service availability.\n\nThe Service may be temporarily unavailable due to maintenance or technical issues.\n\nNo compensation is provided for temporary interruptions.",
+    "article8_title": "8. Service Availability",
+    "article8_text": "Wizpix makes reasonable efforts to ensure service availability.\n\nThe Service may be temporarily unavailable due to maintenance or technical issues.\n\nNo compensation is provided for temporary interruptions.",
 
-  "article9_title": "9. Liability",
-  "article9_text": "The Service is provided “as is.”\n\nWizpix does not guarantee uninterrupted service or perfect results.\n\nTo the extent permitted by law, Wizpix shall not be liable for any direct or indirect damages.",
+    "article9_title": "9. Liability",
+    "article9_text": "The Service is provided “as is.”\n\nWizpix does not guarantee uninterrupted service or perfect results.\n\nTo the extent permitted by law, Wizpix shall not be liable for any direct or indirect damages.",
 
-  "article10_title": "10. Personal Data",
-  "article10_text": "Personal data processing is governed by the <a href=\"/privacy\">Privacy Policy</a>.",
+    "article10_title": "10. Personal Data",
+    "article10_text": "Personal data processing is governed by the <a href=\"/privacy\">Privacy Policy</a>.",
 
-  "article11_title": "11. Suspension and Termination",
-  "article11_text": "Wizpix may suspend or terminate accounts in case of misuse or violation of these terms.\n\nNo refunds will be issued in such cases.",
+    "article11_title": "11. Suspension and Termination",
+    "article11_text": "Wizpix may suspend or terminate accounts in case of misuse or violation of these terms.\n\nNo refunds will be issued in such cases.",
 
-  "article12_title": "12. Governing Law",
-  "article12_text": "These Terms are governed by Swiss law.\n\nThe courts of the canton of Vaud have exclusive jurisdiction, unless otherwise required by law.",
+    "article12_title": "12. Governing Law",
+    "article12_text": "These Terms are governed by Swiss law.\n\nThe courts of the canton of Vaud have exclusive jurisdiction, unless otherwise required by law.",
 
-  "article13_title": "13. Changes",
-  "article13_text": "Wizpix may update these Terms at any time. The applicable version is the one published on the website.",
+    "article13_title": "13. Changes",
+    "article13_text": "Wizpix may update these Terms at any time. The applicable version is the one published on the website.",
 
-  "conclusion": "By subscribing, the Customer agrees to these Terms of Sale."
-},
+    "conclusion": "By subscribing, the Customer agrees to these Terms of Sale."
+  },
 
   "servicePageTitle": {
     "title_h1": "Test the quality of our services",

@@ -200,6 +200,24 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         );
       } catch {}
 
+      // Keep local subscription billing window in sync with Stripe.
+      // This is required for monthly credit quota renewal (credits are computed over [period_start, period_end)).
+      if (stripeSubscriptionId && periodStart && periodEnd) {
+        try {
+          await pool.execute<ResultSetHeader>(
+            `UPDATE Subscription
+             SET status = 'active', is_active = TRUE, period_start = ?, period_end = ?
+             WHERE stripe_subscription_id = ?`,
+            [periodStart, periodEnd, stripeSubscriptionId]
+          );
+        } catch (syncErr: any) {
+          logger.warn("[stripeWebhook] Failed to sync subscription period", {
+            stripeSubscriptionId,
+            message: syncErr?.message || String(syncErr),
+          });
+        }
+      }
+
       console.log("[stripeWebhook] invoice.paid stored for user", userId);
       return res.status(200).send("ok");
     }

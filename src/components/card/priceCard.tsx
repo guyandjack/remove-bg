@@ -175,10 +175,10 @@ const PriceCard = ({ lang, option, currency }: PriceCardProps) => {
 
   return (
     <div
-      className={`card w-full h-[450px] bg-base-100 shadow-sm border ${borderColor} bg-component`}
+      className={`card w-[350px] h-[500px] bg-base-100 shadow-sm border ${borderColor} bg-component`}
     >
       <div className="relative card-body">
-        {option.lower_plan_option ? (
+        {option.name == "hobby" ? (
           <span className="absolute top-[-15px] badge badge-s badge-warning">
             {lang.tag}
           </span>

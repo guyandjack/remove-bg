@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { api } from "@/utils/axiosConfig";
+import { sessionSignal } from "@/stores/session";
 
 type FilterOptions = {
   brightness: number;
@@ -26,6 +27,64 @@ type SubmitStatus =
   | { state: "success"; message: string }
   | { state: "error"; message: string }
   | { state: "loading"; message: string };
+
+type ConverterTextContent = {
+  headerTagline: string;
+  headerTitle: string;
+  headerDescription: string;
+  dropzonePrompt: string;
+  dropzoneButton: string;
+  dimensionsTitle: string;
+  dimensionsDescription: string;
+  dimensionsReset: string;
+  dimensionsWidth: string;
+  dimensionsHeight: string;
+  dimensionsLockAspect: string;
+  dimensionsOriginalPrefix: string;
+  formatTitle: string;
+  formatDescription: string;
+  formatExtension: string;
+  qualityLabel: string;
+  qualityPriorityWeight: string;
+  qualityPriorityQuality: string;
+  filtersTitle: string;
+  filtersDescription: string;
+  filtersReset: string;
+  actionClear: string;
+  actionConvert: string;
+  previewTitle: string;
+  previewAlt: string;
+  previewEmpty: string;
+  previewHint: string;
+  summaryDimensions: string;
+  summaryFormat: string;
+  summaryQuality: string;
+  changeImage: string;
+  downloadConverted: string;
+  deleteConverted: string;
+  assetReadyPrefix: string;
+  finalAlt: string;
+  finalDescription: string;
+  emptyConversionHint: string;
+  needPlanLink: string;
+  statusDeleted: string;
+  statusNoFile: string;
+  statusLoading: string;
+  statusSuccess: string;
+  statusError: string;
+  statusParamsModified: string;
+  previewError: string;
+  filterBrightness: string;
+  filterContrast: string;
+  filterSaturation: string;
+  filterHue: string;
+  filterGrayscale: string;
+  filterBlur: string;
+  filterBlurHelper: string;
+};
+
+
+
 
 const MIN_SIZE = 32;
 const MAX_SIZE = 6000;
@@ -65,67 +124,14 @@ const releaseObjectUrl = (url?: string | null) => {
   }
 };
 
-const filterDescriptors: {
-  key: keyof FilterOptions;
-  label: string;
-  min: number;
-  max: number;
-  step?: number;
-  unit: string;
-  helper?: string;
-}[] = [
-  {
-    key: "brightness",
-    label: "Luminosite",
-    min: 50,
-    max: 150,
-    step: 1,
-    unit: "%",
-  },
-  {
-    key: "contrast",
-    label: "Contraste",
-    min: 50,
-    max: 150,
-    step: 1,
-    unit: "%",
-  },
-  {
-    key: "saturation",
-    label: "Saturation",
-    min: 50,
-    max: 200,
-    step: 1,
-    unit: "%",
-  },
-  {
-    key: "hue",
-    label: "Teinte",
-    min: -180,
-    max: 180,
-    step: 1,
-    unit: "",
-  },
-  {
-    key: "grayscale",
-    label: "Niveaux de gris",
-    min: 0,
-    max: 100,
-    step: 1,
-    unit: "%",
-  },
-  {
-    key: "blur",
-    label: "Flou",
-    min: 0,
-    max: 10,
-    step: 0.1,
-    unit: "px",
-    helper: "Appliquer un leger flou pour adoucir les bords.",
-  },
-];
-
-const ImageConverter = () => {
+const ImageConverter = ({
+  converterTextContent,
+}: {
+  converterTextContent: ConverterTextContent;
+}) => {
+  const userLoged = sessionSignal?.value?.authentified;
+  
+  
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
@@ -237,10 +243,10 @@ const ImageConverter = () => {
       const dataUrl = canvas.toDataURL(mime, quality);
       setPreviewDataUrl(dataUrl);
     } catch (error) {
-      console.error("Impossible de generer l'apercu :", error);
+      console.error(converterTextContent.previewError, error);
       setPreviewDataUrl(null);
     }
-  }, [imageElement, options]);
+  }, [imageElement, options, converterTextContent.previewError]);
 
   useEffect(() => {
     renderPreview();
@@ -252,7 +258,7 @@ const ImageConverter = () => {
     setConvertedAsset(null);
     setStatus({
       state: "idle",
-      message: "Parametres modifies. Relance la conversion pour mettre a jour le fichier.",
+      message: converterTextContent.statusParamsModified,
     });
   }, [
     options.width,
@@ -266,6 +272,7 @@ const ImageConverter = () => {
     options.filters.grayscale,
     options.filters.blur,
     previewUrl,
+    converterTextContent.statusParamsModified,
   ]);
 
   useEffect(() => {
@@ -447,13 +454,13 @@ const ImageConverter = () => {
     if (!convertedAsset) return;
     releaseObjectUrl(convertedAsset.url);
     setConvertedAsset(null);
-    setStatus({ state: "idle", message: "L'image convertie a ete supprimee." });
+    setStatus({ state: "idle", message: converterTextContent.statusDeleted });
   };
 
   const handleSubmit = async (event: Event) => {
     event.preventDefault();
     if (!file) {
-      setStatus({ state: "error", message: "Ajoute une image pour demarrer." });
+      setStatus({ state: "error", message: converterTextContent.statusNoFile });
       return;
     }
 
@@ -472,7 +479,7 @@ const ImageConverter = () => {
     );
 
     try {
-      setStatus({ state: "loading", message: "Conversion en cours..." });
+      setStatus({ state: "loading", message: converterTextContent.statusLoading });
       const response = await api.post(IMAGE_CONVERTER_ENDPOINT, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         responseType: "blob",
@@ -487,14 +494,13 @@ const ImageConverter = () => {
       setConvertedAsset({ url, filename });
       setStatus({
         state: "success",
-        message: "Image convertie. Telecharge le fichier pour recuperer le resultat.",
+        message: converterTextContent.statusSuccess,
       });
     } catch (error) {
       console.error("Erreur lors de la conversion :", error);
       setStatus({
         state: "error",
-        message:
-          "Impossible de convertir l'image pour le moment. Verifie ta connexion ou reessaie plus tard.",
+        message: converterTextContent.statusError,
       });
     }
   };
@@ -506,19 +512,80 @@ const ImageConverter = () => {
     return "text-base-content/70";
   }, [status.state]);
 
+  const filterDescriptors = useMemo(
+    () => [
+      {
+        key: "brightness" as const,
+        label: converterTextContent.filterBrightness,
+        min: 50,
+        max: 150,
+        step: 1,
+        unit: "%",
+      },
+      {
+        key: "contrast" as const,
+        label: converterTextContent.filterContrast,
+        min: 50,
+        max: 150,
+        step: 1,
+        unit: "%",
+      },
+      {
+        key: "saturation" as const,
+        label: converterTextContent.filterSaturation,
+        min: 50,
+        max: 200,
+        step: 1,
+        unit: "%",
+      },
+      {
+        key: "hue" as const,
+        label: converterTextContent.filterHue,
+        min: -180,
+        max: 180,
+        step: 1,
+        unit: "",
+      },
+      {
+        key: "grayscale" as const,
+        label: converterTextContent.filterGrayscale,
+        min: 0,
+        max: 100,
+        step: 1,
+        unit: "%",
+      },
+      {
+        key: "blur" as const,
+        label: converterTextContent.filterBlur,
+        min: 0,
+        max: 10,
+        step: 0.1,
+        unit: "px",
+        helper: converterTextContent.filterBlurHelper,
+      },
+    ],
+    [
+      converterTextContent.filterBrightness,
+      converterTextContent.filterContrast,
+      converterTextContent.filterSaturation,
+      converterTextContent.filterHue,
+      converterTextContent.filterGrayscale,
+      converterTextContent.filterBlur,
+      converterTextContent.filterBlurHelper,
+    ],
+  );
+
   return (
     <section className="w-full max-w-[1300px] mx-auto py-12 px-4">
       <header className="text-center flex flex-col gap-2 mb-10">
         <p className="text-sm uppercase tracking-[0.3em] text-primary">
-          Conversion d&apos;images
+          {converterTextContent.headerTagline}
         </p>
         <h2 className="text-3xl font-semibold">
-          Prepare ton image, ajuste et convertis
+          {converterTextContent.headerTitle}
         </h2>
         <p className="text-base-content/80">
-          Televerse un fichier, choisis les dimensions, l&apos;extension finale
-          et applique quelques filtres avant d&apos;envoyer la conversion. Tout
-          le rendu final sera assure par Sharp cote serveur.
+          {converterTextContent.headerDescription}
         </p>
       </header>
 
@@ -540,23 +607,25 @@ const ImageConverter = () => {
               onChange={onFileChange}
             />
             <p className="mb-3 font-medium">
-              {file ? file.name : "Depose ton image ici ou utilise le bouton."}
+              {file ? file.name : converterTextContent.dropzonePrompt}
             </p>
             <button
               type="button"
               className="btn btn-primary btn-sm"
               onClick={() => fileInputRef.current?.click()}
             >
-              Selectionner une image
+              {converterTextContent.dropzoneButton}
             </button>
           </div>
 
           <section className="bg-base-200 rounded-2xl p-5 space-y-5 shadow-sm">
             <header className="flex items-center justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold">Dimensions</h3>
+                <h3 className="text-xl font-semibold">
+                  {converterTextContent.dimensionsTitle}
+                </h3>
                 <p className="text-sm text-base-content/70">
-                  Ajuste la largeur et la hauteur desirees.
+                  {converterTextContent.dimensionsDescription}
                 </p>
               </div>
               <button
@@ -565,13 +634,15 @@ const ImageConverter = () => {
                 onClick={resetSizing}
                 disabled={!naturalSize.width}
               >
-                Reinitialiser
+                {converterTextContent.dimensionsReset}
               </button>
             </header>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <label className="form-control">
-                <span className="label-text font-semibold">Largeur (px)</span>
+                <span className="label-text font-semibold">
+                  {converterTextContent.dimensionsWidth}
+                </span>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -585,7 +656,9 @@ const ImageConverter = () => {
                 />
               </label>
               <label className="form-control">
-                <span className="label-text font-semibold">Hauteur (px)</span>
+                <span className="label-text font-semibold">
+                  {converterTextContent.dimensionsHeight}
+                </span>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -609,12 +682,13 @@ const ImageConverter = () => {
                   onChange={toggleAspectRatio}
                 />
                 <span className="text-sm font-medium">
-                  Verrouiller les proportions
+                  {converterTextContent.dimensionsLockAspect}
                 </span>
               </label>
               {naturalSize.width ? (
                 <p className="text-xs text-base-content/60">
-                  Original : {naturalSize.width} x {naturalSize.height}px
+                  {converterTextContent.dimensionsOriginalPrefix}{" "}
+                  {naturalSize.width} x {naturalSize.height}px
                 </p>
               ) : null}
             </div>
@@ -623,15 +697,19 @@ const ImageConverter = () => {
           <section className="bg-base-200 rounded-2xl p-5 space-y-5 shadow-sm">
             <header className="flex items-center justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold">Format & qualite</h3>
+                <h3 className="text-xl font-semibold">
+                  {converterTextContent.formatTitle}
+                </h3>
                 <p className="text-sm text-base-content/70">
-                  Choisis l&apos;extension finale et ajuste la compression.
+                  {converterTextContent.formatDescription}
                 </p>
               </div>
             </header>
 
             <label className="form-control">
-              <span className="label-text font-semibold mr-[20px]">Extension</span>
+              <span className="label-text font-semibold mr-[20px]">
+                {converterTextContent.formatExtension}
+              </span>
               <select
                 className="select select-bordered select-sm"
                 value={options.format}
@@ -652,7 +730,9 @@ const ImageConverter = () => {
 
             <label className="form-control w-full">
               <div className="flex items-center justify-between">
-                <span className="label-text font-semibold">Qualite</span>
+                <span className="label-text font-semibold">
+                  {converterTextContent.qualityLabel}
+                </span>
                 <span className="text-sm text-base-content/70">
                   {options.quality} %
                 </span>
@@ -672,8 +752,8 @@ const ImageConverter = () => {
                 }
               />
               <div className="flex justify-between text-xs text-base-content/60">
-                <span>Priorite au poids</span>
-                <span>Priorite a la qualite</span>
+                <span>{converterTextContent.qualityPriorityWeight}</span>
+                <span>{converterTextContent.qualityPriorityQuality}</span>
               </div>
             </label>
           </section>
@@ -681,10 +761,11 @@ const ImageConverter = () => {
           <section className="bg-base-200 rounded-2xl p-5 space-y-4 shadow-sm">
             <header className="flex items-center justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold">Filtres rapides</h3>
+                <h3 className="text-xl font-semibold">
+                  {converterTextContent.filtersTitle}
+                </h3>
                 <p className="text-sm text-base-content/70">
-                  Ajuste l&apos;image avant de lancer Sharp pour garder le
-                  controle.
+                  {converterTextContent.filtersDescription}
                 </p>
               </div>
               <button
@@ -692,7 +773,7 @@ const ImageConverter = () => {
                 className="btn btn-ghost btn-xs"
                 onClick={resetFilters}
               >
-                Par defaut
+                {converterTextContent.filtersReset}
               </button>
             </header>
 
@@ -718,7 +799,7 @@ const ImageConverter = () => {
                     onInput={(event) =>
                       updateFilter(
                         filter.key,
-                        Number(event.currentTarget.value)
+                        Number(event.currentTarget.value),
                       )
                     }
                   />
@@ -739,7 +820,7 @@ const ImageConverter = () => {
               onClick={clearAll}
               disabled={!file && !previewDataUrl}
             >
-              Effacer
+              {converterTextContent.actionClear}
             </button>
             <button
               type="submit"
@@ -748,7 +829,7 @@ const ImageConverter = () => {
               }`}
               disabled={!file || status.state === "loading"}
             >
-              Convertir et envoyer
+              {converterTextContent.actionConvert}
             </button>
           </footer>
           {(status.message && status.message.length > 0) ||
@@ -757,95 +838,105 @@ const ImageConverter = () => {
           ) : null}
         </form>
 
-        <div className="bg-base-200 rounded-2xl p-6 shadow-sm flex flex-col gap-5">
-          <h3 className="text-xl font-semibold">Apercu en direct</h3>
+        <div className="relative bg-base-200 rounded-2xl p-6 shadow-sm flex flex-col gap-5">
+          <h3 className="text-xl font-semibold">
+            {converterTextContent.previewTitle}
+          </h3>
           <div className="relative w-full aspect-square bg-base-100 rounded-xl border border-base-300 flex items-center justify-center overflow-hidden">
             {previewDataUrl ? (
               <img
                 src={previewDataUrl}
-                alt="apercu converti"
+                alt={converterTextContent.previewAlt}
                 className="w-full h-full object-contain"
               />
             ) : (
               <p className="text-center text-base-content/60 px-6">
-                Aucun apercu pour l&apos;instant. Ajoute un fichier pour voir le
-                rendu de tes reglages.
+                {converterTextContent.previewEmpty}
               </p>
             )}
           </div>
           {previewDataUrl && (
             <p className="text-sm text-base-content/70">
-              Cette previsualisation donne un apercu instantane de tes reglages.
-              La version finale sera recalculee cote serveur avec Sharp pour
-              garantir un rendu optimal.
+              {converterTextContent.previewHint}
             </p>
           )}
           <div className="bg-base-100 rounded-xl p-4 border border-base-300 space-y-2 text-sm">
             <div className="flex flex-wrap items-center justify-between">
-              <span className="text-base-content/70">Dimensions ciblees</span>
+              <span className="text-base-content/70">
+                {converterTextContent.summaryDimensions}
+              </span>
               <span className="font-semibold">
                 {options.width} x {options.height} px
               </span>
             </div>
             <div className="flex flex-wrap items-center justify-between">
-              <span className="text-base-content/70">Format</span>
+              <span className="text-base-content/70">
+                {converterTextContent.summaryFormat}
+              </span>
               <span className="font-semibold uppercase">{options.format}</span>
             </div>
             <div className="flex flex-wrap items-center justify-between">
-              <span className="text-base-content/70">Qualite</span>
+              <span className="text-base-content/70">
+                {converterTextContent.summaryQuality}
+              </span>
               <span className="font-semibold">{options.quality}%</span>
             </div>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 ">
             <button
               type="button"
               className="btn btn-outline btn-sm"
               onClick={() => fileInputRef.current?.click()}
             >
-              Changer d&apos;image
+              {converterTextContent.changeImage}
             </button>
+
             <button
               type="button"
               className="btn btn-secondary btn-sm"
               onClick={downloadConverted}
-              disabled={!convertedAsset}
+              disabled={!convertedAsset || !userLoged}
             >
-              Telecharger l&apos;image convertie
+              {converterTextContent.downloadConverted}
             </button>
+
             <button
               type="button"
               className="btn btn-error btn-sm btn-outline"
               onClick={deleteConvertedAsset}
               disabled={!convertedAsset}
             >
-              Supprimer l&apos;image convertie
+              {converterTextContent.deleteConverted}
             </button>
           </div>
+
           {convertedAsset ? (
             <div className="space-y-3">
               <p className="text-xs text-base-content/70">
-                Fichier pret :{" "}
+                {converterTextContent.assetReadyPrefix}{" "}
                 <span className="font-semibold">{convertedAsset.filename}</span>
               </p>
               <div className="w-full bg-base-100 rounded-xl border border-base-300 overflow-hidden">
                 <img
                   src={convertedAsset.url}
-                  alt="resultat final"
+                  alt={converterTextContent.finalAlt}
                   className="w-full h-auto object-contain"
                 />
               </div>
               <p className="text-sm text-base-content/70">
-                Visualise ci-dessus l&apos;image calculee par le serveur. Tu
-                peux la telecharger ou la supprimer si le rendu ne correspond
-                pas a tes attentes.
+                {converterTextContent.finalDescription}
               </p>
             </div>
           ) : (
             <p className="text-xs text-base-content/60">
-              La conversion cote serveur generera un lien de telechargement
-              securise.
+              {converterTextContent.emptyConversionHint}
             </p>
           )}
+          {!userLoged ? (
+            <a href="/pricing" className="service-link-info">
+              {converterTextContent.needPlanLink}
+            </a>
+          ) : null}
         </div>
       </div>
     </section>

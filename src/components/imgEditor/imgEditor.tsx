@@ -14,6 +14,8 @@ import * as m from "motion/react-m";
 
 //import des librairies
 import { api } from "@/utils/axiosConfig";
+import { isAuthentified } from "@/utils/request/isAuthentified";
+import { sessionSignal } from "@/stores/session";
 
 //import des composants enfants
 import { DownloadLink } from "@/components/link/DownloadLink";
@@ -48,6 +50,51 @@ type ImgEditorProps = {
   planUser: string;
 
   credit: number;
+  textContent: {
+    title: string;
+    tabColorPicker: string;
+    tabImagePicker: string;
+    resetBackground: string;
+    restrictedOption: string;
+    imageSearchIntro: string;
+    imageSearchPlaceholder: string;
+    imageSearchAriaLabel: string;
+    imageSearchButton: string;
+    imageSearchLoading: string;
+    imageSearchError: string;
+    imageRoyaltyFreeLabel: string;
+    paginationPrev: string;
+    paginationNext: string;
+    paginationPageLabel: string;
+    paginationPageEmpty: string;
+    backgroundAlt: string;
+    previewTitle: string;
+    previewDescription: string;
+    previewAlt: string;
+    previewError: string;
+    previewRetry: string;
+    previewCancel: string;
+    previewConfirm: string;
+    eraserCancel: string;
+    eraserRetry: string;
+    eraserClearMask: string;
+    eraserConfirmMask: string;
+    eraserProcessing: string;
+    eraserApplyToEditor: string;
+    eraserResultIntro: string;
+    eraserResultAlt: string;
+    eraserDrawIntro: string;
+    eraserZoneAlt: string;
+  };
+  downloadLinkTextContent: {
+    pending: string;
+    download: string;
+    noCredits: string;
+    errorPrefix: string;
+    invalidSource: string;
+    retrieveError: string;
+    fileTypeDescription: string;
+  };
 };
 
 type Bg = { type: "color"; value: string } | { type: "image"; value: string };
@@ -57,11 +104,17 @@ type BgValue = Bg | null;
 
 
 // Miniatures locales (fallback si aucune recherche Pexels)
-const backgroundImages = [BgHero, BgDessert, BgFriend, BgSport];
+const backgroundImages:[] = [];
 const MAX_PEXELS_PAGES = 5;
 const EDITOR_FADE_DURATION = 180;
 
-const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
+const ImgEditor = ({
+  src,
+  planUser,
+  credit,
+  textContent,
+  downloadLinkTextContent,
+}: ImgEditorProps) => {
   // Refs DOM/instances Filerobot
   const containerRef = useRef<HTMLDivElement | null>(null); // conteneur pour le canvas Filerobot
   const editorRef = useRef<any>(null); // instance Filerobot en cours
@@ -140,7 +193,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
       setHasPrevPage(safePage > 1);
     } catch (error: any) {
       console.log("error fetch images:", error?.message || error);
-      setSearchError("Erreur lors de la recherche d'images.");
+      setSearchError(textContent.imageSearchError);
     } finally {
       setIsSearching(false);
     }
@@ -490,7 +543,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
       formData.append("mask_image", maskBlob, "mask_image.png");
 
       // Ne pas forcer "multipart/form-data" ici: Axios/le navigateur ajoutera le boundary automatiquement.
-      const { data } = await api.post<Blob>(
+      const response = await api.post<Blob>(
         "api/services/magic-eraser",
         formData,
         {
@@ -499,8 +552,25 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
         }
       );
 
-      const newImage = await blobToDataUrl(data);
+      const remaining = Number(response.headers?.["x-wizpix-credits-remaining"]);
+      const used = Number(response.headers?.["x-wizpix-credits-used"]);
+      if (Number.isFinite(remaining) && Number.isFinite(used) && sessionSignal.value) {
+        const updated = {
+          ...sessionSignal.value,
+          credits: { used_last_24h: used, remaining_last_24h: remaining },
+        };
+        sessionSignal.value = updated;
+        localStorage.setItem("session", JSON.stringify(updated));
+      }
+
+      const newImage = await blobToDataUrl(response.data);
       setEraserResult(newImage);
+
+      // Credits are decremented server-side only if Replicate succeeds.
+      // Refresh session credits after a successful prediction.
+      isAuthentified().catch((err) => {
+        console.warn("Unable to refresh credits after Replicate success", err);
+      });
     } catch (error: any) {
       console.error("Erreur magic erase", error);
       setEraserError(
@@ -576,14 +646,14 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
       if (planUser === "free") {
         return (
           <p className="mt-4 text-sm text-warning">
-            Cette option est réservée aux abonnements supérieurs.
+            {textContent.restrictedOption}
           </p>
         );
       }
       return (
         <div className="mt-3 lg:max-h-[65%] lg:w-full ">
           <p className="text-start text-base-content/70 mb-[10px]">
-            Recherche d'images "PEXELS".
+            {textContent.imageSearchIntro}
           </p>
 
           <div className="mb-3">
@@ -597,10 +667,10 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
               <input
                 id="search"
                 type="search"
-                placeholder="Images en ligne(ex: nature, city, people, animals...)"
+                placeholder={textContent.imageSearchPlaceholder}
                 className="input input-bordered join-item w-full bg-base-200 text-base-content placeholder:text-base-content/60"
                 pattern="[A-Za-z0-9 \\-_'.,]{1,50}"
-                aria-label="Search through pexels images library"
+                aria-label={textContent.imageSearchAriaLabel}
                 maxLength={50}
                 value={searchTerm}
                 onChange={(e) =>
@@ -612,7 +682,9 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                 className="btn btn-info join-item"
                 disabled={isSearching}
               >
-                {isSearching ? "..." : "Search"}
+                {isSearching
+                  ? textContent.imageSearchLoading
+                  : textContent.imageSearchButton}
               </button>
             </form>
             {searchError && (
@@ -621,7 +693,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
           </div>
 
           <div className="my-4 text-start text-base-content/70 mb-[10px] flex flex-col gap-2">
-            <span>Images libre de droit.</span>
+            <span>{textContent.imageRoyaltyFreeLabel}</span>
             <div className="flex items-center justify-center gap-5">
               <button
                 type="button"
@@ -629,12 +701,14 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                 disabled={!lastSearchTerm || !hasPrevPage || isSearching}
                 onClick={() => handleChangePage("prev")}
               >
-                Prev
+                {textContent.paginationPrev}
               </button>
               <span className="text-sm">
                 {lastSearchTerm
-                  ? `Page ${currentPage}/${MAX_PEXELS_PAGES}`
-                  : "Page -"}
+                  ? textContent.paginationPageLabel
+                      .replace("{current}", String(currentPage))
+                      .replace("{total}", String(MAX_PEXELS_PAGES))
+                  : textContent.paginationPageEmpty}
               </span>
               <button
                 type="button"
@@ -642,13 +716,13 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                 disabled={!lastSearchTerm || !hasNextPage || isSearching}
                 onClick={() => handleChangePage("next")}
               >
-                Next
+                {textContent.paginationNext}
               </button>
             </div>
           </div>
 
           <div>
-            <ul className="w-[80%] flex gap-3 pb-2 overflow-auto flex-wrap lg:w-full lg:max-h-[300px]">
+            { <ul className="w-[80%] flex gap-3 pb-2 overflow-auto flex-wrap lg:w-full lg:max-h-[300px]">
               {(pexelsImages.length > 0 ? pexelsImages : backgroundImages).map(
                 (item: any) => {
                   const thumb = typeof item === "string" ? item : item.tiny;
@@ -670,7 +744,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                       >
                         <img
                           src={thumb}
-                          alt="Fond"
+                          alt={textContent.backgroundAlt}
                           className="h-[80px] w-[80px] object-cover"
                         />
                       </button>
@@ -678,13 +752,13 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                   );
                 }
               )}
-            </ul>
+            </ul> }
           </div>
         </div>
       );
     }
 
-    if (activePicker === "erase") {
+    /* if (activePicker === "erase") {
       return (
         <div className="space-y-4 text-start">
           <div className="space-y-1">
@@ -719,7 +793,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
           </label>
         </div>
       );
-    }
+    } */
 
     return null;
   };
@@ -752,11 +826,10 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                 >
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold">
-                      Prévisualisation du fond
+                      {textContent.previewTitle}
                     </h3>
                     <p className="text-sm text-base-content/70">
-                      Seule cette fenêtre applique le fond choisi. Validez pour
-                      mettre à jour l'éditeur principal.
+                      {textContent.previewDescription}
                     </p>
                   </div>
                   <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-base-200 bg-base-200/60">
@@ -765,7 +838,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                         <m.img
                           key={previewImage}
                           src={previewImage}
-                          alt="Aper?u du fond s?lectionn?"
+                          alt={textContent.previewAlt}
                           className={`h-full w-full object-contain transition-opacity duration-300 ${
                             isPreviewLoading ? "opacity-70" : "opacity-100"
                           }`}
@@ -786,7 +859,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                       </div>
                     ) : (
                       <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-base-content/70">
-                        <span>Impossible de g?n?rer un aper?u.</span>
+                        <span>{textContent.previewError}</span>
                         <button
                           type="button"
                           className="btn btn-sm btn-outline"
@@ -796,7 +869,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                               : null
                           }
                         >
-                          R?essayer
+                          {textContent.previewRetry}
                         </button>
                       </div>
                     )}
@@ -809,7 +882,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                       onClick={handleCancelPreview}
                       disabled={isComposing}
                     >
-                      Annuler
+                      {textContent.previewCancel}
                     </button>
                     <button
                       type="button"
@@ -819,7 +892,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                         isPreviewLoading || !previewImage || isComposing
                       }
                     >
-                      Valider ce fond
+                      {textContent.previewConfirm}
                     </button>
                   </div>
                 </m.div>
@@ -843,13 +916,12 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                   {eraserResult ? (
                     <div className="space-y-4">
                       <p className="text-base-content/80">
-                        Nouveau rendu généré. Vérifiez-le avant de l'appliquer à
-                        l'éditeur.
+                        {textContent.eraserResultIntro}
                       </p>
                       <div className="relative w-full overflow-hidden rounded-2xl border border-base-200 bg-base-200/60">
                         <img
                           src={eraserResult}
-                          alt="Résultat gomme magique"
+                          alt={textContent.eraserResultAlt}
                           className="w-full max-h-[70vh] object-contain"
                         />
                       </div>
@@ -857,14 +929,13 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                   ) : (
                     <div className="space-y-4">
                       <p className="text-sm text-base-content/70">
-                        Dessinez directement sur l'image pour marquer les zones
-                        à effacer. Maintenez le clic pour créer votre masque.
+                        {textContent.eraserDrawIntro}
                       </p>
                       <div className="relative w-full overflow-hidden rounded-2xl border border-base-200 bg-base-200/60">
                         <img
                           ref={eraserImageRef}
                           src={currentSource}
-                          alt="Zone à retoucher"
+                          alt={textContent.eraserZoneAlt}
                           className="w-full max-h-[70vh] object-contain"
                           onLoad={initializeEraserCanvas}
                         />
@@ -891,7 +962,9 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                       onClick={resetEraserSurface}
                       disabled={isSendingEraser}
                     >
-                      {eraserResult ? "Recommencer" : "Effacer l'empreinte"}
+                      {eraserResult
+                        ? textContent.eraserRetry
+                        : textContent.eraserClearMask}
                     </button>
                     <div className="flex flex-wrap items-center gap-3">
                       <button
@@ -900,7 +973,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                         onClick={closeMagicEraser}
                         disabled={isSendingEraser}
                       >
-                        Annuler
+                        {textContent.eraserCancel}
                       </button>
                       {eraserResult ? (
                         <button
@@ -909,7 +982,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                           onClick={handleConfirmMagicResult}
                           disabled={isSendingEraser}
                         >
-                          Appliquer à l'éditeur
+                          {textContent.eraserApplyToEditor}
                         </button>
                       ) : (
                         <button
@@ -919,8 +992,8 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                           disabled={isSendingEraser || !eraserMaskData}
                         >
                           {isSendingEraser
-                            ? "Traitement..."
-                            : "Valider l'empreinte"}
+                            ? textContent.eraserProcessing
+                            : textContent.eraserConfirmMask}
                         </button>
                       )}
                     </div>
@@ -946,11 +1019,13 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
       >
         {/* Commandes: onglets, reset, téléchargement */}
         <div className={"lg:h-[25%] lg:w-full "}>
-          <h2 className={"p-[5px] text-xl text-center "}>Outils de retouche</h2>
-          <div className="my-4 border-b border-t py-[10px] border-white/30 flex flex-row justify-evenly flex-wrap items-center gap-y-2 ">
+          <h2 className={"p-[5px] text-xl text-center "}>
+            {textContent.title}
+          </h2>
+          <div className="my-4 border-b border-t py-[10px] border-white/30 flex flex-col justify-start items-center gap-y-4 ">
             <button
               type="button"
-              className={`w-[180px] btn ${
+              className={`w-[220px] btn ${
                 activePicker === "color" ? "btn-success" : "btn-ghost"
               } hover:bg-success/50`}
               onClick={() => {
@@ -971,13 +1046,13 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                   d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z"
                 />
               </svg>
-              <span>Colors picker</span>
+              <span>{textContent.tabColorPicker}</span>
             </button>
             {planUser !== "free" ? (
               <>
                 <button
                   type="button"
-                  className={`w-[180px] btn  ${
+                  className={`w-[220px] btn  ${
                     activePicker === "image" ? "btn-success" : "btn-ghost"
                   } hover:bg-success/50`}
                   onClick={() => setActivePicker("image")}
@@ -996,9 +1071,9 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                       d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                     />
                   </svg>
-                  <span>Images select</span>
+                  <span>{textContent.tabImagePicker}</span>
                 </button>
-                <button
+                {/* <button
                   type="button"
                   className={`w-[180px] btn  ${
                     activePicker === "erase" ? "btn-success" : "btn-ghost"
@@ -1028,8 +1103,8 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                     <path d="M12.2 6.2 11 5" />
                   </svg>
                   <span>Magic eraser</span>
-                </button>
-                <button
+                </button> */}
+                {/* <button
                   type="button"
                   className={`w-[180px] btn  ${
                     activePicker === "social" ? "btn-success" : "btn-ghost"
@@ -1059,7 +1134,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                     <path d="M12.2 6.2 11 5" />
                   </svg>
                   <span>Social content</span>
-                </button>
+                </button> */}
               </>
             ) : null}
           </div>
@@ -1069,9 +1144,17 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
           {renderActiveOptionContent(activePicker)}
         </div>
         <div className={"lg:w-full h-[15%]"}>
-          <div className={"my-3"}>
-            <DownloadLink currentSource={currentSource} credit={credit} />
-          </div>
+          {credit >= 1 ? (
+            <div className={"my-3"}>
+              <DownloadLink
+                currentSource={currentSource}
+                credit={credit}
+                textContent={downloadLinkTextContent}
+              />
+            </div>
+          ) : (
+            <a href="/" className="service-link-info">{downloadLinkTextContent.noCredits} </a>
+          )}
           <button
             type="button"
             className="btn btn-warning"
@@ -1091,7 +1174,7 @@ const ImgEditor = ({ src, planUser, credit }: ImgEditorProps) => {
                 d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
               />
             </svg>
-            <span>Annuler le fond</span>
+            <span>{textContent.resetBackground}</span>
           </button>
         </div>
       </div>

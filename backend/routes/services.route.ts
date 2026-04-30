@@ -1,5 +1,6 @@
 //import deslibrairies
 import express from "express";
+import { verifyAuth } from "../middelware/verifAuth/verifyAuth";
 
 //import des midelware de validation
 import {
@@ -45,6 +46,7 @@ router.post(
 // route remove bg via Replicate (MVP)
 router.post(
   "/remove-bg-replicate",
+  verifyAuth,
   validateRemoveBgUpload,
   attachRemoveBgQuality,
   removeBgByReplicate
@@ -54,6 +56,7 @@ router.post(
 //route magiceraser via replicate (MVP)
 router.post(
   "/magic-eraser",
+  verifyAuth,
   validateMagicEraserPayload,
   magicEraser
 );

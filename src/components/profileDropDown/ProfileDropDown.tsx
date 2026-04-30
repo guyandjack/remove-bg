@@ -14,19 +14,31 @@ import { navigateWithLink } from "@/utils/navigateWithLink";
 //constante et variable globale
 
 //declaration des types
-type DropDownProps = {
-  credit: number;
+//declarations des types
+type DisplayState = {
+  userName: string | null;
+  authentified: boolean;
+  credit: number | null;
   textCredit: string | null;
   plan: string | null;
-  userName: string | null;
-};
+  textLogout: string | null;
+  textDashboard: string | null;
+} | null;
+
+type ProfileDropDownType = {
+  content: DisplayState;
+}
 
 
-const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, userName = null }: DropDownProps) => {
+const ProfileDropDown = ({ content }: ProfileDropDownType) => {
+  if (!content) return null;
   
   //state qui gere l' affichage du loader
   const [isLoader, setIsLoader] = useState(false);
-  const [isStatus, setIsStatus] = useState<"error"|"success"|"idle">("idle");
+  const [isStatus, setIsStatus] = useState<"error" | "success" | "idle">("idle");
+  
+  const credit = content.credit ?? 0;
+  
   
   
   //declaration des fonctions
@@ -43,13 +55,16 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
         //supression des info de session
         sessionSignal.value = null;
         localStorage.removeItem("session");
-
+        localStorage.removeItem("wizpix:last_service");
+        
+        
         setIsLoader(false);
         setIsStatus("success");
         
       }
     } catch {
       sessionSignal.value = null;
+      localStorage.removeItem("wizpix:last_service");
       localStorage.removeItem("session");
       setIsLoader(false)
       setIsStatus("success");
@@ -80,17 +95,29 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
       </button>
       <ul
         tabIndex={-1}
-        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+        className="menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
       >
-        <li>
-          <a href="/dashboard" className="flex flex-row justify-left items-center gap-4">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
-              <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm4.5 0a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 .75.75v6a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75v-6Zm5.25-3.75a.75.75 0 0 0-.75.75V18a.75.75 0 0 0 .75.75h2.25A.75.75 0 0 0 18 18V9a.75.75 0 0 0-.75-.75h-2.25Zm3.75-2.25a.75.75 0 0 0-.75.75v12a.75.75 0 0 0 .75.75h2.25a.75.75 0 0 0 .75-.75V6.75a.75.75 0 0 0-.75-.75H15.75Z" clipRule="evenodd" />
+        <li className="p-1 cursor-pointer rounded-lg hover:bg-base-300 hover:translate-x-1 transition-all">
+          <a
+            href="/dashboard"
+            className="flex flex-row justify-left items-center gap-4"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="size-6"
+            >
+              <path
+                fillRule="evenodd"
+                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm4.5 0a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 .75.75v6a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75v-6Zm5.25-3.75a.75.75 0 0 0-.75.75V18a.75.75 0 0 0 .75.75h2.25A.75.75 0 0 0 18 18V9a.75.75 0 0 0-.75-.75h-2.25Zm3.75-2.25a.75.75 0 0 0-.75.75v12a.75.75 0 0 0 .75.75h2.25a.75.75 0 0 0 .75-.75V6.75a.75.75 0 0 0-.75-.75H15.75Z"
+                clipRule="evenodd"
+              />
             </svg>
-            <span>Tableau de bord</span>
+            <span>{content?.textDashboard}</span>
           </a>
         </li>
-        <li className="w-[130px]">
+        <li className="p-1">
           <div className="flex flex-row justify-left items-center gap-4">
             {credit < 2 ? (
               <svg
@@ -121,15 +148,12 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
             )}
 
             <span className={credit < 2 ? "text-red-500" : "text-success"}>
-              {userName}
+              {content.userName}
             </span>
           </div>
         </li>
-        <li className="w-[130px]">
-          <p
-            
-            className="flex flex-row justify-left items-center gap-4"
-          >
+        <li className="p-1">
+          <p className="flex flex-row justify-left items-center gap-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -144,14 +168,14 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
               />
             </svg>
 
-            <span>{textCredit}</span>
+            <span>{content.textCredit ?? ""}</span>
             <span className={credit < 2 ? "text-red-500" : "text-success"}>
               {credit}
             </span>
           </p>
         </li>
-        <li className="w-[130px]">
-          <div className= "flex flex-row justify-left items-center gap-4">
+        <li className="p-1">
+          <div className="flex flex-row justify-left items-center gap-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -160,13 +184,13 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
             >
               <path d="M2.25 2.25a.75.75 0 0 0 0 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 0 0-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 0 0 0-1.5H5.378A2.25 2.25 0 0 1 7.5 15h11.218a.75.75 0 0 0 .674-.421 60.358 60.358 0 0 0 2.96-7.228.75.75 0 0 0-.525-.965A60.864 60.864 0 0 0 5.68 4.509l-.232-.867A1.875 1.875 0 0 0 3.636 2.25H2.25ZM3.75 20.25a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM16.5 20.25a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" />
             </svg>
-            <span className={"capitalize"}>{plan}</span>
+            <span className={"capitalize"}>{content.plan ?? ""}</span>
           </div>
         </li>
-        <li className="w-[130px]">
+        <li className="p-1 rounded-lg hover:bg-base-300 hover:translate-x-1 transition-all">
           <button
-            className="flex flex-row justify-left items-center gap-4"
-             onClick={logOut} 
+            className="cursor-pointer flex flex-row justify-left items-center gap-4"
+            onClick={logOut}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -181,11 +205,12 @@ const ProfileDropDown = ({ credit = 0, textCredit = "Crédits", plan = null, use
               />
             </svg>
 
-            <span className={"text-warning"}>Logout</span>
+            <span className={"text-warning"}>{content.textLogout ?? ""}</span>
           </button>
-
         </li>
-          {isLoader && isStatus === "idle" ? <Loader top="top-[50%]" left="left-[80%]" text="Logout..." />: null}
+        {isLoader && isStatus === "idle" ? (
+          <Loader top="top-[50%]" left="left-[80%]" text="Logout..." />
+        ) : null}
       </ul>
     </div>
   );

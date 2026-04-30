@@ -103,9 +103,9 @@ const DashboardPage = ({routeKey}: PropsPage) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v12m6-6H6" />
             </svg>
           </div>
-          <div className="stat-title">Crédits restants (24h)</div>
+          <div className="stat-title">Crédits restants (mois)</div>
           <div className="stat-value text-primary">{creditsRemaining}</div>
-          <div className="stat-desc">Dernières 24 heures</div>
+          <div className="stat-desc">Période de facturation en cours</div>
         </div>
 
         <div className="stat bg-base-100 rounded-xl border border-base-300">
@@ -114,9 +114,9 @@ const DashboardPage = ({routeKey}: PropsPage) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3v18h18" />
             </svg>
           </div>
-          <div className="stat-title">Crédits utilisés (24h)</div>
+          <div className="stat-title">Crédits utilisés (mois)</div>
           <div className="stat-value text-info">{creditsUsed}</div>
-          <div className="stat-desc">Sur la période glissante</div>
+          <div className="stat-desc">Période de facturation en cours</div>
         </div>
 
         <div className="stat bg-base-100 rounded-xl border border-base-300">

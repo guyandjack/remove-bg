@@ -19,14 +19,15 @@ const getConfigForPlan = (
   switch (plan) {
     case "free":
       return {
-        tabsIds: [TABS.RESIZE],
+        tabsIds: [TABS.ADJUST, TABS.RESIZE],
         defaultTabId: TABS.RESIZE,
         defaultToolId: TOOLS.RESIZE,
         removeSaveButton: true,
       };
     case "hobby":
       return {
-        tabsIds: [TABS.ADJUST, TABS.RESIZE, TABS.FILTERS],
+        //tabsIds: [TABS.ADJUST, TABS.RESIZE, TABS.FILTERS],
+        tabsIds: [],
         defaultTabId: TABS.RESIZE,
         defaultToolId: TOOLS.RESIZE,
         finetune: { brightness: true, contrast: true, replaceColor: true },

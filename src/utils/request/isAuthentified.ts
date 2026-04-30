@@ -51,6 +51,19 @@ const isAuthentified = async () => {
         ...baseSession?.user,
         ...user,
       },
+      plan: data?.plan
+        ? {
+            ...baseSession.plan,
+            ...data.plan,
+          }
+        : baseSession.plan,
+      credits: data?.credits
+        ? {
+            used_last_24h: data.credits.used_last_24h ?? 0,
+            remaining_last_24h: data.credits.remaining_last_24h ?? 0,
+          }
+        : baseSession.credits,
+      subscriptionId: data?.subscriptionId ?? baseSession.subscriptionId,
     };
 
     sessionSignal.value = updatedSession;

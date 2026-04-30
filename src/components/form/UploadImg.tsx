@@ -1,9 +1,17 @@
 ﻿// UploadImg.tsx
-import { useEffect, useState } from "preact/hooks";
 
+//import des hooks
+import { useEffect, useState } from "preact/hooks";
+import { sessionSignal } from "@/stores/session";
+
+//import des composants enfant
 import { InputFile } from "../input/InputFile";
 
-const MAX_SIZE_BYTES = 10 * 1024 * 1024;
+//import des data
+
+
+
+
 const ACCEPTED_MIME = new Set([
   "image/jpeg",
   "image/png",
@@ -11,6 +19,14 @@ const ACCEPTED_MIME = new Set([
   "image/gif",
 ]);
 const ACCEPTED_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
+
+const fileSizeUploadLimit = {
+  free: 1 * 1024 * 1024,
+  hobby: 5 * 1024 * 1024,
+  pro: 10 * 1024 * 1024,
+} as const;
+
+
 
 export type UploadImgType = {
   label: string;
@@ -25,6 +41,10 @@ export type UploadImgProps = {
   setPreviewUrl: (url: string | null) => void;
   onFileReady: (file: File | null) => void;
   content: UploadImgType;
+  onConfirm?: () => void;
+  confirmDisabled?: boolean;
+  confirmLabel?: string;
+  actionsDisabled?: boolean;
 };
 
 const UploadImg = ({
@@ -32,9 +52,18 @@ const UploadImg = ({
   previewUrl,
   onFileReady,
   content,
+  onConfirm,
+  confirmDisabled = false,
+  confirmLabel = "Valider",
+  actionsDisabled = false,
 }: UploadImgProps) => {
   const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string>("");
+
+  const isLoged = sessionSignal.value?.authentified;
+  const planUser = sessionSignal.value?.plan?.code;
+
+
 
   // Nettoie l'ancienne URL de preview
   useEffect(() => {
@@ -53,7 +82,19 @@ const UploadImg = ({
 
   const validateFile = (file: File): string | null => {
     if (!file) return "Aucun fichier selectionne.";
-    if (file.size > MAX_SIZE_BYTES) return "Le fichier depasse 2 Mo.";
+
+    const maxBytes = (() => {
+      if (!isLoged) return fileSizeUploadLimit.free;
+      if (planUser === "free") return fileSizeUploadLimit.free;
+      if (planUser === "hobby") return fileSizeUploadLimit.hobby;
+      if (planUser === "pro") return fileSizeUploadLimit.pro;
+      return fileSizeUploadLimit.free;
+    })();
+
+    if (file.size > maxBytes) {
+      const maxMb = Math.round(maxBytes / (1024 * 1024));
+      return `Le fichier depasse ${maxMb} Mo.`;
+    }
 
     const isImageMime = file.type.startsWith("image/");
     if (!isImageMime) return "Le fichier doit etre une image.";
@@ -139,15 +180,28 @@ const UploadImg = ({
                 <span className="text-sm text-base-content/70 truncate">
                   {fileName || content.filename}
                 </span>
-                {previewUrl && (
-                  <button
-                    type="button"
-                    onClick={onClear}
-                    className="btn btn-ghost btn-xs"
-                  >
-                    {content.erase}
-                  </button>
-                )}
+                {previewUrl ? (
+                  <div className="flex items-center gap-2">
+                    {onConfirm ? (
+                      <button
+                        type="button"
+                        onClick={onConfirm}
+                        className="btn btn-ghost btn-xs"
+                        disabled={actionsDisabled || confirmDisabled}
+                      >
+                        {confirmLabel}
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={onClear}
+                      className="btn btn-ghost btn-xs"
+                      disabled={actionsDisabled}
+                    >
+                      {content.erase}
+                    </button>
+                  </div>
+                ) : null}
               </div>
 
               <div className="rounded-xl bg-base-200/70 p-4 ring-1 ring-base-200">

@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 import { themeSignal } from "@/stores/theme";
 import { navigateWithLink } from "@/utils/navigateWithLink";
+import { useSignalEffect } from "@preact/signals";
 
 //import des composants enfants
 import { SelectLanguage } from "./LangSwitcher";
@@ -39,10 +40,11 @@ import {
 type DisplayState = {
   userName: string | null;
   authentified: boolean;
+  credit: number | null;
   textCredit: string | null;
-  credit: number;
   plan: string | null;
   textLogout: string | null;
+  textDashboard: string | null;
 } | null;
 
 const NavBar = () => {
@@ -52,9 +54,10 @@ const NavBar = () => {
     userName: null,
     authentified: false,
     credit: 0,
-    textCredit: t("priceTab.credit"),
+    textCredit: t("dropDownProfile.credits"),
     plan: null,
-    textLogout: t("navBar.logout"),
+    textLogout: t("dropDownProfile.logout"),
+    textDashboard: t("dropDownProfile.dashboard"),
   });
 
   const [tinyLogo, setTinyLogo] = useState(true);
@@ -222,23 +225,23 @@ const NavBar = () => {
     });
   }, []);
 
+  // Keep navbar display in sync with sessionSignal updates (credits/plan/auth changes).
   useEffect(() => {
-    const session = sessionSignal?.value;
-    // Ensure email is always a string. If session?.user?.email is not null/undefined
-    // but also not a string (e.g., a number), convert it to a string.
-    const email = String(session?.user?.email || "");
-    const emailFallback =
-      email && email.includes("@") ? email.split("@")[0] : email || null;
+    
+    const session = sessionSignal.value;
+    
+    
 
     setIsDisplay({
-      userName: session?.user?.first_name || emailFallback,
+      userName: session?.user?.first_name || null ,
       authentified: session?.authentified || false,
       credit: session?.credits?.remaining_last_24h || 0,
-      textCredit: t("priceTab.credit"),
+      textCredit: t("dropDownProfile.credits"),
       plan: session?.plan?.name || session?.plan?.code || null,
-      textLogout: t("navBar.logout"),
+      textLogout: t("dropDownProfile.logout"),
+      textDashboard: t("dropDownProfile.dashboard"),
     });
-  }, [sessionSignal?.value, t]);
+  },[t, sessionSignal.value?.authentified]);
 
   return (
     <>
@@ -381,10 +384,7 @@ const NavBar = () => {
           <SelectLanguage />
           {isDisplay?.authentified ? (
             <ProfileDropDown
-              credit={isDisplay?.credit}
-              userName={isDisplay?.userName}
-              textCredit={isDisplay?.textCredit}
-              plan={isDisplay?.plan}
+             content={isDisplay}
             />
           ) : null}
         </div>

@@ -2,7 +2,7 @@ import type { RequestHandler } from "express";
 import { logger } from "../../logger";
 import {
   getUserByEmail,
-  getActiveUsage24h,
+  getActiveUsageBillingPeriod,
   recordCreditUsage,
 } from "../../DB/queriesSQL/queriesSQL.ts";
 
@@ -35,7 +35,7 @@ const updateUserDownload: RequestHandler = async (req, res) => {
       });
     }
 
-    const usage = await getActiveUsage24h(user.id);
+    const usage = await getActiveUsageBillingPeriod(user.id);
     if (!usage) {
       return res.status(403).json({
         status: "error",
@@ -44,14 +44,14 @@ const updateUserDownload: RequestHandler = async (req, res) => {
       });
     }
 
-    if (usage.remaining_last_24h <= 0) {
+    if (usage.remaining_in_period <= 0) {
       return res.status(429).json({
         status: "error",
-        message: "No more credits available for today",
+        message: "No more credits available for this billing period",
         codeErr: "usage:no_credit_left",
         credits: {
-          used_last_24h: usage.used_last_24h,
-          remaining_last_24h: usage.remaining_last_24h,
+          used_last_24h: usage.used_in_period,
+          remaining_last_24h: usage.remaining_in_period,
         },
       });
     }
@@ -73,20 +73,23 @@ const updateUserDownload: RequestHandler = async (req, res) => {
     }
 
     // Récupère l'état des crédits mis à jour
-    const updated = await getActiveUsage24h(user.id);
+    const updated = await getActiveUsageBillingPeriod(user.id);
     if (!updated) {
       return res.status(200).json({
         status: "success",
         message: "Usage recorded, but no usage view available",
-        credits: { used_last_24h: usage.used_last_24h + 1, remaining_last_24h: Math.max(usage.remaining_last_24h - 1, 0) },
+        credits: {
+          used_last_24h: usage.used_in_period + 1,
+          remaining_last_24h: Math.max(usage.remaining_in_period - 1, 0),
+        },
       });
     }
 
     return res.status(200).json({
       status: "success",
       credits: {
-        used_last_24h: updated.used_last_24h,
-        remaining_last_24h: updated.remaining_last_24h,
+        used_last_24h: updated.used_in_period,
+        remaining_last_24h: updated.remaining_in_period,
       },
     });
   } catch (error: any) {

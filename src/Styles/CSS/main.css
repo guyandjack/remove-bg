@@ -194,6 +194,33 @@ img {
 
 }
 
+/***********************************************
+****** custom css pour composant service *********
+**********************************************/
+.service-link-info{
+  
+  display: block;
+  margin:  1rem 0;
+  text-align:center;
+  width: fit-content;
+  padding: 0.5rem;
+  background-color: var(--color-info);
+  border-radius: 0.5rem;
+  color: var(--color-base-300);
+  transition: transform 0.2s linear;
+  
+}
+.service-link-info:hover{
+  transform: translateY(-2px);
+}
+/* @media screen and (min-width: 1300px){
+  .service-link-info{
+    position: absolute;
+    transform: translateX(-50%);
+  left: 50%;
+  bottom: 1.5rem;
+  } 
+}*/
 
 /***********************************************
 ****** custom css pour composant diff *********

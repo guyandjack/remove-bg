@@ -9,11 +9,11 @@ import {
 } from "../function/createToken";
 import {
   getUserByEmail,
-  getActiveUsage24h,
   withTransaction,
-  getUserPlanAndCredits24h,
   getCustomerByUserId,
   getPlanByCode,
+  getActiveUsageBillingPeriod,
+  getUserPlanAndCreditsBillingPeriod,
 } from "../DB/queriesSQL/queriesSQL.ts";
 
 //import des types
@@ -103,8 +103,8 @@ const login: RequestHandler = async (req, res, next) => {
       //if ok get plan and credit of user, for send un formated object response
       const userId = user.id;
       //get Plan et credit available
-      const planAndCredit = await getUserPlanAndCredits24h(userId);
-      const usage = await getActiveUsage24h(userId);
+      const planAndCredit = await getUserPlanAndCreditsBillingPeriod(userId);
+      const usage = await getActiveUsageBillingPeriod(userId);
 
       //get info from user
       const customer = await getCustomerByUserId(userId);
@@ -118,10 +118,10 @@ const login: RequestHandler = async (req, res, next) => {
       const planQuota = planRow?.daily_credit_quota ?? 0;
       const planName = planRow?.name ?? selectedPlanCode;
 
-      const usedCredits = usage?.used_last_24h ?? 0;
+      const usedCredits = usage?.used_in_period ?? 0;
       const remainingCredits =
-        usage?.remaining_last_24h ??
-        planAndCredit?.remaining_credits_24h ??
+        usage?.remaining_in_period ??
+        planAndCredit?.remaining_credits_in_period ??
         planQuota;
 
       formatedObject = {
