@@ -33,9 +33,6 @@ import {
   setSessionFromApiResponse,
 } from "@/stores/session";
 
-
-
-
 //declarations des types
 type DisplayState = {
   userName: string | null;
@@ -91,7 +88,7 @@ const NavBar = () => {
     if (typeof window === "undefined") return;
     const url = new URL(window.location.href);
     ["userValide", "session_id", "plan", "currency"].forEach((key) =>
-      url.searchParams.delete(key)
+      url.searchParams.delete(key),
     );
     window.history.replaceState({}, "", url.toString());
   };
@@ -116,7 +113,7 @@ const NavBar = () => {
       const response = await api.post(
         "api/stripe/finalize",
         { sessionId },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       const data = response.data;
@@ -182,7 +179,7 @@ const NavBar = () => {
         await api.post(
           "api/stripe/cleanup",
           { sessionId },
-          { withCredentials: true }
+          { withCredentials: true },
         );
       }
     } catch (error) {
@@ -227,13 +224,10 @@ const NavBar = () => {
 
   // Keep navbar display in sync with sessionSignal updates (credits/plan/auth changes).
   useEffect(() => {
-    
     const session = sessionSignal.value;
-    
-    
 
     setIsDisplay({
-      userName: session?.user?.first_name || null ,
+      userName: session?.user?.first_name || null,
       authentified: session?.authentified || false,
       credit: session?.credits?.remaining_last_24h || 0,
       textCredit: t("dropDownProfile.credits"),
@@ -241,7 +235,7 @@ const NavBar = () => {
       textLogout: t("dropDownProfile.logout"),
       textDashboard: t("dropDownProfile.dashboard"),
     });
-  },[t, sessionSignal.value?.authentified]);
+  }, [t, sessionSignal.value]);
 
   return (
     <>
@@ -252,8 +246,8 @@ const NavBar = () => {
               checkoutFeedback.status === "success"
                 ? "alert-success"
                 : checkoutFeedback.status === "error"
-                ? "alert-error"
-                : "alert-info"
+                  ? "alert-error"
+                  : "alert-info"
             }`}
           >
             <span>{checkoutFeedback.message}</span>
@@ -292,7 +286,8 @@ const NavBar = () => {
                   link.key === "pricing" ||
                   link.key === "service" ||
                   (link.key === "signup" && !isDisplay?.authentified) ||
-                  (link.key === "login" && !isDisplay?.authentified) ? (
+                  (link.key === "login" && !isDisplay?.authentified) ||
+                  (link.key === "dashboard" && isDisplay?.authentified) ? (
                   <li key={link.href}>
                     <a
                       data-id={link.href}
@@ -313,9 +308,7 @@ const NavBar = () => {
           </div>
 
           {tinyLogo ? (
-            <a 
-            className={"block w-[50px]"}
-            href={"/"}>
+            <a className={"block w-[50px]"} href={"/"}>
               {themeSignal.value === "winter" ? (
                 <AnimatedLogoTinyBlack />
               ) : (
@@ -323,22 +316,23 @@ const NavBar = () => {
               )}
             </a>
           ) : (
-            <a 
-            className={"block w-[150px] pl-8"}
-            href={"/"}>
-                {themeSignal.value === "winter" ? (
-                  <AnimatedLogoNormalBlack />
-                ) : (
-                  <AnimatedLogoNormalWhite />
-                )}
-            </a>  
+            <a className={"block w-[150px] pl-8"} href={"/"}>
+              {themeSignal.value === "winter" ? (
+                <AnimatedLogoNormalBlack />
+              ) : (
+                <AnimatedLogoNormalWhite />
+              )}
+            </a>
           )}
         </div>
         <div className="navbar-center hidden lg:flex">
           <ul className="menu-horizontal gap-5 px-1">
             {navBarContent.map((link) => {
               const label = t(`navBar.${link.key}`);
-              return link.key !== "signup" && link.key !== "login" ? (
+              return link.key === "home" ||
+              link.key === "pricing" ||
+              link.key === "service" ||
+              (link.key === "dashboard" && isDisplay?.authentified) ? (
                 <li key={link.href}>
                   <a
                     data-id={link.href}
@@ -383,9 +377,7 @@ const NavBar = () => {
           <ThemeControler />
           <SelectLanguage />
           {isDisplay?.authentified ? (
-            <ProfileDropDown
-             content={isDisplay}
-            />
+            <ProfileDropDown content={isDisplay} />
           ) : null}
         </div>
       </nav>

@@ -22,7 +22,7 @@ const cleanupStripeCheckout: RequestHandler = async (req, res) => {
 
     const pool = await connectDb();
     const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT email FROM StripeCheckoutSession WHERE session_id = ? LIMIT 1`,
+      `SELECT email FROM \`StripeCheckoutSession\` WHERE session_id = ? LIMIT 1`,
       [normalizedSessionId]
     );
     const record = rows[0] as RowDataPacket | undefined;
@@ -35,13 +35,14 @@ const cleanupStripeCheckout: RequestHandler = async (req, res) => {
     }
 
     await pool.execute<ResultSetHeader>(
-      `DELETE FROM StripeCheckoutSession WHERE session_id = ?`,
+      `DELETE FROM \`StripeCheckoutSession\` WHERE session_id = ?`,
       [normalizedSessionId]
     );
 
     if (record.email) {
       await pool.execute<ResultSetHeader>(
-        `DELETE FROM EmailVerification WHERE email = ? AND account = 0`,
+        // Preserve history: just invalidate any pending OTP rows linked to this email.
+        `UPDATE \`EmailVerification\` SET active = NULL WHERE email = ? AND account = 0`,
         [record.email]
       );
     }

@@ -140,7 +140,7 @@ export const forgotPassword: RequestHandler = async (req, res) => {
       
       // Rendu MJML du template FR
       const { html: mjmlHtml } = await renderMjmlTemplate(
-        "forgot.password.fr.mjml",
+        `forgot.password.${lang}.mjml`,
         { email, resetUrl, appName, logoUrl, expiryMinutes: 15 },
         lang
       );

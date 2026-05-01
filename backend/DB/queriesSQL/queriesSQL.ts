@@ -306,7 +306,7 @@ export async function createUser(email: string, passwordHash: string, id?: ID) {
   const connexion = await connectDb();
   const theId = id ?? crypto.randomUUID(); // you can swap with cuid() if preferred
   const sql = `
-    INSERT INTO User (id, email, password_hash)
+    INSERT INTO \`User\` (id, email, password_hash)
     VALUES (?, ?, ?)
   `;
   const [res] = await connexion.execute<ResultSetHeader>(sql, [
@@ -323,7 +323,7 @@ export async function getUserById(userId: ID): Promise<User | null> {
    */
   const connexion = await connectDb();
   const [rows] = await connexion.execute<User[]>(
-    `SELECT * FROM User WHERE id = ? LIMIT 1`,
+    `SELECT * FROM \`User\` WHERE id = ? LIMIT 1`,
     [userId]
   );
   return rows[0] ?? null;
@@ -335,7 +335,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
    */
   const connexion = await connectDb();
   const [rows] = await connexion.execute<User[]>(
-    `SELECT * FROM User WHERE email = ? LIMIT 1`,
+    `SELECT * FROM \`User\` WHERE email = ? LIMIT 1`,
     [email]
   );
   return rows[0] ?? null;
@@ -349,7 +349,7 @@ export async function listUser(limit = 50, offset = 0): Promise<User[]> {
    */
   const connexion = await connectDb();
   const [rows] = await connexion.execute<User[]>(
-    `SELECT * FROM User ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    `SELECT * FROM \`User\` ORDER BY created_at DESC LIMIT ? OFFSET ?`,
     [limit, offset]
   );
   return rows;
@@ -374,7 +374,7 @@ export async function updateUser(
     values.push(fields.password_hash);
   }
   if (sets.length === 0) return false;
-  const sql = `UPDATE User SET ${sets.join(", ")} WHERE id = ?`;
+  const sql = `UPDATE \`User\` SET ${sets.join(", ")} WHERE id = ?`;
   values.push(userId);
   const [res] = await connexion.execute<ResultSetHeader>(sql, values);
   return res.affectedRows === 1;
@@ -387,7 +387,7 @@ export async function deleteUser(userId: ID) {
    */
   const connexion = await connectDb();
   const [res] = await connexion.execute<ResultSetHeader>(
-    `DELETE FROM User WHERE id = ?`,
+    `DELETE FROM \`User\` WHERE id = ?`,
     [userId]
   );
   return res.affectedRows === 1;
@@ -1142,7 +1142,7 @@ export async function recordCreditUsage(
 ) {
   const connexion = await connectDb();
   const id = crypto.randomUUID();
-  const sql = `INSERT INTO \`wiz_pix\`.\`CreditUsage\` (id, subscription_id, used, reason, request_id)
+  const sql = `INSERT INTO \`CreditUsage\` (id, subscription_id, used, reason, request_id)
                VALUES (?, ?, ?, ?, ?)`;
   try {
     const [res] = await connexion.execute<ResultSetHeader>(sql, [
@@ -1169,6 +1169,15 @@ export async function recordCreditUsage(
     } catch {}
     return res.affectedRows === 1 ? id : null;
   } catch (err: any) {
+    // Idempotency: if we already recorded this request_id, return existing row id.
+    if (requestId && err && err.code === "ER_DUP_ENTRY") {
+      const [rows] = await connexion.execute<RowDataPacket[]>(
+        `SELECT id FROM \`CreditUsage\` WHERE request_id = ? LIMIT 1`,
+        [requestId]
+      );
+      const existingId = rows[0] ? String((rows[0] as any).id) : null;
+      return existingId;
+    }
     // Make this extremely visible during MVP hardening.
     console.error("[recordCreditUsage] insert failed", {
       subscriptionId,

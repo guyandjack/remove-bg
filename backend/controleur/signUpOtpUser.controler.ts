@@ -45,6 +45,8 @@ const normalizeCurrency = (code?: string | null): CurrencyCode => {
   return ["CHF", "EUR", "USD"].includes(upper) ? (upper as CurrencyCode) : "CHF";
 };
 
+const OTP_MAX_ATTEMPTS = 5;
+
 const createNewAccountUser: RequestHandler = async (req, res) => {
   try {
     let { email, otp } = (req as any).userValidated || {};
@@ -67,7 +69,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
     const pool = await connectDb();
     const [rows] = await pool.execute<RowDataPacket[]>(
       `SELECT id, code_hash, salt, password_hash, plan_type, currency_code, expires_at, attempts
-       FROM EmailVerification
+       FROM \`EmailVerification\`
        WHERE email = ? AND active = 1
        ORDER BY created_at DESC
        LIMIT 1`,
@@ -94,12 +96,26 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
       stored.length === expected.length &&
       crypto.timingSafeEqual(stored, expected);
     const expired = new Date(record.expires_at) < now;
+    const attempts = Number(record.attempts ?? 0);
+
+    // Hard cap attempts to reduce brute force risk
+    if (attempts >= OTP_MAX_ATTEMPTS) {
+      await pool.execute<ResultSetHeader>(
+        `UPDATE \`EmailVerification\` SET active = NULL WHERE id = ?`,
+        [record.id]
+      );
+      return res.status(400).json({
+        status: "error",
+        message: "Too many attempts. Please request a new code.",
+        errorCode: "otp_too_many_attempts",
+      });
+    }
 
     // If the OTP matches but is expired, cleanup to allow a fresh attempt
     if (expired && match) {
       await pool.execute<ResultSetHeader>(
-        `DELETE FROM EmailVerification WHERE email = ?`,
-        [email]
+        `UPDATE \`EmailVerification\` SET active = NULL WHERE id = ?`,
+        [record.id]
       );
       return res
         .status(400)
@@ -108,7 +124,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
 
     if (expired) {
       await pool.execute<ResultSetHeader>(
-        `UPDATE EmailVerification SET active = 0 WHERE id = ?`,
+        `UPDATE \`EmailVerification\` SET active = NULL WHERE id = ?`,
         [record.id]
       );
       return res
@@ -118,7 +134,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
 
     if (!match) {
       await pool.execute<ResultSetHeader>(
-        `UPDATE EmailVerification SET attempts = attempts + 1 WHERE id = ?`,
+        `UPDATE \`EmailVerification\` SET attempts = attempts + 1 WHERE id = ?`,
         [record.id]
       );
       return res
@@ -147,23 +163,25 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
           await withTransaction(async (cx) => {
             // 1) Consume/cleanup OTP rows
             await cx.execute<ResultSetHeader>(
-              `DELETE FROM EmailVerification WHERE email = ? AND active = 0`,
+              // Optional hygiene: purge legacy rows that were previously stored with active=0.
+              // With the new model, inactive rows are stored as active=NULL.
+              `DELETE FROM \`EmailVerification\` WHERE email = ? AND active = 0`,
               [email]
             );
             await cx.execute<ResultSetHeader>(
-              `UPDATE EmailVerification SET active = 0, consumed_at = NOW() WHERE id = ?`,
+              `UPDATE \`EmailVerification\` SET active = NULL, consumed_at = NOW() WHERE id = ?`,
               [record.id]
             );
 
             // 2) Find or create user
             const [urows] = await cx.execute<RowDataPacket[]>(
-              `SELECT id FROM User WHERE email = ? LIMIT 1`,
+              `SELECT id FROM \`User\` WHERE email = ? LIMIT 1`,
               [email]
             );
             if (!urows[0]) {
               const id = crypto.randomUUID();
               const [ires] = await cx.execute<ResultSetHeader>(
-                `INSERT INTO User (id, email, password_hash) VALUES (?, ?, ?)`,
+                `INSERT INTO \`User\` (id, email, password_hash) VALUES (?, ?, ?)`,
                 [id, email, String(record.password_hash)]
               );
               if (ires.affectedRows !== 1)
@@ -176,20 +194,20 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
 
             // 3) Mark account created
             await cx.execute<ResultSetHeader>(
-              `UPDATE EmailVerification SET account = 1 WHERE id = ?`,
+              `UPDATE \`EmailVerification\` SET account = 1 WHERE id = ?`,
               [record.id]
             );
 
             // 4) Ensure 'free' plan exists, get its id
             let planId: string | null = null;
             const [prows] = await cx.execute<RowDataPacket[]>(
-              `SELECT id FROM Plan WHERE code = ? LIMIT 1`,
+              `SELECT id FROM \`Plan\` WHERE code = ? LIMIT 1`,
               ["free"]
             );
             if (!prows[0]) {
               const pid = crypto.randomUUID();
               const [pres] = await cx.execute<ResultSetHeader>(
-                `INSERT INTO Plan (id, code, name, price, currency_code, billing_interval, daily_credit_quota, is_archived)
+                `INSERT INTO \`Plan\` (id, code, name, price, currency_code, billing_interval, daily_credit_quota, is_archived)
                VALUES (?, ?, 'Free', 0, 'CHF', 'month',? , 0)`,
                 [pid, planCode, planDailyCredit]
               );
@@ -203,7 +221,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
             // 5) Create active subscription
             const sid = crypto.randomUUID();
             const [sres] = await cx.execute<ResultSetHeader>(
-              `INSERT INTO Subscription (id, user_id, plan_id, status, is_active, period_start, period_end)
+              `INSERT INTO \`Subscription\` (id, user_id, plan_id, status, is_active, period_start, period_end)
              VALUES (?, ?, ?, 'active', TRUE, NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY))`,
               [sid, finalUserId, planId]
             );
@@ -313,7 +331,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
       }
 
       await pool.execute<ResultSetHeader>(
-        `UPDATE EmailVerification SET active = 0, consumed_at = NOW() WHERE id = ?`,
+        `UPDATE \`EmailVerification\` SET active = NULL, consumed_at = NOW() WHERE id = ?`,
         [record.id]
       );
 

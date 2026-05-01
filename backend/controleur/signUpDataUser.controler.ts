@@ -76,6 +76,7 @@ const sendMailVerification: RequestHandler = async (req, res) => {
     const codeHash = hashOtp(otp, salt);
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
     const passwordHash = await bcrypt.hash(String(password), 12);
+    const verificationId = crypto.randomUUID();
 
     const pool = await connectDb();
     const conn = await pool.getConnection();
@@ -91,15 +92,15 @@ const sendMailVerification: RequestHandler = async (req, res) => {
       // Transaction to reset previous verification and insert a fresh one
       await conn.beginTransaction();
       await conn.execute<ResultSetHeader>(
-        `DELETE FROM EmailVerification WHERE email = ?`,
+        // Invalidate any previously active OTP without deleting history
+        `UPDATE \`EmailVerification\` SET active = NULL WHERE email = ? AND active = 1`,
         [normalizedEmail]
       );
-      const idNew = crypto.randomUUID();
       await conn.execute<ResultSetHeader>(
-        `INSERT INTO EmailVerification (id, email, code_hash, salt, password_hash, expires_at, plan_type, currency_code, active, attempts, account)
+        `INSERT INTO \`EmailVerification\` (id, email, code_hash, salt, password_hash, expires_at, plan_type, currency_code, active, attempts, account)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 0, 0)`,
         [
-          idNew,
+          verificationId,
           normalizedEmail,
           codeHash,
           salt,
@@ -158,14 +159,14 @@ const sendMailVerification: RequestHandler = async (req, res) => {
       const info = await transporter.sendMail({ from, to: normalizedEmail, subject, html });
       return res.status(200).json({ status: "success", email: normalizedEmail, messageId: info.messageId, resend: isResend });
     } catch (mailErr) {
-      // Email failed to send (network, SMTP). Clean up verification row so user can retry.
+      // Email failed to send (network, SMTP). Mark OTP as inactive so the user can retry.
       try {
         const pool = await connectDb();
         const conn = await pool.getConnection();
         try {
           await conn.execute<ResultSetHeader>(
-            `DELETE FROM EmailVerification WHERE email = ?`,
-            [normalizedEmail]
+            `UPDATE \`EmailVerification\` SET active = NULL WHERE id = ?`,
+            [verificationId]
           );
         } finally {
           conn.release();

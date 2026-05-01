@@ -138,7 +138,7 @@ export const finalizeCheckoutSessionFromStripeSession = async ({
 
   if (!user) {
     const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT password_hash FROM EmailVerification WHERE email = ? AND account = 0 AND consumed_at IS NOT NULL ORDER BY created_at DESC LIMIT 1`,
+      `SELECT password_hash FROM \`EmailVerification\` WHERE email = ? AND account = 0 AND consumed_at IS NOT NULL ORDER BY created_at DESC LIMIT 1`,
       [normalizedEmail]
     );
     const hash = (rows[0] as any)?.password_hash as string | undefined;
@@ -151,7 +151,7 @@ export const finalizeCheckoutSessionFromStripeSession = async ({
     }
     user = await getUserByEmail(normalizedEmail);
     await pool.execute<ResultSetHeader>(
-      `UPDATE EmailVerification SET account = 1 WHERE email = ? AND account = 0 AND consumed_at IS NOT NULL`,
+      `UPDATE \`EmailVerification\` SET account = 1 WHERE email = ? AND account = 0 AND consumed_at IS NOT NULL`,
       [normalizedEmail]
     );
   }

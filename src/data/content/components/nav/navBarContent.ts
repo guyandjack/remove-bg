@@ -12,6 +12,7 @@ const navBarContent: NavLink[] = [
   { key: "home", href: "/" },
   { key: "service", href: "/services" },
   { key: "pricing", href: "/pricing" },
+  { key: "dashboard", href: "/dashboard"},
   { key: "signup", href: "/pricing/signup" },
   { key: "login", href: "/login" },
   //only footer link
