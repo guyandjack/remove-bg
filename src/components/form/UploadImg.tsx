@@ -59,12 +59,31 @@ const UploadImg = ({
 }: UploadImgProps) => {
   const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [textSize, setTextZise] = useState<number>(5);
+
 
   const isLoged = sessionSignal.value?.authentified;
   const planUser = sessionSignal.value?.plan?.code;
+  let maxBytes = 1;
+  
+  function getLimitSizeFile() {
+    let result = fileSizeUploadLimit.hobby;
+    if (!isLoged) { result = fileSizeUploadLimit.hobby };
+    if (planUser === "free") { result = fileSizeUploadLimit.free };
+    if (planUser === "hobby") { result = fileSizeUploadLimit.hobby };
+    if (planUser === "pro") { result = fileSizeUploadLimit.pro };
+    return {
+      fileSize: result,
+      textSize: Math.round(result / (1024 * 1024))
+    } 
+  }
 
+  useEffect(() => {
+    const result = getLimitSizeFile();
+    setTextZise(result.textSize);
+  },[])
 
-
+  
   // Nettoie l'ancienne URL de preview
   useEffect(() => {
     return () => {
@@ -83,17 +102,11 @@ const UploadImg = ({
   const validateFile = (file: File): string | null => {
     if (!file) return "Aucun fichier selectionne.";
 
-    const maxBytes = (() => {
-      if (!isLoged) return fileSizeUploadLimit.free;
-      if (planUser === "free") return fileSizeUploadLimit.free;
-      if (planUser === "hobby") return fileSizeUploadLimit.hobby;
-      if (planUser === "pro") return fileSizeUploadLimit.pro;
-      return fileSizeUploadLimit.free;
-    })();
+    let result = getLimitSizeFile();
+    
 
-    if (file.size > maxBytes) {
-      const maxMb = Math.round(maxBytes / (1024 * 1024));
-      return `Le fichier depasse ${maxMb} Mo.`;
+    if (file.size > result.fileSize) {
+      return `Le fichier depasse ${result.textSize} Mo.`;
     }
 
     const isImageMime = file.type.startsWith("image/");
@@ -154,12 +167,12 @@ const UploadImg = ({
               accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={onChangeFile}
               className="w-full bg-base-200 file-input-info"
-              placeholder={content.placeholder}
+              //placeholder={content.placeholder}
               buttonText={content.label}
             />
             <div className="label p-0">
               <span className="label-text text-base-content/70">
-                Formats: JPG, PNG, WEBP, GIF - Max 2 Mo
+                {`Formats: JPG, PNG, WEBP, GIF - Max ${textSize} Mo`}
               </span>
             </div>
 

@@ -27,28 +27,26 @@ type DisplayState = {
 
 type ProfileDropDownType = {
   content: DisplayState;
-}
-
+};
 
 const ProfileDropDown = ({ content }: ProfileDropDownType) => {
   if (!content) return null;
-  
+
   //state qui gere l' affichage du loader
   const [isLoader, setIsLoader] = useState(false);
-  const [isStatus, setIsStatus] = useState<"error" | "success" | "idle">("idle");
-  
+  const [isStatus, setIsStatus] = useState<"error" | "success" | "idle">(
+    "idle",
+  );
+
   const credit = content.credit ?? 0;
-  
-  
-  
+
   //declaration des fonctions
-  const logOut = async() => {
+  const logOut = async () => {
     setIsLoader(true);
     try {
-      
-      const response = await api.post("/api/logout",{});
+      const response = await api.post("/api/logout", {});
       if (!response) {
-        console.log("error http")
+        console.log("error http");
       }
       const data = response.data;
       if (data.status === "success") {
@@ -56,27 +54,24 @@ const ProfileDropDown = ({ content }: ProfileDropDownType) => {
         sessionSignal.value = null;
         localStorage.removeItem("session");
         localStorage.removeItem("wizpix:last_service");
-        
-        
+
         setIsLoader(false);
         setIsStatus("success");
-        
       }
     } catch {
       sessionSignal.value = null;
       localStorage.removeItem("wizpix:last_service");
       localStorage.removeItem("session");
-      setIsLoader(false)
+      setIsLoader(false);
       setIsStatus("success");
-      
     } finally {
       setTimeout(() => {
-        setIsStatus("idle")
+        setIsStatus("idle");
         navigateWithLink("/");
-      }, 2000)
+      }, 2000);
     }
-  }
-  
+  };
+
   return (
     <div className="dropdown dropdown-end">
       <button tabIndex={0} type="button" className="btn hover:bg-primary/40">
@@ -208,8 +203,10 @@ const ProfileDropDown = ({ content }: ProfileDropDownType) => {
             <span className={"text-warning"}>{content.textLogout ?? ""}</span>
           </button>
         </li>
-        {isLoader && isStatus === "idle" ? (
-          <Loader top="top-[50%]" left="left-[80%]" text="Logout..." />
+        {isLoader ? (
+          <li className={"relative h-[50px]"}>
+            <Loader top="top-[50%]" left="left-[50%]" text={content.textLogout ?? ""} />
+          </li>
         ) : null}
       </ul>
     </div>

@@ -32,9 +32,7 @@ function Loader({
         `${top} ${left} ${translateX} ${translateY} ${classNameWrapper}`,
       ].join(" ")}
     >
-      <span
-        className={`loading loading-infinity loading-xl ${colorLoader}`}
-      ></span>
+      <span className={`loading loading-bars loading-xl ${colorLoader}`}></span>
       <span className={`${colorText}`}>
         {text == "" ? t("loader.formContact") : text}
       </span>
