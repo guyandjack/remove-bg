@@ -14,13 +14,17 @@
 -- ------------------------------------------------------------------
 
 -- User
-CREATE TABLE IF NOT EXISTS `User` (
-  id            VARCHAR(36)  NOT NULL PRIMARY KEY,
-  email         VARCHAR(191) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS `User` ( 
+  id            VARCHAR(36)  NOT NULL PRIMARY KEY, 
+  email         VARCHAR(191) NOT NULL UNIQUE, 
+  password_hash VARCHAR(255) NOT NULL, 
+  marketing_consent             TINYINT(1) NOT NULL DEFAULT 0,
+  marketing_consent_updated_at  DATETIME   NULL,
+  account_deletion_requested            TINYINT(1) NOT NULL DEFAULT 0,
+  account_deletion_requested_at         DATETIME   NULL,
+  created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+  updated_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 
 
 -- TokenRefresh (stockage des refresh tokens)
 CREATE TABLE IF NOT EXISTS `TokenRefresh` (
@@ -65,22 +69,25 @@ CREATE TABLE IF NOT EXISTS `Plan` (
 
 -- Subscription
 -- MySQL: ENUM pour le statut et "trick" is_active (NULL = inactif, 1 = actif)
-CREATE TABLE IF NOT EXISTS `Subscription` (
-  id                      VARCHAR(36) NOT NULL PRIMARY KEY,
-  user_id                 VARCHAR(36) NOT NULL,
-  plan_id                 VARCHAR(36) NOT NULL,
-  status                  ENUM('active','canceled','past_due','expired','incomplete','incomplete_expired','trialing','unpaid','paused') NOT NULL DEFAULT 'active',
-  is_active               TINYINT(1) NULL, -- 1 pour actif, NULL pour inactif
-  period_start            DATETIME    NOT NULL,
-  period_end              DATETIME    NOT NULL,
-  cancel_at               DATETIME    NULL,
-  canceled_at             DATETIME    NULL,
-  stripe_subscription_id  VARCHAR(255) NULL,
-  stripe_customer_id      VARCHAR(255) NULL,
-  credit_initial          INT UNSIGNED NOT NULL DEFAULT 0,
-  credit_used             INT UNSIGNED NOT NULL DEFAULT 0,
-  created_at              TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at              TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+CREATE TABLE IF NOT EXISTS `Subscription` ( 
+  id                      VARCHAR(36) NOT NULL PRIMARY KEY, 
+  user_id                 VARCHAR(36) NOT NULL, 
+  plan_id                 VARCHAR(36) NOT NULL, 
+  status                  ENUM('active','canceling','canceled','past_due','expired','incomplete','incomplete_expired','trialing','unpaid','paused') NOT NULL DEFAULT 'active', 
+  is_active               TINYINT(1) NULL, -- 1 pour actif, NULL pour inactif 
+  period_start            DATETIME    NOT NULL, 
+  period_end              DATETIME    NOT NULL, 
+  cancel_at               DATETIME    NULL, 
+  canceled_at             DATETIME    NULL, 
+  stripe_cancel_at_period_end TINYINT(1) NOT NULL DEFAULT 0,
+  current_period_end          DATETIME   NULL,
+  plan_access_until           DATETIME   NULL,
+  stripe_subscription_id  VARCHAR(255) NULL, 
+  stripe_customer_id      VARCHAR(255) NULL, 
+  credit_initial          INT UNSIGNED NOT NULL DEFAULT 0, 
+  credit_used             INT UNSIGNED NOT NULL DEFAULT 0, 
+  created_at              TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+  updated_at              TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
 
   CONSTRAINT fk_sub_user FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE CASCADE,
   CONSTRAINT fk_sub_plan FOREIGN KEY (plan_id) REFERENCES `Plan`(id) ON DELETE RESTRICT,
@@ -226,4 +233,3 @@ CREATE TABLE IF NOT EXISTS `Invoice` (
   INDEX idx_invoice_paid (status, amount_paid_cents),
   INDEX idx_invoice_period (period_start, period_end)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-

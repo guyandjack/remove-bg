@@ -33,6 +33,9 @@ import logOutRoute from "./routes/logOut.routes";
 import verifyRoute from "./routes/verifyAuth.route";
 import pexelsRoute from "./routes/pexels.route";
 import stripeRoute from "./routes/stripe.route";
+import subscriptionRoute from "./routes/subscription.route";
+import marketingRoute from "./routes/marketing.route";
+import accountRoute from "./routes/account.route";
 import forgotPasswordRoute from "./routes/forgotPassword.route";
 import refreshRoute from "./routes/authRefresh.route";
 import usageRoute from "./routes/usage.route";
@@ -178,6 +181,15 @@ app.use("/api/pexels", pexelsRoute);
 
 //route pour api de paiement
 app.use("/api/stripe", stripeRoute);
+
+//route gestion abonnement
+app.use("/api/subscription", subscriptionRoute);
+
+//route marketing (consentement)
+app.use("/api/marketing", marketingRoute);
+
+//route compte (suppression)
+app.use("/api/account", accountRoute);
 
 //route mise à jour user
 app.use("/api/usage", usageRoute);

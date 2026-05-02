@@ -1,0 +1,15 @@
+<mjml>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#ffffff" padding="24px">
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold">Your marketing preference has been updated</mj-text>
+        <mj-text><strong>New status:</strong> {{marketingStatusLabel}}</mj-text>
+        <mj-divider />
+        <mj-text font-size="12px" color="#6b7280">
+          This change only affects marketing communications. It does not cancel your subscription and never deletes your account.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+

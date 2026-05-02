@@ -681,5 +681,76 @@
   "servicePageTitle": {
     "title_h1": "Test the quality of our services",
     "title_h1_loged": "Use our services"
+  },
+
+  "dashboardPage": {
+    "title": "Dashboard",
+    "subtitle": "Manage your account and subscriptions.",
+    "billing": {
+      "title": "Billing & Account",
+      "description": "Manage your subscription, marketing preferences and account settings.",
+      "loadError": "Unable to load billing/account status. Please refresh.",
+      "subscription": {
+        "title": "Subscription",
+        "statusLabel": "Status",
+        "statusUnknown": "unknown",
+        "accessUntilLabel": "Access until",
+        "changeCta": "Change subscription",
+        "cancelCta": "Cancel subscription",
+        "resumeCta": "Resume subscription",
+        "cancelModalTitle": "Confirm cancellation",
+        "cancelModalBody": "Your subscription will stop at the end of the current billing period. You keep access until that date.",
+        "cancelModalClose": "Close",
+        "cancelModalConfirm": "Confirm cancellation",
+        "cancelHelp": "Your subscription will remain active until {{date}}. No payments will be made after this date.",
+        "resumeHelp": "Reactivate monthly payments to ensure service continuity.",
+        "resumeSuccess": "Subscription reactivated.",
+        "resumeError": "Unable to reactivate subscription."
+      },
+      "marketing": {
+        "title": "Marketing preferences",
+        "currentLabel": "Current",
+        "active": "enabled",
+        "inactive": "disabled",
+        "enableCta": "Enable",
+        "disableCta": "Disable",
+        "emailingFalse":"WizPix will not keep you informed about promotions and new services",
+        "emailingTrue":"WizPix will keep you informed about promotions and new services",
+        "success": "Marketing preference updated.",
+        "error": "Unable to update marketing preference."
+      },
+      "account": {
+        "title": "Account",
+        "deletionRequested": "Deletion requested.",
+        "deletionNotRequested": "No deletion requested.",
+        "deletionWarning": "Deleting your account disables access immediately. This action cannot be undone.",
+        "typeToConfirm": "Type SUPPRIMER to confirm",
+        "deleteCta": "Delete my account",
+        "deletionSuccess": "Deletion request recorded. You are being signed out.",
+        "deletionError": "Unable to request account deletion."
+      }
+    },
+    "stats": {
+      "creditsRemainingTitle": "Credits remaining",
+      "creditsUsedTitle": "Credits used",
+      "planTitle": "Subscription",
+      "billingPeriod": "Current billing period"
+    },
+    "subscription": {
+      "title": "Subscription management",
+      "description": "Change your plan or cancel your subscription.",
+      "changeCta": "Change subscription",
+      "cancelCta": "Cancel subscription",
+      "cancelSuccess": "Cancellation request recorded.",
+      "cancelError": "Unable to cancel your subscription. Please try again."
+    },
+    "password": {
+      "title": "Password",
+      "description": "Receive an email to reset your password.",
+      "emailLabel": "Email",
+      "submitCta": "Send reset link",
+      "success": "If an account exists, an email has been sent.",
+      "error": "Error while requesting. Please try again."
+    }
   }
 }

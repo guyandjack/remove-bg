@@ -1,0 +1,14 @@
+<mjml>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#ffffff" padding="24px">
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold">Account deletion request recorded</mj-text>
+        <mj-text>We confirm that your account deletion request has been recorded.</mj-text>
+        <mj-text font-size="12px" color="#6b7280">
+          For legal reasons, some data (invoices/payments and minimal logs) may be retained.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+

@@ -2,6 +2,7 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { connectDb } from "../poolConnexion/poolConnexion";
 import crypto from "node:crypto";
+import { isPremiumAccessAllowed } from "../../services/subscription/access.ts";
 
 
 // -----------------------------
@@ -11,6 +12,7 @@ export type ID = string;
 // Align status with schema (extended to support Stripe-like states)
 export type SubscriptionStatus =
   | "active"
+  | "canceling"
   | "canceled"
   | "past_due"
   | "expired"
@@ -24,6 +26,10 @@ export interface User extends RowDataPacket {
   id: ID;
   email: string;
   password_hash: string;
+  marketing_consent: 0 | 1;
+  marketing_consent_updated_at: Date | null;
+  account_deletion_requested: 0 | 1;
+  account_deletion_requested_at: Date | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -52,6 +58,9 @@ export interface Subscription extends RowDataPacket {
   period_end: Date;
   cancel_at: Date | null;
   canceled_at: Date | null;
+  stripe_cancel_at_period_end: 0 | 1;
+  current_period_end: Date | null;
+  plan_access_until: Date | null;
   stripe_subscription_id: string | null;
   stripe_customer_id: string | null;
   credit_initial: number;
@@ -355,10 +364,10 @@ export async function listUser(limit = 50, offset = 0): Promise<User[]> {
   return rows;
 }
 
-export async function updateUser(
-  userId: ID,
-  fields: Partial<Pick<User, "email" | "password_hash">>
-) {
+export async function updateUser( 
+  userId: ID, 
+  fields: Partial<Pick<User, "email" | "password_hash">> 
+) { 
   /**
    * SQL (dynamic SET): UPDATE User SET ... WHERE id = ?
    */
@@ -377,6 +386,50 @@ export async function updateUser(
   const sql = `UPDATE \`User\` SET ${sets.join(", ")} WHERE id = ?`;
   values.push(userId);
   const [res] = await connexion.execute<ResultSetHeader>(sql, values);
+  return res.affectedRows === 1; 
+} 
+
+export async function updateUserMarketingConsent(
+  userId: ID,
+  marketingConsent: boolean,
+  at: Date = new Date()
+) {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE \`User\`
+     SET marketing_consent = ?, marketing_consent_updated_at = ?
+     WHERE id = ?`,
+    [marketingConsent ? 1 : 0, at, userId]
+  );
+  return res.affectedRows === 1;
+}
+
+export async function requestAccountDeletion(
+  userId: ID,
+  at: Date = new Date()
+) {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE \`User\`
+     SET account_deletion_requested = 1, account_deletion_requested_at = ?
+     WHERE id = ?`,
+    [at, userId]
+  );
+  return res.affectedRows === 1;
+}
+
+export async function anonymizeUserCredentials(params: {
+  userId: ID;
+  anonymizedEmail: string;
+  passwordHash: string;
+}) {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE \`User\`
+     SET email = ?, password_hash = ?
+     WHERE id = ?`,
+    [params.anonymizedEmail, params.passwordHash, params.userId]
+  );
   return res.affectedRows === 1;
 }
 
@@ -937,15 +990,28 @@ export async function getSubscriptionById(
   return rows[0] ?? null;
 }
 
-export async function updateSubscription(
-  subId: ID,
-  fields: Partial<
-    Pick<
-      Subscription,
-      "status" | "is_active" | "period_start" | "period_end" | "plan_id" | "stripe_subscription_id" | "stripe_customer_id" | "cancel_at" | "canceled_at" | "credit_initial" | "credit_used"
-    >
-  >
-) {
+export async function updateSubscription( 
+  subId: ID, 
+  fields: Partial< 
+    Pick< 
+      Subscription, 
+      "status"
+      | "is_active"
+      | "period_start"
+      | "period_end"
+      | "plan_id"
+      | "stripe_subscription_id"
+      | "stripe_customer_id"
+      | "cancel_at"
+      | "canceled_at"
+      | "stripe_cancel_at_period_end"
+      | "current_period_end"
+      | "plan_access_until"
+      | "credit_initial"
+      | "credit_used"
+    > 
+  > 
+) { 
   /**
    * SQL (dynamic SET): UPDATE Subscription SET ... WHERE id = ?
    */
@@ -985,14 +1051,26 @@ export async function updateSubscription(
     sets.push(`cancel_at = ?`);
     values.push(fields.cancel_at);
   }
-  if (fields.canceled_at !== undefined) {
-    sets.push(`canceled_at = ?`);
-    values.push(fields.canceled_at);
+  if (fields.canceled_at !== undefined) { 
+    sets.push(`canceled_at = ?`); 
+    values.push(fields.canceled_at); 
+  } 
+  if (fields.stripe_cancel_at_period_end !== undefined) {
+    sets.push(`stripe_cancel_at_period_end = ?`);
+    values.push(fields.stripe_cancel_at_period_end);
   }
-  if (fields.credit_initial !== undefined) {
-    sets.push(`credit_initial = ?`);
-    values.push(fields.credit_initial);
+  if (fields.current_period_end !== undefined) {
+    sets.push(`current_period_end = ?`);
+    values.push(fields.current_period_end);
   }
+  if (fields.plan_access_until !== undefined) {
+    sets.push(`plan_access_until = ?`);
+    values.push(fields.plan_access_until);
+  }
+  if (fields.credit_initial !== undefined) { 
+    sets.push(`credit_initial = ?`); 
+    values.push(fields.credit_initial); 
+  } 
   if (fields.credit_used !== undefined) {
     sets.push(`credit_used = ?`);
     values.push(fields.credit_used);
@@ -1220,6 +1298,9 @@ export async function getActiveUsageBillingPeriod(
 ): Promise<SubscriptionUsageBillingPeriod | null> {
   const connexion = await connectDb();
 
+  const user = await getUserById(userId);
+  const accountDeletionRequested = user ? user.account_deletion_requested === 1 : false;
+
   // Load active subscription first (we may need to roll the period forward).
   const [subs] = await connexion.execute<Subscription[]>(
     `SELECT * FROM Subscription WHERE user_id = ? AND is_active = TRUE LIMIT 1`,
@@ -1229,6 +1310,17 @@ export async function getActiveUsageBillingPeriod(
   if (!sub) return null;
 
   const hasStripe = Boolean(sub.stripe_subscription_id);
+  if (hasStripe) {
+    const allowed = isPremiumAccessAllowed({
+      subscriptionStatus: sub.status,
+      accountDeletionRequested,
+      planAccessUntil: sub.plan_access_until ? new Date(sub.plan_access_until) : null,
+      currentPeriodEnd: sub.current_period_end ? new Date(sub.current_period_end) : null,
+      periodEnd: new Date(sub.period_end),
+      now,
+    });
+    if (!allowed) return null;
+  }
   const subPeriodEnd = new Date(sub.period_end);
   if (!hasStripe && subPeriodEnd.getTime() <= now.getTime()) {
     // Free plan: roll forward by whole months until the current time is inside [start, end).

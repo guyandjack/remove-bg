@@ -1,0 +1,15 @@
+<mjml>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#ffffff" padding="24px">
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold">Votre préférence marketing a été mise à jour</mj-text>
+        <mj-text><strong>Nouveau statut :</strong> {{marketingStatusLabel}}</mj-text>
+        <mj-divider />
+        <mj-text font-size="12px" color="#6b7280">
+          Ce changement n’affecte que les communications marketing. Il n’annule pas votre abonnement et ne supprime jamais votre compte.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+

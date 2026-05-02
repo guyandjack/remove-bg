@@ -1,0 +1,17 @@
+<mjml>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#ffffff" padding="24px">
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold">Your subscription will stop at the end of the billing period</mj-text>
+        <mj-text>We confirm that your subscription cancellation request has been recorded.</mj-text>
+        <mj-text><strong>Access end date:</strong> {{planAccessUntil}}</mj-text>
+        <mj-text><strong>Credits remaining:</strong> {{creditsRemaining}}</mj-text>
+        <mj-divider />
+        <mj-text font-size="12px" color="#6b7280">
+          You can manage your subscription, marketing preferences and account from your dashboard.
+        </mj-text>
+        <mj-button background-color="#2563eb" href="{{dashboardUrl}}">Open dashboard</mj-button>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

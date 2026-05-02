@@ -190,6 +190,11 @@ Conclusion : pour une vraie prod, il faudrait au minimum :
 
 Le fichier `backend/.env` contient des **secrets** (clés API, tokens, mots de passe). Dans un contexte professionnel, ce fichier ne devrait généralement pas être commité dans le dépôt.
 
+## Docs backend
+
+- Annulation SaaS / consentement marketing / demande de suppression: `docs/backend-subscription-cancel.md`
+- Dashboard Billing & Account (UX + endpoints): `docs/dashboard-billing-account.md`
+
 À confirmer / à faire selon votre contexte :
 
 - Remplacer les valeurs sensibles par des placeholders.

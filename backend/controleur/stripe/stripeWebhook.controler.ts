@@ -126,8 +126,8 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       return res.status(200).send("ok");
     }
 
-    // invoice.paid — record invoice, increment customer's total_spent, ensure sub stays active
-    if (type === "invoice.paid") {
+    // invoice.paid / invoice.payment_succeeded — record invoice, increment customer's total_spent, ensure sub stays active
+    if (type === "invoice.paid" || type === "invoice.payment_succeeded") {
       console.log("check invoice paid est lancé");
       const inv = obj;
       const stripeCustomerId: string | undefined = inv.customer as string | undefined;
@@ -204,12 +204,17 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       // This is required for monthly credit quota renewal (credits are computed over [period_start, period_end)).
       if (stripeSubscriptionId && periodStart && periodEnd) {
         try {
-          await pool.execute<ResultSetHeader>(
-            `UPDATE Subscription
-             SET status = 'active', is_active = TRUE, period_start = ?, period_end = ?
-             WHERE stripe_subscription_id = ?`,
-            [periodStart, periodEnd, stripeSubscriptionId]
-          );
+          await pool.execute<ResultSetHeader>( 
+            `UPDATE Subscription 
+             SET status = 'active',
+                 is_active = TRUE,
+                 period_start = ?,
+                 period_end = ?,
+                 current_period_end = ?,
+                 plan_access_until = ?
+             WHERE stripe_subscription_id = ?`, 
+            [periodStart, periodEnd, periodEnd, periodEnd, stripeSubscriptionId] 
+          ); 
         } catch (syncErr: any) {
           logger.warn("[stripeWebhook] Failed to sync subscription period", {
             stripeSubscriptionId,
@@ -223,6 +228,61 @@ const stripeWebhook: RequestHandler = async (req, res) => {
     }
 
     // invoice.payment_failed — record or update invoice status, mark sub past_due
+    // customer.subscription.updated — sync status + cancel_at_period_end + current_period_end
+    if (type === "customer.subscription.updated") {
+      const sub = obj;
+      const stripeSubscriptionId: string | undefined = sub.id as string | undefined;
+      const stripeStatus: string = String(sub.status || "");
+      const cancelAtPeriodEnd: boolean = Boolean(sub.cancel_at_period_end);
+      const periodEnd = unixToDate(sub.current_period_end);
+      const periodStart = unixToDate(sub.current_period_start);
+
+      if (stripeSubscriptionId) {
+        const pool = await connectDb();
+
+        const mappedStatus = (() => {
+          if (stripeStatus === "active" && cancelAtPeriodEnd) return "canceling";
+          if (stripeStatus === "active") return "active";
+          if (stripeStatus === "past_due") return "past_due";
+          if (stripeStatus === "incomplete") return "incomplete";
+          if (stripeStatus === "trialing") return "trialing";
+          if (stripeStatus === "unpaid") return "unpaid";
+          if (stripeStatus === "paused") return "paused";
+          if (stripeStatus === "canceled") return "canceled";
+          return "active";
+        })();
+
+        try {
+          await pool.execute<ResultSetHeader>(
+            `UPDATE Subscription
+             SET status = ?,
+                 stripe_cancel_at_period_end = ?,
+                 current_period_end = ?,
+                 plan_access_until = ?,
+                 period_start = COALESCE(?, period_start),
+                 period_end = COALESCE(?, period_end)
+             WHERE stripe_subscription_id = ?`,
+            [
+              mappedStatus,
+              cancelAtPeriodEnd ? 1 : 0,
+              periodEnd,
+              periodEnd,
+              periodStart,
+              periodEnd,
+              stripeSubscriptionId,
+            ]
+          );
+        } catch (syncErr: any) {
+          logger.warn("[stripeWebhook] Failed to sync subscription.updated", {
+            stripeSubscriptionId,
+            message: syncErr?.message || String(syncErr),
+          });
+        }
+      }
+
+      return res.status(200).send("ok");
+    }
+
     if (type === "invoice.payment_failed") {
       console.log("check invoice payement failed est lancé");
       const inv = obj;
@@ -283,13 +343,21 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       const canceledAt = unixToDate(sub.canceled_at);
       const periodEnd = unixToDate(sub.current_period_end);
 
-      if (stripeSubscriptionId) {
-        const pool = await connectDb();
-        await pool.execute<ResultSetHeader>(
-          `UPDATE Subscription SET status = 'canceled', is_active = NULL, canceled_at = ?, period_end = ? WHERE stripe_subscription_id = ?`,
-          [canceledAt, periodEnd, stripeSubscriptionId]
-        );
-      }
+      if (stripeSubscriptionId) { 
+        const pool = await connectDb(); 
+        await pool.execute<ResultSetHeader>( 
+          `UPDATE Subscription
+           SET status = 'canceled',
+               is_active = NULL,
+               canceled_at = ?,
+               period_end = ?,
+               current_period_end = ?,
+               plan_access_until = ?,
+               stripe_cancel_at_period_end = 0
+           WHERE stripe_subscription_id = ?`, 
+          [canceledAt, periodEnd, periodEnd, periodEnd, stripeSubscriptionId] 
+        ); 
+      } 
       console.log("[stripeWebhook] customer.subscription.deleted processed for Stripe subscription", stripeSubscriptionId);
       return res.status(200).send("ok");
     }

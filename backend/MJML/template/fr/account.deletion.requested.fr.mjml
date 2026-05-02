@@ -1,0 +1,14 @@
+<mjml>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#ffffff" padding="24px">
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold">Demande de suppression enregistrée</mj-text>
+        <mj-text>Nous confirmons que votre demande de suppression de compte a été enregistrée.</mj-text>
+        <mj-text font-size="12px" color="#6b7280">
+          Pour des raisons légales, certaines données (factures/paiements et logs minimaux) peuvent être conservées.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+

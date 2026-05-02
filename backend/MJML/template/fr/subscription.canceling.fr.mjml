@@ -1,0 +1,17 @@
+<mjml>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#ffffff" padding="24px">
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold">Votre abonnement s’arrêtera à la fin de la période de facturation</mj-text>
+        <mj-text>Nous confirmons que votre demande d’annulation a bien été enregistrée.</mj-text>
+        <mj-text><strong>Date de fin d’accès :</strong> {{planAccessUntil}}</mj-text>
+        <mj-text><strong>Crédits restants :</strong> {{creditsRemaining}}</mj-text>
+        <mj-divider />
+        <mj-text font-size="12px" color="#6b7280">
+          Vous pouvez gérer votre abonnement, vos préférences marketing et votre compte depuis votre tableau de bord.
+        </mj-text>
+        <mj-button background-color="#2563eb" href="{{dashboardUrl}}">Ouvrir le tableau de bord</mj-button>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

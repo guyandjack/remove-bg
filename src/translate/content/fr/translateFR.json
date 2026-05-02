@@ -684,5 +684,76 @@
   "servicePageTitle": {
     "title_h1": "Testez la qualité des services",
     "title_h1_loged": "Utilisez nos services"
+  },
+
+  "dashboardPage": {
+    "title": "Tableau de bord",
+    "subtitle": "Gérez votre compte et vos abonnements.",
+    "billing": {
+      "title": "Facturation & Compte",
+      "description": "Gérez votre abonnement, vos préférences marketing et votre compte.",
+      "loadError": "Impossible de charger l’état facturation/compte. Veuillez rafraîchir.",
+      "subscription": {
+        "title": "Abonnement",
+        "statusLabel": "Statut",
+        "statusUnknown": "inconnu",
+        "accessUntilLabel": "Accès jusqu’au",
+        "changeCta": "Changer d'abonnement",
+        "cancelCta": "Annuler l'abonnement",
+        "resumeCta": "Reprendre l'abonnement",
+        "cancelModalTitle": "Confirmer l’annulation",
+        "cancelModalBody": "Votre abonnement s’arrêtera à la fin de la période de facturation en cours. Vous conservez l’accès jusqu’à cette date.",
+        "cancelModalClose": "Fermer",
+        "cancelModalConfirm": "Confirmer l’annulation",
+        "cancelHelp": "Votre abonnement restera actif jusqu’au {{date}}. Aucun paiement ne sera effectué après cette date.",
+        "resumeHelp": "Réactiver les paiements mensuels pour assurer la continuité des services.",
+        "resumeSuccess": "Abonnement réactivé.",
+        "resumeError": "Impossible de réactiver l’abonnement."
+      },
+      "marketing": {
+        "title": "Préférences marketing",
+        "currentLabel": "État actuel",
+        "active": "activé",
+        "inactive": "désactivé",
+        "enableCta": "Activer",
+        "disableCta": "Désactiver",
+        "emailingFalse": "WizPix ne vous tiendra pas infomé sur les promotions et nouveaux services",
+        "emailingTrue": "WizPix vous tiendra infomé sur les promotions et nouveaux services",
+        "success": "Préférence marketing mise à jour.",
+        "error": "Impossible de mettre à jour la préférence marketing."
+      },
+      "account": {
+        "title": "Compte",
+        "deletionRequested": "Suppression demandée.",
+        "deletionNotRequested": "Aucune suppression demandée.",
+        "deletionWarning": "La suppression désactive l’accès immédiatement. Cette action est irréversible.",
+        "typeToConfirm": "Tapez SUPPRIMER pour confirmer",
+        "deleteCta": "Supprimer mon compte",
+        "deletionSuccess": "Demande de suppression enregistrée. Déconnexion en cours.",
+        "deletionError": "Impossible de demander la suppression du compte."
+      }
+    },
+    "stats": {
+      "creditsRemainingTitle": "Crédits restants",
+      "creditsUsedTitle": "Crédits utilisés",
+      "planTitle": "Abonnement",
+      "billingPeriod": "Période de facturation en cours"
+    },
+    "subscription": {
+      "title": "Gestion de l'abonnement",
+      "description": "Changez d'offre ou annulez votre abonnement.",
+      "changeCta": "Changer d'abonnement",
+      "cancelCta": "Annuler l'abonnement",
+      "cancelSuccess": "Demande d'annulation enregistrée.",
+      "cancelError": "Impossible d’annuler l’abonnement. Veuillez réessayer."
+    },
+    "password": {
+      "title": "Mot de passe",
+      "description": "Recevez un email pour réinitialiser votre mot de passe.",
+      "emailLabel": "Email",
+      "submitCta": "Envoyer le lien de réinitialisation",
+      "success": "Si un compte existe, un email a été envoyé.",
+      "error": "Erreur lors de la demande. Réessayez."
+    }
   }
 }

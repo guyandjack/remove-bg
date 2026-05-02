@@ -190,10 +190,10 @@ const NavBar = () => {
     }
   };
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (checkoutHandledRef.current) return;
-    const params = new URLSearchParams(window.location.search);
+  useEffect(() => { 
+    if (typeof window === "undefined") return; 
+    if (checkoutHandledRef.current) return; 
+    const params = new URLSearchParams(window.location.search); 
     const statusFlag = params.get("userValide");
     if (!statusFlag) return;
     checkoutHandledRef.current = true;
@@ -210,7 +210,8 @@ const NavBar = () => {
         window.clearTimeout(toastTimeoutRef.current);
       }
     };
-  }, []);
+  }, []); 
+
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
