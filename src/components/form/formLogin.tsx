@@ -63,8 +63,8 @@ const FormLogin = () => {
   } = useForm<FormValues>({
     mode: "onTouched",
     defaultValues: {
-      email: "guillaume-d@tutanota.com",
-      password: "qwertzuioP!789"
+      email: "",
+      password: ""
       
     },
   });
@@ -306,13 +306,13 @@ const FormLogin = () => {
 
                 <div class="mt-5 h-[1px] w-full bg-gray-500 "></div>
 
-                <div className="relative w-full flex flex-col justify-center items-center mt-4">
+               {/*  <div className="relative w-full flex flex-col justify-center items-center mt-4">
                   <BtnGoogleLogin
                     text={t("formSignUp.btnGoogle")}
                     disabled={isLoader || status !== "idle" || true}
                   />
                   {isLoader ? <Loader top="top-20" /> : null}
-                </div>
+                </div> */}
                 <div
                   className={`btn w-100 transition-all duration-500 transform 
           ${status === "idle" ? "opacity-0 translate-y-0" : ""}
@@ -400,13 +400,13 @@ const FormLogin = () => {
                 </div>
 
                 <div className="relative flex flex-col gap-3">
-                  <button
+                  { <button
                     type="submit"
                     className="btn btn-primary w-full"
                     disabled={isForgotSubmitting}
                   >
                     {t("formForgot.btnSubmit")}
-                  </button>
+                  </button> }
                   <button
                     type="button"
                     className="btn btn-ghost w-full"

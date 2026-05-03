@@ -6,8 +6,10 @@
   "main": "server.ts",
   "scripts": {
     "test": "node --experimental-strip-types tests/run.ts",
-    "dev": "nodemon --watch backend --ext js,ts,tsx --exec tsx backend/server.ts",
-    "start": "tsx backend/server.ts"
+    "dev": "tsx backend/server.ts",
+    "build": "tsc",
+    "start": "node dist/backend/server.js"
+    
   },
   "keywords": [],
   "author": "helveclick",
@@ -53,6 +55,7 @@
     "@types/express": "^5.0.3",
     "@types/morgan": "^1.9.10",
     "nodemon": "^3.1.10",
-    "tsx": "^4.20.6"
+    "tsx": "^4.20.6",
+    "typescript": "^6.0.3"
   }
 }

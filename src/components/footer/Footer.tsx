@@ -1,6 +1,13 @@
 //import des hooks
 import { useTranslation } from "react-i18next";
-import {themeSignal} from "@/stores/theme";
+import { themeSignal } from "@/stores/theme";
+
+//import des signaux de connection
+import {
+  sessionSignal,
+  initSessionFromLocalStorage,
+  setSessionFromApiResponse,
+} from "@/stores/session";
 
 //import des composant enfant
 import { FooterBottom } from "./FooterBottom";
@@ -22,6 +29,7 @@ import shape_2 from "@/assets/images/shape-3.svg";
 
 const Footer = () => {
   const { t } = useTranslation();
+  const isLoged = sessionSignal.value?.authentified;
 
   //Content title footer
   const services = t(`footer.services`);
@@ -52,11 +60,16 @@ const Footer = () => {
           <ul>
             {navBarContent.map((link) => {
               const label = t(`navBar.${link.key}`);
-              return link.key !== "contact" ? (
+              return link.key === "home" ||
+                link.key === "pricing" ||
+                link.key === "service" ||
+                (link.key === "signup" && !isLoged) ||
+                (link.key === "login" && !isLoged) ||
+                (link.key === "dashboard" && isLoged) ? (
                 <li key={link.href}>
                   <a
                     data-id={link.href}
-                    className="pb-[5px] text-lg hover:text-primary"
+                    className="p-[5px] text-base hover:text-primary"
                     href={link.href}
                     onClick={(e) => {
                       setActiveLink(e);
@@ -80,7 +93,7 @@ const Footer = () => {
                 <li key={link.href}>
                   <a
                     data-id={link.href}
-                    className="py-[5] text-lg hover:text-primary"
+                    className="p-[5] text-base hover:text-primary"
                     href={link.href}
                     onClick={(e) => {
                       setActiveLink(e);
@@ -105,7 +118,7 @@ const Footer = () => {
                 <li key={link.href}>
                   <a
                     data-id={link.href}
-                    className="pb-[5px] text-lg hover:text-primary"
+                    className="p-[5px] text-base hover:text-primary"
                     href={link.href}
                     onClick={(e) => {
                       setActiveLink(e);

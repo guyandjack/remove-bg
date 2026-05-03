@@ -102,9 +102,9 @@ const FormSignUp = () => {
   } = useForm<FormValues>({
     mode: "onTouched",
     defaultValues: {
-      email: "guillaume-d@tutanota.com",
-      password: "qwertzuioP!789",
-      confirm: "qwertzuioP!789",
+      email: "",
+      password: "",
+      confirm: "",
       lang: lang,
       plan: plan,
       currency: currency,
@@ -409,7 +409,7 @@ const FormSignUp = () => {
 
                 <div class="mt-5 h-[1px] w-full bg-gray-500 "></div>
 
-                <div className="relative w-full flex flex-col justify-center items-center mt-4">
+                {/* <div className="relative w-full flex flex-col justify-center items-center mt-4">
                   <BtnGoogleLogin
                     text={t("formSignUp.btnGoogle")}
                     disabled={
@@ -417,7 +417,7 @@ const FormSignUp = () => {
                     }
                   />
                   {isLoader ? <Loader top="top-20" /> : null}
-                </div>
+                </div> */}
                 <div
                   className={`btn w-100 transition-all duration-500 transform 
           ${status === "idle" ? "opacity-0 translate-y-0" : ""}
