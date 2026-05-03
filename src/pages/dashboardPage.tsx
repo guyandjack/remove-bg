@@ -1,17 +1,19 @@
 
 import { initSessionFromLocalStorage, sessionSignal } from "@/stores/session";
 import { api } from "@/utils/axiosConfig";
-import { langSignal } from "@/utils/langSignal";
 import { isAuthentified } from "@/utils/request/isAuthentified";
 import { useEffect, useState } from "preact/hooks"; 
 import { useTranslation } from "react-i18next"; 
 import { navigateWithLink } from "@/utils/navigateWithLink"; 
+import { PriceCard } from "@/components/card/priceCard";
+import { FormResetPassword } from "@/components/form/FormResetPassword";
  
 //import des fonctions 
 import { setActiveLink } from "@/utils/setActiveLink"; 
 import { setDocumentTitle } from "@/utils/setDocumentTitle"; 
 
-type SubmitState = "idle" | "loading" | "success" | "error";
+type SubmitState = "idle" | "loading" | "success" | "error"; 
+type CurrencyCode = "CHF" | "EUR" | "USD";
 type BillingAccountState = {
   subscription: null | {
     subscription_status: string;
@@ -19,6 +21,9 @@ type BillingAccountState = {
     plan_access_until_iso: string | null;
     plan_access_until_date: string | null;
     plan_name: string | null;
+    plan_code?: string | null;
+    pending_change_type?: string | null;
+    pending_change_effective_at?: string | null;
   };
   marketing: {
     marketing_consent: boolean;
@@ -35,8 +40,6 @@ type PropsPage = {
 };
 
 const DashboardPage = ({routeKey}: PropsPage) => {
-  const [email, setEmail] = useState<string>("");
-  const [pwSubmitting, setPwSubmitting] = useState<SubmitState>("idle");
   const [cancelSubmitting, setCancelSubmitting] = useState<SubmitState>("idle");
   const [cancelMessage, setCancelMessage] = useState<string | null>(null);
   const [billingSubmitting, setBillingSubmitting] = useState<SubmitState>("idle");
@@ -46,7 +49,31 @@ const DashboardPage = ({routeKey}: PropsPage) => {
   const [deletionSubmitting, setDeletionSubmitting] = useState<SubmitState>("idle");
   const [deletionMessage, setDeletionMessage] = useState<string | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState<string>("");
+  const [planModalStep, setPlanModalStep] = useState<"select" | "confirm">("select");
+  const [planChangeMode, setPlanChangeMode] = useState<"upgrade" | "downgrade">("upgrade");
+  const [availablePlans, setAvailablePlans] = useState<any[]>([]);
+  const [selectedPlan, setSelectedPlan] = useState<any | null>(null);
+  const [planChangeSubmitting, setPlanChangeSubmitting] = useState<SubmitState>("idle");
+  const [planChangeMessage, setPlanChangeMessage] = useState<string | null>(null);
   const { t } = useTranslation();
+
+  const currency: CurrencyCode = "CHF";
+  const textLangCard = {
+    tag: t("priceCard.tag"),
+    remove_bg: t("priceCard.remove_bg"),
+    conversion: t("priceCard.conversion"),
+    price: t("priceCard.price"),
+    credit: t("priceCard.credit"),
+    conversions_suffix: t("priceCard.conversions_suffix"),
+    unlimited: t("priceCard.unlimited"),
+    size_max: t("priceCard.size_max"),
+    tools: t("priceCard.tools"),
+    gomme_magique: t("priceCard.gomme_magique"),
+    Image_pexels: t("priceCard.img_pexels"),
+    api: t("priceCard.api"),
+    bundle: t("priceCard.bundle"),
+    subscribe: t("dashboardPage.billing.subscription.selectPlanCta"),
+  };
 
   useEffect(() => {
     setActiveLink();
@@ -76,7 +103,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
         if (sessionSignal?.value && sessionSignal.value.authentified !== true) {
           sessionSignal.value = { ...sessionSignal.value, authentified: true } as any;
         }
-        setEmail(sessionSignal?.value?.user?.email || "");
+
 
         // Fetch billing/account state for the dashboard (subscription/marketing/account flags)
         setBillingSubmitting("loading");
@@ -111,21 +138,6 @@ const DashboardPage = ({routeKey}: PropsPage) => {
   const creditsRemaining = sessionSignal?.value?.credits?.remaining_last_24h ?? 0;
   const creditsUsed = sessionSignal?.value?.credits?.used_last_24h ?? 0;
   const planName = sessionSignal?.value?.plan?.name || sessionSignal?.value?.plan?.code || "-";
-
-  const requestPasswordReset = async (e: Event) => {
-    e.preventDefault();
-    if (!email) return;
-    setPwSubmitting("loading");
-    try {
-      const lang = langSignal.value as "fr" | "en" | "de" | "it";
-      await api.post("/api/forgot", { email, lang });
-      setPwSubmitting("success");
-    } catch (e) {
-      setPwSubmitting("error");
-    } finally {
-      setTimeout(() => setPwSubmitting("idle"), 2000);
-    }
-  };
 
   const handleCancelSubscription = async () => {
     setCancelSubmitting("loading");
@@ -240,6 +252,87 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       setDeletionMessage(t("dashboardPage.billing.account.deletionError"));
     } finally {
       setTimeout(() => setDeletionSubmitting("idle"), 2500);
+    }
+  };
+
+  const openPlanChangeModal = async () => {
+    setPlanModalStep("select");
+    setSelectedPlan(null);
+    setPlanChangeMessage(null);
+    setPlanChangeSubmitting("idle");
+    try {
+      const resp = await api.get("/api/plan/option");
+      const plans = resp?.data?.plans;
+      if (Array.isArray(plans)) {
+        setAvailablePlans(plans.filter((p) => p && p.active !== false));
+      } else {
+        setAvailablePlans([]);
+      }
+    } catch {
+      setAvailablePlans([]);
+    } finally {
+      const dialog = document.getElementById("plan_change_modal") as HTMLDialogElement | null;
+      dialog?.showModal?.();
+    }
+  };
+
+  const closePlanChangeModal = () => {
+    setPlanModalStep("select");
+    setSelectedPlan(null);
+    setPlanChangeMessage(null);
+    setPlanChangeSubmitting("idle");
+    const dialog = document.getElementById("plan_change_modal") as HTMLDialogElement | null;
+    dialog?.close?.();
+  };
+
+  const currentPlanCode =
+    billingState?.subscription?.plan_code ||
+    sessionSignal?.value?.plan?.code ||
+    "";
+
+  const currentPlan = availablePlans.find((p) => p?.name === currentPlanCode) || null;
+  const filteredPlans = (() => {
+    const base = availablePlans.filter((p) => p?.name && p?.name !== "free");
+    if (!currentPlan) return base;
+    if (planChangeMode === "upgrade") {
+      return base.filter((p) => Number(p.price) > Number(currentPlan.price));
+    }
+    return base.filter((p) => Number(p.price) < Number(currentPlan.price));
+  })();
+
+  const confirmPlanChange = async () => {
+    if (!selectedPlan) return;
+    setPlanChangeSubmitting("loading");
+    setPlanChangeMessage(null);
+    try {
+      const resp = await api.post("/api/subscription/change-plan", {
+        plan_code: selectedPlan.name,
+        currency: currency,
+      });
+      if (resp?.data?.success !== true) throw new Error("change_plan_failed");
+      if (resp?.data?.redirectUrl && typeof resp.data.redirectUrl === "string") {
+        setPlanChangeSubmitting("success");
+        setPlanChangeMessage(resp?.data?.message || t("dashboardPage.billing.subscription.checkoutRedirect"));
+        setTimeout(() => {
+          window.location.assign(resp.data.redirectUrl);
+        }, 400);
+        return;
+      }
+      setPlanChangeSubmitting("success");
+      setPlanChangeMessage(resp?.data?.message || t("dashboardPage.billing.subscription.changePlanSuccess"));
+      try {
+        const st = await api.get("/api/account/billing-account");
+        if (st?.data?.success) setBillingState(st.data as any);
+      } catch {}
+      setTimeout(() => {
+        const dialog = document.getElementById("plan_change_modal") as HTMLDialogElement | null;
+        dialog?.close?.();
+      }, 800);
+    } catch {
+      setPlanChangeSubmitting("error");
+      setPlanChangeMessage(t("dashboardPage.billing.subscription.changePlanError"));
+    } finally {
+      setTimeout(() => setPlanChangeSubmitting("idle"), 2500);
     }
   };
 
@@ -366,9 +459,9 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                   ) : null}
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <a href="/pricing" className="btn btn-sm btn-primary">
+                  <button className="btn btn-sm btn-primary" onClick={openPlanChangeModal}>
                     {t("dashboardPage.billing.subscription.changeCta")}
-                  </a>
+                  </button>
 
                   {billingState?.subscription?.subscription_status ===
                   "canceling" ? (
@@ -595,6 +688,123 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                 <button>close</button>
               </form>
             </dialog>
+
+            {/* Plan change modal */}
+            <dialog id="plan_change_modal" className="modal">
+              <div className="modal-box max-w-5xl">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-bold text-lg">{t("dashboardPage.billing.subscription.changeModalTitle")}</h3>
+                  <button type="button" className="btn btn-sm btn-ghost" onClick={closePlanChangeModal}>
+                    {t("dashboardPage.billing.subscription.changeModalClose")}
+                  </button>
+                </div>
+                <p className="py-2 text-base-content/70">{t("dashboardPage.billing.subscription.changeModalBody")}</p>
+
+                <div className="tabs tabs-boxed mt-3">
+                  <button
+                    className={`tab ${planChangeMode === "upgrade" ? "tab-active" : ""}`}
+                    onClick={() => setPlanChangeMode("upgrade")}
+                    type="button"
+                  >
+                    {t("dashboardPage.billing.subscription.upgradeTab")}
+                  </button>
+                  <button
+                    className={`tab ${planChangeMode === "downgrade" ? "tab-active" : ""}`}
+                    onClick={() => setPlanChangeMode("downgrade")}
+                    type="button"
+                  >
+                    {t("dashboardPage.billing.subscription.downgradeTab")}
+                  </button>
+                </div>
+
+                {planModalStep === "select" ? (
+                  <div className="mt-4">
+                    <p className="text-sm text-base-content/70">
+                      {planChangeMode === "upgrade"
+                        ? t("dashboardPage.billing.subscription.upgradeInfo")
+                        : t("dashboardPage.billing.subscription.downgradeInfo")}
+                    </p>
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {filteredPlans.map((p) => (
+                        <div key={p.name} className="flex justify-center">
+                          <PriceCard
+                            lang={textLangCard as any}
+                            option={p}
+                            currency={currency}
+                            onSelect={() => {
+                              setSelectedPlan(p);
+                              setPlanModalStep("confirm");
+                            }}
+                            isCurrentPlan={p.name === currentPlanCode}
+                            currentBadgeLabel={t("dashboardPage.billing.subscription.currentBadge")}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    {filteredPlans.length === 0 ? (
+                      <p className="text-sm text-base-content/70 mt-4">
+                        {t("dashboardPage.billing.subscription.noPlanAvailable")}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                {planModalStep === "confirm" && selectedPlan ? (
+                  <div className="mt-4">
+                    <div className="rounded-xl border border-base-300 p-4">
+                      <p className="font-semibold">
+                        {t("dashboardPage.billing.subscription.confirmTitle")}{" "}
+                        <span className="capitalize">{selectedPlan.name}</span>
+                      </p>
+                      <p className="text-sm text-base-content/70 mt-2">
+                        {planChangeMode === "upgrade"
+                          ? t("dashboardPage.billing.subscription.confirmUpgrade")
+                          : t("dashboardPage.billing.subscription.confirmDowngrade")}
+                      </p>
+                    </div>
+                    {planChangeMessage ? (
+                      <div
+                        role="alert"
+                        className={`alert mt-3 ${
+                          planChangeSubmitting === "error"
+                            ? "alert-error"
+                            : planChangeSubmitting === "success"
+                            ? "alert-success"
+                            : "alert-info"
+                        }`}
+                      >
+                        <span>{planChangeMessage}</span>
+                      </div>
+                    ) : null}
+                    <div className="modal-action">
+                      <button
+                        className="btn btn-ghost"
+                        type="button"
+                        onClick={() => setPlanModalStep("select")}
+                        disabled={planChangeSubmitting === "loading"}
+                      >
+                        {t("dashboardPage.billing.subscription.back")}
+                      </button>
+                      <button
+                        className="btn btn-primary"
+                        type="button"
+                        onClick={confirmPlanChange}
+                        disabled={planChangeSubmitting === "loading"}
+                      >
+                        {planChangeSubmitting === "loading" ? (
+                          <span className="loading loading-spinner loading-sm" />
+                        ) : null}
+                        {t("dashboardPage.billing.subscription.confirm")}
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+
+                <form method="dialog" className="modal-backdrop">
+                  <button>close</button>
+                </form>
+              </div>
+            </dialog>
           </div>
         </section>
 
@@ -604,45 +814,9 @@ const DashboardPage = ({routeKey}: PropsPage) => {
             <p className="text-base-content/70">
               {t("dashboardPage.password.description")}
             </p>
-            <form
-              className="mt-2 flex flex-col gap-3"
-              onSubmit={requestPasswordReset as any}
-            >
-              <label className="form-control w-full">
-                <div className="label">
-                  <span className="label-text">
-                    {t("dashboardPage.password.emailLabel")}
-                  </span>
-                </div>
-                <input
-                  type="email"
-                  className="input input-bordered w-full"
-                  value={email}
-                  onInput={(e: any) => setEmail(e.currentTarget.value)}
-                  required
-                />
-              </label>
-              <button
-                type="submit"
-                className="btn btn-success"
-                disabled={pwSubmitting === "loading"}
-              >
-                {pwSubmitting === "loading" ? (
-                  <span className="loading loading-spinner loading-sm" />
-                ) : null}
-                {t("dashboardPage.password.submitCta")}
-              </button>
-            </form>
-            {pwSubmitting === "success" ? (
-              <div role="alert" className="alert alert-success mt-3">
-                <span>{t("dashboardPage.password.success")}</span>
-              </div>
-            ) : null}
-            {pwSubmitting === "error" ? (
-              <div role="alert" className="alert alert-error mt-3">
-                <span>{t("dashboardPage.password.error")}</span>
-              </div>
-            ) : null}
+            <div className="mt-3">
+              <FormResetPassword mode="dashboard" embedded />
+            </div>
           </div>
         </section>
       </div>

@@ -5,7 +5,12 @@ import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { connectDb } from "../../DB/poolConnexion/poolConnexion.ts";
 import {
   markStripeCheckoutSessionFailed,
+  getPlanByStripePriceId,
+  getPlanByCode,
+  tryMarkWebhookEventReceived,
+  markWebhookEventProcessed,
 } from "../../DB/queriesSQL/queriesSQL.ts";
+import { planOption } from "../../data/planOption.ts";
 import { logger } from "../../logger.ts";
 import {
   CheckoutSessionPendingError,
@@ -92,19 +97,50 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       }
     }
 
-    const type = event?.type;
-    const obj = event?.data?.object || {};
+    const type = event?.type; 
+    const obj = event?.data?.object || {}; 
+    const eventId: string | null = typeof event?.id === "string" ? event.id : null;
 
-    // Small helpers
-    const unixToDate = (v: any): Date | null => (typeof v === "number" ? new Date(v * 1000) : v ? new Date(v) : null);
+    // Idempotency: do not process the same Stripe event twice.
+    if (eventId && type) {
+      try {
+        const { inserted } = await tryMarkWebhookEventReceived({
+          id: eventId,
+          eventType: type,
+          receivedAt: new Date(),
+        });
+        if (!inserted) {
+          logger.info("[stripeWebhook] Duplicate event ignored", { eventId, type });
+          return res.status(200).send("ok");
+        }
+      } catch (err: any) {
+        logger.error("[stripeWebhook] Failed to mark event received", {
+          eventId,
+          type,
+          message: err?.message || String(err),
+        });
+        return res.status(200).send("ok");
+      }
+    }
+
+    // Small helpers 
+    const unixToDate = (v: any): Date | null => (typeof v === "number" ? new Date(v * 1000) : v ? new Date(v) : null); 
+    const returnOk = async () => {
+      if (eventId) {
+        try {
+          await markWebhookEventProcessed({ id: eventId });
+        } catch {}
+      }
+      return res.status(200).send("ok");
+    };
 
     if (type === "checkout.session.completed") {
       console.log("check session.completed est lancé");
-      currentCheckoutSessionId = typeof obj?.id === "string" ? obj.id : null;
-      if (!currentCheckoutSessionId) {
-        logger.warn("[stripeWebhook] Missing session id on checkout.session.completed event");
-        return res.status(200).send("ok");
-      }
+      currentCheckoutSessionId = typeof obj?.id === "string" ? obj.id : null; 
+      if (!currentCheckoutSessionId) { 
+        logger.warn("[stripeWebhook] Missing session id on checkout.session.completed event"); 
+        return await returnOk(); 
+      } 
       try {
         await finalizeCheckoutSessionFromStripeSession({
           session: obj as Stripe.Checkout.Session,
@@ -112,19 +148,19 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         });
       } catch (sessionErr) {
         if (sessionErr instanceof CheckoutSessionPendingError) {
-          logger.warn(
-            `[stripeWebhook] session ${currentCheckoutSessionId} pending: ${sessionErr.message}`
-          );
-          return res.status(200).send("ok");
-        }
-        throw sessionErr;
-      }
+          logger.warn( 
+            `[stripeWebhook] session ${currentCheckoutSessionId} pending: ${sessionErr.message}` 
+          ); 
+          return await returnOk(); 
+        } 
+        throw sessionErr; 
+      } 
       console.log(
         "[stripeWebhook] checkout.session.completed processed for",
         obj?.customer_details?.email || obj?.customer_email || "unknown email"
       );
-      return res.status(200).send("ok");
-    }
+      return await returnOk(); 
+    } 
 
     // invoice.paid / invoice.payment_succeeded — record invoice, increment customer's total_spent, ensure sub stays active
     if (type === "invoice.paid" || type === "invoice.payment_succeeded") {
@@ -174,10 +210,10 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         planId = r?.plan_id || null;
         userId = userId || r?.user_id || null;
       }
-      if (!userId) {
-        console.log("[stripeWebhook] invoice.paid ignored: unable to resolve user");
-        return res.status(200).send("ok");
-      }
+      if (!userId) { 
+        console.log("[stripeWebhook] invoice.paid ignored: unable to resolve user"); 
+        return await returnOk(); 
+      } 
 
       // Insert invoice (idempotent by uniq_stripe_invoice)
       try {
@@ -223,9 +259,9 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         }
       }
 
-      console.log("[stripeWebhook] invoice.paid stored for user", userId);
-      return res.status(200).send("ok");
-    }
+      console.log("[stripeWebhook] invoice.paid stored for user", userId); 
+      return await returnOk(); 
+    } 
 
     // invoice.payment_failed — record or update invoice status, mark sub past_due
     // customer.subscription.updated — sync status + cancel_at_period_end + current_period_end
@@ -236,6 +272,10 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       const cancelAtPeriodEnd: boolean = Boolean(sub.cancel_at_period_end);
       const periodEnd = unixToDate(sub.current_period_end);
       const periodStart = unixToDate(sub.current_period_start);
+      const priceId: string | undefined =
+        sub?.items?.data?.[0]?.price?.id ||
+        sub?.items?.data?.[0]?.price ||
+        undefined;
 
       if (stripeSubscriptionId) {
         const pool = await connectDb();
@@ -253,25 +293,69 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         })();
 
         try {
-          await pool.execute<ResultSetHeader>(
-            `UPDATE Subscription
-             SET status = ?,
-                 stripe_cancel_at_period_end = ?,
-                 current_period_end = ?,
-                 plan_access_until = ?,
-                 period_start = COALESCE(?, period_start),
-                 period_end = COALESCE(?, period_end)
-             WHERE stripe_subscription_id = ?`,
-            [
-              mappedStatus,
-              cancelAtPeriodEnd ? 1 : 0,
-              periodEnd,
-              periodEnd,
-              periodStart,
-              periodEnd,
-              stripeSubscriptionId,
-            ]
-          );
+          let planIdToSet: string | null = null;
+          if (priceId && typeof priceId === "string") {
+            // First try DB mapping (Plan.stripe_price_id). If not set, fallback to planOption mapping (multi-currency).
+            const plan = await getPlanByStripePriceId(priceId);
+            planIdToSet = plan?.id ?? null;
+            if (!planIdToSet) {
+              const cfg = planOption.find((p) =>
+                Object.values(p.stripePriceIds || {}).includes(priceId)
+              );
+              if (cfg?.name) {
+                const byCode = await getPlanByCode(cfg.name);
+                planIdToSet = byCode?.id ?? null;
+              }
+            }
+          }
+
+          if (planIdToSet) {
+            await pool.execute<ResultSetHeader>(
+              `UPDATE Subscription
+               SET status = ?,
+                   stripe_cancel_at_period_end = ?,
+                   current_period_end = ?,
+                   plan_access_until = ?,
+                   period_start = COALESCE(?, period_start),
+                   period_end = COALESCE(?, period_end),
+                   plan_id = ?,
+                   pending_plan_id = NULL,
+                   pending_change_type = NULL,
+                   pending_change_effective_at = NULL,
+                   stripe_schedule_id = NULL
+               WHERE stripe_subscription_id = ?`,
+              [
+                mappedStatus,
+                cancelAtPeriodEnd ? 1 : 0,
+                periodEnd,
+                periodEnd,
+                periodStart,
+                periodEnd,
+                planIdToSet,
+                stripeSubscriptionId,
+              ]
+            );
+          } else {
+            await pool.execute<ResultSetHeader>(
+              `UPDATE Subscription
+               SET status = ?,
+                   stripe_cancel_at_period_end = ?,
+                   current_period_end = ?,
+                   plan_access_until = ?,
+                   period_start = COALESCE(?, period_start),
+                   period_end = COALESCE(?, period_end)
+               WHERE stripe_subscription_id = ?`,
+              [
+                mappedStatus,
+                cancelAtPeriodEnd ? 1 : 0,
+                periodEnd,
+                periodEnd,
+                periodStart,
+                periodEnd,
+                stripeSubscriptionId,
+              ]
+            );
+          }
         } catch (syncErr: any) {
           logger.warn("[stripeWebhook] Failed to sync subscription.updated", {
             stripeSubscriptionId,
@@ -280,8 +364,8 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         }
       }
 
-      return res.status(200).send("ok");
-    }
+      return await returnOk(); 
+    } 
 
     if (type === "invoice.payment_failed") {
       console.log("check invoice payement failed est lancé");
@@ -330,10 +414,10 @@ const stripeWebhook: RequestHandler = async (req, res) => {
           `UPDATE Subscription SET status = 'past_due' WHERE stripe_subscription_id = ?`,
           [stripeSubscriptionId]
         );
-      }
-      console.log("[stripeWebhook] invoice.payment_failed recorded for user", userId ?? "unknown");
-      return res.status(200).send("ok");
-    }
+      } 
+      console.log("[stripeWebhook] invoice.payment_failed recorded for user", userId ?? "unknown"); 
+      return await returnOk(); 
+    } 
 
     // customer.subscription.deleted — cancel local subscription
     if (type === "customer.subscription.deleted") {
@@ -357,14 +441,14 @@ const stripeWebhook: RequestHandler = async (req, res) => {
            WHERE stripe_subscription_id = ?`, 
           [canceledAt, periodEnd, periodEnd, periodEnd, stripeSubscriptionId] 
         ); 
-      } 
-      console.log("[stripeWebhook] customer.subscription.deleted processed for Stripe subscription", stripeSubscriptionId);
-      return res.status(200).send("ok");
-    }
+      }  
+      console.log("[stripeWebhook] customer.subscription.deleted processed for Stripe subscription", stripeSubscriptionId); 
+      return await returnOk(); 
+    } 
 
-    console.log("[stripeWebhook] Unhandled event type received:", type);
-    return res.status(200).send("ok");
-  } catch (err: any) {
+    console.log("[stripeWebhook] Unhandled event type received:", type); 
+    return await returnOk(); 
+  } catch (err: any) { 
     console.error("stripeWebhook error:", err?.message || err);
     if (currentCheckoutSessionId) {
       try {

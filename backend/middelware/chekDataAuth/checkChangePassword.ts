@@ -1,9 +1,13 @@
 import { z } from "zod";
 import type { Request, Response, NextFunction } from "express";
 
-export const resetPasswordSchema = z
+export const changePasswordSchema = z
   .object({
-    token: z.string({ required_error: "token requis" }).min(10, "token invalide").trim(),
+    current_password: z
+      .string({ required_error: "Mot de passe actuel requis" })
+      .min(1, "Mot de passe actuel requis")
+      .max(72, "Max 72 caracteres")
+      .trim(),
     password: z
       .string({ required_error: "Mot de passe requis" })
       .max(72, "Max 72 caracteres")
@@ -19,10 +23,10 @@ export const resetPasswordSchema = z
     message: "Les mots de passe ne correspondent pas",
   });
 
-export type ResetPasswordDTO = z.infer<typeof resetPasswordSchema>;
+export type ChangePasswordDTO = z.infer<typeof changePasswordSchema>;
 
-const checkResetPassword = (req: Request, res: Response, next: NextFunction) => {
-  const result = resetPasswordSchema.safeParse(req.body);
+const checkChangePassword = (req: Request, res: Response, next: NextFunction) => {
+  const result = changePasswordSchema.safeParse(req.body);
 
   if (!result.success) {
     return res.status(400).json({
@@ -36,14 +40,14 @@ const checkResetPassword = (req: Request, res: Response, next: NextFunction) => 
     });
   }
 
-  const data: ResetPasswordDTO = result.data;
+  const data: ChangePasswordDTO = result.data;
   (req as any).userValidated = {
-    token: data.token,
+    current_password: data.current_password,
     password: data.password,
   };
 
   next();
 };
 
-export { checkResetPassword };
+export { checkChangePassword };
 

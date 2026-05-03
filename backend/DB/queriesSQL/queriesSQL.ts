@@ -61,6 +61,10 @@ export interface Subscription extends RowDataPacket {
   stripe_cancel_at_period_end: 0 | 1;
   current_period_end: Date | null;
   plan_access_until: Date | null;
+  pending_plan_id: ID | null;
+  pending_change_type: "upgrade" | "downgrade" | null;
+  pending_change_effective_at: Date | null;
+  stripe_schedule_id: string | null;
   stripe_subscription_id: string | null;
   stripe_customer_id: string | null;
   credit_initial: number;
@@ -132,6 +136,51 @@ export interface StripeCheckoutSessionState extends RowDataPacket {
   consumed_at: Date | null;
   created_at: Date;
   updated_at: Date;
+}
+
+export interface ProcessedWebhookEvent extends RowDataPacket {
+  id: string;
+  provider: string;
+  event_type: string;
+  received_at: Date;
+  processed_at: Date | null;
+}
+
+export async function tryMarkWebhookEventReceived(params: {
+  id: string;
+  provider?: string;
+  eventType: string;
+  receivedAt?: Date;
+}): Promise<{ inserted: boolean }> {
+  const connexion = await connectDb();
+  try {
+    await connexion.execute<ResultSetHeader>(
+      `INSERT INTO ProcessedWebhookEvent (id, provider, event_type, received_at)
+       VALUES (?, ?, ?, ?)`,
+      [
+        params.id,
+        params.provider ?? "stripe",
+        params.eventType,
+        params.receivedAt ?? new Date(),
+      ]
+    );
+    return { inserted: true };
+  } catch (err: any) {
+    // Duplicate => already received/processed
+    if (err?.code === "ER_DUP_ENTRY") return { inserted: false };
+    throw err;
+  }
+}
+
+export async function markWebhookEventProcessed(params: {
+  id: string;
+  processedAt?: Date;
+}): Promise<void> {
+  const connexion = await connectDb();
+  await connexion.execute<ResultSetHeader>(
+    `UPDATE ProcessedWebhookEvent SET processed_at = ? WHERE id = ?`,
+    [params.processedAt ?? new Date(), params.id]
+  );
 }
 
 
@@ -738,11 +787,20 @@ export async function getPlanByName(name: string): Promise<Plan | null> {
 /**
  * Find a plan by code (e.g., 'free','hobby','pro').
  */
-export async function getPlanByCode(code: string): Promise<Plan | null> {
+export async function getPlanByCode(code: string): Promise<Plan | null> { 
   const connexion = await connectDb();
   const [rows] = await connexion.execute<Plan[]>(
     `SELECT * FROM Plan WHERE code = ? LIMIT 1`,
     [code]
+  );
+  return rows[0] ?? null;
+} 
+
+export async function getPlanByStripePriceId(stripePriceId: string): Promise<Plan | null> {
+  const connexion = await connectDb();
+  const [rows] = await connexion.execute<Plan[]>(
+    `SELECT * FROM Plan WHERE stripe_price_id = ? LIMIT 1`,
+    [stripePriceId]
   );
   return rows[0] ?? null;
 }
@@ -1007,6 +1065,10 @@ export async function updateSubscription(
       | "stripe_cancel_at_period_end"
       | "current_period_end"
       | "plan_access_until"
+      | "pending_plan_id"
+      | "pending_change_type"
+      | "pending_change_effective_at"
+      | "stripe_schedule_id"
       | "credit_initial"
       | "credit_used"
     > 
@@ -1066,6 +1128,22 @@ export async function updateSubscription(
   if (fields.plan_access_until !== undefined) {
     sets.push(`plan_access_until = ?`);
     values.push(fields.plan_access_until);
+  }
+  if (fields.pending_plan_id !== undefined) {
+    sets.push(`pending_plan_id = ?`);
+    values.push(fields.pending_plan_id);
+  }
+  if (fields.pending_change_type !== undefined) {
+    sets.push(`pending_change_type = ?`);
+    values.push(fields.pending_change_type);
+  }
+  if (fields.pending_change_effective_at !== undefined) {
+    sets.push(`pending_change_effective_at = ?`);
+    values.push(fields.pending_change_effective_at);
+  }
+  if (fields.stripe_schedule_id !== undefined) {
+    sets.push(`stripe_schedule_id = ?`);
+    values.push(fields.stripe_schedule_id);
   }
   if (fields.credit_initial !== undefined) { 
     sets.push(`credit_initial = ?`); 

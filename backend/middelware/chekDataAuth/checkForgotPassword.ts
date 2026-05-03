@@ -3,16 +3,12 @@ import type { Request, Response, NextFunction } from "express";
 
 export const authSchema = z.object({
   email: z.email("email invalide").trim().toLowerCase(),
-  lang: z.enum(["fr", "en", "de", "it"])
+  lang: z.enum(["fr", "en", "de", "it"]),
 });
 
 export type AuthDTO = z.infer<typeof authSchema>;
 
-const checkForgotPassword = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const checkForgotPassword = (req: Request, res: Response, next: NextFunction) => {
   const result = authSchema.safeParse(req.body);
   if (!result.success) {
     return res.status(400).json({
@@ -25,14 +21,14 @@ const checkForgotPassword = (
       requestId: (req as any).requestId,
     });
   }
-  
+
   const data: AuthDTO = result.data;
   (req as any).userValidated = {
     email: data.email,
-    lang: data.lang
-    
+    lang: data.lang,
   };
   next();
 };
 
 export { checkForgotPassword };
+

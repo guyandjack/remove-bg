@@ -36,6 +36,7 @@ import stripeRoute from "./routes/stripe.route";
 import subscriptionRoute from "./routes/subscription.route";
 import marketingRoute from "./routes/marketing.route";
 import accountRoute from "./routes/account.route";
+import billingRoute from "./routes/billing.route";
 import forgotPasswordRoute from "./routes/forgotPassword.route";
 import refreshRoute from "./routes/authRefresh.route";
 import usageRoute from "./routes/usage.route";
@@ -190,6 +191,9 @@ app.use("/api/marketing", marketingRoute);
 
 //route compte (suppression)
 app.use("/api/account", accountRoute);
+
+// billing status (Stripe verification)
+app.use("/api/billing", billingRoute);
 
 //route mise à jour user
 app.use("/api/usage", usageRoute);

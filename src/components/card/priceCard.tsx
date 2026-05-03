@@ -51,6 +51,10 @@ type PriceCardProps = {
   lang: PlanText; // contenu textuel traduit (titres, libellÃ©s, CTA)
   option: PlanOption; // donnÃ©es dynamiques issues du backend
   currency: CurrencyCode;
+  onSelect?: ((planName: string) => void) | null;
+  selectCtaLabel?: string | null;
+  isCurrentPlan?: boolean;
+  currentBadgeLabel?: string | null;
 };
 
 const currencySymbols: Record<CurrencyCode, string> = {
@@ -59,7 +63,15 @@ const currencySymbols: Record<CurrencyCode, string> = {
   USD: "$",
 };
 
-const PriceCard = ({ lang, option, currency }: PriceCardProps) => {
+const PriceCard = ({
+  lang,
+  option,
+  currency,
+  onSelect = null,
+  selectCtaLabel = null,
+  isCurrentPlan = false,
+  currentBadgeLabel = null,
+}: PriceCardProps) => {
   const borderColor =
     {
       hobby: "border-success",
@@ -175,12 +187,19 @@ const PriceCard = ({ lang, option, currency }: PriceCardProps) => {
 
   return (
     <div
-      className={`card w-[350px] h-[500px] bg-base-100 shadow-sm border ${borderColor} bg-component`}
+      className={`card w-[350px] h-[500px] bg-base-100 shadow-sm border ${borderColor} bg-component ${
+        isCurrentPlan ? "ring-2 ring-primary" : ""
+      }`}
     >
       <div className="relative card-body">
         {option.name == "hobby" ? (
           <span className="absolute top-[-15px] badge badge-s badge-warning">
             {lang.tag}
+          </span>
+        ) : null}
+        {isCurrentPlan ? (
+          <span className="absolute top-[-15px] right-[10px] badge badge-primary">
+            {currentBadgeLabel || "Current"}
           </span>
         ) : null}
 
@@ -198,14 +217,24 @@ const PriceCard = ({ lang, option, currency }: PriceCardProps) => {
           ))}
         </ul>
         <div className="absolute bottom-[10px] left-[50%] w-[80%] translate-x-[-50%]  ">
-          <a
-            data-id={"/signup"}
-            href={`/signup?plan=${option.name}&currency=${currency}`}
-            className={`transition-all btn ${bgColor} btn-block text-base text-black hover:opacity-60`}
-            onClick={(e) => setActiveLink(e)}
-          >
-            {lang.subscribe}
-          </a>
+          {onSelect ? (
+            <button
+              type="button"
+              className={`transition-all btn ${bgColor} btn-block text-base text-black hover:opacity-60`}
+              onClick={() => onSelect(option.name)}
+            >
+              {selectCtaLabel || lang.subscribe}
+            </button>
+          ) : (
+            <a
+              data-id={"/signup"}
+              href={`/signup?plan=${option.name}&currency=${currency}`}
+              className={`transition-all btn ${bgColor} btn-block text-base text-black hover:opacity-60`}
+              onClick={(e) => setActiveLink(e)}
+            >
+              {lang.subscribe}
+            </a>
+          )}
         </div>
       </div>
     </div>

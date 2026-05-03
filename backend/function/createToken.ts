@@ -4,8 +4,9 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createRefreshTokenRecord, findValidRefreshTokenByJti } from "../DB/queriesSQL/queriesSQL.ts";
-import { getUserByEmail } from "../DB/queriesSQL/queriesSQL.ts";
+// IMPORTANT: do not import DB modules at top-level.
+// This file is used in contexts (tests, tooling) where DB modules may not be resolvable.
+// DB queries are imported lazily inside the few functions that need them (refresh tokens).
 
 type Option = {
   domain?: string;
@@ -94,9 +95,9 @@ function resolveRefreshPublicKey(): string {
 
 /**
  * Sign JWT access token
- * Accepts either a string email (legacy) or a password reset payload.
+ * Accepts either a string email (legacy) or a structured payload.
  */
-const signAccessToken = (payload: string | PasswordResetPayload) => {
+const signAccessToken = (payload: string | JwtPayload) => {
   const privateKey = resolvePrivateKey();
 
   const body: JwtPayload | string =
@@ -112,9 +113,23 @@ const signAccessToken = (payload: string | PasswordResetPayload) => {
 };
 
 /**
+ * Password reset tokens must not be tied to short-lived access tokens.
+ */
+const signPasswordResetToken = (payload: PasswordResetPayload) => {
+  const privateKey = resolvePrivateKey();
+  const key: Secret = privateKey as unknown as Secret;
+  const options: SignOptions = {
+    algorithm: "RS256" as SignOptions["algorithm"],
+    expiresIn: (process.env.JWT_PASSWORD_RESET_EXPIRES_IN || "15m") as SignOptions["expiresIn"],
+  };
+  return jwt.sign(payload as unknown as JwtPayload, key, options);
+};
+
+/**
  * Sign JWT refreshToken
  */
 const signRefreshToken = async (email: string, opts?: { ip?: string | null; userAgent?: string | null }) => {
+  const { createRefreshTokenRecord, getUserByEmail } = await import("../DB/queriesSQL/queriesSQL.ts");
   const privateKey = resolvePrivateKey();
   const key: Secret = privateKey as unknown as Secret;
   const jti = crypto.randomUUID();
@@ -158,10 +173,16 @@ const verifyAccessToken = (token: string) => {
   return decoded as JwtPayload | string;
 };
 
+const verifyPasswordResetToken = (token: string) => {
+  return verifyAccessToken(token) as JwtPayload | string;
+};
+
+
 /**
  * Verify JWT refresh token (RS256)
  */
 const verifyRefreshToken = async (token: string) => {
+  const { findValidRefreshTokenByJti } = await import("../DB/queriesSQL/queriesSQL.ts");
   const publicKey = resolveRefreshPublicKey();
   const decoded = jwt.verify(token, publicKey, { algorithms: ["RS256"] }) as any;
   const jti: string | undefined = decoded?.jti || decoded?.jwtid;
@@ -200,4 +221,4 @@ const setCookieOptionsObject = () => {
   }
 };
 
-export { signAccessToken, signRefreshToken, setCookieOptionsObject, verifyAccessToken, verifyRefreshToken };
+export { signAccessToken, signPasswordResetToken, signRefreshToken, setCookieOptionsObject, verifyAccessToken, verifyPasswordResetToken, verifyRefreshToken };

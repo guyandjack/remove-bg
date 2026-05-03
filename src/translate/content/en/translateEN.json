@@ -102,7 +102,7 @@
     "passwordError": "Password too weak",
     "confirmError": "Passwords must match",
     "missingToken": "This link is invalid or has expired.",
-    "textSuccess": "Password updated, redirecting...",
+    "textSuccess": "Password updated",
     "textError": "Unable to update password"
   },
 
@@ -696,6 +696,25 @@
         "statusUnknown": "unknown",
         "accessUntilLabel": "Access until",
         "changeCta": "Change subscription",
+        "changeModalTitle": "Change subscription",
+        "changeModalBody": "Choose a plan and confirm. No redirection.",
+        "changeModalClose": "Cancel",
+        "upgradeTab": "Upgrade",
+        "downgradeTab": "Downgrade",
+        "upgradeInfo": "Immediate effect with proration. Payment may be required.",
+        "downgradeInfo": "Takes effect at the end of the current billing period.",
+        "selectPlanCta": "Select",
+        "currentBadge": "Current",
+        "confirmTitle": "Confirm change to",
+        "confirmUpgrade": "This upgrade takes effect immediately with proration and may trigger an immediate payment.",
+        "confirmDowngrade": "This downgrade is scheduled for the end of the current billing period (no proration).",
+        "back": "Back",
+        "confirm": "Confirm",
+        "noPlanAvailable": "No plans available for this action.",
+        "changePlanSuccess": "Plan change requested.",
+        "changePlanError": "Unable to change plan.",
+        "checkoutRedirect": "Payment required. Redirecting to Stripe…",
+        "creditsLabel": "Credits",
         "cancelCta": "Cancel subscription",
         "resumeCta": "Resume subscription",
         "cancelModalTitle": "Confirm cancellation",
@@ -752,5 +771,16 @@
       "success": "If an account exists, an email has been sent.",
       "error": "Error while requesting. Please try again."
     }
+  }
+  ,
+  "billingSuccess": {
+    "title": "Payment confirmation",
+    "processing": "Payment confirmation in progress.",
+    "paidWaitingDb": "Payment confirmed. Activating your account…",
+    "failed": "Payment failed. If you were charged, please contact support.",
+    "missingSession": "Missing payment session identifier.",
+    "doNotRetry": "Do not retry payment. This page updates automatically.",
+    "success": "Payment confirmed. Redirecting…",
+    "backDashboard": "Back to dashboard"
   }
 }

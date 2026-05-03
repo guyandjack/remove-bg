@@ -3,15 +3,16 @@ import type Stripe from "stripe";
 import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
 import { connectDb } from "../../DB/poolConnexion/poolConnexion.ts";
-import {
-  createStripeCheckoutSessionState,
-  createSubscription,
-  createUser,
-  getPlanByCode,
-  getStripeCheckoutSessionState,
-  getUserByEmail,
-  markStripeCheckoutSessionCompleted,
-  type StripeCheckoutSessionState,
+import { 
+  createStripeCheckoutSessionState, 
+  createSubscription, 
+  createUser, 
+  getActiveSubscription,
+  getPlanByCode, 
+  getStripeCheckoutSessionState, 
+  getUserByEmail, 
+  markStripeCheckoutSessionCompleted, 
+  type StripeCheckoutSessionState, 
   updateSubscription,
   upsertPlanByCode,
 } from "../../DB/queriesSQL/queriesSQL.ts";
@@ -205,14 +206,28 @@ export const finalizeCheckoutSessionFromStripeSession = async ({
     }
   }
 
-  let subscriptionId = state.subscription_id ?? null;
-  if (!subscriptionId) {
-    subscriptionId = await createSubscription({
-      userId: user.id,
-      planId: plan.id,
-      isActive: true,
-    });
-  }
+  let subscriptionId = state.subscription_id ?? null; 
+  if (!subscriptionId) { 
+    // If a user is currently on a "free" local subscription (no Stripe subscription id),
+    // they can still checkout a paid plan. In that scenario we must NOT insert a second
+    // active subscription row because of UNIQUE(user_id, is_active). Reuse the existing
+    // active row and simply switch its plan_id.
+    const existingActive = await getActiveSubscription(user.id);
+    if (existingActive?.id) {
+      subscriptionId = existingActive.id;
+      await updateSubscription(subscriptionId, {
+        plan_id: plan.id,
+        status: "active",
+        is_active: 1,
+      } as any);
+    } else {
+      subscriptionId = await createSubscription({ 
+        userId: user.id, 
+        planId: plan.id, 
+        isActive: true, 
+      }); 
+    }
+  } 
 
   if (subscriptionId && (stripeSubscriptionId || stripeCustomerId)) {
     await updateSubscription(subscriptionId, {

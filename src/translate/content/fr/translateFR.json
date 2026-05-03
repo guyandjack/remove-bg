@@ -100,7 +100,7 @@
     "passwordError": "Mot de passe trop faible",
     "confirmError": "Les mots de passe doivent correspondre",
     "missingToken": "Ce lien est invalide ou a expiré.",
-    "textSuccess": "Mot de passe mis à jour, redirection...",
+    "textSuccess": "Mot de passe mis à jour",
     "textError": "Impossible de mettre à jour le mot de passe"
   },
   "loader": {
@@ -699,6 +699,25 @@
         "statusUnknown": "inconnu",
         "accessUntilLabel": "Accès jusqu’au",
         "changeCta": "Changer d'abonnement",
+        "changeModalTitle": "Changer d’abonnement",
+        "changeModalBody": "Choisissez un plan puis confirmez. Aucune redirection.",
+        "changeModalClose": "Annuler",
+        "upgradeTab": "Upgrade",
+        "downgradeTab": "Downgrade",
+        "upgradeInfo": "Effet immédiat avec proration. Un paiement prorata peut être demandé.",
+        "downgradeInfo": "Effet à la fin de la période de facturation en cours (sans proration).",
+        "selectPlanCta": "Choisir",
+        "currentBadge": "Actuel",
+        "confirmTitle": "Confirmer le changement vers",
+        "confirmUpgrade": "Cet upgrade prend effet immédiatement avec proration et peut déclencher un paiement immédiat.",
+        "confirmDowngrade": "Ce downgrade est programmé à la fin de la période de facturation en cours (sans proration).",
+        "back": "Retour",
+        "confirm": "Confirmer",
+        "noPlanAvailable": "Aucun plan disponible pour cette action.",
+        "changePlanSuccess": "Changement de plan demandé.",
+        "changePlanError": "Impossible de changer de plan.",
+        "checkoutRedirect": "Paiement requis. Redirection vers Stripe…",
+        "creditsLabel": "Crédits",
         "cancelCta": "Annuler l'abonnement",
         "resumeCta": "Reprendre l'abonnement",
         "cancelModalTitle": "Confirmer l’annulation",
@@ -749,11 +768,22 @@
     },
     "password": {
       "title": "Mot de passe",
-      "description": "Recevez un email pour réinitialiser votre mot de passe.",
+      "description": "Renforcez la sécurité de votre compte en mettant à jour votre mot de passe",
       "emailLabel": "Email",
       "submitCta": "Envoyer le lien de réinitialisation",
       "success": "Si un compte existe, un email a été envoyé.",
       "error": "Erreur lors de la demande. Réessayez."
     }
+  }
+  ,
+  "billingSuccess": {
+    "title": "Confirmation de paiement",
+    "processing": "Confirmation du paiement en cours.",
+    "paidWaitingDb": "Paiement confirmé. Activation en cours…",
+    "failed": "Paiement échoué. Si vous avez été débité, contactez le support.",
+    "missingSession": "Identifiant de session de paiement manquant.",
+    "doNotRetry": "Ne relancez pas le paiement. Cette page se met à jour automatiquement.",
+    "success": "Paiement confirmé. Redirection…",
+    "backDashboard": "Retour au tableau de bord"
   }
 }

@@ -82,6 +82,10 @@ CREATE TABLE IF NOT EXISTS `Subscription` (
   stripe_cancel_at_period_end TINYINT(1) NOT NULL DEFAULT 0,
   current_period_end          DATETIME   NULL,
   plan_access_until           DATETIME   NULL,
+  pending_plan_id             VARCHAR(36) NULL,
+  pending_change_type         ENUM('upgrade','downgrade') NULL,
+  pending_change_effective_at DATETIME NULL,
+  stripe_schedule_id          VARCHAR(255) NULL,
   stripe_subscription_id  VARCHAR(255) NULL, 
   stripe_customer_id      VARCHAR(255) NULL, 
   credit_initial          INT UNSIGNED NOT NULL DEFAULT 0, 
@@ -90,7 +94,8 @@ CREATE TABLE IF NOT EXISTS `Subscription` (
   updated_at              TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
 
   CONSTRAINT fk_sub_user FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE CASCADE,
-  CONSTRAINT fk_sub_plan FOREIGN KEY (plan_id) REFERENCES `Plan`(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_sub_plan FOREIGN KEY (plan_id) REFERENCES `Plan`(id) ON DELETE RESTRICT, 
+  CONSTRAINT fk_sub_pending_plan FOREIGN KEY (pending_plan_id) REFERENCES `Plan`(id) ON DELETE SET NULL, 
 
   UNIQUE KEY uniq_user_active (user_id, is_active),
   UNIQUE KEY uniq_stripe_subscription (stripe_subscription_id),
@@ -179,10 +184,19 @@ CREATE TABLE IF NOT EXISTS `StripeCheckoutSession` (
   CONSTRAINT fk_stripe_session_user FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE SET NULL,
   CONSTRAINT fk_stripe_session_subscription FOREIGN KEY (subscription_id) REFERENCES `Subscription`(id) ON DELETE SET NULL,
   CONSTRAINT fk_stripe_session_plan FOREIGN KEY (plan_id) REFERENCES `Plan`(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 
 
--- Customer (profil + Stripe customer)
-CREATE TABLE IF NOT EXISTS `Customer` (
+CREATE TABLE IF NOT EXISTS `ProcessedWebhookEvent` (
+  id           VARCHAR(255) NOT NULL PRIMARY KEY,
+  provider     VARCHAR(32)  NOT NULL DEFAULT 'stripe',
+  event_type   VARCHAR(255) NOT NULL,
+  received_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  processed_at DATETIME     NULL,
+  INDEX idx_pwe_type_time (event_type, received_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+ 
+-- Customer (profil + Stripe customer) 
+CREATE TABLE IF NOT EXISTS `Customer` ( 
   id                  VARCHAR(36)   NOT NULL PRIMARY KEY,
   user_id              VARCHAR(36)   NOT NULL,
   email                VARCHAR(191)  NOT NULL,

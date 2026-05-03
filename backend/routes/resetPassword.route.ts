@@ -7,3 +7,4 @@ const router = express.Router();
 router.post("/", checkResetPassword, resetPassword);
 
 export default router;
+

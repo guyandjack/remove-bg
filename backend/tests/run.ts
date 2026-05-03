@@ -10,6 +10,7 @@ export function test(name: string, fn: TestCase["fn"]) {
 async function main() {
   // Register test files
   await import("./access.test.ts");
+  await import("./planChange.test.ts");
 
   let failed = 0;
   for (const t of tests) {

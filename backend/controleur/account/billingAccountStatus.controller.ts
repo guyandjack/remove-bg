@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 import {
   getActiveSubscription,
+  getPlanById,
   getUserByEmail,
 } from "../../DB/queriesSQL/queriesSQL.ts";
 
@@ -31,6 +32,7 @@ export const billingAccountStatusController: RequestHandler = async (req, res) =
   }
 
   const sub = await getActiveSubscription(user.id);
+  const plan = sub ? await getPlanById(sub.plan_id) : null;
 
   const planAccessUntil = sub
     ? sub.plan_access_until ?? sub.current_period_end ?? sub.period_end ?? null
@@ -50,7 +52,10 @@ export const billingAccountStatusController: RequestHandler = async (req, res) =
           current_period_end: formatIsoDateTime(sub.current_period_end),
           plan_access_until: formatIsoDateTime(planAccessUntil ? new Date(planAccessUntil) : null),
           plan_access_until_date: formatIsoDate(planAccessUntil ? new Date(planAccessUntil) : null),
-          plan_name: (sub as any).plan_name ?? null,
+          plan_name: plan?.name ?? (sub as any).plan_name ?? null,
+          plan_code: plan?.code ?? null,
+          pending_change_type: sub.pending_change_type,
+          pending_change_effective_at: formatIsoDateTime(sub.pending_change_effective_at),
         }
       : null,
     account: {
@@ -59,4 +64,3 @@ export const billingAccountStatusController: RequestHandler = async (req, res) =
     },
   });
 };
-

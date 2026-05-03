@@ -43,10 +43,8 @@ const createCheckoutSession = async ({
   }
 
   const base = buildBaseUrl();
-  const successUrl = `${base}?userValide=true&currency=${currency}&session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl = `${base}?userValide=false&session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(
-    planCode
-  )}&currency=${currency}`;
+  const successUrl = `${base}/billing/success?session_id={CHECKOUT_SESSION_ID}`;
+  const cancelUrl = `${base}/billing/success?session_id={CHECKOUT_SESSION_ID}`;
 
   try {
     const session = await stripe.checkout.sessions.create({
