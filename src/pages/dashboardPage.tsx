@@ -547,7 +547,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                       onClick={handleResumeSubscription}
                     >
                       {cancelSubmitting === "loading" ? (
-                        <span className="loading loading-spinner loading-sm" />
+                        <span className="loading loading-bars loading-spinner loading-sm" />
                       ) : null}
                       {t("dashboardPage.billing.subscription.resumeCta")}
                     </button>
@@ -566,7 +566,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                       }}
                     >
                       {cancelSubmitting === "loading" ? (
-                        <span className="loading loading-spinner loading-sm" />
+                        <span className="loading loading-bars loading-spinner loading-sm" />
                       ) : null}
                       {t("dashboardPage.billing.subscription.cancelCta")}
                     </button>
@@ -672,7 +672,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                   onClick={handleAccountDeletionRequest}
                 >
                   {deletionSubmitting === "loading" ? (
-                    <span className="loading loading-spinner loading-sm" />
+                    <span className="loading loading-bars loading-spinner loading-sm" />
                   ) : null}
                   {t("dashboardPage.billing.account.deleteCta")}
                 </button>
@@ -845,7 +845,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                         }
                       >
                         {planChangeSubmitting === "loading" ? (
-                          <span className="loading loading-spinner loading-sm" />
+                          <span className="loading loading-bars loading-spinner loading-sm" />
                         ) : null}
                         {t("dashboardPage.billing.subscription.confirm")}
                       </button>

@@ -804,7 +804,7 @@ const ImgEditor = ({
       <div className="relative w-full h-full rounded-xl ring-1 ring-base-200 bg-base-100/60 backdrop-blur-sm lg:min-w-[550px]">
         {isComposing && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-base-100/50">
-            <span className="loading loading-spinner loading-md text-primary" />
+            <span className="loading loading-bars loading-spinner loading-md text-primary" />
           </div>
         )}
         <LazyMotion features={domAnimation}>
@@ -849,13 +849,13 @@ const ImgEditor = ({
                         />
                         {isPreviewLoading && (
                           <div className="absolute inset-0 flex items-center justify-center bg-base-100/30 backdrop-blur-[1px]">
-                            <span className="loading loading-spinner loading-lg text-primary" />
+                            <span className="loading loading-bars loading-spinner loading-lg text-primary" />
                           </div>
                         )}
                       </div>
                     ) : isPreviewLoading ? (
                       <div className="flex h-full w-full items-center justify-center">
-                        <span className="loading loading-spinner loading-lg text-primary" />
+                        <span className="loading loading-bars loading-spinner loading-lg text-primary" />
                       </div>
                     ) : (
                       <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-base-content/70">

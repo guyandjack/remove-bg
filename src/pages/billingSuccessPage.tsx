@@ -98,7 +98,7 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
           <p className="text-base-content/70">{message}</p>
           {state === "processing" || state === "loading" ? (
             <div className="mt-4 flex items-center gap-2">
-              <span className="loading loading-spinner loading-sm" />
+              <span className="loading loading-bars loading-spinner loading-sm" />
               <span className="text-sm text-base-content/70">{t("billingSuccess.doNotRetry")}</span>
             </div>
           ) : null}
@@ -114,4 +114,3 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
     </div>
   );
 };
-

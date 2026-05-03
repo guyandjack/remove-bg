@@ -1,16 +1,98 @@
 <mjml>
-  <mj-body background-color="#f4f4f4">
-    <mj-section background-color="#ffffff" padding="24px">
-      <mj-column>
-        <mj-text font-size="20px" font-weight="bold">Your subscription will stop at the end of the billing period</mj-text>
-        <mj-text>We confirm that your subscription cancellation request has been recorded.</mj-text>
-        <mj-text><strong>Access end date:</strong> {{planAccessUntil}}</mj-text>
-        <mj-text><strong>Credits remaining:</strong> {{creditsRemaining}}</mj-text>
-        <mj-divider />
-        <mj-text font-size="12px" color="#6b7280">
+  <mj-body background-color="#1e293b">
+    <mj-section padding-bottom="20px" padding-top="20px">
+      <mj-column vertical-align="top" width="100%">
+        <mj-image
+          src="{{logoUrl}}"
+          alt="{{appName}}"
+          align="center"
+          border="none"
+          width="200px"
+          height="50px"
+          padding-left="0px"
+          padding-right="0px"
+          padding-bottom="0px"
+          padding-top="0"
+        />
+      </mj-column>
+    </mj-section>
+
+    <mj-section padding-bottom="20px" padding-top="20px">
+      <mj-column vertical-align="middle" width="100%">
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="22px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+        >
+          Cancellation scheduled
+        </mj-text>
+
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="16px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          line-height="1.4"
+        >
+          We confirm that your cancellation request has been recorded.
+        </mj-text>
+
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="16px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          line-height="1.4"
+        >
+          Access until: <span style="color: #f4bf51">{{planAccessUntil}}</span><br />
+          Remaining credits: <span style="color: #f4bf51">{{creditsRemaining}}</span>
+        </mj-text>
+
+        <mj-button
+          href="{{dashboardUrl}}"
+          align="left"
+          color="#1e293b"
+          background-color="#f4bf51"
+          font-size="15px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          border-radius="6px"
+          padding-left="25px"
+          padding-right="25px"
+          inner-padding="10px 16px"
+        >
+          Open dashboard
+        </mj-button>
+
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="13px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          line-height="1.4"
+        >
           You can manage your subscription, marketing preferences and account from your dashboard.
         </mj-text>
-        <mj-button background-color="#2563eb" href="{{dashboardUrl}}">Open dashboard</mj-button>
+
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="15px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+        >
+          Thank you, <br />
+          The {{appName}} Team
+        </mj-text>
       </mj-column>
     </mj-section>
   </mj-body>
