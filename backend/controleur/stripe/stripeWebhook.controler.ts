@@ -5,8 +5,10 @@ import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { connectDb } from "../../DB/poolConnexion/poolConnexion.ts";
 import {
   markStripeCheckoutSessionFailed,
+  getActiveSubscription,
   getPlanByStripePriceId,
   getPlanByCode,
+  switchPlan,
   tryMarkWebhookEventReceived,
   markWebhookEventProcessed,
 } from "../../DB/queriesSQL/queriesSQL.ts";
@@ -441,6 +443,31 @@ const stripeWebhook: RequestHandler = async (req, res) => {
            WHERE stripe_subscription_id = ?`, 
           [canceledAt, periodEnd, periodEnd, periodEnd, stripeSubscriptionId] 
         ); 
+
+        // When the paid Stripe subscription ends, ensure the user falls back to an active FREE plan.
+        // This prevents "no access" states when access control relies on an active subscription row.
+        try {
+          const [rows] = await pool.execute<RowDataPacket[]>(
+            `SELECT user_id FROM Subscription WHERE stripe_subscription_id = ? LIMIT 1`,
+            [stripeSubscriptionId],
+          );
+          const userId = (rows[0] as any)?.user_id as string | undefined;
+          if (userId) {
+            const active = await getActiveSubscription(userId);
+            // If another subscription is already active, do not override it.
+            if (!active) {
+              const freePlan = await getPlanByCode("free");
+              if (freePlan?.id) {
+                await switchPlan(userId, freePlan.id, new Date());
+              }
+            }
+          }
+        } catch (syncErr: any) {
+          logger.warn("[stripeWebhook] Unable to switch to free plan after subscription.deleted", {
+            stripeSubscriptionId,
+            message: syncErr?.message || String(syncErr),
+          });
+        }
       }  
       console.log("[stripeWebhook] customer.subscription.deleted processed for Stripe subscription", stripeSubscriptionId); 
       return await returnOk(); 

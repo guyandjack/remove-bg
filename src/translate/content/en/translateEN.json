@@ -687,7 +687,7 @@
     "title": "Dashboard",
     "subtitle": "Manage your account and subscriptions.",
     "billing": {
-      "title": "Billing & Account",
+      "title": "Account & subscription",
       "description": "Manage your subscription, marketing preferences and account settings.",
       "loadError": "Unable to load billing/account status. Please refresh.",
       "subscription": {
@@ -753,7 +753,8 @@
       "creditsRemainingTitle": "Credits remaining",
       "creditsUsedTitle": "Credits used",
       "planTitle": "Subscription",
-      "billingPeriod": "Current billing period"
+      "billingPeriod": "Current billing period",
+      "user": "User"
     },
     "subscription": {
       "title": "Subscription management",

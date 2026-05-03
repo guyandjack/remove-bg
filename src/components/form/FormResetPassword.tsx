@@ -38,6 +38,7 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
   const { t } = useTranslation();
   const token = useMemo(() => (mode === "reset" ? getTokenFromLocation() : ""), [mode]);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isLoader, setIsLoader] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
@@ -62,6 +63,24 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
   const passwordValue = watch("password");
   const confirmValue = watch("confirm");
 
+  const extractApiErrorMessage = (error: unknown): string | null => {
+    const anyError = error as any;
+    const data = anyError?.response?.data;
+
+    if (data && typeof data.message === "string" && data.message.trim()) {
+      return data.message.trim();
+    }
+
+    if (data && Array.isArray(data.issues) && data.issues.length > 0) {
+      const issueMessages = data.issues
+        .map((issue: any) => (typeof issue?.message === "string" ? issue.message.trim() : ""))
+        .filter(Boolean);
+      if (issueMessages.length > 0) return issueMessages.join(" ");
+    }
+
+    return null;
+  };
+
   const onSubmit = async (values: ResetPasswordFormValues) => {
     if (mode === "reset" && !token) {
       setStatus("error");
@@ -70,6 +89,7 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
 
     setIsLoader(true);
     setStatus("idle");
+    setStatusMessage(null);
 
     try {
       const response =
@@ -99,13 +119,25 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
 
       if (response?.data?.status === "success") {
         setStatus("success");
+        const successMessage =
+          typeof response?.data?.message === "string" && response.data.message.trim()
+            ? response.data.message.trim()
+            : t("formReset.textSuccess");
+        setStatusMessage(successMessage);
         reset();
         return;
       }
 
       setStatus("error");
+      const apiMessage =
+        typeof response?.data?.message === "string" && response.data.message.trim()
+          ? response.data.message.trim()
+          : t("formReset.textError");
+      setStatusMessage(apiMessage);
     } catch (error) {
       axiosError(setStatus, error);
+      const apiMessage = extractApiErrorMessage(error) ?? t("formReset.textError");
+      setStatusMessage(apiMessage);
     } finally {
       setIsLoader(false);
       setTimeout(() => {
@@ -118,9 +150,10 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
     isSubmitting ||
     isLoader ||
     (mode === "reset" && !token) ||
+    (mode === "dashboard" && !currentPasswordValue) ||
+    passwordValue !== confirmValue ||
     !passwordValue ||
     !confirmValue ||
-    (mode === "dashboard" && !currentPasswordValue) ||
     Object.keys(errors).length > 0;
 
   return (
@@ -354,7 +387,11 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
           <div className="relative flex flex-col gap-4">
             <button
               type="submit"
-              className="btn btn-primary w-full"
+              className={
+                mode === "dashboard" && embedded
+                  ? "btn btn-primary w-fit self-start"
+                  : "btn btn-primary w-full"
+              }
               disabled={submitDisabled}
             >
               {mode === "dashboard"
@@ -380,8 +417,12 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
                   : ""
               }`}
             >
-              {status === "success" ? t("formReset.textSuccess") : ""}
-              {status === "error" ? t("formReset.textError") : ""}
+              {status === "idle"
+                ? ""
+                : statusMessage ??
+                  (status === "success"
+                    ? t("formReset.textSuccess")
+                    : t("formReset.textError"))}
             </div>
           </div>
         </form>
@@ -391,4 +432,3 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
 };
 
 export { FormResetPassword };
-

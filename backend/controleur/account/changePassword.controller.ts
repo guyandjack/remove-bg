@@ -1,7 +1,8 @@
 import type { RequestHandler } from "express";
 import bcrypt from "bcryptjs";
-import { getUserByEmail, updateUser, revokeAllRefreshTokensForUser } from "../../DB/queriesSQL/queriesSQL.ts";
+import { getUserByEmail, updateUser, revokeAllRefreshTokensForUser, revokeAllRefreshTokensForUserExcept } from "../../DB/queriesSQL/queriesSQL.ts";
 import { logger } from "../../logger.ts";
+import jwt from "jsonwebtoken";
 
 type ChangePasswordValidatedPayload = {
   current_password: string;
@@ -37,7 +38,19 @@ export const changePasswordController: RequestHandler = async (req, res) => {
     }
 
     try {
-      await revokeAllRefreshTokensForUser(user.id);
+      // Security: revoke refresh tokens for other sessions/devices, but keep the current session usable.
+      // The current session's refresh token is stored in the HttpOnly cookie `tokenRefresh`.
+      const refreshCookie = (req as any)?.cookies?.tokenRefresh as string | undefined;
+      const decoded = refreshCookie ? (jwt.decode(refreshCookie) as any) : null;
+      const currentJti: string | undefined = decoded?.jti || decoded?.jwtid;
+      const currentUserId: string | undefined = decoded?.userId;
+
+      if (currentJti && String(currentUserId || "") === String(user.id)) {
+        await revokeAllRefreshTokensForUserExcept(user.id, currentJti);
+      } else {
+        // Fallback: if we can't identify the current refresh token, revoke all (safer, but may log out current session).
+        await revokeAllRefreshTokensForUser(user.id);
+      }
     } catch (error) {
       logger.warn("Unable to revoke refresh tokens after password change", {
         userId: user.id,
@@ -51,4 +64,3 @@ export const changePasswordController: RequestHandler = async (req, res) => {
     return res.status(500).json({ status: "error", message: "server error change_password_2" });
   }
 };
-

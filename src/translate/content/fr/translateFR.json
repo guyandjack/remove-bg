@@ -688,9 +688,9 @@
 
   "dashboardPage": {
     "title": "Tableau de bord",
-    "subtitle": "Gérez votre compte et vos abonnements.",
+    "subtitle": "Gérez votre compte et votre abonnement.",
     "billing": {
-      "title": "Facturation & Compte",
+      "title": "Compte & abonement",
       "description": "Gérez votre abonnement, vos préférences marketing et votre compte.",
       "loadError": "Impossible de charger l’état facturation/compte. Veuillez rafraîchir.",
       "subscription": {
@@ -756,7 +756,8 @@
       "creditsRemainingTitle": "Crédits restants",
       "creditsUsedTitle": "Crédits utilisés",
       "planTitle": "Abonnement",
-      "billingPeriod": "Période de facturation en cours"
+      "billingPeriod": "Période en cours",
+      "user": "Utilisateur"
     },
     "subscription": {
       "title": "Gestion de l'abonnement",

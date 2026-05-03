@@ -55,6 +55,8 @@ type PriceCardProps = {
   selectCtaLabel?: string | null;
   isCurrentPlan?: boolean;
   currentBadgeLabel?: string | null;
+  disabled?: boolean;
+  disabledBadgeLabel?: string | null;
 };
 
 const currencySymbols: Record<CurrencyCode, string> = {
@@ -71,6 +73,8 @@ const PriceCard = ({
   selectCtaLabel = null,
   isCurrentPlan = false,
   currentBadgeLabel = null,
+  disabled = false,
+  disabledBadgeLabel = null,
 }: PriceCardProps) => {
   const borderColor =
     {
@@ -202,6 +206,11 @@ const PriceCard = ({
             {currentBadgeLabel || "Current"}
           </span>
         ) : null}
+        {disabled && !isCurrentPlan ? (
+          <span className="absolute top-[-15px] right-[10px] badge badge-neutral">
+            {disabledBadgeLabel || "Indisponible"}
+          </span>
+        ) : null}
 
         <div className="flex justify-between">
           <h2 className="text-3xl font-bold capitalize">{option.name}</h2>
@@ -222,6 +231,7 @@ const PriceCard = ({
               type="button"
               className={`transition-all btn ${bgColor} btn-block text-base text-black hover:opacity-60`}
               onClick={() => onSelect(option.name)}
+              disabled={disabled}
             >
               {selectCtaLabel || lang.subscribe}
             </button>

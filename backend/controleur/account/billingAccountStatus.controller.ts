@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 import {
   getActiveSubscription,
+  getCustomerByUserId,
   getPlanById,
   getUserByEmail,
 } from "../../DB/queriesSQL/queriesSQL.ts";
@@ -33,13 +34,22 @@ export const billingAccountStatusController: RequestHandler = async (req, res) =
 
   const sub = await getActiveSubscription(user.id);
   const plan = sub ? await getPlanById(sub.plan_id) : null;
+  const customer = await getCustomerByUserId(user.id);
 
   const planAccessUntil = sub
     ? sub.plan_access_until ?? sub.current_period_end ?? sub.period_end ?? null
     : null;
 
+  const periodStart = sub?.period_start ?? null;
+  const periodEnd = sub?.current_period_end ?? sub?.period_end ?? null;
+
   return res.status(200).json({
     success: true,
+    customer: {
+      first_name: customer?.first_name ?? null,
+      last_name: customer?.last_name ?? null,
+      email: customer?.email ?? user.email,
+    },
     marketing: {
       marketing_consent: user.marketing_consent === 1,
       marketing_consent_updated_at: formatIsoDateTime(user.marketing_consent_updated_at),
@@ -50,6 +60,10 @@ export const billingAccountStatusController: RequestHandler = async (req, res) =
           stripe_subscription_id: sub.stripe_subscription_id ? "present" : null,
           stripe_cancel_at_period_end: sub.stripe_cancel_at_period_end === 1,
           current_period_end: formatIsoDateTime(sub.current_period_end),
+          period_start: formatIsoDateTime(periodStart ? new Date(periodStart) : null),
+          period_end: formatIsoDateTime(periodEnd ? new Date(periodEnd) : null),
+          period_start_date: formatIsoDate(periodStart ? new Date(periodStart) : null),
+          period_end_date: formatIsoDate(periodEnd ? new Date(periodEnd) : null),
           plan_access_until: formatIsoDateTime(planAccessUntil ? new Date(planAccessUntil) : null),
           plan_access_until_date: formatIsoDate(planAccessUntil ? new Date(planAccessUntil) : null),
           plan_name: plan?.name ?? (sub as any).plan_name ?? null,

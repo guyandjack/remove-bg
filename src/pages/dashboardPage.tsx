@@ -2,7 +2,7 @@
 import { initSessionFromLocalStorage, sessionSignal } from "@/stores/session";
 import { api } from "@/utils/axiosConfig";
 import { isAuthentified } from "@/utils/request/isAuthentified";
-import { useEffect, useState } from "preact/hooks"; 
+import { useEffect, useRef, useState } from "preact/hooks"; 
 import { useTranslation } from "react-i18next"; 
 import { navigateWithLink } from "@/utils/navigateWithLink"; 
 import { PriceCard } from "@/components/card/priceCard";
@@ -15,6 +15,11 @@ import { setDocumentTitle } from "@/utils/setDocumentTitle";
 type SubmitState = "idle" | "loading" | "success" | "error"; 
 type CurrencyCode = "CHF" | "EUR" | "USD";
 type BillingAccountState = {
+  customer?: {
+    first_name: string | null;
+    last_name: string | null;
+    email: string | null;
+  };
   subscription: null | {
     subscription_status: string;
     stripe_cancel_at_period_end: boolean;
@@ -24,6 +29,10 @@ type BillingAccountState = {
     plan_code?: string | null;
     pending_change_type?: string | null;
     pending_change_effective_at?: string | null;
+    period_start?: string | null;
+    period_end?: string | null;
+    period_start_date?: string | null;
+    period_end_date?: string | null;
   };
   marketing: {
     marketing_consent: boolean;
@@ -50,12 +59,17 @@ const DashboardPage = ({routeKey}: PropsPage) => {
   const [deletionMessage, setDeletionMessage] = useState<string | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState<string>("");
   const [planModalStep, setPlanModalStep] = useState<"select" | "confirm">("select");
-  const [planChangeMode, setPlanChangeMode] = useState<"upgrade" | "downgrade">("upgrade");
   const [availablePlans, setAvailablePlans] = useState<any[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<any | null>(null);
   const [planChangeSubmitting, setPlanChangeSubmitting] = useState<SubmitState>("idle");
   const [planChangeMessage, setPlanChangeMessage] = useState<string | null>(null);
+  const [actionToast, setActionToast] = useState<{
+    status: "idle" | "success" | "error" | "info";
+    message: string | null;
+  }>({ status: "idle", message: null });
+  const actionToastTimeoutRef = useRef<number | null>(null);
   const { t } = useTranslation();
+  const dashboardActionBtn = "btn btn-sm min-w-[220px]";
 
   const currency: CurrencyCode = "CHF";
   const textLangCard = {
@@ -135,9 +149,45 @@ const DashboardPage = ({routeKey}: PropsPage) => {
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (actionToastTimeoutRef.current) {
+        window.clearTimeout(actionToastTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const pushActionToast = (payload: { status: "success" | "error" | "info"; message: string }) => {
+    setActionToast({ status: payload.status, message: payload.message });
+    if (typeof window === "undefined") return;
+    if (actionToastTimeoutRef.current) window.clearTimeout(actionToastTimeoutRef.current);
+    actionToastTimeoutRef.current = window.setTimeout(() => {
+      setActionToast({ status: "idle", message: null });
+      actionToastTimeoutRef.current = null;
+    }, 4500);
+  };
+
   const creditsRemaining = sessionSignal?.value?.credits?.remaining_last_24h ?? 0;
   const creditsUsed = sessionSignal?.value?.credits?.used_last_24h ?? 0;
   const planName = sessionSignal?.value?.plan?.name || sessionSignal?.value?.plan?.code || "-";
+  const userDisplayName = (() => {
+    const first = billingState?.customer?.first_name?.trim() || "";
+    const last = billingState?.customer?.last_name?.trim() || "";
+    const full = `${first} ${last}`.trim();
+    if (full) return full;
+    return sessionSignal?.value?.user?.first_name || sessionSignal?.value?.user?.email || "-";
+  })();
+  const billingPeriodRange = (():any => {
+    const start = billingState?.subscription?.period_start_date || "";
+    const end = billingState?.subscription?.period_end_date || "";
+    //if (start && end) return `Du ${start} <br>au ${end}`;
+    if (start && end) return {
+      start: start,
+      end: end
+    };
+    if (end) return end;
+    return "-";
+  })();
 
   const handleCancelSubscription = async () => {
     setCancelSubmitting("loading");
@@ -150,6 +200,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
           : t("dashboardPage.subscription.cancelSuccess");
       setCancelMessage(msg);
       setCancelSubmitting("success");
+      pushActionToast({ status: "success", message: msg });
 
       // Refresh billing state to show canceling + access until
       try {
@@ -158,7 +209,9 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       } catch {}
     } catch (e) {
       setCancelSubmitting("error");
-      setCancelMessage(t("dashboardPage.subscription.cancelError"));
+      const msg = t("dashboardPage.subscription.cancelError");
+      setCancelMessage(msg);
+      pushActionToast({ status: "error", message: msg });
     } finally {
       setTimeout(() => setCancelSubmitting("idle"), 2500);
     }
@@ -175,6 +228,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
           : t("dashboardPage.billing.subscription.resumeSuccess");
       setCancelMessage(msg);
       setCancelSubmitting("success");
+      pushActionToast({ status: "success", message: msg });
 
       try {
         const st = await api.get("/api/account/billing-account");
@@ -182,7 +236,9 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       } catch {}
     } catch {
       setCancelSubmitting("error");
-      setCancelMessage(t("dashboardPage.billing.subscription.resumeError"));
+      const msg = t("dashboardPage.billing.subscription.resumeError");
+      setCancelMessage(msg);
+      pushActionToast({ status: "error", message: msg });
     } finally {
       setTimeout(() => setCancelSubmitting("idle"), 2500);
     }
@@ -209,13 +265,21 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       });
       if (resp?.data?.success !== true) throw new Error("marketing_update_failed");
       setMarketingSubmitting("success");
-      setMarketingMessage(t("dashboardPage.billing.marketing.success"));
+      {
+        const msg = t("dashboardPage.billing.marketing.success");
+        setMarketingMessage(msg);
+        pushActionToast({ status: "success", message: msg });
+      }
       // Refresh from backend (source of truth)
       const st = await api.get("/api/account/billing-account");
       if (st?.data?.success) setBillingState(st.data as any);
     } catch {
       setMarketingSubmitting("error");
-      setMarketingMessage(t("dashboardPage.billing.marketing.error"));
+      {
+        const msg = t("dashboardPage.billing.marketing.error");
+        setMarketingMessage(msg);
+        pushActionToast({ status: "error", message: msg });
+      }
       // Rollback by reloading state
       try {
         const st = await api.get("/api/account/billing-account");
@@ -234,7 +298,11 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       const resp = await api.post("/api/account/deletion-request");
       if (resp?.data?.success !== true) throw new Error("deletion_failed");
       setDeletionSubmitting("success");
-      setDeletionMessage(t("dashboardPage.billing.account.deletionSuccess"));
+      {
+        const msg = t("dashboardPage.billing.account.deletionSuccess");
+        setDeletionMessage(msg);
+        pushActionToast({ status: "success", message: msg });
+      }
 
       // Clear local session and redirect to login (account is effectively disabled)
       try {
@@ -249,7 +317,11 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       }, 800);
     } catch {
       setDeletionSubmitting("error");
-      setDeletionMessage(t("dashboardPage.billing.account.deletionError"));
+      {
+        const msg = t("dashboardPage.billing.account.deletionError");
+        setDeletionMessage(msg);
+        pushActionToast({ status: "error", message: msg });
+      }
     } finally {
       setTimeout(() => setDeletionSubmitting("idle"), 2500);
     }
@@ -264,7 +336,8 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       const resp = await api.get("/api/plan/option");
       const plans = resp?.data?.plans;
       if (Array.isArray(plans)) {
-        setAvailablePlans(plans.filter((p) => p && p.active !== false));
+        // Keep inactive plans visible (disabled in UI) to avoid an empty modal when only inactive plans exist.
+        setAvailablePlans(plans.filter((p) => p));
       } else {
         setAvailablePlans([]);
       }
@@ -291,17 +364,26 @@ const DashboardPage = ({routeKey}: PropsPage) => {
     "";
 
   const currentPlan = availablePlans.find((p) => p?.name === currentPlanCode) || null;
-  const filteredPlans = (() => {
-    const base = availablePlans.filter((p) => p?.name && p?.name !== "free");
-    if (!currentPlan) return base;
-    if (planChangeMode === "upgrade") {
-      return base.filter((p) => Number(p.price) > Number(currentPlan.price));
-    }
-    return base.filter((p) => Number(p.price) < Number(currentPlan.price));
-  })();
+  const selectablePlans = availablePlans.filter(
+    (p) =>
+      p?.name &&
+      p.name !== currentPlanCode &&
+      // Le plan "pro" n'est pas supporté côté produit, on ne l'affiche pas.
+      p.name !== "pro",
+  );
+
+  const resolveSelectedChangeType = (plan: any): "upgrade" | "downgrade" | "same" => {
+    if (!currentPlan) return "upgrade";
+    const currentPrice = Number(currentPlan?.price ?? 0);
+    const targetPrice = Number(plan?.price ?? 0);
+    if (targetPrice > currentPrice) return "upgrade";
+    if (targetPrice < currentPrice) return "downgrade";
+    return "same";
+  };
 
   const confirmPlanChange = async () => {
     if (!selectedPlan) return;
+    if ((selectedPlan as any)?.active === false) return;
     setPlanChangeSubmitting("loading");
     setPlanChangeMessage(null);
     try {
@@ -338,6 +420,23 @@ const DashboardPage = ({routeKey}: PropsPage) => {
 
   return (
     <div className="page-container">
+      {actionToast.status !== "idle" ? (
+        <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
+          <div className="toast toast-top toast-center mt-20">
+            <p
+              className={`alert pointer-events-auto ${
+                actionToast.status === "success"
+                  ? "alert-success"
+                  : actionToast.status === "error"
+                    ? "alert-error"
+                    : "alert-info"
+              }`}
+            >
+              <span>{actionToast.message}</span>
+            </p>
+          </div>
+        </div>
+      ) : null}
       <div className="mb-8">
         <h1 className="text-3xl lg:text-4xl font-bold">
           {t("dashboardPage.title")}
@@ -347,79 +446,50 @@ const DashboardPage = ({routeKey}: PropsPage) => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="stat bg-base-100 rounded-xl border border-base-300">
-          <div className="stat-figure text-primary">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 6v12m6-6H6"
-              />
-            </svg>
+      <div className="flex flex-col md:flex-row md:flex-wrap md:justify-center  gap-4">
+        <div className="w-[200px] h-[100px] stat bg-base-100 rounded-xl border border-base-300">
+          <div className="stat-title">{t("dashboardPage.stats.user")}</div>
+          <div className="stat-value text-primary truncate">
+            {userDisplayName}
           </div>
+        </div>
+        <div className="w-[200px] h-[100px] stat bg-base-100 rounded-xl border border-base-300">
+          <div className="stat-title">{t("dashboardPage.stats.planTitle")}</div>
+          <div className="stat-value text-success">{planName}</div>
+        </div>
+        <div className="w-[200px] h-[100px] stat bg-base-100 rounded-xl border border-base-300">
+          <div className="stat-desc">
+            {t("dashboardPage.stats.billingPeriod")}
+          </div>
+          <div className="stat-title">
+            <p>
+              <span>du  </span>
+              <span
+                className="stat-value text-dark text-base"
+                dangerouslySetInnerHTML={{ __html: billingPeriodRange.start }}
+              ></span>
+            </p>
+            <p>
+              <span>au  </span>
+              <span
+                className="stat-value text-dark text-base"
+                dangerouslySetInnerHTML={{ __html: billingPeriodRange.end }}
+              ></span>
+            </p>
+          </div>
+        </div>
+        <div className="w-[200px] h-[100px] stat bg-base-100 rounded-xl border border-base-300">
           <div className="stat-title">
             {t("dashboardPage.stats.creditsRemainingTitle")}
           </div>
           <div className="stat-value text-primary">{creditsRemaining}</div>
-          <div className="stat-desc">
-            {t("dashboardPage.stats.billingPeriod")}
-          </div>
         </div>
 
-        <div className="stat bg-base-100 rounded-xl border border-base-300">
-          <div className="stat-figure text-info">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 3v18h18"
-              />
-            </svg>
-          </div>
+        <div className="w-[200px] h-[100px] stat bg-base-100 rounded-xl border border-base-300">
           <div className="stat-title">
             {t("dashboardPage.stats.creditsUsedTitle")}
           </div>
           <div className="stat-value text-info">{creditsUsed}</div>
-          <div className="stat-desc">
-            {t("dashboardPage.stats.billingPeriod")}
-          </div>
-        </div>
-
-        <div className="stat bg-base-100 rounded-xl border border-base-300">
-          <div className="stat-figure text-success">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 14l9-5-9-5-9 5 9 5z"
-              />
-            </svg>
-          </div>
-          <div className="stat-title">{t("dashboardPage.stats.planTitle")}</div>
-          <div className="stat-value text-success">{planName}</div>
-          {/* <div className="stat-desc">Gérez votre offre</div> */}
         </div>
       </div>
 
@@ -459,14 +529,17 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                   ) : null}
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <button className="btn btn-sm btn-primary" onClick={openPlanChangeModal}>
+                  <button
+                    className={`${dashboardActionBtn} btn-primary`}
+                    onClick={openPlanChangeModal}
+                  >
                     {t("dashboardPage.billing.subscription.changeCta")}
                   </button>
 
                   {billingState?.subscription?.subscription_status ===
                   "canceling" ? (
                     <button
-                      className="btn btn-sm btn-outline btn-success"
+                      className={`${dashboardActionBtn} btn-outline btn-success`}
                       disabled={
                         cancelSubmitting === "loading" ||
                         billingState?.account?.account_deletion_requested
@@ -480,7 +553,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                     </button>
                   ) : (
                     <button
-                      className="btn btn-sm btn-outline btn-error"
+                      className={`${dashboardActionBtn} btn-outline btn-error`}
                       disabled={
                         cancelSubmitting === "loading" ||
                         billingState?.account?.account_deletion_requested
@@ -515,22 +588,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                 </p>
               )}
 
-              {cancelSubmitting === "success" ? (
-                <div role="alert" className="alert alert-success mt-3">
-                  <span>
-                    {cancelMessage ||
-                      t("dashboardPage.subscription.cancelSuccess")}
-                  </span>
-                </div>
-              ) : null}
-              {cancelSubmitting === "error" ? (
-                <div role="alert" className="alert alert-error mt-3">
-                  <span>
-                    {cancelMessage ||
-                      t("dashboardPage.subscription.cancelError")}
-                  </span>
-                </div>
-              ) : null}
+              {/* Feedback is shown via the fixed toast to avoid layout shifts */}
             </div>
 
             {/* Préférences marketing */}
@@ -548,7 +606,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                   </p>
                 </div>
                 <button
-                  className="btn btn-sm"
+                  className={`${dashboardActionBtn} btn-outline`}
                   disabled={
                     marketingSubmitting === "loading" ||
                     billingState?.account?.account_deletion_requested
@@ -568,22 +626,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                   ? t("dashboardPage.billing.marketing.emailingTrue")
                   : t("dashboardPage.billing.marketing.emailingFalse")}
               </p>
-              {marketingSubmitting === "success" ? (
-                <div role="alert" className="alert alert-success mt-3">
-                  <span>
-                    {marketingMessage ||
-                      t("dashboardPage.billing.marketing.success")}
-                  </span>
-                </div>
-              ) : null}
-              {marketingSubmitting === "error" ? (
-                <div role="alert" className="alert alert-error mt-3">
-                  <span>
-                    {marketingMessage ||
-                      t("dashboardPage.billing.marketing.error")}
-                  </span>
-                </div>
-              ) : null}
+              {/* Feedback is shown via the fixed toast to avoid layout shifts */}
             </div>
 
             {/* Compte */}
@@ -620,7 +663,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                   </div>
                 </div>
                 <button
-                  className="btn btn-sm btn-error"
+                  className={`${dashboardActionBtn} btn-error`}
                   disabled={
                     deletionSubmitting === "loading" ||
                     billingState?.account?.account_deletion_requested ||
@@ -634,22 +677,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                   {t("dashboardPage.billing.account.deleteCta")}
                 </button>
               </div>
-              {deletionSubmitting === "success" ? (
-                <div role="alert" className="alert alert-success mt-3">
-                  <span>
-                    {deletionMessage ||
-                      t("dashboardPage.billing.account.deletionSuccess")}
-                  </span>
-                </div>
-              ) : null}
-              {deletionSubmitting === "error" ? (
-                <div role="alert" className="alert alert-error mt-3">
-                  <span>
-                    {deletionMessage ||
-                      t("dashboardPage.billing.account.deletionError")}
-                  </span>
-                </div>
-              ) : null}
+              {/* Feedback is shown via the fixed toast to avoid layout shifts */}
             </div>
 
             {/* Cancel modal */}
@@ -693,39 +721,47 @@ const DashboardPage = ({routeKey}: PropsPage) => {
             <dialog id="plan_change_modal" className="modal">
               <div className="modal-box max-w-5xl">
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="font-bold text-lg">{t("dashboardPage.billing.subscription.changeModalTitle")}</h3>
-                  <button type="button" className="btn btn-sm btn-ghost" onClick={closePlanChangeModal}>
+                  <h3 className="font-bold text-lg">
+                    {t("dashboardPage.billing.subscription.changeModalTitle")}
+                  </h3>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-ghost"
+                    onClick={closePlanChangeModal}
+                  >
                     {t("dashboardPage.billing.subscription.changeModalClose")}
                   </button>
                 </div>
-                <p className="py-2 text-base-content/70">{t("dashboardPage.billing.subscription.changeModalBody")}</p>
-
-                <div className="tabs tabs-boxed mt-3">
-                  <button
-                    className={`tab ${planChangeMode === "upgrade" ? "tab-active" : ""}`}
-                    onClick={() => setPlanChangeMode("upgrade")}
-                    type="button"
-                  >
-                    {t("dashboardPage.billing.subscription.upgradeTab")}
-                  </button>
-                  <button
-                    className={`tab ${planChangeMode === "downgrade" ? "tab-active" : ""}`}
-                    onClick={() => setPlanChangeMode("downgrade")}
-                    type="button"
-                  >
-                    {t("dashboardPage.billing.subscription.downgradeTab")}
-                  </button>
-                </div>
+                <p className="py-2 text-base-content/70">
+                  {t("dashboardPage.billing.subscription.changeModalBody")}
+                </p>
 
                 {planModalStep === "select" ? (
                   <div className="mt-4">
-                    <p className="text-sm text-base-content/70">
-                      {planChangeMode === "upgrade"
-                        ? t("dashboardPage.billing.subscription.upgradeInfo")
-                        : t("dashboardPage.billing.subscription.downgradeInfo")}
-                    </p>
+                    <div className="rounded-xl border border-base-300 p-4">
+                      <p className="text-sm text-base-content/70">
+                        <span className="font-semibold">
+                          Abonnement actuel :
+                        </span>{" "}
+                        <span className="capitalize">
+                          {currentPlanCode || "-"}
+                        </span>
+                      </p>
+                      <div className="mt-2 space-y-1">
+                        <p className="text-sm text-base-content/70">
+                          -{" "}
+                          {t("dashboardPage.billing.subscription.upgradeInfo")}
+                        </p>
+                        <p className="text-sm text-base-content/70">
+                          -{" "}
+                          {t(
+                            "dashboardPage.billing.subscription.downgradeInfo",
+                          )}
+                        </p>
+                      </div>
+                    </div>
                     <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                      {filteredPlans.map((p) => (
+                      {selectablePlans.map((p) => (
                         <div key={p.name} className="flex justify-center">
                           <PriceCard
                             lang={textLangCard as any}
@@ -735,15 +771,21 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                               setSelectedPlan(p);
                               setPlanModalStep("confirm");
                             }}
-                            isCurrentPlan={p.name === currentPlanCode}
-                            currentBadgeLabel={t("dashboardPage.billing.subscription.currentBadge")}
+                            isCurrentPlan={false}
+                            currentBadgeLabel={t(
+                              "dashboardPage.billing.subscription.currentBadge",
+                            )}
+                            disabled={p?.active === false}
+                            disabledBadgeLabel="Indisponible"
                           />
                         </div>
                       ))}
                     </div>
-                    {filteredPlans.length === 0 ? (
+                    {selectablePlans.length === 0 ? (
                       <p className="text-sm text-base-content/70 mt-4">
-                        {t("dashboardPage.billing.subscription.noPlanAvailable")}
+                        {t(
+                          "dashboardPage.billing.subscription.noPlanAvailable",
+                        )}
                       </p>
                     ) : null}
                   </div>
@@ -757,9 +799,16 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                         <span className="capitalize">{selectedPlan.name}</span>
                       </p>
                       <p className="text-sm text-base-content/70 mt-2">
-                        {planChangeMode === "upgrade"
-                          ? t("dashboardPage.billing.subscription.confirmUpgrade")
-                          : t("dashboardPage.billing.subscription.confirmDowngrade")}
+                        {resolveSelectedChangeType(selectedPlan) === "upgrade"
+                          ? t(
+                              "dashboardPage.billing.subscription.confirmUpgrade",
+                            )
+                          : resolveSelectedChangeType(selectedPlan) ===
+                              "downgrade"
+                            ? t(
+                                "dashboardPage.billing.subscription.confirmDowngrade",
+                              )
+                            : "Vous êtes déjà sur ce plan."}
                       </p>
                     </div>
                     {planChangeMessage ? (
@@ -769,8 +818,8 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                           planChangeSubmitting === "error"
                             ? "alert-error"
                             : planChangeSubmitting === "success"
-                            ? "alert-success"
-                            : "alert-info"
+                              ? "alert-success"
+                              : "alert-info"
                         }`}
                       >
                         <span>{planChangeMessage}</span>
@@ -789,7 +838,11 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                         className="btn btn-primary"
                         type="button"
                         onClick={confirmPlanChange}
-                        disabled={planChangeSubmitting === "loading"}
+                        disabled={
+                          planChangeSubmitting === "loading" ||
+                          resolveSelectedChangeType(selectedPlan) === "same" ||
+                          (selectedPlan as any)?.active === false
+                        }
                       >
                         {planChangeSubmitting === "loading" ? (
                           <span className="loading loading-spinner loading-sm" />

@@ -96,6 +96,55 @@ export const changePlanController: RequestHandler = async (req, res) => {
     });
   }
 
+  // Paid -> FREE: cancel Stripe subscription at period end and switch to free when it ends.
+  if (planCode === "free") {
+    // Prevent overlapping pending changes
+    if (subscription.pending_plan_id) {
+      return res.status(409).json({
+        success: false,
+        message: locale === "fr" ? "Un changement d’abonnement est déjà en cours." : "A plan change is already pending.",
+      });
+    }
+
+    const stripeSub: any = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id, {
+      expand: ["items.data.price"],
+    } as any);
+
+    const currentPeriodEndUnix = stripeSub?.current_period_end as number | undefined;
+    if (typeof currentPeriodEndUnix !== "number") {
+      return res.status(502).json({ success: false, message: "Unable to read Stripe subscription period end." });
+    }
+    const currentPeriodEnd = new Date(currentPeriodEndUnix * 1000);
+
+    try {
+      await stripe.subscriptions.update(subscription.stripe_subscription_id, { cancel_at_period_end: true } as any);
+    } catch (err: any) {
+      logger.error("subscription.change_plan::stripe_cancel_to_free_failed", {
+        userId: user.id,
+        message: err?.message || String(err),
+      });
+      return res.status(502).json({ success: false, message: "Stripe cancel failed." });
+    }
+
+    await updateSubscription(subscription.id, {
+      pending_plan_id: targetPlan.id,
+      pending_change_type: "downgrade",
+      pending_change_effective_at: currentPeriodEnd,
+      stripe_schedule_id: null,
+    });
+
+    return res.status(200).json({
+      success: true,
+      change_type: "downgrade",
+      pending: true,
+      effective_at: currentPeriodEnd.toISOString(),
+      message:
+        locale === "fr"
+          ? "Passage au plan gratuit programmé à la fin de la période en cours."
+          : "Switch to the free plan scheduled for the end of the current period.",
+    });
+  }
+
   // Determine upgrade/downgrade based on Plan.price (cents)
   const changeType = resolvePlanChangeType({
     currentPlanPrice: Number((subscription as any).plan_price ?? 0),

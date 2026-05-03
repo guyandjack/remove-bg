@@ -331,6 +331,17 @@ export async function revokeAllRefreshTokensForUser(userId: ID): Promise<number>
   return res.affectedRows;
 }
 
+export async function revokeAllRefreshTokensForUserExcept(userId: ID, exceptJti: string): Promise<number> {
+  const connexion = await connectDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE TokenRefresh
+     SET revoked = 1, revoked_at = NOW()
+     WHERE user_id = ? AND revoked = 0 AND jti <> ?`,
+    [userId, exceptJti]
+  );
+  return res.affectedRows;
+}
+
 export async function deleteRefreshTokenByJti(jti: string): Promise<boolean> {
   const connexion = await connectDb();
   const [res] = await connexion.execute<ResultSetHeader>(
