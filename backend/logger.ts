@@ -87,8 +87,7 @@ const transportsList = [
 
 function requestIdMiddleware(req: Request, res: Response, next: NextFunction) {
   const rid = req.headers["x-request-id"] || randomUUID();
-  // @ts-expect-error augmented in types
-  req.requestId = String(rid);
+  (req as any).requestId = String(rid);
   res.setHeader("X-Request-Id", rid);
   next();
 }

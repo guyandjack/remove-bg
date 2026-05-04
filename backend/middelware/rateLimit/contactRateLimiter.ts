@@ -1,5 +1,5 @@
 import type { RequestHandler } from "express";
-import { resolveClientIp } from "../../utils/telegramNotification.ts";
+import { resolveClientIp } from "../../utils/telegramNotification.js";
 
 type RateEntry = { count: number; expiresAt: number };
 

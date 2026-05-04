@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 
-import { planOption } from "../data/planOption";
+import { planOption } from "../data/planOption.js";
 
 const getPlanOption = (req: Request, res: Response) => {
 

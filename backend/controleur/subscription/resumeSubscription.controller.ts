@@ -1,11 +1,11 @@
 import type { RequestHandler } from "express";
-import { logger } from "../../logger.ts";
-import { getStripeClient } from "../../function/stripe/stripeClient.ts";
+import { logger } from "../../logger.js";
+import { getStripeClient } from "../../function/stripe/stripeClient.js";
 import {
   getActiveSubscription,
   getUserByEmail,
   updateSubscription,
-} from "../../DB/queriesSQL/queriesSQL.ts";
+} from "../../DB/queriesSQL/queriesSQL.js";
 
 function resolveLocale(input: unknown): "fr" | "en" | "de" | "it" {
   const raw = String(input || "en").toLowerCase();

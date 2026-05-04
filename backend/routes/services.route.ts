@@ -1,27 +1,27 @@
 //import deslibrairies
 import express from "express";
-import { verifyAuth } from "../middelware/verifAuth/verifyAuth";
+import { verifyAuth } from "../middelware/verifAuth/verifyAuth.js";
 
 //import des midelware de validation
 import {
   validateConverterUpload,
   validateConverterOptions,
-} from "../middelware/services/imageConverter.middleware";
-import { parseSocialPicturePayload } from "../middelware/services/socialPicture.middleware";
+} from "../middelware/services/imageConverter.middleware.js";
+import { parseSocialPicturePayload } from "../middelware/services/socialPicture.middleware.js";
 
 //import des controleur
-import { imageConverter } from "../controleur/services/imageConverter.controler";
-import { formatSocialPictures } from "../controleur/services/socialFormatter.controler";
-import { removeBg } from "../controleur/services/removeBg.controler";
-import { removeBgByReplicate } from "../controleur/services/removeBgByReplicate.controler";
-import { magicEraser } from "../controleur/services/magicEraser.controler";
+import { imageConverter } from "../controleur/services/imageConverter.controler.js";
+import { formatSocialPictures } from "../controleur/services/socialFormatter.controler.js";
+import { removeBg } from "../controleur/services/removeBg.controler.js";
+import { removeBgByReplicate } from "../controleur/services/removeBgByReplicate.controler.js";
+import { magicEraser } from "../controleur/services/magicEraser.controler.js";
 import {
   attachRemoveBgQuality,
   validateRemoveBgUpload,
-} from "../middelware/services/removeBg.middelware";
+} from "../middelware/services/removeBg.middelware.js";
 import {
   validateMagicEraserPayload,
-} from "../middelware/services/magicEraser.middleware";
+} from "../middelware/services/magicEraser.middleware.js";
 
 const router = express.Router();
 

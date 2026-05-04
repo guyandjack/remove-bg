@@ -1,11 +1,11 @@
 import type { RequestHandler } from "express";
-import { getStripeClient } from "../../function/stripe/stripeClient.ts";
-import { getStripeCheckoutSessionState } from "../../DB/queriesSQL/queriesSQL.ts";
-import { logger } from "../../logger.ts";
+import { getStripeClient } from "../../function/stripe/stripeClient.js";
+import { getStripeCheckoutSessionState } from "../../DB/queriesSQL/queriesSQL.js";
+import { logger } from "../../logger.js";
 import {
   CheckoutSessionPendingError,
   finalizeCheckoutSessionFromStripeSession,
-} from "../../services/stripe/finalizeCheckoutSession.ts";
+} from "../../services/stripe/finalizeCheckoutSession.js";
 
 function jsonError(res: any, status: number, message: string) {
   return res.status(status).json({ success: false, message });

@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import { setCookieOptionsObject, signAccessToken, signRefreshToken } from "../function/createToken";
-import { revokeRefreshToken } from "../DB/queriesSQL/queriesSQL.ts";
+import { setCookieOptionsObject, signAccessToken, signRefreshToken } from "../function/createToken.js";
+import { revokeRefreshToken } from "../DB/queriesSQL/queriesSQL.js";
 
 // Controller: issue new access/refresh tokens after middleware validation
 const refreshAuth: RequestHandler = async (req, res) => {

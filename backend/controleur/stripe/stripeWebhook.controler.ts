@@ -1,8 +1,7 @@
 import crypto from "node:crypto";
 import type { RequestHandler } from "express";
-import type Stripe from "stripe";
 import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
-import { connectDb } from "../../DB/poolConnexion/poolConnexion.ts";
+import { connectDb } from "../../DB/poolConnexion/poolConnexion.js";
 import {
   markStripeCheckoutSessionFailed,
   getActiveSubscription,
@@ -11,13 +10,13 @@ import {
   switchPlan,
   tryMarkWebhookEventReceived,
   markWebhookEventProcessed,
-} from "../../DB/queriesSQL/queriesSQL.ts";
-import { planOption } from "../../data/planOption.ts";
-import { logger } from "../../logger.ts";
+} from "../../DB/queriesSQL/queriesSQL.js";
+import { planOption } from "../../data/planOption.js";
+import { logger } from "../../logger.js";
 import {
   CheckoutSessionPendingError,
   finalizeCheckoutSessionFromStripeSession,
-} from "../../services/stripe/finalizeCheckoutSession.ts";
+} from "../../services/stripe/finalizeCheckoutSession.js";
 
 
 // Stripe webhook to finalize paid signups and activate subscriptions
@@ -145,7 +144,7 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       } 
       try {
         await finalizeCheckoutSessionFromStripeSession({
-          session: obj as Stripe.Checkout.Session,
+          session: obj as any,
           referer: (req.headers.referer as string | undefined) ?? null,
         });
       } catch (sessionErr) {

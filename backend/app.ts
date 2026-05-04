@@ -19,30 +19,30 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // methode de journalsiation des evenements
-import { logger, httpLoggerStream, requestIdMiddleware } from "./logger";
+import { logger, httpLoggerStream, requestIdMiddleware } from "./logger.js";
 
 //import des types
 import type { CorsOptions } from "cors";
 import type { Request, Response, NextFunction } from "express";
 
 //import des routes
-import contactRoute from "./routes/contact.route";
-import signupRoute from "./routes/signUp.route";
-import loginRoute from "./routes/login.route";
-import logOutRoute from "./routes/logOut.routes";
-import verifyRoute from "./routes/verifyAuth.route";
-import pexelsRoute from "./routes/pexels.route";
-import stripeRoute from "./routes/stripe.route";
-import subscriptionRoute from "./routes/subscription.route";
-import marketingRoute from "./routes/marketing.route";
-import accountRoute from "./routes/account.route";
-import billingRoute from "./routes/billing.route";
-import forgotPasswordRoute from "./routes/forgotPassword.route";
-import refreshRoute from "./routes/authRefresh.route";
-import usageRoute from "./routes/usage.route";
-import planOptionRoute from "./routes/planOption.route";
-import servicesRoute from "./routes/services.route";
-import resetPasswordRoute from "./routes/resetPassword.route";
+import contactRoute from "./routes/contact.route.js";
+import signupRoute from "./routes/signUp.route.js";
+import loginRoute from "./routes/login.route.js";
+import logOutRoute from "./routes/logOut.routes.js";
+import verifyRoute from "./routes/verifyAuth.route.js";
+import pexelsRoute from "./routes/pexels.route.js";
+import stripeRoute from "./routes/stripe.route.js";
+import subscriptionRoute from "./routes/subscription.route.js";
+import marketingRoute from "./routes/marketing.route.js";
+import accountRoute from "./routes/account.route.js";
+import billingRoute from "./routes/billing.route.js";
+import forgotPasswordRoute from "./routes/forgotPassword.route.js";
+import refreshRoute from "./routes/authRefresh.route.js";
+import usageRoute from "./routes/usage.route.js";
+import planOptionRoute from "./routes/planOption.route.js";
+import servicesRoute from "./routes/services.route.js";
+import resetPasswordRoute from "./routes/resetPassword.route.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -62,9 +62,15 @@ const corsOptions: CorsOptions = {
     callback: (err: Error | null, allow?: boolean) => void
   ) {
     const allowedOrigins = [
-      "https://wizpix.ch", // domaine de production
-      "http://localhost:5173", // front-end Vite dev
-      "http://localhost:4173", // autre port Vite preview
+      //dev
+      "http://localhost:5173", 
+      "http://localhost:4173", 
+
+      //pre_prod
+      "https://preprod.wizpix.ch",
+      
+      //production
+      "https://wizpix.ch", 
     ];
     if (!origin) callback(null, true); // requêtes locales (ex: Postman)
     else if (allowedOrigins.includes(origin)) callback(null, true);

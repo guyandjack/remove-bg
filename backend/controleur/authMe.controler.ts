@@ -3,7 +3,7 @@ import {
   getActiveUsageBillingPeriod,
   getPlanById,
   getUserByEmail,
-} from "../DB/queriesSQL/queriesSQL.ts";
+} from "../DB/queriesSQL/queriesSQL.js";
 
 const authMe = async (req: Request, res: Response) => {
   const email = ((req as any).payload as any)?.email ?? (req as any).payload ?? null;

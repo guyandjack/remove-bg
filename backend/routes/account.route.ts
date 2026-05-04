@@ -1,11 +1,11 @@
 import express from "express";
-import { verifyAuth } from "../middelware/verifAuth/verifyAuth";
+import { verifyAuth } from "../middelware/verifAuth/verifyAuth.js";
 import {
   accountDeletionRequestController,
-} from "../controleur/account/deletionRequest.controller";
-import { billingAccountStatusController } from "../controleur/account/billingAccountStatus.controller";
-import { changePasswordController } from "../controleur/account/changePassword.controller";
-import { checkChangePassword } from "../middelware/chekDataAuth/checkChangePassword";
+} from "../controleur/account/deletionRequest.controller.js";
+import { billingAccountStatusController } from "../controleur/account/billingAccountStatus.controller.js";
+import { changePasswordController } from "../controleur/account/changePassword.controller.js";
+import { checkChangePassword } from "../middelware/chekDataAuth/checkChangePassword.js";
 
 const router = express.Router();
 

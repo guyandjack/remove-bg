@@ -1,6 +1,6 @@
 // middleware/verifyAuth.ts
 import type { Request, Response, NextFunction } from "express";
-import { verifyAccessToken } from "../../function/createToken";
+import { verifyAccessToken } from "../../function/createToken.js";
 
 const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
   const rawAuth = req.headers.authorization;

@@ -3,7 +3,7 @@ import Handlebars from "handlebars";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { logger } from "../../logger.ts";
+import { logger } from "../../logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.resolve(__dirname, "..", "template");

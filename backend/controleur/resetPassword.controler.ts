@@ -1,8 +1,8 @@
 import type { RequestHandler } from "express";
 import bcrypt from "bcryptjs";
-import { getUserByEmail, getUserById, updateUser, revokeAllRefreshTokensForUser } from "../DB/queriesSQL/queriesSQL.ts";
-import { verifyPasswordResetToken } from "../function/createToken.ts";
-import { logger } from "../logger.ts";
+import { getUserByEmail, getUserById, updateUser, revokeAllRefreshTokensForUser } from "../DB/queriesSQL/queriesSQL.js";
+import { verifyPasswordResetToken } from "../function/createToken.js";
+import { logger } from "../logger.js";
 
 type ResetValidatedPayload = {
   token: string;

@@ -35,19 +35,23 @@ const pexelsCheckReqParams: RequestHandler = (req, res, next) => {
     : req.query.page;
   const idValue = Array.isArray(req.query.id) ? req.query.id[0] : req.query.id;
 
-  if (!themeValue || !themeRegex.test(themeValue)) {
+  if (typeof themeValue !== "string" || !themeRegex.test(themeValue)) {
     tabError.push("error on value param theme code 10");
   }
 
-  if (!langValue || !langRegex.test(langValue)) {
+  if (typeof langValue !== "string" || !langRegex.test(langValue)) {
     tabError.push("error on value param lang code 11");
   }
 
-  if (pageValue && !pageRegex.test(pageValue)) {
+  if (pageValue !== undefined && pageValue !== null && typeof pageValue !== "string") {
+    tabError.push("error on value param page code 12");
+  } else if (typeof pageValue === "string" && pageValue && !pageRegex.test(pageValue)) {
     tabError.push("error on value param page code 12");
   }
 
-  if (idValue && !idRegex.test(idValue)) {
+  if (idValue !== undefined && idValue !== null && typeof idValue !== "string") {
+    tabError.push("error on value param id code 13");
+  } else if (typeof idValue === "string" && idValue && !idRegex.test(idValue)) {
     tabError.push("error on value param id code 13");
   }
 

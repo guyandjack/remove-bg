@@ -1,5 +1,5 @@
 import express from "express";
-import { getPlanOption } from "../controleur/getPlanOption.controler";
+import { getPlanOption } from "../controleur/getPlanOption.controler.js";
 
 const router = express.Router();
 

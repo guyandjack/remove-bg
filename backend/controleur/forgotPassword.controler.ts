@@ -1,11 +1,11 @@
 import type { RequestHandler } from "express";
 import nodemailer from "nodemailer";
 import { randomUUID } from "node:crypto";
-import { getUserByEmail } from "../DB/queriesSQL/queriesSQL.ts";
-import { logger } from "../logger.ts";
-import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.ts";
-import { signPasswordResetToken } from "../function/createToken.ts";
-import { buildLogoUrl } from "../utils/publicAssetUrl.ts";
+import { getUserByEmail } from "../DB/queriesSQL/queriesSQL.js";
+import { logger } from "../logger.js";
+import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.js";
+import { signPasswordResetToken } from "../function/createToken.js";
+import { buildLogoUrl } from "../utils/publicAssetUrl.js";
 
 function normalizeEmail(email: unknown): string | null {
   if (!email) return null;

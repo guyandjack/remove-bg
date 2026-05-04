@@ -129,7 +129,7 @@ const signPasswordResetToken = (payload: PasswordResetPayload) => {
  * Sign JWT refreshToken
  */
 const signRefreshToken = async (email: string, opts?: { ip?: string | null; userAgent?: string | null }) => {
-  const { createRefreshTokenRecord, getUserByEmail } = await import("../DB/queriesSQL/queriesSQL.ts");
+  const { createRefreshTokenRecord, getUserByEmail } = await import("../DB/queriesSQL/queriesSQL.js");
   const privateKey = resolvePrivateKey();
   const key: Secret = privateKey as unknown as Secret;
   const jti = crypto.randomUUID();
@@ -182,7 +182,7 @@ const verifyPasswordResetToken = (token: string) => {
  * Verify JWT refresh token (RS256)
  */
 const verifyRefreshToken = async (token: string) => {
-  const { findValidRefreshTokenByJti } = await import("../DB/queriesSQL/queriesSQL.ts");
+  const { findValidRefreshTokenByJti } = await import("../DB/queriesSQL/queriesSQL.js");
   const publicKey = resolveRefreshPublicKey();
   const decoded = jwt.verify(token, publicKey, { algorithms: ["RS256"] }) as any;
   const jti: string | undefined = decoded?.jti || decoded?.jwtid;

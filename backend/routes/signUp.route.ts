@@ -1,8 +1,8 @@
 import express from "express";
-import { sendMailVerification } from "../controleur/signUpDataUser.controler.ts";
-import { checkSignUpDataUser } from "../middelware/chekDataAuth/checkSignUpDataUser.ts";
-import { checkSignUpOtpUser } from "../middelware/chekDataAuth/checkSignUpOtpUser.ts";
-import { createNewAccountUser } from "../controleur/signUpOtpUser.controler.ts";
+import { sendMailVerification } from "../controleur/signUpDataUser.controler.js";
+import { checkSignUpDataUser } from "../middelware/chekDataAuth/checkSignUpDataUser.js";
+import { checkSignUpOtpUser } from "../middelware/chekDataAuth/checkSignUpOtpUser.js";
+import { createNewAccountUser } from "../controleur/signUpOtpUser.controler.js";
 
 const router = express.Router();
 

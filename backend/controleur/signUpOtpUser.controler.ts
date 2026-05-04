@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 //import des fonctions
 
 //pour base de données
-import { connectDb } from "../DB/poolConnexion/poolConnexion.ts";
+import { connectDb } from "../DB/poolConnexion/poolConnexion.js";
 import {
   getUserByEmail,
   getActiveUsageBillingPeriod,
@@ -12,25 +12,25 @@ import {
   getPlanByCode,
   getCustomerByUserId,
   createStripeCheckoutSessionState,
-} from "../DB/queriesSQL/queriesSQL.ts";
+} from "../DB/queriesSQL/queriesSQL.js";
 
 //pour gerer les tokens
 import {
   signAccessToken,
   signRefreshToken,
   setCookieOptionsObject,
-} from "../function/createToken.ts";
+} from "../function/createToken.js";
 
 //pour gerer stripe
-import { createCheckoutSession } from "../function/stripe/createCheckoutSession.ts";
+import { createCheckoutSession } from "../function/stripe/createCheckoutSession.js";
 
 //import des spec des plan
-import { planOption } from "../data/planOption.ts";
+import { planOption } from "../data/planOption.js";
 
 //import des types
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import type { RequestHandler } from "express";
-import type { ObjectResponse } from "./loginDataUser.controler.ts";
+import type { ObjectResponse } from "./loginDataUser.controler.js";
 
 //declaration de fonctions
 function hashOtp(code: string, salt: Buffer): Buffer {

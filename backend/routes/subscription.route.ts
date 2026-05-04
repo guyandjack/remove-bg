@@ -1,8 +1,8 @@
 import express from "express";
-import { verifyAuth } from "../middelware/verifAuth/verifyAuth";
-import { cancelSubscriptionController } from "../controleur/subscription/cancelSubscription.controller";
-import { resumeSubscriptionController } from "../controleur/subscription/resumeSubscription.controller";
-import { changePlanController } from "../controleur/subscription/changePlan.controller";
+import { verifyAuth } from "../middelware/verifAuth/verifyAuth.js";
+import { cancelSubscriptionController } from "../controleur/subscription/cancelSubscription.controller.js";
+import { resumeSubscriptionController } from "../controleur/subscription/resumeSubscription.controller.js";
+import { changePlanController } from "../controleur/subscription/changePlan.controller.js";
 
 const router = express.Router();
 

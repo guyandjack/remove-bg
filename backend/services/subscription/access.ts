@@ -1,4 +1,4 @@
-import type { SubscriptionStatus } from "../../DB/queriesSQL/queriesSQL.ts";
+import type { SubscriptionStatus } from "../../DB/queriesSQL/queriesSQL.js";
 
 export function isPremiumAccessAllowed(input: {
   subscriptionStatus: SubscriptionStatus;

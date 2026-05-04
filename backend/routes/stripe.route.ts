@@ -1,7 +1,7 @@
 import express from "express";
-import { stripeWebhook } from "../controleur/stripe/stripeWebhook.controler";
-import { finalizeStripeCheckout } from "../controleur/stripe/stripeFinalize.controller";
-import { cleanupStripeCheckout } from "../controleur/stripe/stripeCleanup.controller";
+import { stripeWebhook } from "../controleur/stripe/stripeWebhook.controler.js";
+import { finalizeStripeCheckout } from "../controleur/stripe/stripeFinalize.controller.js";
+import { cleanupStripeCheckout } from "../controleur/stripe/stripeCleanup.controller.js";
 
 const router = express.Router();
 const jsonParser = express.json({ type: "application/json" });

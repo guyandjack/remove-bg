@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { Request } from "express";
-import { logger } from "../logger.ts";
+import { logger } from "../logger.js";
 
 const TELEGRAM_ENDPOINT = "https://api.telegram.org";
 const TELEGRAM_SPECIAL_CHARS = /[_*\[\]\(\)~`>#+\-=|{}\.!]/g;

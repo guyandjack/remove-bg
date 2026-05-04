@@ -1,10 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
 
-import { validateImageUpload } from "../checkDataUpload/checkDataUpload";
+import { validateImageUpload } from "../checkDataUpload/checkDataUpload.js";
 import {
   parseOptionsPayload,
   type NormalizedConverterOptions,
-} from "../../utils/imageConverterOptions";
+} from "../../utils/imageConverterOptions.js";
 
 const MAX_IMAGE_SIZE = 25 * 1024 * 1024; // 25 MB
 

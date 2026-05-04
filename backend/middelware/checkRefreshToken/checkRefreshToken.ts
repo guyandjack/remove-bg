@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { verifyRefreshToken } from "../../function/createToken";
+import { verifyRefreshToken } from "../../function/createToken.js";
 
 const checkRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
   try {

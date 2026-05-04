@@ -2,13 +2,13 @@ import Replicate from "replicate";
 import axios, { type AxiosError } from "axios";
 
 import type { RequestHandler } from "express";
-import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload";
-import { logger } from "../../logger";
+import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload.js";
+import { logger } from "../../logger.js";
 import {
   getActiveUsageBillingPeriod,
   getUserByEmail,
   recordCreditUsage,
-} from "../../DB/queriesSQL/queriesSQL.ts";
+} from "../../DB/queriesSQL/queriesSQL.js";
 
 const REPLICATE_TIMEOUT_MS =
   Number(process.env.REPLICATE_TIMEOUT_MS ?? "120000") || 120000;

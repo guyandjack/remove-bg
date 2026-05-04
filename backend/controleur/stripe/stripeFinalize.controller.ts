@@ -7,18 +7,18 @@ import {
   getActiveUsageBillingPeriod,
   getPlanByCode,
   getCustomerByUserId,
-} from "../../DB/queriesSQL/queriesSQL.ts";
+} from "../../DB/queriesSQL/queriesSQL.js";
 import {
   signAccessToken,
   signRefreshToken,
   setCookieOptionsObject,
-} from "../../function/createToken.ts";
-import type { ObjectResponse } from "../loginDataUser.controler.ts";
-import { planOption } from "../../data/planOption.ts";
+} from "../../function/createToken.js";
+import type { ObjectResponse } from "../loginDataUser.controler.js";
+import { planOption } from "../../data/planOption.js";
 import {
   CheckoutSessionPendingError,
   finalizeCheckoutSessionFromStripeSession,
-} from "../../services/stripe/finalizeCheckoutSession.ts";
+} from "../../services/stripe/finalizeCheckoutSession.js";
 
 const buildStripeClient = (): Stripe | null => {
   const isProd =

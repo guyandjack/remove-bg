@@ -1,16 +1,16 @@
-﻿//import des librairies
+//import des librairies
 import axios, { type AxiosError } from "axios";
 
 //import de class
 import FormData from "form-data";
 
 //import de fonction
-import { logger } from "../../logger";
-import { getEnv } from "../../utils/getEnv";
+import { logger } from "../../logger.js";
+import { getEnv } from "../../utils/getEnv.js";
 
 //import des types
 import type { RequestHandler } from "express";
-import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload";
+import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload.js";
 
 
 const env = getEnv();

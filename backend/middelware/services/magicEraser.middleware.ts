@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import type { UploadedFile } from "express-fileupload";
 
-import type { ValidatedImage } from "../checkDataUpload/checkDataUpload";
+import type { ValidatedImage } from "../checkDataUpload/checkDataUpload.js";
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB
 

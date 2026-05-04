@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { test } from "./run.ts";
-import { resolvePlanChangeType } from "../services/subscription/planChange.ts";
+import { test } from "./run.js";
+import { resolvePlanChangeType } from "../services/subscription/planChange.js";
 
 test("plan change: upgrade when target price is higher", () => {
   assert.equal(

@@ -11,6 +11,7 @@ const { urlApi } = localOrProd();
 
 // Normalise l'URL de base: supprime les slash finaux pour éviter les doublons
 const normalizedBaseURL = urlApi.replace(/\/+$/, "");
+console.log("api url: ", normalizedBaseURL);
 
 //instance api qui aura des interceptor
 const api = axios.create({

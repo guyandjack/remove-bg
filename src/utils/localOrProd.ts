@@ -1,58 +1,59 @@
-// Accès aux variables d'environnement
+type Mode = "development" | "preprod" | "production";
 
+interface EnvConfig {
+  url: string;
+  urlApi: string;
+}
 
-//local
-const baseDevUrl = import.meta.env.VITE_BASE_DEV_URL;
-const apiDevUrl = import.meta.env.VITE_API_DEV_URL;
+interface EnvResult extends EnvConfig {
+  mode: Mode;
+}
 
-//prod
-const baseProdUrl = import.meta.env.VITE_BASE_PROD_URL;
-const apiProdUrl = import.meta.env.VITE_API_PROD_URL;
+const mode = import.meta.env.MODE as Mode;
 
-const mode = import.meta.env.MODE;
+const envConfig: Record<Mode, EnvConfig> = {
+  development: {
+    url: import.meta.env.VITE_BASE_DEV_URL,
+    urlApi: import.meta.env.VITE_API_DEV_URL,
+  },
+  preprod: {
+    url: import.meta.env.VITE_BASE_PRE_PROD_URL,
+    urlApi: import.meta.env.VITE_API_PRE_PROD_URL,
+  },
+  production: {
+    url: import.meta.env.VITE_BASE_PROD_URL,
+    urlApi: import.meta.env.VITE_API_PROD_URL,
+  },
+};
 
-// Fonction pour vérifier que les variables d'environnement sont bien chargées
-function validateEnvVariables() {
-  if (
-    !baseDevUrl ||
-    !baseProdUrl ||
-    !apiDevUrl ||
-    !apiProdUrl ||
-    !mode 
-    
-  ) {
+function validateEnvVariables(
+  config: EnvConfig | undefined,
+): asserts config is EnvConfig {
+  if (!mode) {
+    throw new Error("Le mode Vite est manquant.");
+  }
+
+  if (!config) {
+    throw new Error(`Mode Vite non reconnu : ${mode}`);
+  }
+
+  if (!config.url || !config.urlApi) {
     throw new Error(
-      "Une ou plusieurs variables d'environnement sont manquantes."
+      `Variables d'environnement manquantes pour le mode : ${mode}`,
     );
   }
 }
 
 /**
- * Determines if the application is running in a local or production environment
- * and returns the appropriate URLs
- * @returns {Object} Object containing url, urlApi, and mode
+ * ⚡ Garde le même nom que ton ancienne fonction
  */
-function localOrProd() {
-    validateEnvVariables();
-  const isLocalhost =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
+export function localOrProd(): EnvResult {
+  const config = envConfig[mode];
 
-  
-  if (isLocalhost) {
-    return {
-      url: baseDevUrl,
-      urlApi: apiDevUrl,
-      mode: mode,
-    };
-   
-  } else {
-    return {
-      url: baseProdUrl,
-      urlApi: apiProdUrl,
-      mode: mode,
-    };
-  }
+  validateEnvVariables(config);
+
+  return {
+    ...config,
+    mode,
+  };
 }
-
-export { localOrProd };

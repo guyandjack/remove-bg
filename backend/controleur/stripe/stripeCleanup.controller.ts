@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { connectDb } from "../../DB/poolConnexion/poolConnexion.ts";
+import { connectDb } from "../../DB/poolConnexion/poolConnexion.js";
 
 const cleanupStripeCheckout: RequestHandler = async (req, res) => {
   try {

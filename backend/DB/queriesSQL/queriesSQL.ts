@@ -1,8 +1,8 @@
 // src/db.ts
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { connectDb } from "../poolConnexion/poolConnexion";
+import { connectDb } from "../poolConnexion/poolConnexion.js";
 import crypto from "node:crypto";
-import { isPremiumAccessAllowed } from "../../services/subscription/access.ts";
+import { isPremiumAccessAllowed } from "../../services/subscription/access.js";
 
 
 // -----------------------------

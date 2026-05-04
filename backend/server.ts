@@ -21,8 +21,8 @@ dotenv.config({ path: path.join(__dirname, ".env") });
 // 2) Imports applicatifs et cœur Node
 // -----------------------------------------------------------------------------
 import http from "node:http";
-import app from "./app"; // Instance Express déjà configurée (TS/ESM: sans extension)
-import { logger } from "./logger";
+import app from "./app.js"; // Instance Express déjà configurée (TS/ESM: sans extension)
+import { logger } from "./logger.js";
 
 // -----------------------------------------------------------------------------
 // 3) Normalisation du port & lecture des variables

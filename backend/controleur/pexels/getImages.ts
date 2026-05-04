@@ -1,5 +1,5 @@
 //import des fonctions
-import { pexelsConnect } from "../../function/pexelsConnect";
+import { pexelsConnect } from "../../function/pexelsConnect.js";
 
 //import des types
 import type { RequestHandler } from "express";
@@ -7,8 +7,15 @@ import type { RequestHandler } from "express";
 
 //permet de recuperer un tableau d'images pour les vignettes d'une pallete cote front
 const getImages: RequestHandler = async (req, res) => {
-    const query = req.query.theme;
-    let lang = req.query.lang;
+    const themeValue = Array.isArray(req.query.theme)
+        ? req.query.theme[0]
+        : req.query.theme;
+    const query = typeof themeValue === "string" ? themeValue : "";
+
+    const langValue = Array.isArray(req.query.lang)
+        ? req.query.lang[0]
+        : req.query.lang;
+    let lang = typeof langValue === "string" ? langValue : "en";
     const MAX_PAGE = 5;
     const rawPage = Array.isArray(req.query.page)
         ? req.query.page[0]

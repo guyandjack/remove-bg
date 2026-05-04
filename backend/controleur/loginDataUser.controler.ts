@@ -6,7 +6,7 @@ import {
   setCookieOptionsObject,
   signAccessToken,
   signRefreshToken,
-} from "../function/createToken";
+} from "../function/createToken.js";
 import {
   getUserByEmail,
   withTransaction,
@@ -14,7 +14,7 @@ import {
   getPlanByCode,
   getActiveUsageBillingPeriod,
   getUserPlanAndCreditsBillingPeriod,
-} from "../DB/queriesSQL/queriesSQL.ts";
+} from "../DB/queriesSQL/queriesSQL.js";
 
 //import des types
 import type { RequestHandler } from "express";

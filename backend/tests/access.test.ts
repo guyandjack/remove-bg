@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { test } from "./run.ts";
-import { isPremiumAccessAllowed } from "../services/subscription/access.ts";
+import { test } from "./run.js";
+import { isPremiumAccessAllowed } from "../services/subscription/access.js";
 
 test("access: active + future access_until => allowed", () => {
   const allowed = isPremiumAccessAllowed({

@@ -1,9 +1,9 @@
 import express from "express";
 
 
-import { verifyAuth } from "../middelware/verifAuth/verifyAuth";
-import { checkDataUsageDownload } from "../middelware/checkDataUsage/checkDataUsageDowload";
-import { updateUserDownload } from "../controleur/usage/updateUserDowmload";
+import { verifyAuth } from "../middelware/verifAuth/verifyAuth.js";
+import { checkDataUsageDownload } from "../middelware/checkDataUsage/checkDataUsageDowload.js";
+import { updateUserDownload } from "../controleur/usage/updateUserDowmload.js";
 
 const router = express.Router();
 

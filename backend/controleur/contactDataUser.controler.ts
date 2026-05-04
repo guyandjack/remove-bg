@@ -5,7 +5,7 @@ import "dotenv/config";
 import {
   notifyContactSubmission,
   safeNotify,
-} from "../utils/telegramNotification.ts";
+} from "../utils/telegramNotification.js";
 
 /** Utilitaire: lit une variable d'env, avec fallback et/ou obligation */
 function env(name: string, opts?: { required?: boolean; fallback?: string }) {

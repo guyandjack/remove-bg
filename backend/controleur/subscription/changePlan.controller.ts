@@ -1,16 +1,16 @@
 import type { RequestHandler } from "express";
-import { logger } from "../../logger.ts";
-import { getStripeClient } from "../../function/stripe/stripeClient.ts";
+import { logger } from "../../logger.js";
+import { getStripeClient } from "../../function/stripe/stripeClient.js";
 import {
   getActiveSubscription,
   getPlanByCode,
   getUserByEmail,
   updateSubscription,
   createStripeCheckoutSessionState,
-} from "../../DB/queriesSQL/queriesSQL.ts";
-import { resolvePlanChangeType } from "../../services/subscription/planChange.ts";
-import { createCheckoutSession } from "../../function/stripe/createCheckoutSession.ts";
-import { planOption } from "../../data/planOption.ts";
+} from "../../DB/queriesSQL/queriesSQL.js";
+import { resolvePlanChangeType } from "../../services/subscription/planChange.js";
+import { createCheckoutSession } from "../../function/stripe/createCheckoutSession.js";
+import { planOption } from "../../data/planOption.js";
 
 function resolveLocale(input: unknown): "fr" | "en" | "de" | "it" {
   const raw = String(input || "en").toLowerCase();

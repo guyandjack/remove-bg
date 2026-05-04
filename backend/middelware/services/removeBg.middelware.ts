@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 
-import { validateImageUpload } from "../checkDataUpload/checkDataUpload";
+import { validateImageUpload } from "../checkDataUpload/checkDataUpload.js";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 

@@ -2,8 +2,8 @@ import sharp from "sharp";
 import JSZip from "jszip";
 import type { RequestHandler } from "express";
 
-import { logger } from "../../logger";
-import type { SanitizedSocialAsset } from "../../middelware/services/socialPicture.middleware";
+import { logger } from "../../logger.js";
+import type { SanitizedSocialAsset } from "../../middelware/services/socialPicture.middleware.js";
 
 const extensionByFormat = {
   jpeg: "jpeg",

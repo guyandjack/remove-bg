@@ -3,14 +3,14 @@ import axios, { type AxiosError } from "axios";
 import sharp from "sharp";
 
 import type { RequestHandler } from "express";
-import { logger } from "../../logger";
+import { logger } from "../../logger.js";
 
-import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload";
+import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload.js";
 import {
   getActiveUsageBillingPeriod,
   getUserByEmail,
   recordCreditUsage,
-} from "../../DB/queriesSQL/queriesSQL.ts";
+} from "../../DB/queriesSQL/queriesSQL.js";
 
 const REPLICATE_TIMEOUT_MS =
   Number(process.env.REPLICATE_TIMEOUT_MS ?? "120000") || 120000;

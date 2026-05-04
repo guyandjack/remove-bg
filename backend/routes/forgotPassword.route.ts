@@ -1,6 +1,6 @@
 import express from "express";
-import { checkForgotPassword } from "../middelware/chekDataAuth/checkForgotPassword";
-import { forgotPassword } from "../controleur/forgotPassword.controler";
+import { checkForgotPassword } from "../middelware/chekDataAuth/checkForgotPassword.js";
+import { forgotPassword } from "../controleur/forgotPassword.controler.js";
 
 const router = express.Router();
 

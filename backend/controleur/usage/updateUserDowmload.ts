@@ -1,10 +1,10 @@
 import type { RequestHandler } from "express";
-import { logger } from "../../logger";
+import { logger } from "../../logger.js";
 import {
   getUserByEmail,
   getActiveUsageBillingPeriod,
   recordCreditUsage,
-} from "../../DB/queriesSQL/queriesSQL.ts";
+} from "../../DB/queriesSQL/queriesSQL.js";
 
 /**
  * Contrôleur: décrémente 1 crédit lors d'un téléchargement

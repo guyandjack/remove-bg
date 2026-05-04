@@ -2,7 +2,7 @@
 import type { RequestHandler } from "express";
 
 //import des fonctions
-import { pexelsConnect } from "../../function/pexelsConnect";
+import { pexelsConnect } from "../../function/pexelsConnect.js";
 
 const getOneImage: RequestHandler = async (req, res) => {
   const idImg = Number(req.params.id);

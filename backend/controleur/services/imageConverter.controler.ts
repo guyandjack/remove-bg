@@ -1,12 +1,12 @@
 import sharp from "sharp";
 import type { RequestHandler } from "express";
 
-import { logger } from "../../logger";
-import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload";
+import { logger } from "../../logger.js";
+import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload.js";
 import type {
   NormalizedConverterOptions,
   SupportedFormat,
-} from "../../utils/imageConverterOptions";
+} from "../../utils/imageConverterOptions.js";
 
 const clampNumber = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);

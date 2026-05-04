@@ -2,8 +2,8 @@ import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 //import des fonctions
-import { setCookieOptionsObject } from "../function/createToken.ts";
-import { revokeAllRefreshTokensForUser, getUserByEmail } from "../DB/queriesSQL/queriesSQL.ts";
+import { setCookieOptionsObject } from "../function/createToken.js";
+import { revokeAllRefreshTokensForUser, getUserByEmail } from "../DB/queriesSQL/queriesSQL.js";
 
 const logOut = async (req: Request, res: Response) => {
   const options = setCookieOptionsObject();

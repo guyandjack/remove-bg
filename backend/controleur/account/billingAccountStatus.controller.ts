@@ -4,7 +4,7 @@ import {
   getCustomerByUserId,
   getPlanById,
   getUserByEmail,
-} from "../../DB/queriesSQL/queriesSQL.ts";
+} from "../../DB/queriesSQL/queriesSQL.js";
 
 function formatIsoDateTime(d: Date | null): string | null {
   if (!d) return null;

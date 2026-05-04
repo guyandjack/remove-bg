@@ -1,6 +1,6 @@
 import express from "express";
-import { checkResetPassword } from "../middelware/chekDataAuth/checkResetPassword";
-import { resetPassword } from "../controleur/resetPassword.controler";
+import { checkResetPassword } from "../middelware/chekDataAuth/checkResetPassword.js";
+import { resetPassword } from "../controleur/resetPassword.controler.js";
 
 const router = express.Router();
 

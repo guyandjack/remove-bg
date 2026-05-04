@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 import bcrypt from "bcryptjs";
-import { getUserByEmail, updateUser, revokeAllRefreshTokensForUser, revokeAllRefreshTokensForUserExcept } from "../../DB/queriesSQL/queriesSQL.ts";
-import { logger } from "../../logger.ts";
+import { getUserByEmail, updateUser, revokeAllRefreshTokensForUser, revokeAllRefreshTokensForUserExcept } from "../../DB/queriesSQL/queriesSQL.js";
+import { logger } from "../../logger.js";
 import jwt from "jsonwebtoken";
 
 type ChangePasswordValidatedPayload = {

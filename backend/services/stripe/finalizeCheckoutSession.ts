@@ -1,8 +1,7 @@
 import crypto from "node:crypto";
-import type Stripe from "stripe";
 import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
-import { connectDb } from "../../DB/poolConnexion/poolConnexion.ts";
+import { connectDb } from "../../DB/poolConnexion/poolConnexion.js";
 import { 
   createStripeCheckoutSessionState, 
   createSubscription, 
@@ -15,10 +14,10 @@ import {
   type StripeCheckoutSessionState, 
   updateSubscription,
   upsertPlanByCode,
-} from "../../DB/queriesSQL/queriesSQL.ts";
-import { planOption } from "../../data/planOption.ts";
-import { logger } from "../../logger.ts";
-import { notifyNewClientSignup, safeNotify } from "../../utils/telegramNotification.ts";
+} from "../../DB/queriesSQL/queriesSQL.js";
+import { planOption } from "../../data/planOption.js";
+import { logger } from "../../logger.js";
+import { notifyNewClientSignup, safeNotify } from "../../utils/telegramNotification.js";
 
 export class CheckoutSessionPendingError extends Error {
   constructor(message: string) {
@@ -27,40 +26,74 @@ export class CheckoutSessionPendingError extends Error {
   }
 }
 
-const resolveEmailFromSession = (session: Stripe.Checkout.Session): string | null => {
+type StripeAddressLike = {
+  line1?: string | null;
+  line2?: string | null;
+  postal_code?: string | null;
+  city?: string | null;
+  country?: string | null;
+};
+
+type StripeCustomerLike = {
+  id: string;
+  email?: string | null;
+};
+
+type StripeSubscriptionLike = {
+  id: string;
+};
+
+type StripeCustomerDetailsLike = {
+  email?: string | null;
+  name?: string | null;
+  phone?: string | null;
+  address?: StripeAddressLike | null;
+};
+
+export type StripeCheckoutSessionLike = {
+  id: string;
+  currency?: string | null;
+  customer_details?: StripeCustomerDetailsLike | null;
+  customer_email?: string | null;
+  customer?: string | StripeCustomerLike | null;
+  subscription?: string | StripeSubscriptionLike | null;
+  metadata?: Record<string, unknown> | null;
+};
+
+const resolveEmailFromSession = (session: StripeCheckoutSessionLike): string | null => {
   const fromDetails = session.customer_details?.email;
   if (fromDetails) return fromDetails.toLowerCase();
   if (session.customer_email) return session.customer_email.toLowerCase();
   if (typeof session.customer === "object" && session.customer && "email" in session.customer) {
-    const email = (session.customer as Stripe.Customer).email;
+    const email = (session.customer as StripeCustomerLike).email;
     if (email) return email.toLowerCase();
   }
   if (session.metadata?.email) return String(session.metadata.email).toLowerCase();
   return null;
 };
 
-const resolvePlanCodeFromSession = (session: Stripe.Checkout.Session): string | null => {
+const resolvePlanCodeFromSession = (session: StripeCheckoutSessionLike): string | null => {
   const raw = session.metadata?.plan_code ?? (session.metadata as any)?.planCode;
   if (!raw) return null;
   return String(raw).toLowerCase();
 };
 
-const resolveStripeCustomerId = (session: Stripe.Checkout.Session): string | null => {
+const resolveStripeCustomerId = (session: StripeCheckoutSessionLike): string | null => {
   if (typeof session.customer === "string") return session.customer;
   if (session.customer && "id" in session.customer) {
-    return (session.customer as Stripe.Customer).id;
+    return (session.customer as StripeCustomerLike).id;
   }
   return null;
 };
 
-const resolveStripeSubscriptionId = (session: Stripe.Checkout.Session): string | null => {
+const resolveStripeSubscriptionId = (session: StripeCheckoutSessionLike): string | null => {
   if (!session.subscription) return null;
   if (typeof session.subscription === "string") return session.subscription;
-  return (session.subscription as Stripe.Subscription).id ?? null;
+  return (session.subscription as StripeSubscriptionLike).id ?? null;
 };
 
 export type FinalizeCheckoutSessionInput = {
-  session: Stripe.Checkout.Session;
+  session: StripeCheckoutSessionLike;
   referer?: string | null;
 };
 
