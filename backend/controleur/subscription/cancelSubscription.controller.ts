@@ -1,19 +1,19 @@
 import type { RequestHandler } from "express";
-import { logger } from "../../logger.ts";
-import { getStripeClient } from "../../function/stripe/stripeClient.ts";
+import { logger } from "../../logger.js";
+import { getStripeClient } from "../../function/stripe/stripeClient.js";
 import {
   getActiveSubscription,
   getActiveUsageBillingPeriod,
   getUserByEmail,
   updateSubscription,
-} from "../../DB/queriesSQL/queriesSQL.ts";
-import { renderMjmlTemplate } from "../../MJML/functions/renderMjmlTemplate.ts";
-import { buildLogoUrl } from "../../utils/publicAssetUrl.ts";
+} from "../../DB/queriesSQL/queriesSQL.js";
+import { renderMjmlTemplate } from "../../MJML/functions/renderMjmlTemplate.js";
+import { buildLogoUrl } from "../../utils/publicAssetUrl.js";
 import { 
   resolveMailAppName, 
   resolveMailSender, 
   createSmtpTransporter, 
-} from "../../utils/mailer.ts"; 
+} from "../../utils/mailer.js"; 
 
 function resolveLocale(input: unknown): "fr" | "en" | "de" | "it" {
   const raw = String(input || "en").toLowerCase();

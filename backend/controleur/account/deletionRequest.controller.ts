@@ -1,5 +1,5 @@
 import type { RequestHandler } from "express";
-import { logger } from "../../logger.ts";
+import { logger } from "../../logger.js";
 import {
   anonymizeUserCredentials,
   getActiveSubscription,
@@ -8,15 +8,15 @@ import {
   revokeAllRefreshTokensForUser,
   updateUserMarketingConsent,
   updateSubscription,
-} from "../../DB/queriesSQL/queriesSQL.ts";
-import { getStripeClient } from "../../function/stripe/stripeClient.ts";
-import { renderMjmlTemplate } from "../../MJML/functions/renderMjmlTemplate.ts";
-import { buildLogoUrl } from "../../utils/publicAssetUrl.ts";
+} from "../../DB/queriesSQL/queriesSQL.js";
+import { getStripeClient } from "../../function/stripe/stripeClient.js";
+import { renderMjmlTemplate } from "../../MJML/functions/renderMjmlTemplate.js";
+import { buildLogoUrl } from "../../utils/publicAssetUrl.js";
 import {
   createSmtpTransporter,
   resolveMailAppName,
   resolveMailSender,
-} from "../../utils/mailer.ts";
+} from "../../utils/mailer.js";
 import crypto from "node:crypto";
 
 function resolveLocale(input: unknown): "fr" | "en" | "de" | "it" {

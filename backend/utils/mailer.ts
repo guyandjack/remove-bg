@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { logger } from "../logger.ts";
+import { logger } from "../logger.js";
 
 export function createSmtpTransporter(isProd: boolean) {
   const from = (

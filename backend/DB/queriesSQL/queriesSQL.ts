@@ -1,9 +1,43 @@
+﻿/// <reference types="node" />
+
 // src/db.ts
-import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import type {
+  FieldPacket,
+  Pool,
+  QueryOptions,
+  ResultSetHeader,
+  RowDataPacket,
+} from "mysql2/promise";
 import { connectDb } from "../poolConnexion/poolConnexion.js";
 import crypto from "node:crypto";
 import { isPremiumAccessAllowed } from "../../services/subscription/access.js";
 
+type DbExecute = <T>(
+  sql: string | QueryOptions,
+  values?: any,
+) => Promise<[T, FieldPacket[]]>;
+
+type DbQueryable = {
+  execute: DbExecute;
+  query: DbExecute;
+};
+
+type DbTransactionConnection = DbQueryable & {
+  beginTransaction: () => Promise<void>;
+  commit: () => Promise<void>;
+  rollback: () => Promise<void>;
+  release: () => void;
+};
+
+async function getDb(): Promise<DbQueryable> {
+  // Defensive typing: in some TS setups `mysql2/promise` Pool loses inherited method types.
+  return (await connectDb()) as unknown as DbQueryable;
+}
+
+async function getPool(): Promise<Pool> {
+  // Same reason as `getDb()`: keep a single, well-typed entry point.
+  return (await connectDb()) as unknown as Pool;
+}
 
 // -----------------------------
 // Types de base (adapte si besoin)
@@ -152,7 +186,7 @@ export async function tryMarkWebhookEventReceived(params: {
   eventType: string;
   receivedAt?: Date;
 }): Promise<{ inserted: boolean }> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   try {
     await connexion.execute<ResultSetHeader>(
       `INSERT INTO ProcessedWebhookEvent (id, provider, event_type, received_at)
@@ -162,7 +196,7 @@ export async function tryMarkWebhookEventReceived(params: {
         params.provider ?? "stripe",
         params.eventType,
         params.receivedAt ?? new Date(),
-      ]
+      ],
     );
     return { inserted: true };
   } catch (err: any) {
@@ -176,40 +210,39 @@ export async function markWebhookEventProcessed(params: {
   id: string;
   processedAt?: Date;
 }): Promise<void> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   await connexion.execute<ResultSetHeader>(
     `UPDATE ProcessedWebhookEvent SET processed_at = ? WHERE id = ?`,
-    [params.processedAt ?? new Date(), params.id]
+    [params.processedAt ?? new Date(), params.id],
   );
 }
 
-
-
-
 // ------------------------------------------------------
-// Helper transaction — version simple
+// Helper transaction â€” version simple
 // ------------------------------------------------------
 /**
- * Exécute plusieurs requêtes SQL dans une seule transaction.
- * Si une échoue → tout est annulé (rollback automatique).
+ * ExÃ©cute plusieurs requÃªtes SQL dans une seule transaction.
+ * Si une Ã©choue â†’ tout est annulÃ© (rollback automatique).
  *
  * @param fn Une fonction async recevant la connexion transactionnelle.
- * @returns La valeur renvoyée par fn().
+ * @returns La valeur renvoyÃ©e par fn().
  */
-export async function withTransaction<T>(fn: (conn: PoolConnection) => Promise<T>): Promise<T> {
-  const pool = await connectDb();
-  const conn = await pool.getConnection();
+export async function withTransaction<T>(
+  fn: (conn: DbTransactionConnection) => Promise<T>,
+): Promise<T> {
+  const pool = await getPool();
+  const conn = (await (pool as any).getConnection()) as DbTransactionConnection;
 
   try {
     await conn.beginTransaction();
-    const result = await fn(conn); // exécute ton code utilisateur
+    const result = await fn(conn); // exÃ©cute ton code utilisateur
     await conn.commit(); // valide tout
     return result;
   } catch (error) {
     await conn.rollback(); // annule tout
     throw error;
   } finally {
-    conn.release(); // libère la connexion
+    conn.release(); // libÃ¨re la connexion
   }
 }
 
@@ -232,7 +265,7 @@ export function addMonthsKeepingDay(d: Date, months: number) {
 }
 
 // ===================================================================
-// TokenRefresh — CRUD
+// TokenRefresh â€” CRUD
 // ===================================================================
 export interface TokenRefresh extends RowDataPacket {
   id: ID;
@@ -265,7 +298,7 @@ export async function createRefreshTokenRecord(input: {
   replacedByJti?: string | null;
   id?: ID;
 }): Promise<ID | null> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const theId = input.id ?? crypto.randomUUID();
   const tokenHash = input.token ? sha256Buffer(input.token) : null;
   const sql = `
@@ -287,17 +320,22 @@ export async function createRefreshTokenRecord(input: {
   return res.affectedRows === 1 ? theId : null;
 }
 
-export async function getRefreshTokenByJti(jti: string): Promise<TokenRefresh | null> {
-  const connexion = await connectDb();
+export async function getRefreshTokenByJti(
+  jti: string,
+): Promise<TokenRefresh | null> {
+  const connexion = await getDb();
   const [rows] = await connexion.execute<TokenRefresh[]>(
     `SELECT * FROM TokenRefresh WHERE jti = ? LIMIT 1`,
-    [jti]
+    [jti],
   );
   return rows[0] ?? null;
 }
 
-export async function findValidRefreshTokenByJti(jti: string, userId?: ID): Promise<TokenRefresh | null> {
-  const connexion = await connectDb();
+export async function findValidRefreshTokenByJti(
+  jti: string,
+  userId?: ID,
+): Promise<TokenRefresh | null> {
+  const connexion = await getDb();
   const now = new Date();
   const sql = `
     SELECT * FROM TokenRefresh
@@ -313,66 +351,78 @@ export async function findValidRefreshTokenByJti(jti: string, userId?: ID): Prom
   return rows[0] ?? null;
 }
 
-export async function revokeRefreshToken(jti: string, replacedByJti: string | null = null): Promise<boolean> {
-  const connexion = await connectDb();
+export async function revokeRefreshToken(
+  jti: string,
+  replacedByJti: string | null = null,
+): Promise<boolean> {
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE TokenRefresh SET revoked = 1, revoked_at = NOW(), replaced_by_jti = ? WHERE jti = ? AND revoked = 0`,
-    [replacedByJti, jti]
+    [replacedByJti, jti],
   );
   return res.affectedRows === 1;
 }
 
-export async function revokeAllRefreshTokensForUser(userId: ID): Promise<number> {
-  const connexion = await connectDb();
+export async function revokeAllRefreshTokensForUser(
+  userId: ID,
+): Promise<number> {
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE TokenRefresh SET revoked = 1, revoked_at = NOW() WHERE user_id = ? AND revoked = 0`,
-    [userId]
+    [userId],
   );
   return res.affectedRows;
 }
 
-export async function revokeAllRefreshTokensForUserExcept(userId: ID, exceptJti: string): Promise<number> {
-  const connexion = await connectDb();
+export async function revokeAllRefreshTokensForUserExcept(
+  userId: ID,
+  exceptJti: string,
+): Promise<number> {
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE TokenRefresh
      SET revoked = 1, revoked_at = NOW()
      WHERE user_id = ? AND revoked = 0 AND jti <> ?`,
-    [userId, exceptJti]
+    [userId, exceptJti],
   );
   return res.affectedRows;
 }
 
 export async function deleteRefreshTokenByJti(jti: string): Promise<boolean> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `DELETE FROM TokenRefresh WHERE jti = ?`,
-    [jti]
+    [jti],
   );
   return res.affectedRows === 1;
 }
 
 export async function purgeExpiredRefreshTokens(): Promise<number> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
-    `DELETE FROM TokenRefresh WHERE expires_at <= NOW()`
+    `DELETE FROM TokenRefresh WHERE expires_at <= NOW()`,
   );
   return res.affectedRows;
 }
 
-export async function listRefreshTokensForUser(userId: ID, limit = 50, offset = 0): Promise<TokenRefresh[]> {
-  const connexion = await connectDb();
+export async function listRefreshTokensForUser(
+  userId: ID,
+  limit = 50,
+  offset = 0,
+): Promise<TokenRefresh[]> {
+  const connexion = await getDb();
   const [rows] = await connexion.execute<TokenRefresh[]>(
     `SELECT * FROM TokenRefresh WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-    [userId, limit, offset]
+    [userId, limit, offset],
   );
   return rows;
 }
 
 // ===================================================================
-// User — CRUD
+// User â€” CRUD
 // ===================================================================
 export async function createUser(email: string, passwordHash: string, id?: ID) {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const theId = id ?? crypto.randomUUID(); // you can swap with cuid() if preferred
   const sql = `
     INSERT INTO \`User\` (id, email, password_hash)
@@ -390,10 +440,10 @@ export async function getUserById(userId: ID): Promise<User | null> {
   /**
    * SQL: SELECT * FROM User WHERE id = ? LIMIT 1
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [rows] = await connexion.execute<User[]>(
     `SELECT * FROM \`User\` WHERE id = ? LIMIT 1`,
-    [userId]
+    [userId],
   );
   return rows[0] ?? null;
 }
@@ -402,36 +452,34 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   /**
    * SQL: SELECT * FROM User WHERE email = ? LIMIT 1
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [rows] = await connexion.execute<User[]>(
     `SELECT * FROM \`User\` WHERE email = ? LIMIT 1`,
-    [email]
+    [email],
   );
   return rows[0] ?? null;
 }
-
-
 
 export async function listUser(limit = 50, offset = 0): Promise<User[]> {
   /**
    * SQL: SELECT * FROM User ORDER BY created_at DESC LIMIT ? OFFSET ?
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [rows] = await connexion.execute<User[]>(
     `SELECT * FROM \`User\` ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-    [limit, offset]
+    [limit, offset],
   );
   return rows;
 }
 
-export async function updateUser( 
-  userId: ID, 
-  fields: Partial<Pick<User, "email" | "password_hash">> 
-) { 
+export async function updateUser(
+  userId: ID,
+  fields: Partial<Pick<User, "email" | "password_hash">>,
+) {
   /**
    * SQL (dynamic SET): UPDATE User SET ... WHERE id = ?
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const sets: string[] = [];
   const values: any[] = [];
   if (fields.email !== undefined) {
@@ -446,34 +494,34 @@ export async function updateUser(
   const sql = `UPDATE \`User\` SET ${sets.join(", ")} WHERE id = ?`;
   values.push(userId);
   const [res] = await connexion.execute<ResultSetHeader>(sql, values);
-  return res.affectedRows === 1; 
-} 
+  return res.affectedRows === 1;
+}
 
 export async function updateUserMarketingConsent(
   userId: ID,
   marketingConsent: boolean,
-  at: Date = new Date()
+  at: Date = new Date(),
 ) {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE \`User\`
      SET marketing_consent = ?, marketing_consent_updated_at = ?
      WHERE id = ?`,
-    [marketingConsent ? 1 : 0, at, userId]
+    [marketingConsent ? 1 : 0, at, userId],
   );
   return res.affectedRows === 1;
 }
 
 export async function requestAccountDeletion(
   userId: ID,
-  at: Date = new Date()
+  at: Date = new Date(),
 ) {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE \`User\`
      SET account_deletion_requested = 1, account_deletion_requested_at = ?
      WHERE id = ?`,
-    [at, userId]
+    [at, userId],
   );
   return res.affectedRows === 1;
 }
@@ -483,12 +531,12 @@ export async function anonymizeUserCredentials(params: {
   anonymizedEmail: string;
   passwordHash: string;
 }) {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE \`User\`
      SET email = ?, password_hash = ?
      WHERE id = ?`,
-    [params.anonymizedEmail, params.passwordHash, params.userId]
+    [params.anonymizedEmail, params.passwordHash, params.userId],
   );
   return res.affectedRows === 1;
 }
@@ -498,16 +546,16 @@ export async function deleteUser(userId: ID) {
   /**
    * SQL: DELETE FROM User WHERE id = ?
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `DELETE FROM \`User\` WHERE id = ?`,
-    [userId]
+    [userId],
   );
   return res.affectedRows === 1;
 }
 
 // ===================================================================
-// Customer — CRUD
+// Customer â€” CRUD
 // ===================================================================
 type CustomerWritableFields = Pick<
   Customer,
@@ -539,7 +587,7 @@ export async function createCustomer(params: {
   total_spent_cents?: number;
   id?: ID;
 }) {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const id = params.id ?? crypto.randomUUID();
   const sql = `INSERT INTO Customer (
       id,
@@ -575,44 +623,56 @@ export async function createCustomer(params: {
   return res.affectedRows === 1 ? id : null;
 }
 
-export async function getCustomerById(customerId: ID): Promise<Customer | null> {
-  const connexion = await connectDb();
+export async function getCustomerById(
+  customerId: ID,
+): Promise<Customer | null> {
+  const connexion = await getDb();
   const [rows] = await connexion.execute<Customer[]>(
     `SELECT * FROM Customer WHERE id = ? LIMIT 1`,
-    [customerId]
+    [customerId],
   );
   return rows[0] ?? null;
 }
 
-export async function getCustomerByUserId(userId: ID): Promise<Customer | null> {
-  const connexion = await connectDb();
+export async function getCustomerByUserId(
+  userId: ID,
+): Promise<Customer | null> {
+  const connexion = await getDb();
   const [rows] = await connexion.execute<Customer[]>(
     `SELECT * FROM Customer WHERE user_id = ? LIMIT 1`,
-    [userId]
+    [userId],
   );
   return rows[0] ?? null;
 }
 
-export async function getCustomerByStripeCustomerId(stripeCustomerId: string): Promise<Customer | null> {
-  const connexion = await connectDb();
+export async function getCustomerByStripeCustomerId(
+  stripeCustomerId: string,
+): Promise<Customer | null> {
+  const connexion = await getDb();
   const [rows] = await connexion.execute<Customer[]>(
     `SELECT * FROM Customer WHERE stripe_customer_id = ? LIMIT 1`,
-    [stripeCustomerId]
+    [stripeCustomerId],
   );
   return rows[0] ?? null;
 }
 
-export async function listCustomers(limit = 50, offset = 0): Promise<Customer[]> {
-  const connexion = await connectDb();
+export async function listCustomers(
+  limit = 50,
+  offset = 0,
+): Promise<Customer[]> {
+  const connexion = await getDb();
   const [rows] = await connexion.execute<Customer[]>(
     `SELECT * FROM Customer ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-    [limit, offset]
+    [limit, offset],
   );
   return rows;
 }
 
-export async function updateCustomer(customerId: ID, fields: Partial<CustomerWritableFields>) {
-  const connexion = await connectDb();
+export async function updateCustomer(
+  customerId: ID,
+  fields: Partial<CustomerWritableFields>,
+) {
+  const connexion = await getDb();
   const sets: string[] = [];
   const values: any[] = [];
 
@@ -670,10 +730,10 @@ export async function updateCustomer(customerId: ID, fields: Partial<CustomerWri
 }
 
 export async function deleteCustomer(customerId: ID) {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `DELETE FROM Customer WHERE id = ?`,
-    [customerId]
+    [customerId],
   );
   return res.affectedRows === 1;
 }
@@ -689,7 +749,7 @@ export async function createStripeCheckoutSessionState(params: {
   planId?: ID | null;
   currencyCode?: string;
 }): Promise<ID | null> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const id = crypto.randomUUID();
   const sql = `INSERT INTO StripeCheckoutSession (id, session_id, email, plan_code, plan_id, currency_code, status)
                VALUES (?, ?, ?, ?, ?, ?, 'pending')
@@ -705,17 +765,26 @@ export async function createStripeCheckoutSessionState(params: {
   return res.affectedRows >= 1 ? id : null;
 }
 
-export async function getStripeCheckoutSessionState(sessionId: string): Promise<StripeCheckoutSessionState | null> {
-  const connexion = await connectDb();
+export async function getStripeCheckoutSessionState(
+  sessionId: string,
+): Promise<StripeCheckoutSessionState | null> {
+  const connexion = await getDb();
   const [rows] = await connexion.execute<StripeCheckoutSessionState[]>(
     `SELECT * FROM StripeCheckoutSession WHERE session_id = ? LIMIT 1`,
-    [sessionId]
+    [sessionId],
   );
   return rows[0] ?? null;
 }
 
-export async function markStripeCheckoutSessionCompleted(sessionId: string, params: { userId?: ID | null; subscriptionId?: ID | null; planId?: ID | null }) {
-  const connexion = await connectDb();
+export async function markStripeCheckoutSessionCompleted(
+  sessionId: string,
+  params: {
+    userId?: ID | null;
+    subscriptionId?: ID | null;
+    planId?: ID | null;
+  },
+) {
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE StripeCheckoutSession
        SET status = 'completed',
@@ -724,48 +793,61 @@ export async function markStripeCheckoutSessionCompleted(sessionId: string, para
            plan_id = COALESCE(?, plan_id),
            last_error = NULL
      WHERE session_id = ?`,
-    [params.userId ?? null, params.subscriptionId ?? null, params.planId ?? null, sessionId]
+    [
+      params.userId ?? null,
+      params.subscriptionId ?? null,
+      params.planId ?? null,
+      sessionId,
+    ],
   );
   return res.affectedRows >= 1;
 }
 
-export async function markStripeCheckoutSessionFailed(sessionId: string, errorMessage: string) {
-  const connexion = await connectDb();
+export async function markStripeCheckoutSessionFailed(
+  sessionId: string,
+  errorMessage: string,
+) {
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE StripeCheckoutSession
        SET status = 'failed',
            last_error = ?
      WHERE session_id = ?`,
-    [errorMessage, sessionId]
+    [errorMessage, sessionId],
   );
   return res.affectedRows >= 1;
 }
 
 export async function markStripeCheckoutSessionConsumed(sessionId: string) {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE StripeCheckoutSession
        SET consumed_at = NOW()
      WHERE session_id = ? AND consumed_at IS NULL`,
-    [sessionId]
+    [sessionId],
   );
   return res.affectedRows >= 1;
 }
 
 // ===================================================================
-// PLANS — CRUD & seed helpers (new schema)
+// PLANS â€” CRUD & seed helpers (new schema)
 // ===================================================================
 /**
  * Create a minimal plan (legacy signature).
  * Only uses name + price. Other fields get defaults.
  */
 export async function createPlan(name: string, price: number, id?: ID) {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const theId = id ?? crypto.randomUUID();
   const sql = `INSERT INTO Plan (id, code, name, price, currency_code, billing_interval, daily_credit_quota, is_archived)
                VALUES (?, LOWER(REPLACE(?, ' ', '_')), ?, ?, 'CHF', 'month', 0, 0)`;
   // code is derived from name by default (e.g., 'Pro Plan' -> 'pro_plan')
-  const [res] = await connexion.execute<ResultSetHeader>(sql, [theId, name, name, price]);
+  const [res] = await connexion.execute<ResultSetHeader>(sql, [
+    theId,
+    name,
+    name,
+    price,
+  ]);
   return res.affectedRows === 1 ? theId : null;
 }
 
@@ -774,10 +856,10 @@ export async function createPlan(name: string, price: number, id?: ID) {
  * SQL: SELECT * FROM Plan WHERE id = ? LIMIT 1
  */
 export async function getPlanById(planId: ID): Promise<Plan | null> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [rows] = await connexion.execute<Plan[]>(
     `SELECT * FROM Plan WHERE id = ? LIMIT 1`,
-    [planId]
+    [planId],
   );
   return rows[0] ?? null;
 }
@@ -787,10 +869,10 @@ export async function getPlanById(planId: ID): Promise<Plan | null> {
  * SQL: SELECT * FROM Plan WHERE name = ? LIMIT 1
  */
 export async function getPlanByName(name: string): Promise<Plan | null> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [rows] = await connexion.execute<Plan[]>(
     `SELECT * FROM Plan WHERE name = ? LIMIT 1`,
-    [name]
+    [name],
   );
   return rows[0] ?? null;
 }
@@ -798,20 +880,22 @@ export async function getPlanByName(name: string): Promise<Plan | null> {
 /**
  * Find a plan by code (e.g., 'free','hobby','pro').
  */
-export async function getPlanByCode(code: string): Promise<Plan | null> { 
-  const connexion = await connectDb();
+export async function getPlanByCode(code: string): Promise<Plan | null> {
+  const connexion = await getDb();
   const [rows] = await connexion.execute<Plan[]>(
     `SELECT * FROM Plan WHERE code = ? LIMIT 1`,
-    [code]
+    [code],
   );
   return rows[0] ?? null;
-} 
+}
 
-export async function getPlanByStripePriceId(stripePriceId: string): Promise<Plan | null> {
-  const connexion = await connectDb();
+export async function getPlanByStripePriceId(
+  stripePriceId: string,
+): Promise<Plan | null> {
+  const connexion = await getDb();
   const [rows] = await connexion.execute<Plan[]>(
     `SELECT * FROM Plan WHERE stripe_price_id = ? LIMIT 1`,
-    [stripePriceId]
+    [stripePriceId],
   );
   return rows[0] ?? null;
 }
@@ -820,7 +904,7 @@ export async function listPlans(includeArchived = false): Promise<Plan[]> {
   /**
    * SQL: SELECT * FROM Plan [WHERE is_archived=0] ORDER BY created_at DESC
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const sql = includeArchived
     ? `SELECT * FROM Plan ORDER BY created_at DESC`
     : `SELECT * FROM Plan WHERE is_archived = 0 ORDER BY created_at DESC`;
@@ -830,12 +914,22 @@ export async function listPlans(includeArchived = false): Promise<Plan[]> {
 
 export async function updatePlan(
   planId: ID,
-  fields: Partial<Pick<Plan, "name" | "price" | "currency_code" | "billing_interval" | "daily_credit_quota" | "stripe_price_id">>
+  fields: Partial<
+    Pick<
+      Plan,
+      | "name"
+      | "price"
+      | "currency_code"
+      | "billing_interval"
+      | "daily_credit_quota"
+      | "stripe_price_id"
+    >
+  >,
 ) {
   /**
    * SQL (dynamic SET): UPDATE Plan SET ... WHERE id = ?
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const sets: string[] = [];
   const values: any[] = [];
   if (fields.name !== undefined) {
@@ -873,29 +967,29 @@ export async function archivePlan(planId: ID, archived = true) {
   /**
    * SQL: UPDATE Plan SET is_archived = ? WHERE id = ?
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE Plan SET is_archived = ? WHERE id = ?`,
-    [archived ? 1 : 0, planId]
+    [archived ? 1 : 0, planId],
   );
   return res.affectedRows === 1;
 }
 
 export async function deletePlan(planId: ID) {
-  // Attention: FK Subscription ON DELETE RESTRICT peut empêcher la suppression
+  // Attention: FK Subscription ON DELETE RESTRICT peut empÃªcher la suppression
   /**
    * SQL: DELETE FROM Plan WHERE id = ?
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `DELETE FROM Plan WHERE id = ?`,
-    [planId]
+    [planId],
   );
   return res.affectedRows === 1;
 }
 
 // ------------------------------------------------------
-// PLANS — Seed helpers
+// PLANS â€” Seed helpers
 // ------------------------------------------------------
 /**
  * Ensure a plan exists by code; insert or update with provided attributes.
@@ -910,7 +1004,7 @@ export async function upsertPlanByCode(input: {
   daily_credit_quota?: number;
   stripe_price_id?: string | null;
 }): Promise<ID> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const existing = await getPlanByCode(input.code);
   if (!existing) {
     const id = crypto.randomUUID();
@@ -935,8 +1029,10 @@ export async function upsertPlanByCode(input: {
       price: input.price,
       currency_code: input.currency_code ?? existing.currency_code,
       billing_interval: input.billing_interval ?? existing.billing_interval,
-      daily_credit_quota: input.daily_credit_quota ?? existing.daily_credit_quota,
-      stripe_price_id: input.stripe_price_id ?? existing.stripe_price_id ?? undefined,
+      daily_credit_quota:
+        input.daily_credit_quota ?? existing.daily_credit_quota,
+      stripe_price_id:
+        input.stripe_price_id ?? existing.stripe_price_id ?? undefined,
     });
     return existing.id;
   }
@@ -945,26 +1041,47 @@ export async function upsertPlanByCode(input: {
 /**
  * Seed default plans (adjust values as needed).
  * - free: price 0, 10 credits/day
- * - hobby: 9.99€, 100 credits/day
- * - pro: 29.99€, 1000 credits/day
+ * - hobby: 9.99â‚¬, 100 credits/day
+ * - pro: 29.99â‚¬, 1000 credits/day
  */
 export async function seedDefaultPlans() {
-  await upsertPlanByCode({ code: "free", name: "Free", price: 0, currency_code: "CHF", billing_interval: "month", daily_credit_quota: 10 });
-  await upsertPlanByCode({ code: "hobby", name: "Hobby", price: 500, currency_code: "CHF", billing_interval: "month", daily_credit_quota: 100 });
-  await upsertPlanByCode({ code: "pro", name: "Pro", price: 1500, currency_code: "CHF", billing_interval: "month", daily_credit_quota: 1000 });
+  await upsertPlanByCode({
+    code: "free",
+    name: "Free",
+    price: 0,
+    currency_code: "CHF",
+    billing_interval: "month",
+    daily_credit_quota: 10,
+  });
+  await upsertPlanByCode({
+    code: "hobby",
+    name: "Hobby",
+    price: 500,
+    currency_code: "CHF",
+    billing_interval: "month",
+    daily_credit_quota: 100,
+  });
+  await upsertPlanByCode({
+    code: "pro",
+    name: "Pro",
+    price: 1500,
+    currency_code: "CHF",
+    billing_interval: "month",
+    daily_credit_quota: 1000,
+  });
 }
 
 // ===================================================================
-// SUBSCRIPTIONS — CRUD & logique d'affaires
+// SUBSCRIPTIONS â€” CRUD & logique d'affaires
 // ===================================================================
 /**
  * Fetch the active subscription for a user with plan details (name, price).
  * SQL: SELECT s.*, p.name AS plan_name, p.price AS plan_price FROM Subscription s JOIN Plan p ON p.id=s.plan_id WHERE s.user_id=? AND s.is_active=TRUE LIMIT 1
  */
 export async function getActiveSubscription(
-  userId: ID
+  userId: ID,
 ): Promise<(Subscription & { plan_name: string; plan_price: number }) | null> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   // Active subscription with joined plan info (name, price)
   const [rows] = await connexion.execute<any[]>(
     `
@@ -974,7 +1091,7 @@ export async function getActiveSubscription(
     WHERE s.user_id = ? AND s.is_active = TRUE
     LIMIT 1
     `,
-    [userId]
+    [userId],
   );
   return rows[0] ?? null;
 }
@@ -984,9 +1101,9 @@ export async function getActiveSubscription(
  * SQL: SELECT s.*, p.name AS plan_name FROM Subscription s JOIN Plan p ON p.id=s.plan_id WHERE s.user_id=? ORDER BY s.period_start DESC
  */
 export async function listUserubscriptions(
-  userId: ID
+  userId: ID,
 ): Promise<(Subscription & { plan_name: string })[]> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   // History of subscriptions for a user, most recent first
   const [rows] = await connexion.execute<any[]>(
     `
@@ -996,7 +1113,7 @@ export async function listUserubscriptions(
     WHERE s.user_id = ?
     ORDER BY s.period_start DESC
     `,
-    [userId]
+    [userId],
   );
   return rows as any[];
 }
@@ -1015,13 +1132,13 @@ export interface CreateSubscriptionInput {
 }
 
 /**
- * Crée une subscription.
- * ⚠️ Si isActive=true, il faut que l'index UNIQUE(user_id, is_active) soit en place
+ * CrÃ©e une subscription.
+ * âš ï¸ Si isActive=true, il faut que l'index UNIQUE(user_id, is_active) soit en place
  * et qu'aucune autre ligne active n'existe (sinon erreur SQL).
- * Utilise switchPlan() pour gérer proprement le passage d'un plan à l'autre.
+ * Utilise switchPlan() pour gÃ©rer proprement le passage d'un plan Ã  l'autre.
  */
 export async function createSubscription(input: CreateSubscriptionInput) {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const now = new Date();
   const start = input.periodStart ?? now;
   const end = input.periodEnd ?? addDays(start, 30);
@@ -1046,25 +1163,25 @@ export async function createSubscription(input: CreateSubscriptionInput) {
 }
 
 export async function getSubscriptionById(
-  subId: ID
+  subId: ID,
 ): Promise<Subscription | null> {
   /**
    * SQL: SELECT * FROM Subscription WHERE id = ? LIMIT 1
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [rows] = await connexion.execute<Subscription[]>(
     `SELECT * FROM Subscription WHERE id = ? LIMIT 1`,
-    [subId]
+    [subId],
   );
   return rows[0] ?? null;
 }
 
-export async function updateSubscription( 
-  subId: ID, 
-  fields: Partial< 
-    Pick< 
-      Subscription, 
-      "status"
+export async function updateSubscription(
+  subId: ID,
+  fields: Partial<
+    Pick<
+      Subscription,
+      | "status"
       | "is_active"
       | "period_start"
       | "period_end"
@@ -1082,13 +1199,13 @@ export async function updateSubscription(
       | "stripe_schedule_id"
       | "credit_initial"
       | "credit_used"
-    > 
-  > 
-) { 
+    >
+  >,
+) {
   /**
    * SQL (dynamic SET): UPDATE Subscription SET ... WHERE id = ?
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const sets: string[] = [];
   const values: any[] = [];
 
@@ -1124,10 +1241,10 @@ export async function updateSubscription(
     sets.push(`cancel_at = ?`);
     values.push(fields.cancel_at);
   }
-  if (fields.canceled_at !== undefined) { 
-    sets.push(`canceled_at = ?`); 
-    values.push(fields.canceled_at); 
-  } 
+  if (fields.canceled_at !== undefined) {
+    sets.push(`canceled_at = ?`);
+    values.push(fields.canceled_at);
+  }
   if (fields.stripe_cancel_at_period_end !== undefined) {
     sets.push(`stripe_cancel_at_period_end = ?`);
     values.push(fields.stripe_cancel_at_period_end);
@@ -1156,10 +1273,10 @@ export async function updateSubscription(
     sets.push(`stripe_schedule_id = ?`);
     values.push(fields.stripe_schedule_id);
   }
-  if (fields.credit_initial !== undefined) { 
-    sets.push(`credit_initial = ?`); 
-    values.push(fields.credit_initial); 
-  } 
+  if (fields.credit_initial !== undefined) {
+    sets.push(`credit_initial = ?`);
+    values.push(fields.credit_initial);
+  }
   if (fields.credit_used !== undefined) {
     sets.push(`credit_used = ?`);
     values.push(fields.credit_used);
@@ -1178,32 +1295,32 @@ export async function deleteSubscription(subId: ID) {
   /**
    * SQL: DELETE FROM Subscription WHERE id = ?
    */
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `DELETE FROM Subscription WHERE id = ?`,
-    [subId]
+    [subId],
   );
   return res.affectedRows === 1;
 }
 
 // -------------------------------------------------------------------
-// Logique : CANCEL l'abonnement actif (si présent)
+// Logique : CANCEL l'abonnement actif (si prÃ©sent)
 // -------------------------------------------------------------------
 export async function cancelActiveSubscription(
   userId: ID,
-  at: Date = new Date()
+  at: Date = new Date(),
 ) {
   return withTransaction(async (cx) => {
     const [rows] = await cx.execute<Subscription[]>(
       `SELECT * FROM Subscription WHERE user_id = ? AND is_active = TRUE LIMIT 1`,
-      [userId]
+      [userId],
     );
     const current = rows[0];
     if (!current) return false;
 
     const [res] = await cx.execute<ResultSetHeader>(
       `UPDATE Subscription SET status = 'canceled', is_active = NULL, period_end = ?, canceled_at = ? WHERE id = ?`,
-      [at, at, current.id]
+      [at, at, current.id],
     );
     return res.affectedRows === 1;
   });
@@ -1211,30 +1328,30 @@ export async function cancelActiveSubscription(
 
 // -------------------------------------------------------------------
 // Logique : SWITCH / UPGRADE de plan (transaction atomique)
-// - Clôture l'actif courant (si existe)
-// - Crée une nouvelle subscription active pour le nouveau plan
-// - Respecte l'unicité (user_id, is_active)
+// - ClÃ´ture l'actif courant (si existe)
+// - CrÃ©e une nouvelle subscription active pour le nouveau plan
+// - Respecte l'unicitÃ© (user_id, is_active)
 // -------------------------------------------------------------------
 export async function switchPlan(
   userId: ID,
   newPlanId: ID,
-  now: Date = new Date()
+  now: Date = new Date(),
 ) {
   return withTransaction(async (cx) => {
-    // 1) Désactiver l'actuel (s'il existe)
+    // 1) DÃ©sactiver l'actuel (s'il existe)
     const [rows] = await cx.execute<Subscription[]>(
       `SELECT * FROM Subscription WHERE user_id = ? AND is_active = TRUE LIMIT 1`,
-      [userId]
+      [userId],
     );
     const current = rows[0];
     if (current) {
       await cx.execute(
         `UPDATE Subscription SET status = 'canceled', is_active = NULL, period_end = ?, canceled_at = ? WHERE id = ?`,
-        [now, now, current.id]
+        [now, now, current.id],
       );
     }
 
-    // 2) Créer le nouveau actif (période par défaut : 30 jours)
+    // 2) CrÃ©er le nouveau actif (pÃ©riode par dÃ©faut : 30 jours)
     const periodEnd = addDays(now, 30);
     const newId = crypto.randomUUID();
     await cx.execute(
@@ -1243,7 +1360,7 @@ export async function switchPlan(
         (id, user_id, plan_id, status, is_active, period_start, period_end)
       VALUES (?, ?, ?, 'active', TRUE, ?, ?)
       `,
-      [newId, userId, newPlanId, now, periodEnd]
+      [newId, userId, newPlanId, now, periodEnd],
     );
 
     return newId;
@@ -1251,13 +1368,13 @@ export async function switchPlan(
 }
 
 // -------------------------------------------------------------------
-// Logique : RENEW (prolonge la période d'un actif)
+// Logique : RENEW (prolonge la pÃ©riode d'un actif)
 // -------------------------------------------------------------------
 export async function renewActiveSubscription(userId: ID, extraDays = 30) {
   return withTransaction(async (cx) => {
     const [rows] = await cx.execute<Subscription[]>(
       `SELECT * FROM Subscription WHERE user_id = ? AND is_active = TRUE LIMIT 1`,
-      [userId]
+      [userId],
     );
     const current = rows[0];
     if (!current) throw new Error("Aucun abonnement actif");
@@ -1265,37 +1382,37 @@ export async function renewActiveSubscription(userId: ID, extraDays = 30) {
     const newEnd = addDays(new Date(current.period_end), extraDays);
     const [res] = await cx.execute<ResultSetHeader>(
       `UPDATE Subscription SET period_end = ? WHERE id = ?`,
-      [newEnd, current.id]
+      [newEnd, current.id],
     );
     return res.affectedRows === 1;
   });
 }
 
 // -------------------------------------------------------------------
-// Logique : Activer une subscription spécifique (et désactiver l'actuelle)
+// Logique : Activer une subscription spÃ©cifique (et dÃ©sactiver l'actuelle)
 // -------------------------------------------------------------------
 export async function activateSubscription(
   userId: ID,
   subscriptionId: ID,
-  now: Date = new Date()
+  now: Date = new Date(),
 ) {
   return withTransaction(async (cx) => {
-    // Désactiver l'actuelle
+    // DÃ©sactiver l'actuelle
     await cx.execute(
       `UPDATE Subscription SET status = 'canceled', is_active = NULL, period_end = ? WHERE user_id = ? AND is_active = TRUE`,
-      [now, userId]
+      [now, userId],
     );
-    // Activer la ciblée
+    // Activer la ciblÃ©e
     const [res] = await cx.execute<ResultSetHeader>(
       `UPDATE Subscription SET status = 'active', is_active = TRUE, period_start = ? WHERE id = ? AND user_id = ?`,
-      [now, subscriptionId, userId]
+      [now, subscriptionId, userId],
     );
     return res.affectedRows === 1;
   });
 }
 
 // ===================================================================
-// Credit usage — helpers (ledger + 24h window)
+// Credit usage â€” helpers (ledger + 24h window)
 // ===================================================================
 /**
  * Record a credit usage event for a subscription.
@@ -1305,9 +1422,9 @@ export async function recordCreditUsage(
   subscriptionId: ID,
   used = 1,
   reason: string = "api_call",
-  requestId?: string
+  requestId?: string,
 ) {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const id = crypto.randomUUID();
   const sql = `INSERT INTO \`CreditUsage\` (id, subscription_id, used, reason, request_id)
                VALUES (?, ?, ?, ?, ?)`;
@@ -1322,7 +1439,7 @@ export async function recordCreditUsage(
     // Extra debug: helps validate which DB/schema this code is actually writing to.
     try {
       const [dbRows] = await connexion.query<RowDataPacket[]>(
-        `SELECT DATABASE() AS db`
+        `SELECT DATABASE() AS db`,
       );
       const currentDb = (dbRows[0] as any)?.db ?? null;
       console.log("[recordCreditUsage] insert ok", {
@@ -1340,7 +1457,7 @@ export async function recordCreditUsage(
     if (requestId && err && err.code === "ER_DUP_ENTRY") {
       const [rows] = await connexion.execute<RowDataPacket[]>(
         `SELECT id FROM \`CreditUsage\` WHERE request_id = ? LIMIT 1`,
-        [requestId]
+        [requestId],
       );
       const existingId = rows[0] ? String((rows[0] as any).id) : null;
       return existingId;
@@ -1364,11 +1481,13 @@ export async function recordCreditUsage(
  * Get usage and remaining credits over the last 24h for the active subscription of a user.
  * Relies on the SQL view v_subscription_usage_24h.
  */
-export async function getActiveUsage24h(userId: ID): Promise<SubscriptionUsage24h | null> {
-  const connexion = await connectDb();
+export async function getActiveUsage24h(
+  userId: ID,
+): Promise<SubscriptionUsage24h | null> {
+  const connexion = await getDb();
   const [rows] = await connexion.execute<SubscriptionUsage24h[]>(
     `SELECT * FROM v_subscription_usage_24h WHERE user_id = ? LIMIT 1`,
-    [userId]
+    [userId],
   );
   return rows[0] ?? null;
 }
@@ -1383,17 +1502,19 @@ export async function getActiveUsage24h(userId: ID): Promise<SubscriptionUsage24
  */
 export async function getActiveUsageBillingPeriod(
   userId: ID,
-  now: Date = new Date()
+  now: Date = new Date(),
 ): Promise<SubscriptionUsageBillingPeriod | null> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
 
   const user = await getUserById(userId);
-  const accountDeletionRequested = user ? user.account_deletion_requested === 1 : false;
+  const accountDeletionRequested = user
+    ? user.account_deletion_requested === 1
+    : false;
 
   // Load active subscription first (we may need to roll the period forward).
   const [subs] = await connexion.execute<Subscription[]>(
     `SELECT * FROM Subscription WHERE user_id = ? AND is_active = TRUE LIMIT 1`,
-    [userId]
+    [userId],
   );
   const sub = subs[0];
   if (!sub) return null;
@@ -1403,8 +1524,12 @@ export async function getActiveUsageBillingPeriod(
     const allowed = isPremiumAccessAllowed({
       subscriptionStatus: sub.status,
       accountDeletionRequested,
-      planAccessUntil: sub.plan_access_until ? new Date(sub.plan_access_until) : null,
-      currentPeriodEnd: sub.current_period_end ? new Date(sub.current_period_end) : null,
+      planAccessUntil: sub.plan_access_until
+        ? new Date(sub.plan_access_until)
+        : null,
+      currentPeriodEnd: sub.current_period_end
+        ? new Date(sub.current_period_end)
+        : null,
       periodEnd: new Date(sub.period_end),
       now,
     });
@@ -1424,7 +1549,7 @@ export async function getActiveUsageBillingPeriod(
     }
     await connexion.execute<ResultSetHeader>(
       `UPDATE Subscription SET period_start = ?, period_end = ? WHERE id = ?`,
-      [newStart, newEnd, sub.id]
+      [newStart, newEnd, sub.id],
     );
   }
 
@@ -1448,14 +1573,15 @@ export async function getActiveUsageBillingPeriod(
     GROUP BY s.id, s.user_id, s.plan_id, s.period_start, s.period_end, p.daily_credit_quota
     LIMIT 1
   `;
-  const [rows] = await connexion.execute<SubscriptionUsageBillingPeriod[]>(sql, [
-    userId,
-  ]);
+  const [rows] = await connexion.execute<SubscriptionUsageBillingPeriod[]>(
+    sql,
+    [userId],
+  );
   return rows[0] ?? null;
 }
 
 // ------------------------------------------------------
-// Plan + crédits restants sur 24h (par utilisateur)
+// Plan + crÃ©dits restants sur 24h (par utilisateur)
 // ------------------------------------------------------
 export interface UserPlanAndCreditsRow extends RowDataPacket {
   plan_code: string;
@@ -1464,57 +1590,67 @@ export interface UserPlanAndCreditsRow extends RowDataPacket {
 
 /**
  * Retourne le type de plan (code: 'free' | 'hobby' | 'pro', etc.)
- * et le nombre de crédits restants sur 24h pour l'utilisateur donné.
+ * et le nombre de crÃ©dits restants sur 24h pour l'utilisateur donnÃ©.
  * S'appuie sur la vue `v_subscription_usage_24h` et la table `Plan`.
  */
 export async function getUserPlanAndCredits24h(
-  userId: ID
+  userId: ID,
 ): Promise<{ plan: string; remaining_credits_24h: number } | null> {
-  const connexion = await connectDb();
+  const connexion = await getDb();
   try {
     const [rows] = await connexion.execute<UserPlanAndCreditsRow[]>(
       `SELECT plan_code, remaining_last_24h FROM v_subscription_usage_24h WHERE user_id = ? LIMIT 1`,
-      [userId]
+      [userId],
     );
     const row = rows[0];
     if (!row) return null;
-    return { plan: row.plan_code, remaining_credits_24h: row.remaining_last_24h };
+    return {
+      plan: row.plan_code,
+      remaining_credits_24h: row.remaining_last_24h,
+    };
   } catch (err: any) {
     // Fallback for environments where the view doesn't expose plan_code yet
-    if (err && (err.code === "ER_BAD_FIELD_ERROR" || String(err.message || "").includes("plan_code"))) {
+    if (
+      err &&
+      (err.code === "ER_BAD_FIELD_ERROR" ||
+        String(err.message || "").includes("plan_code"))
+    ) {
       const [rows] = await connexion.execute<RowDataPacket[]>(
         `SELECT p.code AS plan_code, v.remaining_last_24h
          FROM v_subscription_usage_24h v
          JOIN Plan p ON p.id = v.plan_id
          WHERE v.user_id = ?
          LIMIT 1`,
-        [userId]
+        [userId],
       );
       const row: any = rows[0];
       if (!row) return null;
-      return { plan: String(row.plan_code), remaining_credits_24h: Number(row.remaining_last_24h) };
+      return {
+        plan: String(row.plan_code),
+        remaining_credits_24h: Number(row.remaining_last_24h),
+      };
     }
     throw err;
   }
 }
 
 // -------------------------------------------------------------------
-// Plan + crédits restants sur la période de facturation (mensuelle)
+// Plan + crÃ©dits restants sur la pÃ©riode de facturation (mensuelle)
 // -------------------------------------------------------------------
 export async function getUserPlanAndCreditsBillingPeriod(
-  userId: ID
+  userId: ID,
 ): Promise<{ plan: string; remaining_credits_in_period: number } | null> {
   const usage = await getActiveUsageBillingPeriod(userId);
   if (!usage) return null;
 
-  const connexion = await connectDb();
+  const connexion = await getDb();
   const [rows] = await connexion.execute<RowDataPacket[]>(
     `SELECT p.code AS plan_code
      FROM Subscription s
      JOIN Plan p ON p.id = s.plan_id
      WHERE s.user_id = ? AND s.is_active = TRUE
      LIMIT 1`,
-    [userId]
+    [userId],
   );
   const planCode = rows[0] ? String((rows[0] as any).plan_code) : "";
   if (!planCode) return null;

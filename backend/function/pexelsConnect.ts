@@ -2,31 +2,29 @@ import { createClient } from "pexels";
 import fs from "fs/promises";
 import path from "path";
 
-
 const pexelsConnect = async () => {
-  const apiKeyPath = process.env.PEXELS_API_KEY;
-
-  if (!apiKeyPath) {
-    throw new Error("PEXELS_API_KEY path is missing in .env");
+  const envValue = process.env.PEXELS_API_KEY;
+  if (!envValue) {
+    throw new Error("PEXELS_API_KEY is missing in .env");
   }
 
-  // Résout le chemin vers ton fichier `.key`
-  const resolvedPath = path.resolve(apiKeyPath);
-
-  // Lecture réelle du fichier contenant la clé
-  const rawKey = await fs.readFile(resolvedPath, "utf8");
-
-  // Nettoyage (retours à la ligne / espaces)
-  const apiKey = rawKey.trim();
+  // New setup: PEXELS_API_KEY contains the actual API key.
+  // Backward-compat: if it still contains a file path, read the key from that file.
+  const trimmedEnvValue = envValue.trim();
+  let apiKey: string;
+  try {
+    const resolvedPath = path.resolve(trimmedEnvValue);
+    const rawKey = await fs.readFile(resolvedPath, "utf8");
+    apiKey = rawKey.trim();
+  } catch {
+    apiKey = trimmedEnvValue;
+  }
 
   if (!apiKey) {
-    throw new Error("PEXELS API key file is empty or invalid");
+    throw new Error("PEXELS_API_KEY is empty or invalid");
   }
 
-  // Création du client Pexels
-  const client = createClient(apiKey);
-
-  return client;
+  return createClient(apiKey);
 };
 
 export { pexelsConnect };

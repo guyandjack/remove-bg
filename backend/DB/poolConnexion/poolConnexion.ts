@@ -1,7 +1,7 @@
+/// <reference types="node" />
+
 import "dotenv/config";
-import mysql, { Pool } from "mysql2/promise";
-
-
+import { createPool, type Pool } from "mysql2/promise";
 
 // -----------------------------
 // Connexion / Déconnexion
@@ -10,14 +10,37 @@ import mysql, { Pool } from "mysql2/promise";
 // -------------------------
 // Variables d'environnement
 // -------------------------
-const isDev = process.env.NODE_ENV === "development";
+let env = process.env.NODE_ENV;
+let host = "";
+let user = "";
+let password = "";
+let database = "";
+switch (env) {
+  case "development":
+    host = process.env.DB_HOST_DEV;
+    user = process.env.DB_USER_DEV;
+    password = process.env.DB_PASSWORD_DEV;
+    database = process.env.DB_NAME_DEV;
 
-// En dev → variables locales (.env)
-// En prod → tu peux définir d'autres variables dans ton hébergeur
-const host = isDev ? process.env.DB_HOST_DEV : process.env.DB_HOST_PROD;
-const user = isDev ? process.env.DB_USER_DEV : process.env.DB_USER_PROD;
-const password = isDev ? process.env.DB_PASSWORD_DEV : process.env.DB_PASSWORD_PROD;
-const database = isDev ? process.env.DB_NAME_DEV : process.env.DB_NAME_PROD;
+    break;
+  case "preprod":
+    host = process.env.DB_HOST_PRE_PROD;
+    user = process.env.DB_USER_PRE_PROD;
+    password = process.env.DB_PASSWORD_PRE_PROD;
+    database = process.env.DB_NAME_PRE_PROD;
+
+    break;
+  case "production":
+    host = process.env.DB_HOST_PRODUCTION;
+    user = process.env.DB_USER_PRODUCTION;
+    password = process.env.DB_PASSWORD_PRODUCTION;
+    database = process.env.DB_NAME_PRODUCTION;
+
+    break;
+
+  default:
+    break;
+}
 
 // -------------------------
 // Pool de connexion
@@ -30,11 +53,11 @@ let pool: Pool | null = null;
 export async function connectDb(): Promise<Pool> {
   if (pool) return pool; // déjà connecté
 
-  if (!host || !user || !database) {
+  if (!host || !user || !database || !password) {
     throw new Error("❌ Variables d'environnement DB manquantes");
   }
 
-  pool = mysql.createPool({
+  pool = createPool({
     host,
     user,
     password,
@@ -42,7 +65,7 @@ export async function connectDb(): Promise<Pool> {
     connectionLimit: 10,
   });
 
-  console.log(`✅ Connecté à la base ${database} (${isDev ? "DEV" : "PROD"})`);
+  console.log(`✅ Connecté à la base ${database} de ${env}`);
   return pool;
 }
 

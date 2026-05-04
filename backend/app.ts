@@ -89,6 +89,7 @@ app.use(cors(corsOptions));
 
 
 
+
 // ----------------------------------------------------
 // ⚙️ 2️⃣ Middlewares généraux
 // ----------------------------------------------------
@@ -164,9 +165,10 @@ app.use("/api/", limiter);
 
 // Exemple de route de test
 app.get("/test", (req, res) => {
-  res.json({
-    message: "✅ API online 🚀",
-    requestId: (req as any).requestId,
+  res.status(200).json({
+    ok: true,
+    message: "API preprod Wizpix joignable",
+    timestamp: new Date().toISOString(),
   });
 });
 

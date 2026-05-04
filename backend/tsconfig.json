@@ -5,10 +5,12 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "ES2022",
+    "lib": ["ES2022"],
+    "types": ["node"],
     "esModuleInterop": true,
     "strict": false,
     "skipLibCheck": true,
-    "types": ["node"]
+    "noEmitOnError": false
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]

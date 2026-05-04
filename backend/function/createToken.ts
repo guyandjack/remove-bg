@@ -13,8 +13,8 @@ type Option = {
   httpOnly: boolean;
   secure: boolean;
   maxAge: number;
-sameSite?: string;
-}
+  sameSite?: string;
+};
 
 export type PasswordResetPayload = {
   sub: string;
@@ -26,8 +26,11 @@ export type PasswordResetPayload = {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function normalizePem(input: string): string {
-  const maybe = input.includes("\\n") ? input.replace(/\\n/g, "\n") : input;
-  return maybe.trim();
+  const withRealNewlines = input.replace(/\r\n/g, "\n");
+  const withEscapedNewlines = withRealNewlines.includes("\\n")
+    ? withRealNewlines.replace(/\\n/g, "\n")
+    : withRealNewlines;
+  return withEscapedNewlines.trim();
 }
 
 function tryRead(p?: string): string | null {
@@ -39,58 +42,100 @@ function tryRead(p?: string): string | null {
   }
 }
 
+function resolvePemFromEnvOrPath(
+  value: string | undefined,
+  expectedHeader: RegExp,
+  expectedFooter: RegExp
+): string | null {
+  if (!value) return null;
+
+  // If the env var now directly contains the PEM (your new setup), use it as-is.
+  const normalized = normalizePem(value);
+  if (expectedHeader.test(normalized) && expectedFooter.test(normalized)) return normalized;
+
+  // Backward-compat: if the env var used to be a path, try to read it.
+  const fileContent = tryRead(value);
+  if (!fileContent) return null;
+  const fileNormalized = normalizePem(fileContent);
+  if (expectedHeader.test(fileNormalized) && expectedFooter.test(fileNormalized)) return fileNormalized;
+
+  return null;
+}
+
 function resolvePrivateKey(): string {
-  const candidatePaths = [
+  const header = /BEGIN (RSA )?PRIVATE KEY/;
+  const footer = /END (RSA )?PRIVATE KEY/;
+
+  // Support both old and new meanings:
+  // - Previously: *_PATH = file path to a .key
+  // - Now:       *_PATH = actual PEM content inside .env
+  const envCandidates = [
+    process.env.JWT_PRIVATE_KEY_PATH,
     process.env.PRIVATE_KEY_PATH,
-    path.resolve(__dirname, "..", "keys", "jwt_private_key.key"),
+    process.env.JWT_PRIVATE_KEY,
   ];
-  for (const p of candidatePaths) {
-    const content = tryRead(p);
-    if (content && /BEGIN (RSA )?PRIVATE KEY/.test(content)) return content.trim();
+  for (const v of envCandidates) {
+    const resolved = resolvePemFromEnvOrPath(v, header, footer);
+    if (resolved) return resolved;
   }
-  const envKey = process.env.JWT_PRIVATE_KEY;
-  if (envKey) {
-    const k = normalizePem(envKey);
-    if (/BEGIN (RSA )?PRIVATE KEY/.test(k)) return k;
+
+  const fallbackPath = path.resolve(__dirname, "..", "keys", "jwt_private_key.key");
+  const fallback = tryRead(fallbackPath);
+  if (fallback) {
+    const resolved = resolvePemFromEnvOrPath(fallback, header, footer);
+    if (resolved) return resolved;
   }
-  throw new Error("RSA private key not found. Set PRIVATE_KEY_PATH or place keys/private.key");
+
+  throw new Error(
+    "RSA private key not found. Set JWT_PRIVATE_KEY_PATH (recommended) or JWT_PRIVATE_KEY. Backward-compat: PRIVATE_KEY_PATH can be a path."
+  );
 }
 
 function resolveAccessPublicKey(): string {
-  const normalize = (v: string) => (v.includes("\\n") ? v.replace(/\\n/g, "\n") : v).trim();
-  const candidatePaths = [
-    process.env.JWT_PUBLIC_KEY_PATH,
-    path.resolve(__dirname, "..", "keys", "jwt_public_key.key"),
-  ];
-  for (const p of candidatePaths) {
-    const content = tryRead(p);
-    if (content && /BEGIN (RSA )?PUBLIC KEY/.test(content)) return content.trim();
+  const header = /BEGIN (RSA )?PUBLIC KEY/;
+  const footer = /END (RSA )?PUBLIC KEY/;
+
+  const envCandidates = [process.env.JWT_PUBLIC_KEY_PATH, process.env.JWT_PUBLIC_KEY];
+  for (const v of envCandidates) {
+    const resolved = resolvePemFromEnvOrPath(v, header, footer);
+    if (resolved) return resolved;
   }
-  const envKey = process.env.JWT_PUBLIC_KEY;
-  if (envKey) {
-    const k = normalize(envKey);
-    if (/BEGIN (RSA )?PUBLIC KEY/.test(k)) return k;
+
+  const fallbackPath = path.resolve(__dirname, "..", "keys", "jwt_public_key.key");
+  const fallback = tryRead(fallbackPath);
+  if (fallback) {
+    const resolved = resolvePemFromEnvOrPath(fallback, header, footer);
+    if (resolved) return resolved;
   }
-  throw new Error("RSA public key (access) not found. Set JWT_PUBLIC_KEY_PATH or JWT_PUBLIC_KEY");
+
+  throw new Error("RSA public key (access) not found. Set JWT_PUBLIC_KEY_PATH (recommended) or JWT_PUBLIC_KEY");
 }
 
 function resolveRefreshPublicKey(): string {
-  const normalize = (v: string) => (v.includes("\\n") ? v.replace(/\\n/g, "\n") : v).trim();
-  const candidatePaths = [
+  const header = /BEGIN (RSA )?PUBLIC KEY/;
+  const footer = /END (RSA )?PUBLIC KEY/;
+
+  const envCandidates = [
     process.env.JWT_REFRESH_PUBLIC_KEY_PATH,
     process.env.JWT_PUBLIC_KEY_PATH,
-    path.resolve(__dirname, "..", "keys", "jwt_public_key.key"),
+    process.env.JWT_REFRESH_PUBLIC_KEY,
+    process.env.JWT_PUBLIC_KEY,
   ];
-  for (const p of candidatePaths) {
-    const content = tryRead(p);
-    if (content && /BEGIN (RSA )?PUBLIC KEY/.test(content)) return content.trim();
+  for (const v of envCandidates) {
+    const resolved = resolvePemFromEnvOrPath(v, header, footer);
+    if (resolved) return resolved;
   }
-  const envKey = process.env.JWT_REFRESH_PUBLIC_KEY || process.env.JWT_PUBLIC_KEY;
-  if (envKey) {
-    const k = normalize(envKey);
-    if (/BEGIN (RSA )?PUBLIC KEY/.test(k)) return k;
+
+  const fallbackPath = path.resolve(__dirname, "..", "keys", "jwt_public_key.key");
+  const fallback = tryRead(fallbackPath);
+  if (fallback) {
+    const resolved = resolvePemFromEnvOrPath(fallback, header, footer);
+    if (resolved) return resolved;
   }
-  throw new Error("RSA public key (refresh) not found. Set JWT_REFRESH_PUBLIC_KEY_PATH or JWT_REFRESH_PUBLIC_KEY");
+
+  throw new Error(
+    "RSA public key (refresh) not found. Set JWT_REFRESH_PUBLIC_KEY_PATH (recommended) or JWT_REFRESH_PUBLIC_KEY"
+  );
 }
 
 /**

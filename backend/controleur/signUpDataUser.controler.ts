@@ -7,8 +7,8 @@ import type { ResultSetHeader } from "mysql2/promise";
 import { connectDb } from "../DB/poolConnexion/poolConnexion.js";
 import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.js";
 import { getUserByEmail } from "../DB/queriesSQL/queriesSQL.js";
-/* import { planOption } from "../data/planOption.ts";
-import { buildLogoUrl } from "../utils/publicAssetUrl.ts"; */
+/* import { planOption } from "../data/planOption.js";
+import { buildLogoUrl } from "../utils/publicAssetUrl.js"; */
 
 function generateOtp(): string {
   return crypto.randomInt(0, 1_000_000).toString().padStart(6, "0");
