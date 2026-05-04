@@ -4,9 +4,9 @@ import nodemailer from "nodemailer";
 import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import type { ResultSetHeader } from "mysql2/promise";
-import { connectDb } from "../DB/poolConnexion/poolConnexion.ts";
-import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.ts";
-import { getUserByEmail } from "../DB/queriesSQL/queriesSQL.ts";
+import { connectDb } from "../DB/poolConnexion/poolConnexion.js";
+import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.js";
+import { getUserByEmail } from "../DB/queriesSQL/queriesSQL.js";
 /* import { planOption } from "../data/planOption.ts";
 import { buildLogoUrl } from "../utils/publicAssetUrl.ts"; */
 
@@ -40,7 +40,7 @@ const sendMailVerification: RequestHandler = async (req, res) => {
       code: "signup_missing_env",})
     }
   const isProd = nodEnv === "production";
-  const baseUrlUsed = isProd ? baseUrlProd : baseUrlDev ;
+  const baseUrlUsed = isProd ? baseUrlProd : baseUrlDev;
   try {
     const { email, password, lang, plan, id, currency } = (req as any).userValidated || {};
 
@@ -148,7 +148,9 @@ const sendMailVerification: RequestHandler = async (req, res) => {
     }
 
     const transporter = nodemailer.createTransport({
-      host: isProd ? process.env.MAILBOX_PROD_HOST : "smtp.gmail.com",
+      host: isProd
+        ? process.env.MAILBOX_PROD_HOST
+        : process.env.MAILBOX_DEV_HOST,
       port: isProd ? Number(process.env.MAILBOX_PROD_PORT || 465) : 465,
       secure: true,
       auth: { user: from, pass },

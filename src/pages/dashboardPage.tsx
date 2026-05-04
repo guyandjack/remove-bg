@@ -463,14 +463,14 @@ const DashboardPage = ({routeKey}: PropsPage) => {
           </div>
           <div className="stat-title">
             <p>
-              <span>du  </span>
+              <span>du </span>
               <span
                 className="stat-value text-dark text-base"
                 dangerouslySetInnerHTML={{ __html: billingPeriodRange.start }}
               ></span>
             </p>
             <p>
-              <span>au  </span>
+              <span>au </span>
               <span
                 className="stat-value text-dark text-base"
                 dangerouslySetInnerHTML={{ __html: billingPeriodRange.end }}
@@ -541,6 +541,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                     <button
                       className={`${dashboardActionBtn} btn-outline btn-success`}
                       disabled={
+                        currentPlanCode === "free" ||
                         cancelSubmitting === "loading" ||
                         billingState?.account?.account_deletion_requested
                       }
@@ -555,6 +556,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                     <button
                       className={`${dashboardActionBtn} btn-outline btn-error`}
                       disabled={
+                        currentPlanCode === "free" ||
                         cancelSubmitting === "loading" ||
                         billingState?.account?.account_deletion_requested
                       }
