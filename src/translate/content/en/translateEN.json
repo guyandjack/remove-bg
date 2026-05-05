@@ -90,7 +90,9 @@
     "info": "Enter your email to receive a reset link.",
     "email": "Email",
     "btnSubmit": "Send the link",
-    "btnCancel": "Cancel"
+    "btnCancel": "Cancel",
+    "textSuccess": "If an account exists<br>a reset link has been sent.",
+    "textError": "Unable to send the reset link. Please try again."
   },
   "formReset": {
     "title": "Choose a new password",

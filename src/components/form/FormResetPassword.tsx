@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { api, login } from "@/utils/axiosConfig";
 import { axiosError } from "@/utils/axiosError";
 import { Loader } from "@/components/loader/Loader";
+import { route } from "preact-router";
 
 type ResetPasswordFormValues = {
   current_password?: string;
@@ -43,6 +44,8 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [isCurrentVisible, setIsCurrentVisible] = useState(false);
+
+  console.log("mode du form: ", mode);
 
   const {
     register,
@@ -125,6 +128,10 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
             : t("formReset.textSuccess");
         setStatusMessage(successMessage);
         reset();
+        setTimeout(() => {
+          setStatus("idle");
+          if (mode !== "dashboard") {route("/login")};
+        }, 3000);
         return;
       }
 

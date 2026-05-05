@@ -64,8 +64,8 @@ export const forgotPassword: RequestHandler = async (req, res) => {
 
       const from = (
         isProd
-          ? process.env.MAILBOX_PROD_ADDRESS || process.env.MAILBOX_PROD_ADRESS
-          : process.env.MAILBOX_DEV_ADDRESS || process.env.MAILBOX_DEV_ADRESS
+          ? process.env.MAILBOX_PROD_ADRESS
+          : process.env.MAILBOX_DEV_ADRESS
       ) as string | undefined;
       const pass = (isProd ? process.env.MAILBOX_PROD_PASSWORD : process.env.MAILBOX_DEV_PASSWORD) as
         | string

@@ -6,11 +6,8 @@
   "scripts": {
     "dev": "vite",
     "dev:preprod": "vite --mode preprod",
-
     "build:prod": "tsc -b && vite build --mode production",
-
     "build:preprod": "tsc -b && vite build --mode preprod",
-    
     "preview:prod": "vite preview --mode production",
     "preview:preprod": "vite preview --mode preprod"
   },
@@ -27,6 +24,7 @@
     "motion": "^12.23.25",
     "preact": "^10.27.2",
     "preact-iso": "^2.11.0",
+    "preact-router": "^4.1.2",
     "radix-ui": "^1.4.3",
     "react-best-gradient-color-picker": "^3.0.14",
     "react-hook-form": "^7.65.0",

@@ -68,6 +68,9 @@ const corsOptions: CorsOptions = {
 
       //pre_prod
       "https://preprod.wizpix.ch",
+      "http://preprod.wizpix.ch",
+      "www.preprod.wizpix.ch",
+      
       
       //production
       "https://wizpix.ch", 

@@ -1,6 +1,8 @@
 //import des hooks
 import { useRef, useState } from "preact/hooks";
 import { set, useForm } from "react-hook-form";
+import { route } from "preact-router";
+
 
 //import des librairies
 import { login } from "@/utils/axiosConfig";
@@ -15,7 +17,7 @@ import { Loader } from "@/components/loader/Loader";
 //import des fonctions
 import { axiosError } from "@/utils/axiosError";
 import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
-import { navigateWithLink } from "@/utils/navigateWithLink";
+//import { navigateWithLink } from "@/utils/navigateWithLink";
 
 //declarations des types
 export type FormValues = {
@@ -87,7 +89,6 @@ const FormLogin = () => {
   });
 
   const onForgotSubmit = async (data:FormValuesForgot) => {
-    
     setIsLoader(true);
     const DATA = { ...data, lang: language };
     try {
@@ -103,24 +104,28 @@ const FormLogin = () => {
        }
      );
       if (!response) {
-        setIsLoader(false)
         setStatusForgot("error");
+        return;
       }
-      const data = response.data;
-      if (data.status !== "success") {
-        setIsLoader(false)
-        setStatusForgot("success");
+
+      const responseData = response.data;
+      setStatusForgot(responseData?.status === "success" ? "success" : "error");
+
+      if (responseData?.status === "success") {
+        resetForgot();
+        setTimeout(() => {
+          setIsForgotOpen(false);
+        }, 4000);
       }
-      
-      setIsLoader(false)
-      setStatusForgot("success");
     } catch (err) {
       axiosError(setStatusForgot, err)
     } finally {
       setIsLoader(false);
       setTimeout(() => {
-        setStatusForgot("idle")
-      }, 3000);
+        setStatusForgot("idle");
+        
+        
+      }, 3500);
     }
     //resetForgot();
     //setIsForgotOpen(false); 
@@ -157,7 +162,7 @@ const FormLogin = () => {
         setIsLoader(false);
         setTimeout(() => {
           setStatus("idle");
-          navigateWithLink("/services");
+          route("/services");
         }, 2000);
 
         
@@ -306,7 +311,7 @@ const FormLogin = () => {
 
                 <div class="mt-5 h-[1px] w-full bg-gray-500 "></div>
 
-               {/*  <div className="relative w-full flex flex-col justify-center items-center mt-4">
+                {/*  <div className="relative w-full flex flex-col justify-center items-center mt-4">
                   <BtnGoogleLogin
                     text={t("formSignUp.btnGoogle")}
                     disabled={isLoader || status !== "idle" || true}
@@ -369,7 +374,7 @@ const FormLogin = () => {
               </p>
               <form
                 onSubmit={handleForgotSubmit(onForgotSubmit)}
-                className="mt-6 space-y-6"
+                className="form-forgot mt-6 space-y-6"
               >
                 <div>
                   <label htmlFor="forgotEmail" className="label p-0">
@@ -379,7 +384,7 @@ const FormLogin = () => {
                   </label>
                   <div className="mt-2">
                     <input
-                      id="email"
+                      id="forgotEmail"
                       type="email"
                       className="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
                       aria-invalid={!!forgotErrors.email || undefined}
@@ -400,13 +405,15 @@ const FormLogin = () => {
                 </div>
 
                 <div className="relative flex flex-col gap-3">
-                  { <button
-                    type="submit"
-                    className="btn btn-primary w-full"
-                    disabled={isForgotSubmitting}
-                  >
-                    {t("formForgot.btnSubmit")}
-                  </button> }
+                  {
+                    <button
+                      type="submit"
+                      className="btn btn-primary w-full"
+                      disabled={isForgotSubmitting }
+                    >
+                      {t("formForgot.btnSubmit")}
+                    </button>
+                  }
                   <button
                     type="button"
                     className="btn btn-ghost w-full"
@@ -432,10 +439,8 @@ const FormLogin = () => {
           }
         `}
                   >
-                    {statusForgot === "success"
-                      ? t("formSignUp.textSuccess")
-                      : ""}
-                    {statusForgot === "error" ? t("formSignUp.textError") : ""}
+                    {statusForgot === "success" ? t("formForgot.textSuccess") : ""}
+                    {statusForgot === "error" ? t("formForgot.textError") : ""}
                   </div>
                 </div>
               </form>

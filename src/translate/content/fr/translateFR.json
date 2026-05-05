@@ -88,7 +88,9 @@
     "info": "Saisissez votre email pour recevoir un lien de réinitialisation.",
     "email": "Email",
     "btnSubmit": "Envoyer le lien",
-    "btnCancel": "Annuler"
+    "btnCancel": "Annuler",
+    "textSuccess": "Si un compte existe, un lien de réinitialisation a été envoyé.",
+    "textError": "Impossible d'envoyer le lien de réinitialisation. Réessayez."
   },
   "formReset": {
     "title": "Choisissez un nouveau mot de passe",

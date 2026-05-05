@@ -22,13 +22,7 @@ switch (env) {
     password = process.env.DB_PASSWORD_DEV;
     database = process.env.DB_NAME_DEV;
 
-    break;
-  case "preprod":
-    host = process.env.DB_HOST_PRE_PROD;
-    user = process.env.DB_USER_PRE_PROD;
-    password = process.env.DB_PASSWORD_PRE_PROD;
-    database = process.env.DB_NAME_PRE_PROD;
-
+    
     break;
   case "production":
     host = process.env.DB_HOST_PRODUCTION;
