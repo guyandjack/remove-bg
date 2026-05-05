@@ -1,15 +1,16 @@
 import type { Request, Response, NextFunction } from "express";
 import type { UploadedFile } from "express-fileupload";
+import { logger } from "../../logger.js";
 
-// Types MIME autorisés
+// Types MIME autorisÃ©s
 const ALLOWED_MIMES = new Set([
   "image/jpeg",
-  "image/jpg", // alias, normalisé en image/jpeg
+  "image/jpg", // alias, normalisÃ© en image/jpeg
   "image/png",
   "image/webp",
 ]);
 
-// Taille max par défaut (5 MB)
+// Taille max par dÃ©faut (5 MB)
 const DEFAULT_MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 export type ImageValidationOptions = {
@@ -25,7 +26,7 @@ export type ValidatedImage = {
   extension: "jpg" | "jpeg" | "png" | "webp";
 };
 
-// ---------- Helpers sécurité/validation ----------
+// ---------- Helpers sÃ©curitÃ©/validation ----------
 
 // Nettoyage simple du nom de fichier (retire chemins)
 function sanitizeFilename(name: string): string {
@@ -35,23 +36,23 @@ function sanitizeFilename(name: string): string {
     .trim();
 }
 
-// Déduit l’extension “classique” depuis un mime
+// DÃ©duit lâ€™extension â€œclassiqueâ€ depuis un mime
 function extFromMime(mime: string): ValidatedImage["extension"] {
   if (mime === "image/jpeg" || mime === "image/jpg") return "jpg";
   if (mime === "image/png") return "png";
   if (mime === "image/webp") return "webp";
-  // Fallback — ne devrait pas arriver car on filtre avant
+  // Fallback â€” ne devrait pas arriver car on filtre avant
   return "jpg";
 }
 
-// Détection par “magic numbers” afin d’éviter le spoof de MIME.
-// Retourne le mime “réel” ou null si non reconnu.
+// DÃ©tection par â€œmagic numbersâ€ afin dâ€™Ã©viter le spoof de MIME.
+// Retourne le mime â€œrÃ©elâ€ ou null si non reconnu.
 function sniffMimeFromBuffer(
   buf: Buffer
 ): "image/jpeg" | "image/png" | "image/webp" | null {
   if (!buf || buf.length < 12) return null;
 
-  // JPEG: ff d8 ... (et souvent ff d9 en fin, mais début suffit ici)
+  // JPEG: ff d8 ... (et souvent ff d9 en fin, mais dÃ©but suffit ici)
   if (buf[0] === 0xff && buf[1] === 0xd8) {
     return "image/jpeg";
   }
@@ -90,9 +91,9 @@ function sniffMimeFromBuffer(
 // ---------- Middleware factory ----------
 
 /**
- * Crée un middleware de validation d’upload d’image pour le champ donné.
+ * CrÃ©e un middleware de validation dâ€™upload dâ€™image pour le champ donnÃ©.
  * @param fieldName Nom du champ de formulaire (ex: "image")
- * @param options  Options facultatives (taille max, mimes autorisés)
+ * @param options  Options facultatives (taille max, mimes autorisÃ©s)
  */
 export function validateImageUpload(
   fieldName: string,
@@ -102,28 +103,45 @@ export function validateImageUpload(
   const allowed = options?.allowedMimes ?? ALLOWED_MIMES;
 
   return (req: Request, res: Response, next: NextFunction) => {
-    // Vérifie la présence du fichier via express-fileupload
+    const requestMeta = {
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      fieldName,
+      contentType: req.headers["content-type"] || null,
+    };
+
+    // VÃ©rifie la prÃ©sence du fichier via express-fileupload
     const files = (req as any).files as
       | undefined
       | Record<string, UploadedFile | UploadedFile[]>;
 
     if (!files || !files[fieldName]) {
       const availableFields = files ? Object.keys(files) : [];
+      logger.warn("validateImageUpload::missing_file", {
+        ...requestMeta,
+        availableFields,
+        status: 400,
+      });
       return res.status(400).json({
         error: true,
-        message: `Aucun fichier reçu dans le champ "${fieldName}".`,
+        message: `Aucun fichier reÃ§u dans le champ "${fieldName}".`,
         availableFields,
         contentType: req.headers["content-type"] || null,
         requestId: (req as any).requestId,
       });
     }
 
-    // Interdit les tableaux de fichiers — on attend un seul fichier
+    // Interdit les tableaux de fichiers â€” on attend un seul fichier
     const file = files[fieldName];
     if (Array.isArray(file)) {
+      logger.warn("validateImageUpload::multiple_files", {
+        ...requestMeta,
+        status: 400,
+      });
       return res.status(400).json({
         error: true,
-        message: `Plusieurs fichiers reçus pour "${fieldName}", un seul attendu.`,
+        message: `Plusieurs fichiers reÃ§us pour "${fieldName}", un seul attendu.`,
         requestId: (req as any).requestId,
       });
     }
@@ -132,19 +150,30 @@ export function validateImageUpload(
     const originalName = sanitizeFilename(f.name || "upload");
     const declaredMime = (f.mimetype || "").toLowerCase();
 
-    // Vérif MIME déclaré dans la liste autorisée
+    // VÃ©rif MIME dÃ©clarÃ© dans la liste autorisÃ©e
     if (!allowed.has(declaredMime)) {
+      logger.warn("validateImageUpload::unsupported_mime", {
+        ...requestMeta,
+        declaredMime: declaredMime || null,
+        status: 415,
+      });
       return res.status(415).json({
         error: true,
-        message: `Type de fichier non supporté (${
+        message: `Type de fichier non supportÃ© (${
           declaredMime || "inconnu"
-        }). Autorisés: jpeg, png, webp.`,
+        }). AutorisÃ©s: jpeg, png, webp.`,
         requestId: (req as any).requestId,
       });
     }
 
     // Taille max
     if (typeof f.size !== "number" || f.size <= 0) {
+      logger.warn("validateImageUpload::invalid_size", {
+        ...requestMeta,
+        declaredMime: declaredMime || null,
+        size: typeof f.size === "number" ? f.size : null,
+        status: 400,
+      });
       return res.status(400).json({
         error: true,
         message: "Fichier vide ou taille invalide.",
@@ -152,6 +181,13 @@ export function validateImageUpload(
       });
     }
     if (f.size > maxSize) {
+      logger.warn("validateImageUpload::too_large", {
+        ...requestMeta,
+        declaredMime: declaredMime || null,
+        size: f.size,
+        maxSize,
+        status: 413,
+      });
       return res.status(413).json({
         error: true,
         message: `Fichier trop volumineux. Taille max: ${Math.floor(
@@ -161,9 +197,15 @@ export function validateImageUpload(
       });
     }
 
-    // Récupère le buffer binaire (express-fileupload expose .data)
+    // RÃ©cupÃ¨re le buffer binaire (express-fileupload expose .data)
     const buffer: Buffer = (f as any).data as Buffer;
     if (!Buffer.isBuffer(buffer) || buffer.length !== f.size) {
+      logger.warn("validateImageUpload::corrupted_buffer", {
+        ...requestMeta,
+        declaredMime: declaredMime || null,
+        size: f.size,
+        status: 400,
+      });
       return res.status(400).json({
         error: true,
         message: "Fichier non lisible ou corrompu.",
@@ -174,9 +216,15 @@ export function validateImageUpload(
     // Sniff binaire (anti-spoof de MIME)
     const sniffed = sniffMimeFromBuffer(buffer);
     if (!sniffed) {
+      logger.warn("validateImageUpload::unknown_signature", {
+        ...requestMeta,
+        declaredMime: declaredMime || null,
+        size: f.size,
+        status: 415,
+      });
       return res.status(415).json({
         error: true,
-        message: "Signature de fichier inconnue ou non supportée.",
+        message: "Signature de fichier inconnue ou non supportÃ©e.",
         requestId: (req as any).requestId,
       });
     }
@@ -189,16 +237,30 @@ export function validateImageUpload(
       normalizedMime !== declaredMime &&
       declaredMime !== "image/jpg"
     ) {
-      // Si le sniff contredit le MIME déclaré (hors alias jpg/jpeg) → refuse
+      // Si le sniff contredit le MIME dÃ©clarÃ© (hors alias jpg/jpeg) â†’ refuse
+      logger.warn("validateImageUpload::mime_mismatch", {
+        ...requestMeta,
+        declaredMime: declaredMime || null,
+        sniffedMime: sniffed,
+        size: f.size,
+        status: 415,
+      });
       return res.status(415).json({
         error: true,
-        message: `Le contenu du fichier ne correspond pas au type déclaré (${declaredMime}).`,
+        message: `Le contenu du fichier ne correspond pas au type dÃ©clarÃ© (${declaredMime}).`,
         requestId: (req as any).requestId,
       });
     }
 
-    // Contrôles additionnels simples sur le nom
+    // ContrÃ´les additionnels simples sur le nom
     if (originalName.length > 200) {
+      logger.warn("validateImageUpload::filename_too_long", {
+        ...requestMeta,
+        declaredMime: declaredMime || null,
+        size: f.size,
+        filenameLength: originalName.length,
+        status: 400,
+      });
       return res.status(400).json({
         error: true,
         message: "Nom de fichier trop long.",
@@ -206,7 +268,7 @@ export function validateImageUpload(
       });
     }
 
-    // Tout est OK → on injecte une version validée/normalisée dans req
+    // Tout est OK â†’ on injecte une version validÃ©e/normalisÃ©e dans req
     const ext = extFromMime(normalizedMime);
     (req as any).imageValidated = {
       buffer,

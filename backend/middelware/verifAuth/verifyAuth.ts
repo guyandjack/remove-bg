@@ -1,6 +1,7 @@
 // middleware/verifyAuth.ts
 import type { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../../function/createToken.js";
+import { logger } from "../../logger.js";
 
 const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
   const rawAuth = req.headers.authorization;
@@ -13,6 +14,13 @@ const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
     token.split(".").length !== 3;
 
   if (looksMalformed) {
+    logger.warn("verifyAuth::missing_or_malformed_token", {
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      hasAuthHeader: Boolean(rawAuth),
+      errorCode: "veri1",
+    });
     return res
       .status(401)
       .set("Cache-Control", "no-store")
@@ -29,18 +37,28 @@ const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
     }
     
     if (!email) {
+      logger.warn("verifyAuth::invalid_token_payload", {
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        errorCode: "veri2",
+      });
       return res
       .status(401)
       .set("Cache-Control", "no-store")
       .json({ status: "error", message: "Invalid token", errorCode: "veri2" });
     }
     
-    console.log("email decoded dans verifiauth: ", email);
-    
     (req as any).payload = { ...(req as any).payload, email: email };
-    console.log("req payload  dans verifiauth: ", (req as any).payload);
     next();
   } catch (err: any) {
+    logger.warn("verifyAuth::verify_failed", {
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      errorCode: "veri3",
+      message: err?.message ?? String(err),
+    });
     return res
       .status(401)
       .set("Cache-Control", "no-store")
