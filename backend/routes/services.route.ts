@@ -15,10 +15,13 @@ import { formatSocialPictures } from "../controleur/services/socialFormatter.con
 import { removeBg } from "../controleur/services/removeBg.controler.js";
 import { removeBgByReplicate } from "../controleur/services/removeBgByReplicate.controler.js";
 import { magicEraser } from "../controleur/services/magicEraser.controler.js";
+import { removeBgVisitorByReplicate } from "../controleur/services/removeBgVisitorByReplicate.controler.js";
+import { imageConverterVisitor } from "../controleur/services/imageConverterVisitor.controler.js";
 import {
   attachRemoveBgQuality,
   validateRemoveBgUpload,
 } from "../middelware/services/removeBg.middelware.js";
+import { validateVisitorImageUpload1Mb } from "../middelware/services/visitorPublicLimits.middleware.js";
 import {
   validateMagicEraserPayload,
 } from "../middelware/services/magicEraser.middleware.js";
@@ -29,18 +32,36 @@ const router = express.Router();
 //route image converter
 router.post(
   "/image-converter",
+  verifyAuth,
   validateConverterUpload,
   validateConverterOptions,
   imageConverter
+);
+
+// Public (no auth) - anti abuse visitors: 1MB max, quota server-side by hashed IP.
+router.post(
+  "/public/image-converter",
+  validateVisitorImageUpload1Mb,
+  validateConverterOptions,
+  imageConverterVisitor,
 );
 
 //route image social
 router.post("/image-social", parseSocialPicturePayload, formatSocialPictures);
 router.post(
   "/remove-bg",
+  verifyAuth,
   validateRemoveBgUpload,
   attachRemoveBgQuality,
   removeBg
+);
+
+// Public (no auth) - anti abuse visitors: 1MB max, 1 trial total.
+router.post(
+  "/public/remove-bg",
+  validateVisitorImageUpload1Mb,
+  attachRemoveBgQuality,
+  removeBgVisitorByReplicate,
 );
 
 // route remove bg via Replicate (MVP)

@@ -91,6 +91,7 @@ const RemoveBg = ({
   const [processingError, setProcessingError] = useState<string | null>(null);
   const [isCdnLoaded, setCdnLoaded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [visitorBlocked, setVisitorBlocked] = useState(false);
   const [typePlan, setTypePlan] = useState<string>(
     sessionSignal?.value?.plan?.code ||
       sessionSignal?.value?.plan?.name ||
@@ -225,8 +226,12 @@ const RemoveBg = ({
       const formData = new FormData();
       formData.append("file", fileToProcess);
 
+      const endpoint = userLoged
+        ? "api/services/remove-bg-replicate"
+        : "api/services/public/remove-bg";
+
       const response = await api.post<Blob>(
-        "api/services/remove-bg-replicate",
+        endpoint,
         formData,
         {
           responseType: "blob",
@@ -280,15 +285,34 @@ const RemoveBg = ({
     });
 
     Promise.all([ensureEditor, apiPromise])
-      .catch((err) => {
+      .catch(async (err) => {
         if (isCancelled) return;
-        const axiosError = err as AxiosError<{ message?: string }>;
+        const axiosError = err as AxiosError<any>;
         console.error("Erreur pendant chargement editeur ou API :", err);
-        const message =
-          axiosError.response?.data?.message ||
+        let message: string | null = null;
+        let code: string | null = null;
+        const data = axiosError.response?.data;
+
+        if (data && typeof data === "object" && typeof data.message === "string") {
+          message = data.message;
+          code = typeof data.code === "string" ? data.code : null;
+        } else if (data instanceof Blob) {
+          try {
+            const text = await data.text();
+            const parsed = JSON.parse(text);
+            if (parsed && typeof parsed.message === "string") {
+              message = parsed.message;
+              code = typeof parsed.code === "string" ? parsed.code : null;
+            }
+          } catch {}
+        }
+
+        const finalMessage =
+          message ||
           axiosError.message ||
           removeTextContent.defaultProcessingError;
-        setProcessingError(message);
+        setProcessingError(finalMessage);
+        setVisitorBlocked(!userLoged && code === "VISITOR_QUOTA_EXCEEDED");
         setResponseApi((previous) => {
           revokeIfBlobUrl(previous);
           return "";
@@ -304,7 +328,7 @@ const RemoveBg = ({
       isCancelled = true;
       abortController.abort();
     };
-  }, [fileToProcess]);
+  }, [fileToProcess, userLoged]);
 
   //si un utilisateur est connecte
   // Image editor sera remonte avec la valeur du plan de l'utilisateur connecte
@@ -345,6 +369,20 @@ const RemoveBg = ({
       setSelectedFile(null);
       setFileToProcess(null);
       setProcessingError(null);
+      setVisitorBlocked(false);
+      setResponseApi((previous) => {
+        revokeIfBlobUrl(previous);
+        return "";
+      });
+      return;
+    }
+    // Visitor anti-abuse: backend enforces 1MB, but we short-circuit for UX.
+    if (!userLoged && file.size > 1 * 1024 * 1024) {
+      setSelectedFile(null);
+      setFileToProcess(null);
+      setProcessingError(
+        "Image trop volumineuse. Taille max: 1 MB pour les visiteurs non connectes."
+      );
       setResponseApi((previous) => {
         revokeIfBlobUrl(previous);
         return "";
@@ -353,6 +391,7 @@ const RemoveBg = ({
     }
     setSelectedFile(file);
     setProcessingError(null);
+    setVisitorBlocked(false);
     setResponseApi((previous) => {
       revokeIfBlobUrl(previous);
       return "";
@@ -377,7 +416,7 @@ const RemoveBg = ({
           onFileReady={handleFileReady}
           content={uploadTextContent}
           onConfirm={confirmProcessing}
-          confirmDisabled={!selectedFile || isProcessing}
+          confirmDisabled={!selectedFile || isProcessing || visitorBlocked}
           confirmLabel={
             isProcessing
               ? removeTextContent.confirmLabelProcessing

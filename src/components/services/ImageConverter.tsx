@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { api } from "@/utils/axiosConfig";
 import { sessionSignal } from "@/stores/session";
+import type { AxiosError } from "axios";
 
 type FilterOptions = {
   brightness: number;
@@ -130,6 +131,7 @@ const ImageConverter = ({
   converterTextContent: ConverterTextContent;
 }) => {
   const userLoged = sessionSignal?.value?.authentified;
+  const [visitorBlocked, setVisitorBlocked] = useState(false);
   
   
   const [file, setFile] = useState<File | null>(null);
@@ -416,6 +418,7 @@ const ImageConverter = ({
     setPreviewUrl(null);
     setPreviewDataUrl(null);
     setConvertedAsset(null);
+    setVisitorBlocked(false);
     setOptions({
       width: 1024,
       height: 1024,
@@ -428,7 +431,9 @@ const ImageConverter = ({
     setStatus({ state: "idle" });
   };
 
-  const IMAGE_CONVERTER_ENDPOINT = "/api/services/image-converter";
+  const IMAGE_CONVERTER_ENDPOINT = userLoged
+    ? "/api/services/image-converter"
+    : "/api/services/public/image-converter";
 
   const buildOutputFilename = () => {
     const baseName = file?.name?.replace(/\.[^/.]+$/, "") || "image-convertie";
@@ -464,6 +469,15 @@ const ImageConverter = ({
       return;
     }
 
+    // Visitor anti-abuse: backend enforces 1MB, but we short-circuit for UX.
+    if (!userLoged && file.size > 1 * 1024 * 1024) {
+      setStatus({
+        state: "error",
+        message: "Image trop volumineuse. Taille max: 1 MB pour les visiteurs non connectes.",
+      });
+      return;
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append(
@@ -496,12 +510,38 @@ const ImageConverter = ({
         state: "success",
         message: converterTextContent.statusSuccess,
       });
+      setVisitorBlocked(false);
     } catch (error) {
+      const axiosError = error as AxiosError<any>;
+      let backendMessage: string | null = null;
+      let backendCode: string | null = null;
+
+      const data = axiosError.response?.data;
+      if (data && typeof data === "object" && typeof data.message === "string") {
+        backendMessage = data.message;
+        backendCode = typeof data.code === "string" ? data.code : null;
+      } else if (data instanceof Blob) {
+        // When responseType=blob, errors can still be JSON blobs.
+        try {
+          const text = await data.text();
+          const parsed = JSON.parse(text);
+          if (parsed && typeof parsed.message === "string") {
+            backendMessage = parsed.message;
+            backendCode = typeof parsed.code === "string" ? parsed.code : null;
+          }
+        } catch {}
+      }
+
       console.error("Erreur lors de la conversion :", error);
       setStatus({
         state: "error",
-        message: converterTextContent.statusError,
+        message:
+          backendMessage || axiosError.message || converterTextContent.statusError,
       });
+
+      if (!userLoged && backendCode === "VISITOR_QUOTA_EXCEEDED") {
+        setVisitorBlocked(true);
+      }
     }
   };
 
@@ -827,7 +867,7 @@ const ImageConverter = ({
               className={`btn btn-success ${
                 status.state === "loading" ? "loading" : ""
               }`}
-              disabled={!file || status.state === "loading"}
+              disabled={!file || status.state === "loading" || visitorBlocked}
             >
               {converterTextContent.actionConvert}
             </button>

@@ -247,3 +247,15 @@ CREATE TABLE IF NOT EXISTS `Invoice` (
   INDEX idx_invoice_paid (status, amount_paid_cents),
   INDEX idx_invoice_period (period_start, period_end)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Visitor quotas (NO raw IP stored)
+-- Identifiant: sha256(ip + SECRET_SALT) (computed server-side).
+CREATE TABLE IF NOT EXISTS `VisitorQuota` (
+  hashed_ip            CHAR(64)     NOT NULL PRIMARY KEY,
+  remove_bg_used       INT UNSIGNED NOT NULL DEFAULT 0,
+  image_convert_month  CHAR(7)      NULL,
+  image_convert_used   INT UNSIGNED NOT NULL DEFAULT 0,
+  created_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_vq_month_used (image_convert_month, image_convert_used)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
