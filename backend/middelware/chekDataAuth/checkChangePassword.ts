@@ -1,21 +1,22 @@
 import { z } from "zod";
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
+import { validationLimits, validationRegex, toRegExp } from "../../shared/validationRegex.js";
 
 export const changePasswordSchema = z
   .object({
     current_password: z
       .string({ message: "Mot de passe actuel requis" })
       .min(1, "Mot de passe actuel requis")
-      .max(72, "Max 72 caracteres")
+      .max(validationLimits.password.max, "Max 72 caracteres")
       .trim(),
     password: z
       .string({ message: "Mot de passe requis" })
-      .max(72, "Max 72 caracteres")
-      .min(8, "Min. 8 caracteres")
-      .regex(/[a-z]/, "1 minuscule requise")
-      .regex(/[A-Z]/, "1 majuscule requise")
-      .regex(/\d/, "1 chiffre requis")
-      .regex(/[^\w\s]/, "1 caractere special requis"),
+      .max(validationLimits.password.max, "Max 72 caracteres")
+      .min(validationLimits.password.min, "Min. 8 caracteres")
+      .regex(toRegExp(validationRegex.passwordLower), "1 minuscule requise")
+      .regex(toRegExp(validationRegex.passwordUpper), "1 majuscule requise")
+      .regex(toRegExp(validationRegex.passwordDigit), "1 chiffre requis")
+      .regex(toRegExp(validationRegex.passwordSpecial), "1 caractere special requis"),
     confirm: z.string({ message: "confirmation requise" }),
   })
   .refine((data) => data.password === data.confirm, {

@@ -14,6 +14,7 @@ import { Loader } from "@/components/loader/Loader";
 //import des fonctions
 import { axiosError } from "@/utils/axiosError";
 import { localOrProd } from "@/utils/localOrProd";
+import { REGEX } from "@/shared/validationRegex";
 
 
 //declarations des types
@@ -212,7 +213,7 @@ const FormSignUp = () => {
                     {...register("email", {
                       required: t("formContact.required"),
                       pattern: {
-                        value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,80}$/,
+                        value: REGEX.email,
                         message: t("formContact.pattern"),
                       },
                     })}
@@ -277,8 +278,7 @@ const FormSignUp = () => {
                     {...register("password", {
                       required: t("formContact.required"),
                       pattern: {
-                        value:
-                          /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~])(?=.{8,20}).*$/u,
+                        value: REGEX.password,
                         message: t("formSignUp.passwordError"),
                       },
                     })}
@@ -341,8 +341,7 @@ const FormSignUp = () => {
                     {...register("confirm", {
                       required: t("formContact.required"),
                       pattern: {
-                        value:
-                          /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~])(?=.{8,20}).*$/u,
+                        value: REGEX.password,
                         message: t("formSignUp.passwordError"),
                       },
                     })}

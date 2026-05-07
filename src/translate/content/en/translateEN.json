@@ -83,7 +83,8 @@
     "link": "Create your account",
     "passwordError": "Invalid password",
     "textSuccess": "You are logged in",
-    "textError": "An error occurred"
+    "textError": "An error occurred",
+    "pattern":"Invalid email"
   },
   "formForgot": {
     "title": "Recover your password",

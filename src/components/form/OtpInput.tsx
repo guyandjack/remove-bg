@@ -14,6 +14,7 @@ import { Loader } from "@/components/loader/Loader";
 import { axiosError } from "@/utils/axiosError";
 import { localOrProd } from "@/utils/localOrProd";
 import { setSessionFromApiResponse, privileges } from "@/stores/session";
+import { REGEX } from "@/shared/validationRegex";
 //import { navigateWithLink } from "@/utils/navigateWithLink";
 
 import type { FormValues as SignUpFormValues } from "./FormSignUp";
@@ -293,7 +294,7 @@ function OtpInput({
           {...register("otp", {
             required: errorRequire,
             pattern: {
-              value: /^\d{6}$/,
+              value: REGEX.otp6,
               message: errorPattern,
             },
           })}

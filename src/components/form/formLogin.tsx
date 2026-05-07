@@ -17,6 +17,7 @@ import { Loader } from "@/components/loader/Loader";
 //import des fonctions
 import { axiosError } from "@/utils/axiosError";
 import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
+import { REGEX } from "@/shared/validationRegex";
 //import { navigateWithLink } from "@/utils/navigateWithLink";
 
 //declarations des types
@@ -217,7 +218,7 @@ const FormLogin = () => {
                     {...register("email", {
                       required: t("formContact.required"),
                       pattern: {
-                        value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,80}$/,
+                        value: REGEX.email,
                         message: t("formLogin.pattern"),
                       },
                     })}
@@ -282,8 +283,7 @@ const FormLogin = () => {
                     {...register("password", {
                       required: t("formLogin.required"),
                       pattern: {
-                        value:
-                          /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~])(?=.{8,20}).*$/u,
+                        value: REGEX.password,
                         message: t("formLogin.passwordError"),
                       },
                     })}
@@ -393,7 +393,7 @@ const FormLogin = () => {
                       {...registerForgot("email", {
                         required: t("formContact.required"),
                         pattern: {
-                          value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,80}$/,
+                          value: REGEX.email,
                           message: t("formContact.pattern"),
                         },
                       })}

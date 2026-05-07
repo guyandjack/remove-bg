@@ -81,7 +81,8 @@
     "link": "Créer votre compte",
     "passwordError": "Mot de passe non valide",
     "textSuccess": "Vous êtes connecté",
-    "textError": "Une erreur s'est produite"
+    "textError": "Une erreur s'est produite",
+    "pattern":"Email non valide"
   },
   "formForgot": {
     "title": "Récupérer votre mot de passe",

@@ -12,6 +12,7 @@ import { Loader } from "@/components/loader/Loader";
 //import des fonctions
 import { localOrProd } from "@/utils/localOrProd";
 import { axiosError } from "@/utils/axiosError";
+import { REGEX, validationLimits } from "@/shared/validationRegex";
 
 //declarations des types
 type FormValues = {
@@ -198,10 +199,10 @@ function FormContact({content}:FormProps) {
               aria-invalid={!!errors.firstname || undefined}
               {...register("firstname", {
                 required: content.required,
-                minLength: { value: 2, message: content.minLength },
-                maxLength: { value: 30, message: content.maxLength },
+                minLength: { value: validationLimits.name.min, message: content.minLength },
+                maxLength: { value: validationLimits.name.max, message: content.maxLength },
                 pattern: {
-                  value: /^[a-zA-Z\-'. \D]{1,30}$/u,
+                  value: REGEX.name,
                   message: content.pattern,
                 },
                 onChange: (e) => storeValue(e),
@@ -229,10 +230,10 @@ function FormContact({content}:FormProps) {
               aria-invalid={!!errors.lastname || undefined}
               {...register("lastname", {
                 required: content.required,
-                minLength: { value: 2, message: content.minLength },
-                maxLength: { value: 30, message: content.maxLength },
+                minLength: { value: validationLimits.name.min, message: content.minLength },
+                maxLength: { value: validationLimits.name.max, message: content.maxLength },
                 pattern: {
-                  value: /^[a-zA-Z\-'. ]{1,30}$/u,
+                  value: REGEX.name,
                   message: content.pattern,
                 },
                 onChange: (e) => storeValue(e),
@@ -259,10 +260,11 @@ function FormContact({content}:FormProps) {
               className="input-clean"
               aria-invalid={!!errors.subject || undefined}
               {...register("subject", {
-                minLength: { value: 2, message: content.minLength },
-                maxLength: { value: 50, message: content.maxLength },
+                required: content.required,
+                minLength: { value: validationLimits.subject.min, message: content.minLength },
+                maxLength: { value: validationLimits.subject.max, message: content.maxLength },
                 pattern: {
-                  value: /^[\w\-'. 0-9]{1,50}$/u,
+                  value: REGEX.subject,
                   message: content.pattern,
                 },
                 onChange: (e) => storeValue(e),
@@ -293,7 +295,7 @@ function FormContact({content}:FormProps) {
                 minLength: { value: 10, message: content.minLength },
                 maxLength: { value: 80, message: content.maxLength },
                 pattern: {
-                  value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,80}$/,
+                  value: REGEX.email,
                   message: content.pattern,
                 },
                 onChange: (e) => storeValue(e),
@@ -321,10 +323,10 @@ function FormContact({content}:FormProps) {
               aria-invalid={!!errors.message || undefined}
               {...register("message", {
                 required: content.required,
-                minLength: { value: 10, message: content.minLength },
-                maxLength: { value: 1000, message: content.maxLength },
+                minLength: { value: validationLimits.message.min, message: content.minLength },
+                maxLength: { value: validationLimits.message.max, message: content.maxLength },
                 pattern: {
-                  value: /^[\w\-'.,!?:; ]{10,1000}$/,
+                  value: REGEX.message,
                   message: content.pattern,
                 },
                 onChange: (e) => storeValue(e),

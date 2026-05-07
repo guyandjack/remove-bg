@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { api, login } from "@/utils/axiosConfig";
 import { axiosError } from "@/utils/axiosError";
 import { Loader } from "@/components/loader/Loader";
+import { REGEX, validationLimits } from "@/shared/validationRegex";
 import { route } from "preact-router";
 
 type ResetPasswordFormValues = {
@@ -11,9 +12,6 @@ type ResetPasswordFormValues = {
   password: string;
   confirm: string;
 };
-
-const PASSWORD_PATTERN =
-  /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~])(?=.{8,20}).*$/u;
 
 const getTokenFromLocation = (): string => {
   if (typeof window === "undefined") {
@@ -316,8 +314,10 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
                 aria-invalid={!!errors.password || undefined}
                 {...register("password", {
                   required: t("formContact.required"),
+                  minLength: { value: validationLimits.password.min, message: t("formReset.passwordError") },
+                  maxLength: { value: validationLimits.password.max, message: t("formReset.passwordError") },
                   pattern: {
-                    value: PASSWORD_PATTERN,
+                    value: REGEX.password,
                     message: t("formReset.passwordError"),
                   },
                 })}

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Request, Response, NextFunction } from "express";
+import { validationRegex, toRegExp } from "../../shared/validationRegex.js";
 
 /**
  * Constantes ajustables selon ton besoin
@@ -22,13 +23,13 @@ const normalize = (s: string) => s.trim().replace(/\s+/g, " ");
  * Autorise lettres Unicode + espaces + apostrophes + tirets
  * (ex: Jean-Pierre D'Amour, Étienne, João…)
  */
-const NAME_REGEX = /^[\p{L}][\p{L}\p{M}' -]*$/u;
+const NAME_REGEX = toRegExp(validationRegex.name);
 
 /**
  * Sujet : lettres/chiffres de base + espaces + apostrophes + tirets
  * (interdit ponctuation exotique)
  */
-const SUBJECT_REGEX = /^[\p{L}\p{M}0-9' -]+$/u;
+const SUBJECT_REGEX = toRegExp(validationRegex.subject);
 
 /**
  * Schéma Zod du formulaire de contact

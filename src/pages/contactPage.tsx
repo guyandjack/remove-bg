@@ -8,7 +8,7 @@ import { setActiveLink } from "@/utils/setActiveLink";
 
 
 //import des composants enfant
-import { FormContact } from "../components/formContact";
+import { FormContact } from "../components/form/formContact";
 
 //import des images
 import undraw_contact from "@/assets/images/undraw-contact.svg";
