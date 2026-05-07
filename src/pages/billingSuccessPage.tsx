@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "preact/hooks";
+import { useLocation } from "preact-iso";
 import { useTranslation } from "react-i18next";
 import { api } from "@/utils/axiosConfig";
 import { setSessionFromApiResponse } from "@/stores/session";
-import { navigateWithLink } from "@/utils/navigateWithLink";
 
 type UiState = "loading" | "processing" | "success" | "failed";
 
 export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
   const { t } = useTranslation();
+  const location = useLocation();
   const [state, setState] = useState<UiState>("loading");
   const [message, setMessage] = useState<string>("");
   const pollingRef = useRef<number | null>(null);
@@ -43,7 +44,7 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
         setState("success");
         setMessage(t("billingSuccess.success"));
         stopPolling();
-        setTimeout(() => navigateWithLink("/dashboard"), 1200);
+        setTimeout(() => location.route("/dashboard"), 1200);
         return;
       }
       // If unexpected payload, keep polling
@@ -104,7 +105,7 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
           ) : null}
           {state === "failed" ? (
             <div className="mt-4">
-              <button className="btn btn-primary" onClick={() => navigateWithLink("/dashboard")}>
+              <button className="btn btn-primary" onClick={() => location.route("/dashboard")}>
                 {t("billingSuccess.backDashboard")}
               </button>
             </div>

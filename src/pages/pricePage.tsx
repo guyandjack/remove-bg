@@ -1,5 +1,6 @@
 ﻿//import des hooks
 import { useEffect, useState } from "preact/hooks";
+import { useLocation } from "preact-iso";
 import { useTranslation } from "react-i18next";
 
 //import des instance
@@ -19,7 +20,6 @@ import {
 } from "@/stores/planOptions";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
 import { setActiveLink } from "@/utils/setActiveLink";
-import { navigateWithLink } from "@/utils/navigateWithLink";
 
 
 type PlanKey =
@@ -54,6 +54,7 @@ const currencySymbols: Record<CurrencyCode, string> = {
 
 const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
   const { t } = useTranslation();
+  const location = useLocation();
   const planOptions = planOptionsSignal.value;
   const activePlanOptions = planOptions.filter(
     (plan) => plan.active !== false
@@ -274,7 +275,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
       url.searchParams.delete("userValide");
       window.history.replaceState({}, "", url.toString());
       setTimeout(() => {
-        navigateWithLink("/services");
+        location.route("/services");
       }, 2000);
     } catch (error) {
       setFinalizeStatus("error");

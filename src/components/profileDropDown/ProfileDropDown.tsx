@@ -1,5 +1,6 @@
 //import des hook
 import { useState } from "preact/hooks";
+import { useLocation } from "preact-iso";
 
 //import des instances perso
 import { api } from "@/utils/axiosConfig";
@@ -9,7 +10,6 @@ import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
 import { Loader } from "@/components/loader/Loader";
 
 //import des functions
-import { navigateWithLink } from "@/utils/navigateWithLink";
 
 //constante et variable globale
 
@@ -31,6 +31,7 @@ type ProfileDropDownType = {
 
 const ProfileDropDown = ({ content }: ProfileDropDownType) => {
   if (!content) return null;
+  const location = useLocation();
 
   //state qui gere l' affichage du loader
   const [isLoader, setIsLoader] = useState(false);
@@ -67,7 +68,7 @@ const ProfileDropDown = ({ content }: ProfileDropDownType) => {
     } finally {
       setTimeout(() => {
         setIsStatus("idle");
-        navigateWithLink("/");
+        location.route("/");
       }, 2000);
     }
   };
