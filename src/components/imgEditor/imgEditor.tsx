@@ -1023,11 +1023,11 @@ const ImgEditor = ({
             {textContent.title}
           </h2>
           <div className="my-4 border-b border-t py-[10px] border-white/30 flex flex-col justify-start items-center gap-y-4 ">
-            <button
+            {planUser !== "free" ?
+              <button 
               type="button"
-              className={`w-[220px] btn ${
-                activePicker === "color" ? "btn-success" : "btn-ghost"
-              } hover:bg-success/50`}
+              className={`w-[220px] btn ${activePicker === "color" ? "btn-success" : "btn-ghost"
+                } hover:bg-success/50`}
               onClick={() => {
                 setActivePicker("color");
               }}
@@ -1047,7 +1047,7 @@ const ImgEditor = ({
                 />
               </svg>
               <span>{textContent.tabColorPicker}</span>
-            </button>
+            </button> : null}
             {planUser !== "free" ? (
               <>
                 <button

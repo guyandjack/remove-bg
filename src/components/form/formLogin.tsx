@@ -1,7 +1,7 @@
 //import des hooks
 import { useRef, useState } from "preact/hooks";
 import { set, useForm } from "react-hook-form";
-import { route } from "preact-router";
+import { useLocation } from "preact-iso";
 
 
 //import des librairies
@@ -39,6 +39,7 @@ export type FormValuesForgot = {
 
 const FormLogin = () => {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
   //state qui gere la validite de la reponse.
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
@@ -115,7 +116,8 @@ const FormLogin = () => {
         resetForgot();
         setTimeout(() => {
           setIsForgotOpen(false);
-        }, 4000);
+          location.route("/services");
+        }, 3000);
       }
     } catch (err) {
       axiosError(setStatusForgot, err)
@@ -162,7 +164,7 @@ const FormLogin = () => {
         setIsLoader(false);
         setTimeout(() => {
           setStatus("idle");
-          route("/services");
+          location.route("/services");
         }, 2000);
 
         

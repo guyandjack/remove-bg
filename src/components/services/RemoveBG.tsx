@@ -95,7 +95,7 @@ const RemoveBg = ({
   const [typePlan, setTypePlan] = useState<string>(
     sessionSignal?.value?.plan?.code ||
       sessionSignal?.value?.plan?.name ||
-      ""
+      "free"
   );
 
   const userLoged = sessionSignal?.value?.authentified;
@@ -121,16 +121,17 @@ const RemoveBg = ({
 
   const choicePlan = (e?: MouseEvent) => {
     const elementList = planChoiceEl?.current;
+    console.log("plan type: ", typePlan);
     //si pas d'event et pas de plan c'est option de style par defaut
-    if (!e && typePlan === "" && elementList) {
+    if (!e && typePlan === "free" && elementList) {
       const buttons =
         Array.from(elementList?.querySelectorAll("button")) || null;
       buttons.forEach((btn) => {
         btn.classList.remove("opacity-[1]");
         btn.style.outline = "none";
       });
-      buttons[2].classList.add("opacity-[1]");
-      buttons[2].style.outline = "dashed red";
+      buttons[0].classList.add("opacity-[1]");
+      buttons[0].style.outline = "dashed red";
       return;
     }
 
@@ -151,6 +152,8 @@ const RemoveBg = ({
       el.style.outline = "dashed red";
       setTypePlan(plan);
     }
+
+    
   };
 
   const revokeIfBlobUrl = (url: string | null) => {

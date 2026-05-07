@@ -1,5 +1,6 @@
 // OtpInput.tsx (ou .jsx)
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
+import { useLocation } from "preact-iso";
 
 //import des librairies
 import axios from "axios";
@@ -13,7 +14,7 @@ import { Loader } from "@/components/loader/Loader";
 import { axiosError } from "@/utils/axiosError";
 import { localOrProd } from "@/utils/localOrProd";
 import { setSessionFromApiResponse, privileges } from "@/stores/session";
-import { navigateWithLink } from "@/utils/navigateWithLink";
+//import { navigateWithLink } from "@/utils/navigateWithLink";
 
 import type { FormValues as SignUpFormValues } from "./FormSignUp";
 
@@ -78,6 +79,7 @@ function OtpInput({
   // Initialise le tableau de refs
   const slots = useMemo(() => Array.from({ length }, (_, i) => i), [length]);
 
+  const location = useLocation();
   useEffect(() => {
     if (autoFocus && inputsRef.current[0]) {
       inputsRef.current[0].focus();
@@ -232,7 +234,7 @@ function OtpInput({
         setStatus("success");
         
         setTimeout(() => {
-          navigateWithLink("/services");
+          location.route("/services");
         }, 2000);
       } else if (result.status === "success" && result.redirect) {
         //redirection vers le checkout de stripe

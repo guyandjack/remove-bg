@@ -1,16 +1,20 @@
+//import des hooks
+import { useLocation } from "preact-iso";
+import { useEffect, useRef, useState } from "preact/hooks";
+import { useTranslation } from "react-i18next";
 
-import { initSessionFromLocalStorage, sessionSignal } from "@/stores/session";
-import { api } from "@/utils/axiosConfig";
-import { isAuthentified } from "@/utils/request/isAuthentified";
-import { useEffect, useRef, useState } from "preact/hooks"; 
-import { useTranslation } from "react-i18next"; 
-import { navigateWithLink } from "@/utils/navigateWithLink"; 
+//import des composant enfant
 import { PriceCard } from "@/components/card/priceCard";
 import { FormResetPassword } from "@/components/form/FormResetPassword";
- 
+
+//instance axios
+import { api } from "@/utils/axiosConfig";
+
 //import des fonctions 
-import { setActiveLink } from "@/utils/setActiveLink"; 
-import { setDocumentTitle } from "@/utils/setDocumentTitle"; 
+import { initSessionFromLocalStorage, sessionSignal } from "@/stores/session";
+import { isAuthentified } from "@/utils/request/isAuthentified";
+import { setActiveLink } from "@/utils/setActiveLink";
+import { setDocumentTitle } from "@/utils/setDocumentTitle";
 
 type SubmitState = "idle" | "loading" | "success" | "error"; 
 type CurrencyCode = "CHF" | "EUR" | "USD";
@@ -70,6 +74,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
   const actionToastTimeoutRef = useRef<number | null>(null);
   const { t } = useTranslation();
   const dashboardActionBtn = "btn btn-sm min-w-[220px]";
+  const location = useLocation();
 
   const currency: CurrencyCode = "CHF";
   const textLangCard = {
@@ -106,7 +111,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       const token = sessionSignal?.value?.token;
       if (!token) {
         const redirect = encodeURIComponent("/dashboard");
-        navigateWithLink(`/login?redirect=${redirect}`);
+        location.route(`/login?redirect=${redirect}`);
         return;
       }
       
@@ -139,7 +144,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       } catch {
         if (!mounted) return;
         const redirect = encodeURIComponent("/dashboard");
-        navigateWithLink(`/login?redirect=${redirect}`);
+        location.route(`/login?redirect=${redirect}`);
       }
     };
 
@@ -313,7 +318,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       } catch {}
 
       setTimeout(() => {
-        navigateWithLink("/login");
+        location.route("/");
       }, 800);
     } catch {
       setDeletionSubmitting("error");
@@ -449,7 +454,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       <div className="flex flex-col md:flex-row md:flex-wrap md:justify-center  gap-4">
         <div className="w-[200px] h-[100px] stat bg-base-100 rounded-xl border border-base-300">
           <div className="stat-title">{t("dashboardPage.stats.user")}</div>
-          <div className="stat-value text-primary truncate">
+          <div className="stat-value text-primary truncate text-base">
             {userDisplayName}
           </div>
         </div>

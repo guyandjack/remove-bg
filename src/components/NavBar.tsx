@@ -7,8 +7,9 @@ import { api } from "@/utils/axiosConfig";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 import { themeSignal } from "@/stores/theme";
-import { navigateWithLink } from "@/utils/navigateWithLink";
+//import { navigateWithLink } from "@/utils/navigateWithLink";
 import { useSignalEffect } from "@preact/signals";
+import { useLocation } from "preact-iso";
 
 //import des composants enfants
 import { SelectLanguage } from "./LangSwitcher";
@@ -46,6 +47,7 @@ type DisplayState = {
 
 const NavBar = () => {
   const { t } = useTranslation();
+  const location = useLocation();
   //state qui gere l'affichage du profileDropdown et son contenu textuel
   const [isDisplay, setIsDisplay] = useState<DisplayState>({
     userName: null,
@@ -154,7 +156,7 @@ const NavBar = () => {
       cleanupCheckoutParams();
       setTimeout(() => {
         setCheckoutFeedback({ status: "idle", message: null });
-        navigateWithLink("/services");
+        location.route("/services");
       }, 3000);
     } catch (error) {
       console.error("Erreur finale Stripe:", error);
