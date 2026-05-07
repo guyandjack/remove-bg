@@ -228,9 +228,10 @@ const NavBar = () => {
   // Keep navbar display in sync with sessionSignal updates (credits/plan/auth changes).
   useEffect(() => {
     const session = sessionSignal.value;
+    const pseudo = session?.user.email.split("@")[0];
 
     setIsDisplay({
-      userName: session?.user?.first_name || null,
+      userName: session?.user?.first_name || pseudo || null,
       authentified: session?.authentified || false,
       credit: session?.credits?.remaining_last_24h || 0,
       textCredit: t("dropDownProfile.credits"),

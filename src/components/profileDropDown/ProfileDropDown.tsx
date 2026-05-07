@@ -10,6 +10,7 @@ import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
 import { Loader } from "@/components/loader/Loader";
 
 //import des functions
+import { navigateWithLink } from "@/utils/navigateWithLink";
 
 //constante et variable globale
 
@@ -58,6 +59,7 @@ const ProfileDropDown = ({ content }: ProfileDropDownType) => {
 
         setIsLoader(false);
         setIsStatus("success");
+        
       }
     } catch {
       sessionSignal.value = null;
@@ -65,12 +67,13 @@ const ProfileDropDown = ({ content }: ProfileDropDownType) => {
       localStorage.removeItem("session");
       setIsLoader(false);
       setIsStatus("success");
-    } finally {
+      
+    }  finally {
       setTimeout(() => {
         setIsStatus("idle");
-        location.route("/");
+        navigateWithLink("/");
       }, 2000);
-    }
+    } 
   };
 
   return (

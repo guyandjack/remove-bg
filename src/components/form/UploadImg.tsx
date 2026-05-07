@@ -199,7 +199,7 @@ const UploadImg = ({
                       <button
                         type="button"
                         onClick={onConfirm}
-                        className="btn btn-success btn-lg"
+                        className="btn btn-success btn-md"
                         disabled={actionsDisabled || confirmDisabled}
                       >
                         {confirmLabel}
@@ -208,7 +208,7 @@ const UploadImg = ({
                     <button
                       type="button"
                       onClick={onClear}
-                      className="btn btn-ghost btn-lg"
+                      className="btn btn-ghost btn-md"
                       disabled={actionsDisabled}
                     >
                       {content.erase}
