@@ -2,6 +2,7 @@ import type { RequestHandler } from "express";
 import { logger } from "../../logger.js";
 import {
   anonymizeUserCredentials,
+  createAccountDeletionFeedbackRequest,
   getActiveSubscription,
   getUserByEmail,
   requestAccountDeletion,
@@ -38,10 +39,34 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
 
   const now = new Date();
   const stripe = getStripeClient();
+  const deletionFeedbackToken = crypto.randomBytes(32).toString("hex");
+  const deletionFeedbackTokenHash = crypto
+    .createHash("sha256")
+    .update(deletionFeedbackToken)
+    .digest("hex");
+  const deletionFeedbackExpiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  let feedbackTokenStored = false;
 
   // 1) Mark deletion requested immediately + disable marketing
   await requestAccountDeletion(user.id, now);
   await updateUserMarketingConsent(user.id, false, now);
+
+  // Create a one-time feedback token (does not require auth to submit feedback).
+  try {
+    const created = await createAccountDeletionFeedbackRequest({
+      userId: user.id,
+      tokenHash: deletionFeedbackTokenHash,
+      requestedAt: now,
+      expiresAt: deletionFeedbackExpiresAt,
+    });
+    feedbackTokenStored = Boolean(created);
+  } catch (err: any) {
+    logger.warn("account.deletion_request::feedback_token_failed", {
+      userId: user.id,
+      message: err?.message || String(err),
+    });
+    feedbackTokenStored = false;
+  }
 
   // 2) Cancel Stripe subscription immediately if present + revoke access window locally
   const activeSub = await getActiveSubscription(user.id);
@@ -141,6 +166,7 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
   return res.status(200).json({
     success: true,
     account_deletion_requested: true,
+    deletion_feedback_token: feedbackTokenStored ? deletionFeedbackToken : null,
     message:
       "Votre demande de suppression a été enregistrée. L’accès au service est désactivé et votre demande sera traitée.",
   });

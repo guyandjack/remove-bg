@@ -749,7 +749,24 @@
         "typeToConfirm": "Type SUPPRIMER to confirm",
         "deleteCta": "Delete my account",
         "deletionSuccess": "Deletion request recorded. You are being signed out.",
-        "deletionError": "Unable to request account deletion."
+        "deletionError": "Unable to request account deletion.",
+        "deletionFeedback": {
+          "title": "Before you leave",
+          "subtitle": "Tell us why you're leaving WizPix. This helps us improve the service.",
+          "expensive": "Too expensive",
+          "no_more_use": "I no longer need it",
+          "bad_quality_result": "Results quality is not good enough",
+          "difficult": "Too hard to use",
+          "bad_UX": "Bad user experience (UX)",
+          "found_alternative": "I found an alternative",
+          "other_reason": "Other reason / comment",
+          "placeholder": "Your comment (optional)",
+          "button_submit": "Send",
+          "button_close": "Skip",
+          "success": "Thanks for your feedback.",
+          "error": "Unable to save your feedback. You can close this window.",
+          "validation_error": "Please select at least one reason or add a comment."
+        }
       }
     },
     "stats": {

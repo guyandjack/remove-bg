@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 //import des composant enfant
 import { PriceCard } from "@/components/card/priceCard";
 import { FormResetPassword } from "@/components/form/FormResetPassword";
+import { FormDeleteReasonAccount } from "@/components/form/formDeleteReasonAccount";
 
 //instance axios
 import { api } from "@/utils/axiosConfig";
@@ -61,6 +62,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
   const [marketingMessage, setMarketingMessage] = useState<string | null>(null);
   const [deletionSubmitting, setDeletionSubmitting] = useState<SubmitState>("idle");
   const [deletionMessage, setDeletionMessage] = useState<string | null>(null);
+  const [deletionFeedbackToken, setDeletionFeedbackToken] = useState<string | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState<string>("");
   const [planModalStep, setPlanModalStep] = useState<"select" | "confirm">("select");
   const [availablePlans, setAvailablePlans] = useState<any[]>([]);
@@ -309,17 +311,11 @@ const DashboardPage = ({routeKey}: PropsPage) => {
         pushActionToast({ status: "success", message: msg });
       }
 
-      // Clear local session and redirect to login (account is effectively disabled)
-      try {
-        localStorage.removeItem("session");
-      } catch {}
-      try {
-        sessionSignal.value = { ...(sessionSignal.value as any), token: null, authentified: false } as any;
-      } catch {}
-
-      setTimeout(() => {
-        location.route("/");
-      }, 800);
+      const feedbackToken = typeof resp?.data?.deletion_feedback_token === "string" ? resp.data.deletion_feedback_token : null;
+      // Always open the modal. Redirection is only driven by the modal close/submit flow.
+      setDeletionFeedbackToken(feedbackToken);
+      const dialog = document.getElementById("account_deletion_feedback_modal") as HTMLDialogElement | null;
+      dialog?.showModal?.();
     } catch {
       setDeletionSubmitting("error");
       {
@@ -330,6 +326,21 @@ const DashboardPage = ({routeKey}: PropsPage) => {
     } finally {
       setTimeout(() => setDeletionSubmitting("idle"), 2500);
     }
+  };
+
+  const closeDeletionFeedbackModal = () => {
+    // Finalize deletion on the client side AFTER collecting (or skipping) feedback.
+    try {
+      localStorage.removeItem("session");
+    } catch {}
+    try {
+      sessionSignal.value = { ...(sessionSignal.value as any), token: null, authentified: false } as any;
+    } catch {}
+    try {
+      const dialog = document.getElementById("account_deletion_feedback_modal") as HTMLDialogElement | null;
+      dialog?.close?.();
+    } catch {}
+    location.route("/");
   };
 
   const openPlanChangeModal = async () => {
@@ -864,6 +875,42 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                   <button>close</button>
                 </form>
               </div>
+            </dialog>
+
+            {/* Account deletion feedback modal (post-deletion) */}
+            <dialog
+              id="account_deletion_feedback_modal"
+              className="modal"
+              onCancel={(e) => {
+                e.preventDefault();
+                closeDeletionFeedbackModal();
+              }}
+            >
+              <div className="modal-box max-w-2xl">
+                <FormDeleteReasonAccount
+                  token={deletionFeedbackToken}
+                  onClose={closeDeletionFeedbackModal}
+                  onSubmitted={closeDeletionFeedbackModal}
+                  content={{
+                    title: t("dashboardPage.billing.account.deletionFeedback.title"),
+                    subtitle: t("dashboardPage.billing.account.deletionFeedback.subtitle"),
+                    expensive: t("dashboardPage.billing.account.deletionFeedback.expensive"),
+                    no_more_use: t("dashboardPage.billing.account.deletionFeedback.no_more_use"),
+                    bad_quality_result: t("dashboardPage.billing.account.deletionFeedback.bad_quality_result"),
+                    difficult: t("dashboardPage.billing.account.deletionFeedback.difficult"),
+                    bad_UX: t("dashboardPage.billing.account.deletionFeedback.bad_UX"),
+                    found_alternative: t("dashboardPage.billing.account.deletionFeedback.found_alternative"),
+                    other_reason: t("dashboardPage.billing.account.deletionFeedback.other_reason"),
+                    placeholder: t("dashboardPage.billing.account.deletionFeedback.placeholder"),
+                    button_submit: t("dashboardPage.billing.account.deletionFeedback.button_submit"),
+                    button_close: t("dashboardPage.billing.account.deletionFeedback.button_close"),
+                    success: t("dashboardPage.billing.account.deletionFeedback.success"),
+                    error: t("dashboardPage.billing.account.deletionFeedback.error"),
+                    validation_error: t("dashboardPage.billing.account.deletionFeedback.validation_error"),
+                  }}
+                />
+              </div>
+              <div className="modal-backdrop" onClick={closeDeletionFeedbackModal} />
             </dialog>
           </div>
         </section>

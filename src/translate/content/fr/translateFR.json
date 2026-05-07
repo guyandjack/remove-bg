@@ -752,7 +752,24 @@
         "typeToConfirm": "Tapez SUPPRIMER pour confirmer",
         "deleteCta": "Supprimer mon compte",
         "deletionSuccess": "Demande de suppression enregistrée. Déconnexion en cours.",
-        "deletionError": "Impossible de demander la suppression du compte."
+        "deletionError": "Impossible de demander la suppression du compte.",
+        "deletionFeedback": {
+          "title": "Avant de partir",
+          "subtitle": "Dites-nous pourquoi vous quittez WizPix. Cela nous aide à améliorer le service.",
+          "expensive": "Trop cher",
+          "no_more_use": "Je n'en ai plus l'usage",
+          "bad_quality_result": "Résultats de qualité insuffisante",
+          "difficult": "Trop difficile à  utiliser",
+          "bad_UX": "Mauvaise expérience utilisateur (UX)",
+          "found_alternative": "J'ai trouvé une alternative",
+          "other_reason": "Autre raison / commentaire",
+          "placeholder": "Votre commentaire (optionnel)",
+          "button_submit": "Envoyer",
+          "button_close": "Ignorer",
+          "success": "Merci pour votre retour.",
+          "error": "Impossible d'enregistrer votre retour. Vous pouvez fermer cette fenêtre.",
+          "validation_error": "Merci de sélectionner au moins une raison ou d'ajouter un commentaire."
+        }
       }
     },
     "stats": {

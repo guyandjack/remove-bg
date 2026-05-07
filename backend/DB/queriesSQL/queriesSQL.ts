@@ -526,6 +526,53 @@ export async function requestAccountDeletion(
   return res.affectedRows === 1;
 }
 
+export async function createAccountDeletionFeedbackRequest(params: {
+  userId: ID;
+  tokenHash: string;
+  requestedAt?: Date;
+  expiresAt: Date;
+}) {
+  const connexion = await getDb();
+  const id = crypto.randomUUID();
+  const requestedAt = params.requestedAt ?? new Date();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `INSERT INTO \`AccountDeletionFeedback\`
+      (id, user_id, token_hash, requested_at, expires_at)
+     VALUES (?, ?, ?, ?, ?)`,
+    [id, params.userId, params.tokenHash, requestedAt, params.expiresAt],
+  );
+  return res.affectedRows === 1 ? id : null;
+}
+
+export async function submitAccountDeletionFeedbackByTokenHash(params: {
+  tokenHash: string;
+  reasonsJson: string | null;
+  otherText: string | null;
+  userAgent: string | null;
+  submittedIpHash: string | null;
+  submittedAt?: Date;
+}) {
+  const connexion = await getDb();
+  const submittedAt = params.submittedAt ?? new Date();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE \`AccountDeletionFeedback\`
+     SET reasons_json = ?, other_text = ?, user_agent = ?, submitted_ip_hash = ?, submitted_at = ?
+     WHERE token_hash = ?
+       AND submitted_at IS NULL
+       AND expires_at > ?`,
+    [
+      params.reasonsJson,
+      params.otherText,
+      params.userAgent,
+      params.submittedIpHash,
+      submittedAt,
+      params.tokenHash,
+      submittedAt,
+    ],
+  );
+  return res.affectedRows === 1;
+}
+
 export async function anonymizeUserCredentials(params: {
   userId: ID;
   anonymizedEmail: string;

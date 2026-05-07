@@ -259,3 +259,23 @@ CREATE TABLE IF NOT EXISTS `VisitorQuota` (
   updated_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_vq_month_used (image_convert_month, image_convert_used)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Account deletion feedback (post-deletion survey)
+-- token_hash: sha256(token) (raw token is only returned once to the client)
+CREATE TABLE IF NOT EXISTS `AccountDeletionFeedback` (
+  id            VARCHAR(36)   NOT NULL PRIMARY KEY,
+  user_id       VARCHAR(36)   NULL,
+  token_hash    CHAR(64)      NOT NULL UNIQUE,
+  reasons_json  TEXT          NULL,
+  other_text    TEXT          NULL,
+  user_agent    VARCHAR(255)  NULL,
+  submitted_ip_hash CHAR(64)  NULL,
+  requested_at  DATETIME      NOT NULL,
+  expires_at    DATETIME      NOT NULL,
+  submitted_at  DATETIME      NULL,
+  created_at    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_adf_user (user_id),
+  INDEX idx_adf_submitted (submitted_at),
+  INDEX idx_adf_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
