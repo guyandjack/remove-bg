@@ -185,7 +185,7 @@ export async function tryMarkWebhookEventReceived(params: {
   provider?: string;
   eventType: string;
   receivedAt?: Date;
-}): Promise<{ inserted: boolean }> {
+}): Promise<{ shouldProcess: boolean }> {
   const connexion = await getDb();
   try {
     await connexion.execute<ResultSetHeader>(
@@ -198,10 +198,17 @@ export async function tryMarkWebhookEventReceived(params: {
         params.receivedAt ?? new Date(),
       ],
     );
-    return { inserted: true };
+    return { shouldProcess: true };
   } catch (err: any) {
-    // Duplicate => already received/processed
-    if (err?.code === "ER_DUP_ENTRY") return { inserted: false };
+    // Duplicate => may already be processed, or may have crashed before processed_at was set.
+    if (err?.code === "ER_DUP_ENTRY") {
+      const [rows] = await connexion.execute<ProcessedWebhookEvent[]>(
+        `SELECT processed_at FROM ProcessedWebhookEvent WHERE id = ? LIMIT 1`,
+        [params.id],
+      );
+      const processedAt = rows[0]?.processed_at ?? null;
+      return { shouldProcess: processedAt == null };
+    }
     throw err;
   }
 }
@@ -798,9 +805,17 @@ export async function createStripeCheckoutSessionState(params: {
 }): Promise<ID | null> {
   const connexion = await getDb();
   const id = crypto.randomUUID();
+  // Important: do NOT downgrade an existing record (completed/failed) back to pending.
+  // This state is our source of truth for provisioning status.
   const sql = `INSERT INTO StripeCheckoutSession (id, session_id, email, plan_code, plan_id, currency_code, status)
                VALUES (?, ?, ?, ?, ?, ?, 'pending')
-               ON DUPLICATE KEY UPDATE email = VALUES(email), plan_code = VALUES(plan_code), plan_id = VALUES(plan_id), currency_code = VALUES(currency_code), status = 'pending', last_error = NULL, consumed_at = NULL, user_id = NULL, subscription_id = NULL`;
+               ON DUPLICATE KEY UPDATE
+                 email = VALUES(email),
+                 plan_code = VALUES(plan_code),
+                 plan_id = VALUES(plan_id),
+                 currency_code = VALUES(currency_code),
+                 last_error = CASE WHEN status = 'pending' THEN NULL ELSE last_error END,
+                 status = status`;
   const [res] = await connexion.execute<ResultSetHeader>(sql, [
     id,
     params.sessionId,
@@ -810,6 +825,20 @@ export async function createStripeCheckoutSessionState(params: {
     params.currencyCode ?? "CHF",
   ]);
   return res.affectedRows >= 1 ? id : null;
+}
+
+export async function markStripeCheckoutSessionLastError(
+  sessionId: string,
+  errorMessage: string,
+) {
+  const connexion = await getDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE StripeCheckoutSession
+       SET last_error = ?
+     WHERE session_id = ?`,
+    [errorMessage, sessionId],
+  );
+  return res.affectedRows >= 1;
 }
 
 export async function getStripeCheckoutSessionState(

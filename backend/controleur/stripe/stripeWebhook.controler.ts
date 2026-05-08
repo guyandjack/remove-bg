@@ -4,6 +4,7 @@ import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { connectDb } from "../../DB/poolConnexion/poolConnexion.js";
 import {
   markStripeCheckoutSessionFailed,
+  markStripeCheckoutSessionLastError,
   getActiveSubscription,
   getPlanByStripePriceId,
   getPlanByCode,
@@ -35,68 +36,36 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       ? process.env.STRIPE_SECRET_KEY_PROD ?? null
       : process.env.STRIPE_SECRET_KEY_TEST ?? null;
     
-    const whSecret = process.env.STRIPE_WEBHOOK_SECRET; 
+    const whSecret = process.env.STRIPE_WEBHOOK_SECRET ?? null;
 
-    // Capture raw payload (required by Stripe when validating signatures)
-    const resolveRawPayload = (): Buffer | string | null => {
-      if ((req as any).rawBody) return (req as any).rawBody;
-      if ((req as any).bodyRaw) return (req as any).bodyRaw;
-      const body = (req as any).body;
-      if (Buffer.isBuffer(body) || typeof body === "string") return body;
-      if (!body) return null;
-      try {
-        return JSON.stringify(body);
-      } catch {
-        return null;
-      }
-    };
-    const rawPayload = resolveRawPayload();
-
-    const parseJsonBody = (): any => {
-      const body = (req as any).body;
-      if (body && !Buffer.isBuffer(body) && typeof body !== "string") return body;
-      const source =
-        typeof body === "string"
-          ? body
-          : Buffer.isBuffer(body)
-          ? body.toString("utf8")
-          : rawPayload
-          ? Buffer.isBuffer(rawPayload)
-            ? rawPayload.toString("utf8")
-            : String(rawPayload)
-          : "";
-      if (!source) return null;
-      try {
-        return JSON.parse(source);
-      } catch {
-        return null;
-      }
-    };
-
-    let event: any = null;
-    const sig = req.headers["stripe-signature"] as string | undefined;
-    if (whSecret && sig && secret) {
-      // @ts-ignore
-      const StripeMod = await import("stripe");
-      const Stripe = (StripeMod as any).default || StripeMod;
-      const stripe = new Stripe(secret, { apiVersion: "2023-10-16" });
-      const payloadBuffer = Buffer.isBuffer(rawPayload)
-        ? rawPayload
-        : rawPayload
-        ? Buffer.from(String(rawPayload), "utf8")
-        : null;
-      if (!payloadBuffer || !payloadBuffer.length) {
-        console.log("[stripeWebhook] Missing raw payload, rejecting request");
-        return res.status(400).send("No webhook payload was provided");
-      }
-      event = stripe.webhooks.constructEvent(payloadBuffer, sig, whSecret);
-    } else {
-      event = parseJsonBody();
-      if (!event) {
-        console.log("[stripeWebhook] Unable to parse payload without signature, rejecting request");
-        return res.status(400).send("No webhook payload was provided");
-      }
+    // Webhook MUST be verified. Never trust an unverified JSON payload or /success URL.
+    if (!whSecret) {
+      logger.error("[stripeWebhook] Missing STRIPE_WEBHOOK_SECRET; refusing unverified webhook");
+      return res.status(500).send("Webhook is not configured on this server");
     }
+    if (!secret) {
+      logger.error("[stripeWebhook] Missing Stripe secret key; refusing webhook");
+      return res.status(500).send("Stripe is not configured on this server");
+    }
+
+    const sig = req.headers["stripe-signature"] as string | undefined;
+    if (!sig) {
+      logger.warn("[stripeWebhook] Missing stripe-signature header; rejecting");
+      return res.status(400).send("Missing stripe-signature header");
+    }
+
+    // Route uses express.raw({ type: "application/json" }) so req.body is a Buffer.
+    const rawPayload = (req as any).body;
+    if (!Buffer.isBuffer(rawPayload) || rawPayload.length === 0) {
+      logger.warn("[stripeWebhook] Missing raw payload buffer; rejecting");
+      return res.status(400).send("No webhook payload was provided");
+    }
+
+    // @ts-ignore (dynamic import for ESM interop)
+    const StripeMod = await import("stripe");
+    const Stripe = (StripeMod as any).default || StripeMod;
+    const stripe = new Stripe(secret, { apiVersion: "2023-10-16" });
+    const event = stripe.webhooks.constructEvent(rawPayload, sig, whSecret);
 
     const type = event?.type; 
     const obj = event?.data?.object || {}; 
@@ -105,13 +74,13 @@ const stripeWebhook: RequestHandler = async (req, res) => {
     // Idempotency: do not process the same Stripe event twice.
     if (eventId && type) {
       try {
-        const { inserted } = await tryMarkWebhookEventReceived({
+        const { shouldProcess } = await tryMarkWebhookEventReceived({
           id: eventId,
           eventType: type,
           receivedAt: new Date(),
         });
-        if (!inserted) {
-          logger.info("[stripeWebhook] Duplicate event ignored", { eventId, type });
+        if (!shouldProcess) {
+          logger.info("[stripeWebhook] Duplicate event already processed, ignored", { eventId, type });
           return res.status(200).send("ok");
         }
       } catch (err: any) {
@@ -120,7 +89,8 @@ const stripeWebhook: RequestHandler = async (req, res) => {
           type,
           message: err?.message || String(err),
         });
-        return res.status(200).send("ok");
+        // If we can't persist idempotency state, we must retry later.
+        return res.status(500).send("error");
       }
     }
 
@@ -135,7 +105,10 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       return res.status(200).send("ok");
     };
 
-    if (type === "checkout.session.completed") {
+    if (
+      type === "checkout.session.completed" ||
+      type === "checkout.session.async_payment_succeeded"
+    ) {
       console.log("check session.completed est lancé");
       currentCheckoutSessionId = typeof obj?.id === "string" ? obj.id : null; 
       if (!currentCheckoutSessionId) { 
@@ -152,7 +125,14 @@ const stripeWebhook: RequestHandler = async (req, res) => {
           logger.warn( 
             `[stripeWebhook] session ${currentCheckoutSessionId} pending: ${sessionErr.message}` 
           ); 
-          return await returnOk(); 
+          try {
+            await markStripeCheckoutSessionLastError(
+              currentCheckoutSessionId,
+              sessionErr.message
+            );
+          } catch {}
+          // Ask Stripe to retry later: do not acknowledge processing.
+          return res.status(500).send("pending");
         } 
         throw sessionErr; 
       } 
@@ -162,6 +142,19 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       );
       return await returnOk(); 
     } 
+
+    if (type === "checkout.session.async_payment_failed") {
+      currentCheckoutSessionId = typeof obj?.id === "string" ? obj.id : null;
+      if (currentCheckoutSessionId) {
+        try {
+          await markStripeCheckoutSessionFailed(
+            currentCheckoutSessionId,
+            "async_payment_failed"
+          );
+        } catch {}
+      }
+      return await returnOk();
+    }
 
     // invoice.paid / invoice.payment_succeeded — record invoice, increment customer's total_spent, ensure sub stays active
     if (type === "invoice.paid" || type === "invoice.payment_succeeded") {
@@ -489,9 +482,9 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         );
       }
     }
-    // Always 200 to avoid retries explosion unless you want retries
-    console.log("[stripeWebhook] Error handled, responding with 200 to avoid retries");
-    return res.status(200).send("ok");
+    // Prefer Stripe retries: we are idempotent via ProcessedWebhookEvent.
+    console.log("[stripeWebhook] Error handled, responding with 500 to trigger retries");
+    return res.status(500).send("error");
   }
 };
 

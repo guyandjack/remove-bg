@@ -935,7 +935,7 @@ const ImageConverter = ({
               type="button"
               className="btn btn-secondary btn-sm"
               onClick={downloadConverted}
-              disabled={!convertedAsset || !userLoged}
+              disabled={!convertedAsset}
             >
               {converterTextContent.downloadConverted}
             </button>
@@ -950,7 +950,7 @@ const ImageConverter = ({
             </button>
           </div>
 
-          {convertedAsset ? (
+          {/* {convertedAsset ? (
             <div className="space-y-3">
               <p className="text-xs text-base-content/70">
                 {converterTextContent.assetReadyPrefix}{" "}
@@ -971,12 +971,12 @@ const ImageConverter = ({
             <p className="text-xs text-base-content/60">
               {converterTextContent.emptyConversionHint}
             </p>
-          )}
-          {!userLoged ? (
+          )} */}
+          {/* {!userLoged ? (
             <a href="/pricing" className="service-link-info">
               {converterTextContent.needPlanLink}
             </a>
-          ) : null}
+          ) : null} */}
         </div>
       </div>
     </section>

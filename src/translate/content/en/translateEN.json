@@ -799,9 +799,10 @@
     "processing": "Payment confirmation in progress.",
     "paidWaitingDb": "Payment confirmed. Activating your account…",
     "failed": "Payment failed. If you were charged, please contact support.",
+    "provisioningFailed": "Payment received, but account provisioning failed. Please retry or contact support.",
     "missingSession": "Missing payment session identifier.",
     "doNotRetry": "Do not retry payment. This page updates automatically.",
     "success": "Payment confirmed. Redirecting…",
-    "backDashboard": "Back to dashboard"
+    "backDashboard": "Continue"
   }
 }

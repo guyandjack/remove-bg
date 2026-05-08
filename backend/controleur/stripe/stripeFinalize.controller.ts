@@ -85,11 +85,20 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
       });
     }
 
+    // A previous provisioning attempt may have failed, but if Stripe confirms payment we can retry safely.
     if (record.status === "failed") {
-      return res.status(400).json({
-        status: "error",
-        message: record.last_error || "payment_failed",
-      });
+      const retried = await tryFinalizeDirectly(
+        normalizedSessionId,
+        (req.headers.referer as string | undefined) ?? null
+      );
+      if (retried) {
+        record = retried;
+      } else {
+        return res.status(400).json({
+          status: "error",
+          message: record.last_error || "payment_failed",
+        });
+      }
     }
 
     if (record.status !== "completed" || !record.user_id) {

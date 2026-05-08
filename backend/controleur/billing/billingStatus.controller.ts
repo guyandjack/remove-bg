@@ -14,7 +14,8 @@ function jsonError(res: any, status: number, message: string) {
 type BillingStatus =
   | "paid_active"
   | "processing"
-  | "failed";
+  | "failed"
+  | "paid_but_provisioning_failed";
 
 export const billingStatusController: RequestHandler = async (req, res) => {
   const sessionId = String((req.query as any)?.session_id || "").trim();
@@ -94,11 +95,14 @@ export const billingStatusController: RequestHandler = async (req, res) => {
   let status: BillingStatus = "processing";
   if (isStripeFailed) status = "failed";
   else if (isStripePaid && dbState?.status === "completed") status = "paid_active";
+  else if (isStripePaid && dbState?.status === "failed") status = "paid_but_provisioning_failed";
   else status = "processing";
 
   const message =
     status === "paid_active"
       ? "Payment confirmed."
+      : status === "paid_but_provisioning_failed"
+      ? "Payment received but account provisioning failed. Please contact support or retry provisioning."
       : status === "failed"
       ? "Payment failed."
       : "Payment confirmation in progress. Please wait and do not retry payment.";

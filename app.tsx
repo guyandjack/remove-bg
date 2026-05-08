@@ -19,6 +19,7 @@ import { DashboardPage } from "./src/pages/dashboardPage";
 //import { CguPage} from "./src/pages/cguPage";
 import { Page404 } from "./src/pages/404Page";
 import { ResetPasswordPage } from "./src/pages/reset-passwordPage";
+import { BillingSuccessPage } from "./src/pages/billingSuccessPage";
 
 //import des composants
 import { NavBar } from "./src/components/navBar";
@@ -81,6 +82,10 @@ export function App() {
     const { url } = useLocation();
     return <ResetPasswordPage routeKey={url} />;
   };
+  const RoutedBillingSuccessPage = () => {
+    const { url } = useLocation();
+    return <BillingSuccessPage routeKey={url} />;
+  };
   
 
   return (
@@ -106,6 +111,7 @@ export function App() {
               <Route path="/cgv" component={RoutedCgvPage} />
               <Route path="/dashboard" component={RoutedDashboardPage} />
               <Route path="/reset-password" component={RoutedResetPasswordPage} />
+              <Route path="/billing/success" component={RoutedBillingSuccessPage} />
               <Route path="*/*" component={RoutedPage404} />
             </Router>
           </ErrorBoundary>

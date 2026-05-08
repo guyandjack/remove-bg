@@ -34,7 +34,11 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
     if (finalizedRef.current) return;
     finalizedRef.current = true;
     try {
-      const resp = await api.post("/api/stripe/finalize", { sessionId });
+      const resp = await api.post(
+        "/api/stripe/finalize",
+        { sessionId },
+        { withCredentials: true }
+      );
       if (resp?.data?.status === "pending") {
         finalizedRef.current = false;
         return;
@@ -44,7 +48,7 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
         setState("success");
         setMessage(t("billingSuccess.success"));
         stopPolling();
-        setTimeout(() => location.route("/dashboard"), 1200);
+        setTimeout(() => location.route("/services"), 1200);
         return;
       }
       // If unexpected payload, keep polling
@@ -69,6 +73,12 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
         setState("processing");
         setMessage(t("billingSuccess.paidWaitingDb"));
         await finalizeIfPossible();
+        return;
+      }
+      if (status === "paid_but_provisioning_failed") {
+        setState("failed");
+        setMessage(t("billingSuccess.provisioningFailed"));
+        stopPolling();
         return;
       }
       if (status === "failed") {
@@ -105,9 +115,21 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
           ) : null}
           {state === "failed" ? (
             <div className="mt-4">
-              <button className="btn btn-primary" onClick={() => location.route("/dashboard")}>
-                {t("billingSuccess.backDashboard")}
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  className="btn btn-primary"
+                  onClick={async () => {
+                    setState("processing");
+                    setMessage(t("billingSuccess.processing"));
+                    await finalizeIfPossible();
+                  }}
+                >
+                  {t("billingSuccess.retryProvisioning")}
+                </button>
+                <button className="btn btn-ghost" onClick={() => location.route("/services")}>
+                  {t("billingSuccess.backDashboard")}
+                </button>
+              </div>
             </div>
           ) : null}
         </div>

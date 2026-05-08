@@ -802,9 +802,10 @@
     "processing": "Confirmation du paiement en cours.",
     "paidWaitingDb": "Paiement confirmé. Activation en cours…",
     "failed": "Paiement échoué. Si vous avez été débité, contactez le support.",
+    "provisioningFailed": "Paiement reçu, mais la création du compte a échoué. Merci de réessayer ou de contacter le support.",
     "missingSession": "Identifiant de session de paiement manquant.",
     "doNotRetry": "Ne relancez pas le paiement. Cette page se met à jour automatiquement.",
     "success": "Paiement confirmé. Redirection…",
-    "backDashboard": "Retour au tableau de bord"
+    "backDashboard": "Continuer"
   }
 }
