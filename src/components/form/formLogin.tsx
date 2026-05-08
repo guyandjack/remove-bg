@@ -304,6 +304,7 @@ const FormLogin = () => {
                     isSubmitting || //soumission du formulaire
                     !email || //si formulaire pas rempli entierement
                     !pw ||
+                    !pw.match(REGEX.password) ||
                     Object.keys(errors).length > 0 || //si erreur de hook form detecté
                     status !== "idle" //si le status est en cours
                   }

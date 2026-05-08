@@ -5,7 +5,7 @@ import { api, login } from "@/utils/axiosConfig";
 import { axiosError } from "@/utils/axiosError";
 import { Loader } from "@/components/loader/Loader";
 import { REGEX, validationLimits } from "@/shared/validationRegex";
-import { route } from "preact-router";
+import { useLocation } from "preact-iso";
 
 type ResetPasswordFormValues = {
   current_password?: string;
@@ -30,11 +30,14 @@ type Props = {
   embedded?: boolean;
 };
 
+
+
 const PASSWORD_RULES_TEXT =
   "Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un caractère spécial.";
 
 const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
   const { t } = useTranslation();
+  const location = useLocation();
   const token = useMemo(() => (mode === "reset" ? getTokenFromLocation() : ""), [mode]);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -128,7 +131,7 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
         reset();
         setTimeout(() => {
           setStatus("idle");
-          if (mode !== "dashboard") {route("/login")};
+          if (mode !== "dashboard") { location.route("/login", true )};
         }, 3000);
         return;
       }
