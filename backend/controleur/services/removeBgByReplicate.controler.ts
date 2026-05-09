@@ -251,6 +251,22 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
         "Content-Disposition",
         `inline; filename="${filename}-bg-removed.${extension}"`
       );
+      // Indique explicitement la taille pour aider certains proxies/navigateurs.
+      res.setHeader("Content-Length", String(buffer.length));
+      // Cette réponse est un artefact dérivé d'un upload utilisateur: pas de cache.
+      res.setHeader("Cache-Control", "no-store");
+
+      // Debug: détecte les déconnexions client pendant l'envoi (souvent vu comme ERR_NETWORK côté Axios).
+      const sendStartedAt = Date.now();
+      res.on("close", () => {
+        if (!res.writableEnded) {
+          logger.warn("removeBgByReplicate::client_disconnected", {
+            requestId,
+            durationMs: Date.now() - sendStartedAt,
+            bytesPlanned: buffer.length,
+          });
+        }
+      });
 
       logger.info("removeBgByReplicate::call_success", {
         requestId,

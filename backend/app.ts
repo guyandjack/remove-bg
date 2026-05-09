@@ -53,7 +53,15 @@ const app = express();
 // ----------------------------------------------------
 
 // Helmet ajoute divers en-têtes de sécurité HTTP (XSS, CSP, etc.)
-app.use(helmet());
+// IMPORTANT (front sur un origin diffÃ©rent en dev: :5173 -> API :3000):
+// Helmet active `Cross-Origin-Resource-Policy: same-origin` par dÃ©faut, ce qui peut
+// provoquer des "Network Error" cÃ´tÃ© navigateur (rÃ©ponse bloquÃ©e) sur les requÃªtes XHR/fetch.
+// On le dÃ©sactive pour l'API (les protections utiles restent actives).
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
 
 // Configuration CORS (autorisations de domaines front-end)
 const corsOptions: CorsOptions = {
@@ -127,7 +135,24 @@ app.use("/public", express.static(publicDir));
 app.use(express.static(publicDir));
 
 // Compression des réponses HTTP (gzip)
-app.use(compression());
+// Compression des rÃ©ponses HTTP (gzip)
+// Attention: compresser des rÃ©ponses binaires (images) n'apporte rien et peut augmenter
+// la latence/CPU, voire provoquer des coupures sur de gros payloads. On dÃ©sactive donc
+// la compression pour les routes qui renvoient des blobs image.
+app.use(
+  compression({
+    filter(req, res) {
+      const url = req.originalUrl || req.url || "";
+      if (
+        url.startsWith("/api/services/remove-bg-replicate") ||
+        url.startsWith("/api/services/public/remove-bg")
+      ) {
+        return false;
+      }
+      return compression.filter(req, res);
+    },
+  })
+);
 
 // Gestion des cookies
 app.use(cookieParser());

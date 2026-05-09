@@ -181,6 +181,10 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
         "Content-Disposition",
         `inline; filename=\"${filename}-bg-removed.${extension}\"`,
       );
+      // Indique explicitement la taille pour aider certains proxies/navigateurs.
+      res.setHeader("Content-Length", String(buffer.length));
+      // Cette réponse est un artefact dérivé d'un upload utilisateur: pas de cache.
+      res.setHeader("Cache-Control", "no-store");
       res.setHeader(
         "Access-Control-Expose-Headers",
         "X-Wizpix-Visitor-Quota-Service,X-Wizpix-Visitor-Quota-Used,X-Wizpix-Visitor-Quota-Limit",
@@ -195,6 +199,19 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
         modelKey,
         outputBytes: buffer.length,
         visitorHashSuffix: hashSuffix,
+      });
+
+      // Debug: détecte les déconnexions client pendant l'envoi (souvent vu comme ERR_NETWORK côté Axios).
+      const sendStartedAt = Date.now();
+      res.on("close", () => {
+        if (!res.writableEnded) {
+          logger.warn("removeBgVisitorByReplicate::client_disconnected", {
+            requestId,
+            durationMs: Date.now() - sendStartedAt,
+            bytesPlanned: buffer.length,
+            visitorHashSuffix: hashSuffix,
+          });
+        }
       });
 
       return res.status(200).send(buffer);
@@ -252,4 +269,3 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
 };
 
 export { removeBgVisitorByReplicate };
-

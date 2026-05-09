@@ -10,7 +10,7 @@ import { Loader } from "@/components/loader/Loader";
 
 //import des fonctions
 import { loadScript } from "@/utils/loadScript";
-import { api } from "@/utils/axiosConfig";
+import { apiBlob } from "@/utils/axiosConfig";
 import type { AxiosError } from "axios";
 import { isAuthentified } from "@/utils/request/isAuthentified";
 import { blobCache } from "@/utils/storage/blobCache";
@@ -229,23 +229,34 @@ const RemoveBg = ({
       const formData = new FormData();
       formData.append("file", fileToProcess);
 
-      const endpoint = userLoged
+      // On ne base pas la décision uniquement sur `userLoged` (qui peut fluctuer pendant un refresh):
+      // si on a un token, on utilise la route auth; sinon on utilise la route publique.
+      const authToken = sessionSignal?.value?.token ?? parsedSession?.token ?? null;
+      const endpoint = authToken
         ? "api/services/remove-bg-replicate"
         : "api/services/public/remove-bg";
 
-      const response = await api.post<Blob>(
-        endpoint,
-        formData,
-        {
-          responseType: "blob",
-          signal: abortController.signal,
-          timeout: 30000,
-          }
-      );
+      // Axios dédié aux blobs via adapter `fetch` (plus robuste que XHR sur gros fichiers).
+      const response = await apiBlob.post<Blob>(endpoint, formData, {
+        responseType: "blob",
+        signal: abortController.signal,
+        timeout: 120000,
+        // Node-only en pratique, mais safe côté browser.
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+        onDownloadProgress: (evt) => {
+          console.debug("[remove-bg] download progress", {
+            loaded: evt.loaded,
+            total: (evt as any).total ?? null,
+          });
+        },
+      });
+
+      const blob = response.data;
 
       // Persist processed image (IndexedDB) to avoid re-running prediction on navigation.
       try {
-        await blobCache.set("removebg_processed", response.data);
+        await blobCache.set("removebg_processed", blob);
       } catch {}
 
       const remaining = Number(response.headers?.["x-wizpix-credits-remaining"]);
@@ -259,7 +270,7 @@ const RemoveBg = ({
         localStorage.setItem("session", JSON.stringify(updated));
       }
 
-      return blobToObjectUrl(response.data);
+      return blobToObjectUrl(blob);
     };
 
     setIsProcessing(true);
@@ -291,6 +302,42 @@ const RemoveBg = ({
       .catch(async (err) => {
         if (isCancelled) return;
         const axiosError = err as AxiosError<any>;
+        // Si l'appel a été annulé (changement de page, nouveau fichier, etc.), on ne remonte pas d'erreur UI.
+        const canceled =
+          abortController.signal.aborted ||
+          (axiosError as any)?.code === "ERR_CANCELED";
+        if (canceled) return;
+
+        // Debug minimal “Network Error” (sans données sensibles)
+        // Objectif: distinguer un vrai problème réseau/CORS d’un abort/timeout/front.
+        try {
+          const isAxios = typeof (axiosError as any)?.isAxiosError === "boolean"
+            ? (axiosError as any).isAxiosError
+            : (axiosError as any)?.isAxiosError === true;
+          const status = axiosError.response?.status ?? null;
+          const headers = axiosError.response?.headers ?? null;
+          const data = axiosError.response?.data;
+          const isBlob = typeof Blob !== "undefined" && data instanceof Blob;
+          const blobInfo = isBlob
+            ? { size: (data as Blob).size, type: (data as Blob).type }
+            : null;
+
+          console.warn("[remove-bg] api error debug", {
+            endpoint:
+              (sessionSignal?.value?.token ?? parsedSession?.token ?? null)
+                ? "api/services/remove-bg-replicate"
+                : "api/services/public/remove-bg",
+            axios: isAxios,
+            code: (axiosError as any)?.code ?? null,
+            message: axiosError.message ?? null,
+            status,
+            aborted: abortController.signal.aborted,
+            timeoutMs: 120000,
+            responseHeaders: headers,
+            responseBlob: blobInfo,
+          });
+        } catch {}
+
         console.error("Erreur pendant chargement editeur ou API :", err);
         let message: string | null = null;
         let code: string | null = null;
@@ -331,7 +378,7 @@ const RemoveBg = ({
       isCancelled = true;
       abortController.abort();
     };
-  }, [fileToProcess, userLoged]);
+  }, [fileToProcess]);
 
   //si un utilisateur est connecte
   // Image editor sera remonte avec la valeur du plan de l'utilisateur connecte

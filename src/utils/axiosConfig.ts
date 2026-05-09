@@ -13,11 +13,47 @@ const { urlApi } = localOrProd();
 const normalizedBaseURL = urlApi.replace(/\/+$/, "");
 console.log("api url: ", normalizedBaseURL);
 
+function attachAuthAndNormalizeUrl(client: ReturnType<typeof axios.create>) {
+  client.interceptors.request.use((config) => {
+    const stringSessionObject = localStorage.getItem("session") || "";
+    let token = null;
+    if (stringSessionObject) {
+      const parsedSessionObject = JSON.parse(stringSessionObject);
+      token =
+        sessionSignal?.value?.token?.trim() || parsedSessionObject.token || null;
+    }
+
+    // S'assure que les chemins relatifs commencent par '/'
+    const url = config.url ?? "";
+    const isAbsolute = /^(?:[a-z]+:)?\/\//i.test(url); // http://, https:// ou //
+    if (url && !isAbsolute && !url.startsWith("/")) {
+      config.url = `/${url}`;
+    }
+
+    if (token) {
+      if (!config.headers) config.headers = {} as any;
+      (config.headers as any).Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  });
+}
+
 //instance api qui aura des interceptor
 const api = axios.create({
   baseURL: normalizedBaseURL,
   // Replicate (US) + file d'attente + traitement image => latence possible
-  timeout: 20000,
+  // On garde une marge confortable en prod; les appels sensibles peuvent surcharger via config par requête.
+  timeout: 60000,
+});
+
+// Instance dédiée aux gros blobs:
+// - force l'adapter `fetch` (souvent plus robuste que XHR sur gros downloads)
+// - garde une marge de timeout plus large
+const apiBlob = axios.create({
+  baseURL: normalizedBaseURL,
+  timeout: 120000,
+  adapter: "fetch" as any,
 });
 
 //instance login sans interceptor
@@ -28,29 +64,8 @@ const login = axios.create({
 
 
 // --- Interceptor pour ajouter le token ---
-api.interceptors.request.use((config) => {
-  const stringSessionObject = localStorage.getItem("session") || "";
-  let token = null;
-  if (stringSessionObject) {
-    const parsedSessionObject = JSON.parse(stringSessionObject) ;
-    token = sessionSignal?.value?.token?.trim() || parsedSessionObject.token || null;
-    
-  }
-
-  // S'assure que les chemins relatifs commencent par '/'
-  const url = config.url ?? "";
-  const isAbsolute = /^(?:[a-z]+:)?\/\//i.test(url); // http://, https:// ou //
-  if (url && !isAbsolute && !url.startsWith("/")) {
-    config.url = `/${url}`;
-  }
-
-  if (token) {
-    if (!config.headers) config.headers = {} as any;
-    (config.headers as any).Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
+attachAuthAndNormalizeUrl(api);
+attachAuthAndNormalizeUrl(apiBlob);
 
 // ---- Gestion du refresh en cours (pour éviter plusieurs refresh en parallèle) ----
 let isRefreshing = false;
@@ -176,4 +191,4 @@ api.interceptors.response.use(
   }
 );
 
-export  {api, login};
+export  {api, apiBlob, login};
