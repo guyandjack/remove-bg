@@ -180,6 +180,31 @@ export interface ProcessedWebhookEvent extends RowDataPacket {
   processed_at: Date | null;
 }
 
+export type RemoveBgJobStatus =
+  | "pending"
+  | "processing"
+  | "succeeded"
+  | "failed"
+  | "canceled";
+
+export interface RemoveBgJob extends RowDataPacket {
+  id: ID;
+  user_id: ID | null;
+  request_id: string;
+  idempotency_key: string;
+  replicate_prediction_id: string | null;
+  status: RemoveBgJobStatus;
+  replicate_status: string | null;
+  input_image_url: string | null;
+  output_image_url: string | null;
+  replicate_payload: any | null;
+  error_message: string | null;
+  credits_debited_at: Date | null;
+  created_at: Date;
+  updated_at: Date;
+  completed_at: Date | null;
+}
+
 export async function tryMarkWebhookEventReceived(params: {
   id: string;
   provider?: string;
@@ -222,6 +247,271 @@ export async function markWebhookEventProcessed(params: {
     `UPDATE ProcessedWebhookEvent SET processed_at = ? WHERE id = ?`,
     [params.processedAt ?? new Date(), params.id],
   );
+}
+
+function normalizeRemoveBgShortKey(input: unknown, field: string): string {
+  const value = String(input ?? "").trim();
+  if (!value) {
+    throw new Error(`${field} is required`);
+  }
+  if (value.length > 64) {
+    throw new Error(`${field} is too long (max 64 chars)`);
+  }
+  return value;
+}
+
+function normalizeRemoveBgRequestId(input: unknown): string {
+  return normalizeRemoveBgShortKey(input, "remove_bg_jobs.request_id");
+}
+
+function normalizeRemoveBgIdempotencyKey(input: unknown): string {
+  return normalizeRemoveBgShortKey(input, "remove_bg_jobs.idempotency_key");
+}
+
+export async function createRemoveBgJobIdempotent(params: {
+  requestId: string;
+  idempotencyKey: string;
+  userId?: ID | null;
+}): Promise<RemoveBgJob> {
+  const requestId = normalizeRemoveBgRequestId(params.requestId);
+  const idempotencyKey = normalizeRemoveBgIdempotencyKey(params.idempotencyKey);
+  const connexion = await getDb();
+  const id = crypto.randomUUID();
+  const userId = params.userId ?? null;
+
+  try {
+    await connexion.execute<ResultSetHeader>(
+      `INSERT INTO remove_bg_jobs (id, user_id, request_id, idempotency_key, status)
+       VALUES (?, ?, ?, ?, 'pending')`,
+      [id, userId, requestId, idempotencyKey],
+    );
+    const created = await getRemoveBgJobById(id);
+    if (!created) {
+      throw new Error("remove_bg_jobs insert succeeded but row not found");
+    }
+    return created;
+  } catch (err: any) {
+    // Idempotence: if a unique constraint is hit, return the existing row.
+    if (err && err.code === "ER_DUP_ENTRY") {
+      const byRequest = await getRemoveBgJobByRequestId(requestId);
+      if (byRequest) return byRequest;
+
+      const byUserKey = await getRemoveBgJobByUserIdAndIdempotencyKey({
+        userId,
+        idempotencyKey,
+      });
+      if (byUserKey) return byUserKey;
+
+      throw new Error(
+        "Duplicate remove_bg_jobs insert but existing row could not be loaded",
+      );
+    }
+    throw err;
+  }
+}
+
+export async function getRemoveBgJobById(id: ID): Promise<RemoveBgJob | null> {
+  const connexion = await getDb();
+  const [rows] = await connexion.execute<RemoveBgJob[]>(
+    `SELECT * FROM remove_bg_jobs WHERE id = ? LIMIT 1`,
+    [id],
+  );
+  return rows[0] ?? null;
+}
+
+export async function getRemoveBgJobByRequestId(
+  requestId: string,
+): Promise<RemoveBgJob | null> {
+  const normalized = normalizeRemoveBgRequestId(requestId);
+  const connexion = await getDb();
+  const [rows] = await connexion.execute<RemoveBgJob[]>(
+    `SELECT * FROM remove_bg_jobs WHERE request_id = ? LIMIT 1`,
+    [normalized],
+  );
+  return rows[0] ?? null;
+}
+
+export async function getRemoveBgJobByUserIdAndIdempotencyKey(params: {
+  userId: ID | null;
+  idempotencyKey: string;
+}): Promise<RemoveBgJob | null> {
+  // If userId is null, the uniqueness contract does not apply reliably.
+  if (!params.userId) return null;
+  const idempotencyKey = normalizeRemoveBgIdempotencyKey(params.idempotencyKey);
+  const connexion = await getDb();
+  const [rows] = await connexion.execute<RemoveBgJob[]>(
+    `SELECT * FROM remove_bg_jobs WHERE user_id = ? AND idempotency_key = ? LIMIT 1`,
+    [params.userId, idempotencyKey],
+  );
+  return rows[0] ?? null;
+}
+
+export async function getRemoveBgJobByReplicatePredictionId(
+  replicatePredictionId: string,
+): Promise<RemoveBgJob | null> {
+  const normalized = String(replicatePredictionId ?? "").trim();
+  if (!normalized) {
+    throw new Error("remove_bg_jobs.replicate_prediction_id is required");
+  }
+  const connexion = await getDb();
+  const [rows] = await connexion.execute<RemoveBgJob[]>(
+    `SELECT * FROM remove_bg_jobs WHERE replicate_prediction_id = ? LIMIT 1`,
+    [normalized],
+  );
+  return rows[0] ?? null;
+}
+
+export async function setRemoveBgJobRunning(params: {
+  requestId: string;
+  replicatePredictionId: string;
+  replicateStatus?: string | null;
+  inputImageUrl?: string | null;
+  replicatePayload?: any | null;
+}): Promise<boolean> {
+  const requestId = normalizeRemoveBgRequestId(params.requestId);
+  const replicatePredictionId = String(params.replicatePredictionId ?? "").trim();
+  if (!replicatePredictionId) {
+    throw new Error("remove_bg_jobs.replicate_prediction_id is required");
+  }
+  const connexion = await getDb();
+
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE remove_bg_jobs
+     SET status = 'processing',
+         replicate_prediction_id = ?,
+         replicate_status = COALESCE(?, replicate_status),
+         input_image_url = COALESCE(?, input_image_url),
+         replicate_payload = COALESCE(?, replicate_payload)
+     WHERE request_id = ?
+       AND status IN ('pending','processing')
+       AND (replicate_prediction_id IS NULL OR replicate_prediction_id = ?)`,
+    [
+      replicatePredictionId,
+      params.replicateStatus ?? null,
+      params.inputImageUrl ?? null,
+      params.replicatePayload ?? null,
+      requestId,
+      replicatePredictionId,
+    ],
+  );
+  return (res.affectedRows ?? 0) > 0;
+}
+
+export async function markRemoveBgJobSucceeded(params: {
+  requestId: string;
+  outputImageUrl: string;
+  replicateStatus?: string | null;
+  replicatePayload?: any | null;
+  completedAt?: Date;
+}): Promise<boolean> {
+  const requestId = normalizeRemoveBgRequestId(params.requestId);
+  const outputImageUrl = String(params.outputImageUrl ?? "").trim();
+  if (!outputImageUrl) {
+    throw new Error("remove_bg_jobs.output_image_url is required");
+  }
+  const now = params.completedAt ?? new Date();
+  const connexion = await getDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE remove_bg_jobs
+     SET status = 'succeeded',
+         output_image_url = ?,
+         replicate_status = COALESCE(?, replicate_status),
+         replicate_payload = COALESCE(?, replicate_payload),
+         error_message = NULL,
+         completed_at = ?,
+     WHERE request_id = ?
+       AND status <> 'succeeded'`,
+    [
+      outputImageUrl,
+      params.replicateStatus ?? null,
+      params.replicatePayload ?? null,
+      now,
+      requestId,
+    ],
+  );
+  return (res.affectedRows ?? 0) > 0;
+}
+
+export async function markRemoveBgJobFailed(params: {
+  requestId: string;
+  errorMessage: string;
+  replicateStatus?: string | null;
+  replicatePayload?: any | null;
+  completedAt?: Date;
+}): Promise<boolean> {
+  const requestId = normalizeRemoveBgRequestId(params.requestId);
+  const errorMessage = String(params.errorMessage ?? "").trim();
+  if (!errorMessage) throw new Error("remove_bg_jobs.error_message is required");
+
+  const now = params.completedAt ?? new Date();
+  const connexion = await getDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE remove_bg_jobs
+     SET status = 'failed',
+         error_message = ?,
+         replicate_status = COALESCE(?, replicate_status),
+         replicate_payload = COALESCE(?, replicate_payload),
+         completed_at = ?,
+     WHERE request_id = ?
+       AND status <> 'succeeded'`,
+    [
+      errorMessage,
+      params.replicateStatus ?? null,
+      params.replicatePayload ?? null,
+      now,
+      requestId,
+    ],
+  );
+  return (res.affectedRows ?? 0) > 0;
+}
+
+export async function markRemoveBgJobCanceled(params: {
+  requestId: string;
+  errorMessage?: string | null;
+  replicateStatus?: string | null;
+  replicatePayload?: any | null;
+  completedAt?: Date;
+}): Promise<boolean> {
+  const requestId = normalizeRemoveBgRequestId(params.requestId);
+  const now = params.completedAt ?? new Date();
+  const errorMessage = params.errorMessage
+    ? String(params.errorMessage).trim()
+    : null;
+
+  const connexion = await getDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE remove_bg_jobs
+     SET status = 'canceled',
+         error_message = ?,
+         replicate_status = COALESCE(?, replicate_status),
+         replicate_payload = COALESCE(?, replicate_payload),
+         completed_at = ?,
+     WHERE request_id = ?
+       AND status <> 'succeeded'`,
+    [
+      errorMessage,
+      params.replicateStatus ?? null,
+      params.replicatePayload ?? null,
+      now,
+      requestId,
+    ],
+  );
+  return (res.affectedRows ?? 0) > 0;
+}
+
+export async function markRemoveBgJobCreditsDebited(params: {
+  requestId: string;
+  debitedAt?: Date;
+}): Promise<boolean> {
+  const requestId = normalizeRemoveBgRequestId(params.requestId);
+  const connexion = await getDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE remove_bg_jobs
+     SET credits_debited_at = COALESCE(credits_debited_at, ?)
+     WHERE request_id = ?`,
+    [params.debitedAt ?? new Date(), requestId],
+  );
+  return (res.affectedRows ?? 0) > 0;
 }
 
 // ------------------------------------------------------

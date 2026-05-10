@@ -14,6 +14,7 @@ import { imageConverter } from "../controleur/services/imageConverter.controler.
 import { formatSocialPictures } from "../controleur/services/socialFormatter.controler.js";
 import { removeBg } from "../controleur/services/removeBg.controler.js";
 import { removeBgByReplicate } from "../controleur/services/removeBgByReplicate.controler.js";
+import { createRemoveBgReplicateJob } from "../controleur/services/removeBgReplicateJobs.controler.js";
 import { magicEraser } from "../controleur/services/magicEraser.controler.js";
 import { removeBgVisitorByReplicate } from "../controleur/services/removeBgVisitorByReplicate.controler.js";
 import { imageConverterVisitor } from "../controleur/services/imageConverterVisitor.controler.js";
@@ -71,6 +72,15 @@ router.post(
   validateRemoveBgUpload,
   attachRemoveBgQuality,
   removeBgByReplicate
+);
+
+// route remove bg via Replicate (async job creation)
+router.post(
+  "/remove-bg-replicate/jobs",
+  verifyAuth,
+  validateRemoveBgUpload,
+  attachRemoveBgQuality,
+  createRemoveBgReplicateJob
 );
 
 

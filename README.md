@@ -195,6 +195,7 @@ Le fichier `backend/.env` contient des **secrets** (clés API, tokens, mots de p
 - Annulation SaaS / consentement marketing / demande de suppression: `docs/backend-subscription-cancel.md`
 - Dashboard Billing & Account (UX + endpoints): `docs/dashboard-billing-account.md`
 - Stripe upgrade/downgrade (plan change): `docs/stripe-plan-change.md`
+- Replicate remove-bg (flow async en cours): table DB `remove_bg_jobs` + variables `REPLICATE_WEBHOOK_URL`, `REPLICATE_WEBHOOK_SECRET` (dev) et `BASE_URL_PROD` (preprod/prod)
 
 À confirmer / à faire selon votre contexte :
 
