@@ -16,6 +16,7 @@ import { removeBg } from "../controleur/services/removeBg.controler.js";
 import { removeBgByReplicate } from "../controleur/services/removeBgByReplicate.controler.js";
 import { createRemoveBgReplicateJob } from "../controleur/services/removeBgReplicateJobs.controler.js";
 import { getRemoveBgReplicateJob } from "../controleur/services/getRemoveBgReplicateJob.controller.js";
+import { streamRemoveBgReplicateJobEvents } from "../controleur/services/removeBgReplicateJobEvents.controller.js";
 import { magicEraser } from "../controleur/services/magicEraser.controler.js";
 import { removeBgVisitorByReplicate } from "../controleur/services/removeBgVisitorByReplicate.controler.js";
 import { imageConverterVisitor } from "../controleur/services/imageConverterVisitor.controler.js";
@@ -88,6 +89,12 @@ router.get(
   "/remove-bg-replicate/jobs/:requestId",
   verifyAuth,
   getRemoveBgReplicateJob,
+);
+
+router.get(
+  "/remove-bg-replicate/jobs/:requestId/events",
+  verifyAuth,
+  streamRemoveBgReplicateJobEvents,
 );
 
 

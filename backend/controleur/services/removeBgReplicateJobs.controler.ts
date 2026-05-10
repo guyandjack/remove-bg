@@ -11,6 +11,7 @@ import {
   setRemoveBgJobRunning,
   getUserByEmail,
 } from "../../DB/queriesSQL/queriesSQL.js";
+import { publishRemoveBgJobUpdated } from "../../services/removeBgJobs/removeBgJobEvents.js";
 
 const modelType = {
   portrait:
@@ -123,6 +124,8 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
       idempotencyKey,
     });
     if (existing) {
+      // Best-effort notify: client might already be listening.
+      publishRemoveBgJobUpdated(existing.request_id);
       return res.status(200).json({
         requestId: existing.request_id,
         jobId: existing.id,
@@ -199,6 +202,7 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
       replicateStatus: String((prediction as any)?.status ?? "") || "starting",
       replicatePayload: prediction as any,
     });
+    publishRemoveBgJobUpdated(job.request_id);
 
     return res.status(201).json({
       requestId: job.request_id,
@@ -219,4 +223,3 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
     });
   }
 };
-

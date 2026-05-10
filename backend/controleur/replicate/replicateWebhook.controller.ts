@@ -12,6 +12,7 @@ import {
   recordCreditUsage,
   markRemoveBgJobCreditsDebited,
 } from "../../DB/queriesSQL/queriesSQL.js";
+import { publishRemoveBgJobUpdated } from "../../services/removeBgJobs/removeBgJobEvents.js";
 
 function parseJsonBody(req: any): any | null {
   const body = req?.body;
@@ -191,6 +192,9 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
             marked,
           });
         }
+
+        // Notify SSE subscribers that the job has updated (DB remains source of truth).
+        publishRemoveBgJobUpdated(job.request_id);
       } else {
         await markRemoveBgJobFailed({
           requestId: job.request_id,
@@ -199,6 +203,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
           replicatePayload: payload,
           completedAt,
         });
+        publishRemoveBgJobUpdated(job.request_id);
       }
     } else if (replicateStatus === "failed") {
       await markRemoveBgJobFailed({
@@ -210,6 +215,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
         replicatePayload: payload,
         completedAt,
       });
+      publishRemoveBgJobUpdated(job.request_id);
     } else if (replicateStatus === "canceled") {
       await markRemoveBgJobCanceled({
         requestId: job.request_id,
@@ -218,6 +224,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
         replicatePayload: payload,
         completedAt,
       });
+      publishRemoveBgJobUpdated(job.request_id);
     } else if (replicateStatus) {
       // For "starting"/"processing"/etc: keep DB up to date but do not set completed_at.
       await setRemoveBgJobRunning({
@@ -226,6 +233,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
         replicateStatus,
         replicatePayload: payload,
       });
+      publishRemoveBgJobUpdated(job.request_id);
     }
 
     logger.info("replicateWebhook::job_transition", {
