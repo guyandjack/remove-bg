@@ -10,10 +10,117 @@ import { Loader } from "@/components/loader/Loader";
 
 //import des fonctions
 import { loadScript } from "@/utils/loadScript";
-import { apiBlob } from "@/utils/axiosConfig";
+import { api, apiBlob } from "@/utils/axiosConfig";
 import type { AxiosError } from "axios";
 import { isAuthentified } from "@/utils/request/isAuthentified";
 import { blobCache } from "@/utils/storage/blobCache";
+
+const USE_ASYNC_AUTH_FLOW = true; // easy rollback: set to false to restore blob endpoint for logged users
+
+type RemoveBgJobStatus = "pending" | "processing" | "succeeded" | "failed" | "canceled";
+
+type RemoveBgJobSnapshot = {
+  requestId: string;
+  status: RemoveBgJobStatus | string;
+  outputImageUrl: string | null;
+  errorMessage: string | null;
+  createdAt?: string | Date | null;
+  completedAt?: string | Date | null;
+};
+
+function createUuid(): string {
+  try {
+    // Modern browsers
+    if (typeof crypto !== "undefined" && typeof (crypto as any).randomUUID === "function") {
+      return (crypto as any).randomUUID();
+    }
+  } catch {}
+  // Fallback: not cryptographically perfect, but keeps flow functional.
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}-${Math.random()
+    .toString(16)
+    .slice(2)}`;
+}
+
+function readAuthToken(): string | null {
+  const raw = localStorage.getItem("session") || "";
+  if (!raw) return sessionSignal?.value?.token ?? null;
+  try {
+    const parsed = JSON.parse(raw);
+    return sessionSignal?.value?.token ?? parsed?.token ?? null;
+  } catch {
+    return sessionSignal?.value?.token ?? null;
+  }
+}
+
+async function openSseOverFetch(params: {
+  url: string;
+  token: string;
+  signal: AbortSignal;
+  onEvent: (evt: { event: string; data: any }) => void;
+}) {
+  const resp = await fetch(params.url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${params.token}`,
+      Accept: "text/event-stream",
+    },
+    signal: params.signal,
+  });
+
+  if (!resp.ok || !resp.body) {
+    throw new Error(`SSE failed: HTTP ${resp.status}`);
+  }
+
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder("utf-8");
+  let buffer = "";
+
+  const flushEvent = (rawEvent: string, rawDataLines: string[]) => {
+    const dataText = rawDataLines.join("\n").trim();
+    if (!rawEvent && !dataText) return;
+    let parsed: any = dataText;
+    try {
+      parsed = dataText ? JSON.parse(dataText) : null;
+    } catch {}
+    params.onEvent({ event: rawEvent || "message", data: parsed });
+  };
+
+  let currentEvent = "";
+  let currentData: string[] = [];
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    // Process complete SSE blocks separated by blank lines
+    while (true) {
+      const idx = buffer.indexOf("\n\n");
+      if (idx === -1) break;
+      const block = buffer.slice(0, idx);
+      buffer = buffer.slice(idx + 2);
+
+      const lines = block.split("\n");
+      for (const line of lines) {
+        const trimmed = line.replace(/\r$/, "");
+        if (!trimmed) continue;
+        if (trimmed.startsWith(":")) continue; // comment/heartbeat
+        if (trimmed.startsWith("event:")) {
+          currentEvent = trimmed.slice("event:".length).trim();
+          continue;
+        }
+        if (trimmed.startsWith("data:")) {
+          currentData.push(trimmed.slice("data:".length).trim());
+          continue;
+        }
+      }
+
+      flushEvent(currentEvent, currentData);
+      currentEvent = "";
+      currentData = [];
+    }
+  }
+}
 
 // CDN de l'editeur
 const editorCdn =
@@ -91,6 +198,8 @@ const RemoveBg = ({
   const [processingError, setProcessingError] = useState<string | null>(null);
   const [isCdnLoaded, setCdnLoaded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [jobStatus, setJobStatus] = useState<RemoveBgJobStatus | null>(null);
+  const [jobRequestId, setJobRequestId] = useState<string | null>(null);
   const [visitorBlocked, setVisitorBlocked] = useState(false);
   const [typePlan, setTypePlan] = useState<string>(
     sessionSignal?.value?.plan?.code ||
@@ -232,9 +341,119 @@ const RemoveBg = ({
       // On ne base pas la décision uniquement sur `userLoged` (qui peut fluctuer pendant un refresh):
       // si on a un token, on utilise la route auth; sinon on utilise la route publique.
       const authToken = sessionSignal?.value?.token ?? parsedSession?.token ?? null;
-      const endpoint = authToken
-        ? "api/services/remove-bg-replicate"
-        : "api/services/public/remove-bg";
+      const endpoint =
+        authToken && USE_ASYNC_AUTH_FLOW
+          ? "api/services/remove-bg-replicate/jobs"
+          : authToken
+            ? "api/services/remove-bg-replicate"
+            : "api/services/public/remove-bg";
+
+      // Async (auth) flow: create job, then stream SSE updates.
+      if (authToken && USE_ASYNC_AUTH_FLOW) {
+        const idempotencyKey = createUuid();
+        const requestId = createUuid();
+        setJobRequestId(requestId);
+        setJobStatus("processing");
+
+        formData.append("idempotencyKey", idempotencyKey);
+        formData.append("requestId", requestId);
+
+        const created = await api.post(endpoint, formData, {
+          headers: {
+            "Idempotency-Key": idempotencyKey,
+          },
+          signal: abortController.signal,
+          timeout: 60000,
+        });
+
+        const createdData = created?.data as any;
+        const jobRequestIdFromApi = String(createdData?.requestId ?? "").trim() || requestId;
+        setJobRequestId(jobRequestIdFromApi);
+
+        const sseUrl = `${(api.defaults.baseURL || "").replace(/\/+$/, "")}/api/services/remove-bg-replicate/jobs/${encodeURIComponent(
+          jobRequestIdFromApi,
+        )}/events`;
+
+        // Stream updates over fetch to keep Authorization header support.
+        const sseAbortController = new AbortController();
+        let terminalReached = false;
+        const forwardAbort = () => {
+          try {
+            if (abortController.signal.aborted) sseAbortController.abort();
+          } catch {}
+        };
+        abortController.signal.addEventListener("abort", forwardAbort, { once: true });
+
+        await openSseOverFetch({
+          url: sseUrl,
+          token: authToken,
+          signal: sseAbortController.signal,
+          onEvent: ({ event, data }) => {
+            if (isCancelled) return;
+            if (event !== "snapshot" && event !== "job") return;
+            const snapshot = data as RemoveBgJobSnapshot | null;
+            if (!snapshot || typeof snapshot !== "object") return;
+
+            const status = String(snapshot.status || "").toLowerCase();
+            if (status) setJobStatus(status as any);
+
+            if (status === "succeeded" && snapshot.outputImageUrl) {
+              terminalReached = true;
+              setResponseApi((previous) => {
+                revokeIfBlobUrl(previous);
+                return String(snapshot.outputImageUrl);
+              });
+              setProcessingError(null);
+              setIsProcessing(false);
+              // Refresh session/credits (async flow debits on webhook success).
+              isAuthentified().catch(() => {});
+              try {
+                sseAbortController.abort();
+              } catch {}
+            }
+            if (status === "failed" || status === "canceled") {
+              terminalReached = true;
+              setProcessingError(
+                snapshot.errorMessage || removeTextContent.defaultProcessingError,
+              );
+              setIsProcessing(false);
+              try {
+                sseAbortController.abort();
+              } catch {}
+            }
+          },
+        });
+
+        // If SSE ends without success, fall back to GET once.
+        if (!terminalReached) {
+          try {
+            const fallback = await api.get(
+              `api/services/remove-bg-replicate/jobs/${encodeURIComponent(
+                jobRequestIdFromApi,
+              )}`,
+              { signal: abortController.signal, timeout: 20000 },
+            );
+            const snap = fallback?.data as RemoveBgJobSnapshot | null;
+            if (snap && snap.outputImageUrl) {
+              setResponseApi((previous) => {
+                revokeIfBlobUrl(previous);
+                return String(snap.outputImageUrl);
+              });
+              setProcessingError(null);
+              setJobStatus(String(snap.status) as any);
+              isAuthentified().catch(() => {});
+            } else if (snap && (snap.status === "failed" || snap.status === "canceled")) {
+              setProcessingError(
+                snap.errorMessage || removeTextContent.defaultProcessingError,
+              );
+              setJobStatus(String(snap.status) as any);
+            }
+          } catch {}
+        }
+
+        // In async flow we do not return a blob URL.
+        return "";
+      }
 
       // Axios dédié aux blobs via adapter `fetch` (plus robuste que XHR sur gros fichiers).
       const response = await apiBlob.post<Blob>(endpoint, formData, {
@@ -275,16 +494,20 @@ const RemoveBg = ({
 
     setIsProcessing(true);
     setProcessingError(null);
+    setJobStatus(null);
+    setJobRequestId(null);
 
     const apiPromise = processImage().then((processedUrl) => {
       if (isCancelled) {
         revokeIfBlobUrl(processedUrl);
         return;
       }
-      setResponseApi((previous) => {
-        revokeIfBlobUrl(previous);
-        return processedUrl;
-      });
+      if (processedUrl) {
+        setResponseApi((previous) => {
+          revokeIfBlobUrl(previous);
+          return processedUrl;
+        });
+      }
 
       // Credits are decremented server-side only if Replicate succeeds.
       // Refresh session (credits displayed in Navbar/Dashboard) after success.
@@ -363,6 +586,7 @@ const RemoveBg = ({
           removeTextContent.defaultProcessingError;
         setProcessingError(finalMessage);
         setVisitorBlocked(!userLoged && code === "VISITOR_QUOTA_EXCEEDED");
+        // In async flow, keep job identifiers so the user can still recover via GET.
         setResponseApi((previous) => {
           revokeIfBlobUrl(previous);
           return "";
@@ -419,6 +643,8 @@ const RemoveBg = ({
       setSelectedFile(null);
       setFileToProcess(null);
       setProcessingError(null);
+      setJobStatus(null);
+      setJobRequestId(null);
       setVisitorBlocked(false);
       setResponseApi((previous) => {
         revokeIfBlobUrl(previous);
@@ -433,6 +659,8 @@ const RemoveBg = ({
       setProcessingError(
         "Image trop volumineuse. Taille max: 1 MB pour les visiteurs non connectes."
       );
+      setJobStatus(null);
+      setJobRequestId(null);
       setResponseApi((previous) => {
         revokeIfBlobUrl(previous);
         return "";
@@ -441,6 +669,8 @@ const RemoveBg = ({
     }
     setSelectedFile(file);
     setProcessingError(null);
+    setJobStatus(null);
+    setJobRequestId(null);
     setVisitorBlocked(false);
     setResponseApi((previous) => {
       revokeIfBlobUrl(previous);
@@ -451,6 +681,32 @@ const RemoveBg = ({
   const confirmProcessing = () => {
     if (!selectedFile || isProcessing) return;
     setFileToProcess(selectedFile);
+  };
+
+  const retrieveJobResult = async () => {
+    const token = readAuthToken();
+    if (!token || !jobRequestId) return;
+    setIsProcessing(true);
+    setProcessingError(null);
+    try {
+      const response = await api.get(
+        `api/services/remove-bg-replicate/jobs/${encodeURIComponent(jobRequestId)}`,
+        { timeout: 20000 },
+      );
+      const snap = response?.data as RemoveBgJobSnapshot | null;
+      if (snap && snap.outputImageUrl) {
+        setResponseApi((previous) => {
+          revokeIfBlobUrl(previous);
+          return String(snap.outputImageUrl);
+        });
+      }
+      if (snap?.status) setJobStatus(String(snap.status) as any);
+      if (snap?.errorMessage) setProcessingError(String(snap.errorMessage));
+    } catch (err) {
+      setProcessingError(removeTextContent.defaultProcessingError);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -521,6 +777,24 @@ const RemoveBg = ({
         </ul>
       ) : null}
       <div id="editor" className="mt-6 lg:grow pb-[200px]">
+        {jobRequestId && !responseApi && (
+          <div className="mx-auto max-w-xl px-4">
+            <div className="alert alert-info">
+              <div className="flex flex-col gap-2">
+                <div>
+                  Statut: <b>{jobStatus || "processing"}</b>
+                </div>
+                <button
+                  className="btn btn-outline"
+                  onClick={retrieveJobResult}
+                  disabled={isProcessing}
+                >
+                  Récupérer mon image
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {shouldShowEditor && (
           <ImgEditor
             src={responseApi}
