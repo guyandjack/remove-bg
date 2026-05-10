@@ -515,6 +515,41 @@ export async function markRemoveBgJobCreditsDebited(params: {
   return (res.affectedRows ?? 0) > 0;
 }
 
+export async function backfillRemoveBgJobOutputIfMissing(params: {
+  requestId: string;
+  outputImageUrl: string;
+  replicateStatus?: string | null;
+  replicatePayload?: any | null;
+  completedAt?: Date;
+}): Promise<boolean> {
+  const requestId = normalizeRemoveBgRequestId(params.requestId);
+  const outputImageUrl = String(params.outputImageUrl ?? "").trim();
+  if (!outputImageUrl) {
+    throw new Error("remove_bg_jobs.output_image_url is required");
+  }
+  const now = params.completedAt ?? new Date();
+
+  const connexion = await getDb();
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE remove_bg_jobs
+     SET output_image_url = COALESCE(NULLIF(output_image_url, ''), ?),
+         replicate_status = COALESCE(?, replicate_status),
+         replicate_payload = COALESCE(?, replicate_payload),
+         completed_at = COALESCE(completed_at, ?)
+     WHERE request_id = ?
+       AND status = 'succeeded'
+       AND (output_image_url IS NULL OR output_image_url = '')`,
+    [
+      outputImageUrl,
+      params.replicateStatus ?? null,
+      params.replicatePayload ?? null,
+      now,
+      requestId,
+    ],
+  );
+  return (res.affectedRows ?? 0) > 0;
+}
+
 // ------------------------------------------------------
 // Helper transaction â€” version simple
 // ------------------------------------------------------
