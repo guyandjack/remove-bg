@@ -507,8 +507,9 @@ export async function markRemoveBgJobCreditsDebited(params: {
   const connexion = await getDb();
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE remove_bg_jobs
-     SET credits_debited_at = COALESCE(credits_debited_at, ?)
-     WHERE request_id = ?`,
+     SET credits_debited_at = ?
+     WHERE request_id = ?
+       AND credits_debited_at IS NULL`,
     [params.debitedAt ?? new Date(), requestId],
   );
   return (res.affectedRows ?? 0) > 0;

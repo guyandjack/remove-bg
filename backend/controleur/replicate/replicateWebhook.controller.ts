@@ -8,6 +8,9 @@ import {
   markRemoveBgJobSucceeded,
   markRemoveBgJobFailed,
   markRemoveBgJobCanceled,
+  getActiveUsageBillingPeriod,
+  recordCreditUsage,
+  markRemoveBgJobCreditsDebited,
 } from "../../DB/queriesSQL/queriesSQL.js";
 
 function parseJsonBody(req: any): any | null {
@@ -41,6 +44,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
   const requestId = (req as any).requestId;
   const webhookId = getHeader(req, "webhook-id");
   const eventId = webhookId ? `replicate:${webhookId}` : null;
+  const receivedAt = new Date();
 
   // Respond quickly: acknowledge receipt once we've made the request idempotent.
   // If the idempotency table is unavailable, return 500 so Replicate retries.
@@ -50,7 +54,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
         id: eventId,
         provider: "replicate",
         eventType: "replicate.webhook",
-        receivedAt: new Date(),
+        receivedAt,
       });
       if (!shouldProcess) {
         return res.status(200).json({ ok: true });
@@ -107,6 +111,8 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
     }
 
     const completedAt = new Date();
+    const previousStatus = job.status;
+    const previousReplicateStatus = job.replicate_status;
 
     if (replicateStatus === "succeeded") {
       const outputUrl = extractOutputUrl(payload?.output);
@@ -118,6 +124,73 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
           replicatePayload: payload,
           completedAt,
         });
+
+        // Debit credits strictly on succeeded, and only once.
+        if (!job.user_id) {
+          logger.warn("replicateWebhook::credits_skip_missing_user", {
+            requestId,
+            webhookId,
+            predictionId,
+            jobId: job.id,
+          });
+        } else if (job.credits_debited_at) {
+          logger.info("replicateWebhook::credits_already_debited", {
+            requestId,
+            webhookId,
+            predictionId,
+            jobId: job.id,
+            debitedAt: job.credits_debited_at,
+          });
+        } else {
+          // 1) Validate access/usage at debit time (source of truth: Replicate webhook success).
+          const usage = await getActiveUsageBillingPeriod(job.user_id);
+          if (!usage) {
+            logger.error("replicateWebhook::credits_no_active_usage", {
+              requestId,
+              webhookId,
+              predictionId,
+              jobId: job.id,
+              userId: job.user_id,
+            });
+            // Do not mark webhook as processed: allow Replicate retries.
+            return res.status(500).json({ ok: false });
+          }
+
+          // 2) Ledger insert (idempotent by request_id due to unique index on CreditUsage.request_id).
+          const creditUsageId = await recordCreditUsage(
+            usage.subscription_id,
+            1,
+            "replicate_remove_bg",
+            job.request_id,
+          );
+          if (!creditUsageId) {
+            logger.error("replicateWebhook::credits_record_failed", {
+              requestId,
+              webhookId,
+              predictionId,
+              jobId: job.id,
+              subscriptionId: usage.subscription_id,
+            });
+            return res.status(500).json({ ok: false });
+          }
+
+          // 3) Mark job as debited (guarded by credits_debited_at IS NULL).
+          const marked = await markRemoveBgJobCreditsDebited({
+            requestId: job.request_id,
+            debitedAt: completedAt,
+          });
+
+          logger.info("replicateWebhook::credits_debit", {
+            requestId,
+            webhookId,
+            predictionId,
+            jobId: job.id,
+            userId: job.user_id,
+            subscriptionId: usage.subscription_id,
+            creditUsageId,
+            marked,
+          });
+        }
       } else {
         await markRemoveBgJobFailed({
           requestId: job.request_id,
@@ -154,6 +227,25 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
         replicatePayload: payload,
       });
     }
+
+    logger.info("replicateWebhook::job_transition", {
+      requestId,
+      webhookId,
+      predictionId,
+      jobId: job.id,
+      from: { status: previousStatus, replicate_status: previousReplicateStatus },
+      to: {
+        status:
+          replicateStatus === "succeeded"
+            ? "succeeded"
+            : replicateStatus === "failed"
+              ? "failed"
+              : replicateStatus === "canceled"
+                ? "canceled"
+                : "processing",
+        replicate_status: replicateStatus,
+      },
+    });
   } catch (err: any) {
     logger.error("replicateWebhook::update_failed", {
       requestId,
