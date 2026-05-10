@@ -7,6 +7,7 @@ import {
 } from "../../DB/queriesSQL/queriesSQL.js";
 import {
   subscribeRemoveBgJobEvents,
+  type RemoveBgJobSsePayload,
 } from "../../services/removeBgJobs/removeBgJobEvents.js";
 
 function writeSseEvent(res: any, event: string, data: any) {
@@ -64,26 +65,36 @@ export const streamRemoveBgReplicateJobEvents: RequestHandler = async (req, res)
     completedAt: job.completed_at,
   });
 
-  const unsubscribe = subscribeRemoveBgJobEvents(job.request_id, async () => {
-    try {
-      const latest = await getRemoveBgJobByRequestId(job.request_id);
-      if (!latest) return;
-      writeSseEvent(res, "job", {
-        requestId: latest.request_id,
-        status: latest.status,
-        outputImageUrl: latest.output_image_url,
-        errorMessage: latest.error_message,
-        createdAt: latest.created_at,
-        completedAt: latest.completed_at,
-      });
-    } catch (err: any) {
-      logger.warn("removeBgJobEvents::send_failed", {
-        requestId: httpRequestId,
-        jobRequestId: job.request_id,
-        message: err?.message ?? String(err),
-      });
-    }
-  });
+  const unsubscribe = subscribeRemoveBgJobEvents(
+    job.request_id,
+    async (evt: any) => {
+      try {
+        const payload = (evt?.payload ?? null) as RemoveBgJobSsePayload | null;
+        if (payload && payload.status && payload.status !== "unknown") {
+          writeSseEvent(res, "job", payload);
+          return;
+        }
+
+        // Fallback: DB source of truth snapshot
+        const latest = await getRemoveBgJobByRequestId(job.request_id);
+        if (!latest) return;
+        writeSseEvent(res, "job", {
+          requestId: latest.request_id,
+          status: latest.status,
+          outputImageUrl: latest.output_image_url,
+          errorMessage: latest.error_message,
+          createdAt: latest.created_at,
+          completedAt: latest.completed_at,
+        });
+      } catch (err: any) {
+        logger.warn("removeBgJobEvents::send_failed", {
+          requestId: httpRequestId,
+          jobRequestId: job.request_id,
+          message: err?.message ?? String(err),
+        });
+      }
+    },
+  );
 
   const heartbeatMs = 25_000;
   const heartbeat = setInterval(() => {
@@ -113,4 +124,3 @@ export const streamRemoveBgReplicateJobEvents: RequestHandler = async (req, res)
     userId: user.id,
   });
 };
-

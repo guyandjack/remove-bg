@@ -1,6 +1,15 @@
+export type RemoveBgJobSsePayload = {
+  requestId: string;
+  status: string;
+  outputImageUrl: string | null;
+  errorMessage: string | null;
+  createdAt?: Date | string | null;
+  completedAt?: Date | string | null;
+};
+
 type RemoveBgJobEvent =
-  | { type: "job.updated"; requestId: string; at: string }
-  | { type: "job.created"; requestId: string; at: string };
+  | { type: "job.updated"; payload: RemoveBgJobSsePayload; at: string }
+  | { type: "job.created"; payload: RemoveBgJobSsePayload; at: string };
 
 type Listener = (event: RemoveBgJobEvent) => void;
 
@@ -39,7 +48,7 @@ export function publishRemoveBgJobUpdated(requestId: string) {
   if (!set || set.size === 0) return;
   const event: RemoveBgJobEvent = {
     type: "job.updated",
-    requestId: key,
+    payload: { requestId: key, status: "unknown", outputImageUrl: null, errorMessage: null },
     at: new Date().toISOString(),
   };
   set.forEach((listener) => {
@@ -51,14 +60,14 @@ export function publishRemoveBgJobUpdated(requestId: string) {
   });
 }
 
-export function publishRemoveBgJobCreated(requestId: string) {
-  const key = normalizeRequestId(requestId);
+export function publishRemoveBgJobCreated(payload: RemoveBgJobSsePayload) {
+  const key = normalizeRequestId(payload.requestId);
   if (!key) return;
   const set = listenersByRequestId.get(key);
   if (!set || set.size === 0) return;
   const event: RemoveBgJobEvent = {
     type: "job.created",
-    requestId: key,
+    payload: { ...payload, requestId: key },
     at: new Date().toISOString(),
   };
   set.forEach((listener) => {
@@ -68,3 +77,19 @@ export function publishRemoveBgJobCreated(requestId: string) {
   });
 }
 
+export function publishRemoveBgJobUpdatedPayload(payload: RemoveBgJobSsePayload) {
+  const key = normalizeRequestId(payload.requestId);
+  if (!key) return;
+  const set = listenersByRequestId.get(key);
+  if (!set || set.size === 0) return;
+  const event: RemoveBgJobEvent = {
+    type: "job.updated",
+    payload: { ...payload, requestId: key },
+    at: new Date().toISOString(),
+  };
+  set.forEach((listener) => {
+    try {
+      listener(event);
+    } catch {}
+  });
+}

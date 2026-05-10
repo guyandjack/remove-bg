@@ -4,6 +4,7 @@ import {
   tryMarkWebhookEventReceived,
   markWebhookEventProcessed,
   getRemoveBgJobByReplicatePredictionId,
+  getRemoveBgJobByRequestId,
   setRemoveBgJobRunning,
   markRemoveBgJobSucceeded,
   markRemoveBgJobFailed,
@@ -12,7 +13,7 @@ import {
   recordCreditUsage,
   markRemoveBgJobCreditsDebited,
 } from "../../DB/queriesSQL/queriesSQL.js";
-import { publishRemoveBgJobUpdated } from "../../services/removeBgJobs/removeBgJobEvents.js";
+import { publishRemoveBgJobUpdatedPayload } from "../../services/removeBgJobs/removeBgJobEvents.js";
 
 function parseJsonBody(req: any): any | null {
   const body = req?.body;
@@ -193,8 +194,20 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
           });
         }
 
-        // Notify SSE subscribers that the job has updated (DB remains source of truth).
-        publishRemoveBgJobUpdated(job.request_id);
+        // Notify SSE subscribers (payload is derived from DB, which remains source of truth).
+        try {
+          const latest = await getRemoveBgJobByRequestId(job.request_id);
+          if (latest) {
+            publishRemoveBgJobUpdatedPayload({
+              requestId: latest.request_id,
+              status: latest.status,
+              outputImageUrl: latest.output_image_url,
+              errorMessage: latest.error_message,
+              createdAt: latest.created_at,
+              completedAt: latest.completed_at,
+            });
+          }
+        } catch {}
       } else {
         await markRemoveBgJobFailed({
           requestId: job.request_id,
@@ -203,7 +216,19 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
           replicatePayload: payload,
           completedAt,
         });
-        publishRemoveBgJobUpdated(job.request_id);
+        try {
+          const latest = await getRemoveBgJobByRequestId(job.request_id);
+          if (latest) {
+            publishRemoveBgJobUpdatedPayload({
+              requestId: latest.request_id,
+              status: latest.status,
+              outputImageUrl: latest.output_image_url,
+              errorMessage: latest.error_message,
+              createdAt: latest.created_at,
+              completedAt: latest.completed_at,
+            });
+          }
+        } catch {}
       }
     } else if (replicateStatus === "failed") {
       await markRemoveBgJobFailed({
@@ -215,7 +240,19 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
         replicatePayload: payload,
         completedAt,
       });
-      publishRemoveBgJobUpdated(job.request_id);
+      try {
+        const latest = await getRemoveBgJobByRequestId(job.request_id);
+        if (latest) {
+          publishRemoveBgJobUpdatedPayload({
+            requestId: latest.request_id,
+            status: latest.status,
+            outputImageUrl: latest.output_image_url,
+            errorMessage: latest.error_message,
+            createdAt: latest.created_at,
+            completedAt: latest.completed_at,
+          });
+        }
+      } catch {}
     } else if (replicateStatus === "canceled") {
       await markRemoveBgJobCanceled({
         requestId: job.request_id,
@@ -224,7 +261,19 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
         replicatePayload: payload,
         completedAt,
       });
-      publishRemoveBgJobUpdated(job.request_id);
+      try {
+        const latest = await getRemoveBgJobByRequestId(job.request_id);
+        if (latest) {
+          publishRemoveBgJobUpdatedPayload({
+            requestId: latest.request_id,
+            status: latest.status,
+            outputImageUrl: latest.output_image_url,
+            errorMessage: latest.error_message,
+            createdAt: latest.created_at,
+            completedAt: latest.completed_at,
+          });
+        }
+      } catch {}
     } else if (replicateStatus) {
       // For "starting"/"processing"/etc: keep DB up to date but do not set completed_at.
       await setRemoveBgJobRunning({
@@ -233,7 +282,19 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
         replicateStatus,
         replicatePayload: payload,
       });
-      publishRemoveBgJobUpdated(job.request_id);
+      try {
+        const latest = await getRemoveBgJobByRequestId(job.request_id);
+        if (latest) {
+          publishRemoveBgJobUpdatedPayload({
+            requestId: latest.request_id,
+            status: latest.status,
+            outputImageUrl: latest.output_image_url,
+            errorMessage: latest.error_message,
+            createdAt: latest.created_at,
+            completedAt: latest.completed_at,
+          });
+        }
+      } catch {}
     }
 
     logger.info("replicateWebhook::job_transition", {
