@@ -43,6 +43,7 @@ import usageRoute from "./routes/usage.route.js";
 import planOptionRoute from "./routes/planOption.route.js";
 import servicesRoute from "./routes/services.route.js";
 import resetPasswordRoute from "./routes/resetPassword.route.js";
+import replicateRoute from "./routes/replicate.route.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -112,7 +113,8 @@ const jsonParser = express.json({ limit: "25mb" });
 const urlEncodedParser = express.urlencoded({ extended: true, limit: "25mb" });
 // Stripe webhooks rely on the raw request body, so bypass every parser on that route.
 const skipBodyParser = (req: Request) =>
-  req.originalUrl.startsWith("/api/stripe/webhook");
+  req.originalUrl.startsWith("/api/stripe/webhook") ||
+  req.originalUrl.startsWith("/api/replicate/webhook");
 // Upload fichiers (express-fileupload)
 // `fileSize` protège contre des payloads abusifs. Ajuste selon ton besoin réel.
 const fileUploadMiddleware = fileUpload({
@@ -239,6 +241,9 @@ app.use("/api/plan/option", planOptionRoute);
 
 //route des services
 app.use("/api/services", servicesRoute);
+
+// route Replicate webhooks
+app.use("/api/replicate", replicateRoute);
 
 
 
