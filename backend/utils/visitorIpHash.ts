@@ -39,9 +39,9 @@ export function getHashedVisitorIp(req: Request): {
   hashedIp: string;
   hashSuffix: string;
 } {
-  const salt = String(process.env.SECRET_SALT || "").trim();
+  const salt = String(process.env.SECRET_SALT_IP_VISITOR || "").trim();
   if (!salt) {
-    throw new Error("Missing SECRET_SALT env var (required for visitor quotas).");
+    throw new Error("Missing SECRET_SALT_IP_VISITOR env var (required for visitor quotas).");
   }
 
   const ip = getClientIp(req);

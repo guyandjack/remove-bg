@@ -2,8 +2,6 @@ import type { Request, Response, NextFunction } from "express";
 
 import { validateImageUpload } from "../checkDataUpload/checkDataUpload.js";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-
 const allowedMimes = new Set([
   "image/jpeg",
   "image/jpg",
@@ -15,7 +13,6 @@ const allowedQuality = new Set(["fast", "pro"]);
 const DEFAULT_QUALITY = "pro";
 
 const validateRemoveBgUpload = validateImageUpload("file", {
-  maxSizeBytes: MAX_FILE_SIZE,
   allowedMimes,
 });
 

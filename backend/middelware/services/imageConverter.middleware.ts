@@ -6,8 +6,6 @@ import {
   type NormalizedConverterOptions,
 } from "../../utils/imageConverterOptions.js";
 
-const MAX_IMAGE_SIZE = 25 * 1024 * 1024; // 25 MB
-
 const allowedMimes = new Set([
   "image/jpeg",
   "image/jpg",
@@ -16,7 +14,6 @@ const allowedMimes = new Set([
 ]);
 
 const validateConverterUpload = validateImageUpload("file", {
-  maxSizeBytes: MAX_IMAGE_SIZE,
   allowedMimes,
 });
 

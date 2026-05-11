@@ -24,7 +24,7 @@ import {
   attachRemoveBgQuality,
   validateRemoveBgUpload,
 } from "../middelware/services/removeBg.middelware.js";
-import { validateVisitorImageUpload1Mb } from "../middelware/services/visitorPublicLimits.middleware.js";
+import { validateVisitorImageUpload } from "../middelware/services/visitorPublicLimits.middleware.js";
 import {
   validateMagicEraserPayload,
 } from "../middelware/services/magicEraser.middleware.js";
@@ -41,10 +41,10 @@ router.post(
   imageConverter
 );
 
-// Public (no auth) - anti abuse visitors: 1MB max, quota server-side by hashed IP.
+// Public (no auth) - anti abuse visitors: 5MB max, quota server-side by hashed IP.
 router.post(
   "/public/image-converter",
-  validateVisitorImageUpload1Mb,
+  validateVisitorImageUpload,
   validateConverterOptions,
   imageConverterVisitor,
 );
@@ -59,10 +59,10 @@ router.post(
   removeBg
 );
 
-// Public (no auth) - anti abuse visitors: 1MB max, 1 trial total.
+// Public (no auth) - anti abuse visitors: 5MB max, quota server-side by hashed IP.
 router.post(
   "/public/remove-bg",
-  validateVisitorImageUpload1Mb,
+  validateVisitorImageUpload,
   attachRemoveBgQuality,
   removeBgVisitorByReplicate,
 );

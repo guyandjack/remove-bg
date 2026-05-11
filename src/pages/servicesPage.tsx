@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 import { sessionSignal } from "@/stores/session";
+import { api } from "@/utils/axiosConfig";
+import { type PlanOption, setPlanOptions } from "@/stores/planOptions";
 
 //import des librairies
 import { AnimatePresence, LazyMotion, domAnimation } from "motion/react";
@@ -45,37 +47,6 @@ type PropsPage = {
   routeKey: string;
 };
 
-/**
- * retourne le poids max du fichier a uploader par le client
- *
- * @return {*} 
- */
-function getMaxFileUpload() {
-  const planType = sessionSignal.value?.plan.code || null;
-  if(!planType) return 1
-  let maxSize = 0;
-  switch (planType) {
-    case "free":
-      maxSize = 1;
-      break;
-    
-    case "hobby":
-      maxSize = 5;
-      break;
-    
-    case "pro":
-      maxSize = 10;
-      break;
-  
-    default:
-      maxSize = 1;
-      break;
-  }
-
-  return maxSize
-
-}
-
 const ServicesPage = ({ routeKey }: PropsPage) => {
   type ServiceId = "remove" | "social" | "product" | "convert" | string;
   const [service, setService] = useState<ServiceId | null>(null);
@@ -84,6 +55,64 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
   console.log("isLoged: ", userLoged);
 
   const containerService = useRef<HTMLDivElement | null>(null);
+
+  // Plan options are used for frontend limits (max upload size, etc.).
+  // We hydrate from cache for instant UX, then refresh from API so updates propagate.
+  useEffect(() => {
+    const hydrateFromCache = (): boolean => {
+      const cache = localStorage.getItem("option");
+      if (!cache) return false;
+      try {
+        const parsed = JSON.parse(cache);
+        if (!Array.isArray(parsed) || parsed.length === 0) return false;
+
+        const isCompatible = parsed.every((plan) => {
+          if (!plan || typeof plan !== "object") return false;
+          return (
+            typeof plan.name === "string" &&
+            typeof plan.price === "number" &&
+            typeof plan.credit_IA === "number" &&
+            typeof plan.credit_conversion === "string" &&
+            typeof plan.active === "boolean"
+          );
+        });
+
+        if (!isCompatible) {
+          localStorage.removeItem("option");
+          return false;
+        }
+
+        const normalizedPlans = (parsed as PlanOption[]).map((plan) => ({
+          ...plan,
+          active: plan.active ?? true,
+        }));
+        setPlanOptions(normalizedPlans);
+        return true;
+      } catch {
+        localStorage.removeItem("option");
+        return false;
+      }
+    };
+
+    const fetchOptions = async () => {
+      try {
+        const { data } = await api.get("api/plan/option");
+        if (data?.status !== "success" || !Array.isArray(data?.plans)) return;
+
+        const normalizedPlans = (data.plans as PlanOption[]).map((plan) => ({
+          ...plan,
+          active: plan.active ?? true,
+        }));
+        localStorage.setItem("option", JSON.stringify(normalizedPlans));
+        setPlanOptions(normalizedPlans);
+      } catch {
+        // keep existing cache/signal
+      }
+    };
+
+    hydrateFromCache();
+    fetchOptions();
+  }, [routeKey]);
 
   //contenu textuel du composant RemoveBG
   const textUploadImgComponent: UploadImgType = {

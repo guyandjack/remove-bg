@@ -3,6 +3,8 @@
 //import des hooks
 import { useEffect, useState } from "preact/hooks";
 import { sessionSignal } from "@/stores/session";
+import { planOptionsSignal } from "@/stores/planOptions";
+import { getMaxUploadForUser } from "@/utils/planOptionLimits";
 
 //import des composants enfant
 import { InputFile } from "../input/InputFile";
@@ -16,12 +18,6 @@ const ACCEPTED_MIME = new Set([
   "image/gif",
 ]);
 const ACCEPTED_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
-
-const fileSizeUploadLimit = {
-  free: 1 * 1024 * 1024,
-  hobby: 5 * 1024 * 1024,
-  pro: 10 * 1024 * 1024,
-} as const;
 
 
 
@@ -56,29 +52,13 @@ const UploadImg = ({
 }: UploadImgProps) => {
   const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [textSize, setTextZise] = useState<number>(5);
-
-
-  const isLoged = sessionSignal.value?.authentified;
-  const planUser = sessionSignal.value?.plan?.code;
-  let maxBytes = 1;
-  
-  function getLimitSizeFile() {
-    let result = fileSizeUploadLimit.hobby;
-    if (!isLoged) { result = fileSizeUploadLimit.hobby };
-    if (planUser === "free") { result = fileSizeUploadLimit.free };
-    if (planUser === "hobby") { result = fileSizeUploadLimit.hobby };
-    if (planUser === "pro") { result = fileSizeUploadLimit.pro };
-    return {
-      fileSize: result,
-      textSize: Math.round(result / (1024 * 1024))
-    } 
-  }
-
-  useEffect(() => {
-    const result = getLimitSizeFile();
-    setTextZise(result.textSize);
-  },[])
+  const isLoged = sessionSignal.value?.authentified === true;
+  const planUser = sessionSignal.value?.plan?.code || null;
+  const { maxBytes, maxMb } = getMaxUploadForUser({
+    plans: planOptionsSignal.value,
+    isAuthenticated: isLoged,
+    planCode: planUser,
+  });
 
   
   // Nettoie l'ancienne URL de preview
@@ -98,13 +78,7 @@ const UploadImg = ({
 
   const validateFile = (file: File): string | null => {
     if (!file) return "Aucun fichier selectionne.";
-
-    let result = getLimitSizeFile();
-    
-
-    if (file.size > result.fileSize) {
-      return `Le fichier depasse ${result.textSize} Mo.`;
-    }
+    if (file.size > maxBytes) return `Image trop volumineuse. Taille max: ${maxMb} MB.`;
 
     const isImageMime = file.type.startsWith("image/");
     if (!isImageMime) return "Le fichier doit etre une image.";
@@ -169,7 +143,7 @@ const UploadImg = ({
             />
             <div className="label p-0">
               <span className="label-text text-base-content/70">
-                {`Formats: JPG, PNG, WEBP, GIF - Max ${textSize} Mo`}
+                {`Formats: JPG, PNG, WEBP, GIF - Max ${maxMb} MB`}
               </span>
             </div>
 

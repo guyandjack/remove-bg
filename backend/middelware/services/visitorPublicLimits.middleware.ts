@@ -1,6 +1,18 @@
 import { validateImageUpload } from "../checkDataUpload/checkDataUpload.js";
+import { planOption } from "../../data/planOption.js";
 
-const ONE_MB = 1 * 1024 * 1024;
+const MB = 1024 * 1024;
+const DEFAULT_VISITOR_MAX_BYTES = 5 * MB;
+
+function parseSizeMaxToBytes(sizeMax: unknown): number | null {
+  if (typeof sizeMax !== "string") return null;
+  const trimmed = sizeMax.trim().toLowerCase();
+  const match = trimmed.match(/^(\d+(?:\.\d+)?)\s*(mb|m)$/i);
+  if (!match) return null;
+  const value = Number(match[1]);
+  if (!Number.isFinite(value) || value <= 0) return null;
+  return Math.round(value * MB);
+}
 
 const allowedMimes = new Set([
   "image/jpeg",
@@ -9,10 +21,12 @@ const allowedMimes = new Set([
   "image/webp",
 ]);
 
-const validateVisitorImageUpload1Mb = validateImageUpload("file", {
-  maxSizeBytes: ONE_MB,
+const validateVisitorImageUpload = validateImageUpload("file", {
+  maxSizeBytes:
+    parseSizeMaxToBytes(planOption.find((p) => p.name === "visitor")?.size_max) ??
+    DEFAULT_VISITOR_MAX_BYTES,
   allowedMimes,
 });
 
-export { validateVisitorImageUpload1Mb };
+export { validateVisitorImageUpload };
 

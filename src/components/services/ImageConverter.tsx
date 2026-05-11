@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { api } from "@/utils/axiosConfig";
 import { sessionSignal } from "@/stores/session";
+import { planOptionsSignal } from "@/stores/planOptions";
 import type { AxiosError } from "axios";
 import { isAuthentified } from "@/utils/request/isAuthentified";
+import { getMaxUploadForUser } from "@/utils/planOptionLimits";
 
 type FilterOptions = {
   brightness: number;
@@ -497,11 +499,16 @@ const ImageConverter = ({
       }
     }
 
-    // Visitor anti-abuse: backend enforces 1MB, but we short-circuit for UX.
-    if (!userLoged && file.size > 1 * 1024 * 1024) {
+    // Align UX with backend upload limits (visitor/free/hobby...).
+    const { maxBytes, maxMb } = getMaxUploadForUser({
+      plans: planOptionsSignal.value,
+      isAuthenticated: Boolean(userLoged),
+      planCode: sessionSignal.value?.plan?.code || null,
+    });
+    if (file.size > maxBytes) {
       setStatus({
         state: "error",
-        message: "Image trop volumineuse. Taille max: 1 MB pour les visiteurs non connectes.",
+        message: `Image trop volumineuse. Taille max: ${maxMb} MB.`,
       });
       return;
     }

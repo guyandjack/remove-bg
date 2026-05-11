@@ -2,6 +2,7 @@
 //import des hooks
 import { useEffect, useRef, useState } from "preact/hooks";
 import { sessionSignal } from "@/stores/session";
+import { planOptionsSignal } from "@/stores/planOptions";
 
 //import des composants enfants
 import { UploadImg, type UploadImgType } from "@/components/form/UploadImg";
@@ -14,6 +15,7 @@ import { api, apiBlob } from "@/utils/axiosConfig";
 import type { AxiosError } from "axios";
 import { isAuthentified } from "@/utils/request/isAuthentified";
 import { blobCache } from "@/utils/storage/blobCache";
+import { getMaxUploadForUser } from "@/utils/planOptionLimits";
 
 const USE_ASYNC_AUTH_FLOW = true; // easy rollback: set to false to restore blob endpoint for logged users
 
@@ -655,12 +657,17 @@ const RemoveBg = ({
       });
       return;
     }
-    // Visitor anti-abuse: backend enforces 1MB, but we short-circuit for UX.
-    if (!userLoged && file.size > 1 * 1024 * 1024) {
+    // Align UX with backend upload limits (visitor/free/hobby...).
+    const { maxBytes, maxMb } = getMaxUploadForUser({
+      plans: planOptionsSignal.value,
+      isAuthenticated: Boolean(userLoged),
+      planCode: sessionSignal.value?.plan?.code || null,
+    });
+    if (file.size > maxBytes) {
       setSelectedFile(null);
       setFileToProcess(null);
       setProcessingError(
-        "Image trop volumineuse. Taille max: 1 MB pour les visiteurs non connectes."
+        `Image trop volumineuse. Taille max: ${maxMb} MB.`
       );
       setJobStatus(null);
       setJobRequestId(null);

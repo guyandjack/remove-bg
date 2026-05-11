@@ -2062,3 +2062,20 @@ export async function getUserPlanAndCreditsBillingPeriod(
     remaining_credits_in_period: usage.remaining_in_period,
   };
 }
+
+// --------------------------------------
+// Active plan code (lightweight lookup)
+// --------------------------------------
+export async function getActivePlanCodeForUser(userId: ID): Promise<string | null> {
+  const connexion = await getDb();
+  const [rows] = await connexion.execute<RowDataPacket[]>(
+    `SELECT p.code AS plan_code
+     FROM Subscription s
+     JOIN Plan p ON p.id = s.plan_id
+     WHERE s.user_id = ? AND s.is_active = TRUE
+     LIMIT 1`,
+    [userId],
+  );
+  const planCode = rows[0] ? String((rows[0] as any).plan_code || "") : "";
+  return planCode || null;
+}

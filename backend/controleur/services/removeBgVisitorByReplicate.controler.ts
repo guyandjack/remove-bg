@@ -131,7 +131,7 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
         error: true,
         code: "VISITOR_QUOTA_EXCEEDED",
         message:
-          "Quota visiteur depasse: 1 essai gratuit de suppression d'arriere-plan est autorise sans compte.",
+          `Quota visiteur depasse: ${snapshot.limit} suppression d'arriere-plan maximum par mois.`,
         requestId,
         quota: { service: "remove_bg", used: snapshot.used, limit: snapshot.limit },
       });

@@ -26,6 +26,34 @@ type PlanOptionInput = {
 };
 
 const planOption: PlanOptionInput[] = [
+  // Visitor (non connecte) - expose via API for frontend limits,
+  // but must not appear on pricing page (active: false).
+  {
+    active: false,
+    name: "visitor",
+    price: 0,
+    prices: {
+      CHF: 0,
+      EUR: 0,
+      USD: 0,
+    },
+    stripePriceIds: {
+      CHF: "",
+      EUR: "",
+      USD: "",
+    },
+    model_IA_ressource: "std",
+    credit_IA: 100,
+    credit_conversion: "10",
+    size_max: "5Mb",
+    remove_bg: true,
+    change_bg_color: false,
+    tools_qt: "0/6",
+    tool_name: [],
+    gomme_magique: false,
+    img_pexels: false,
+    use_sale: false,
+  },
   {
     active: true,
     name: "free",
@@ -42,9 +70,9 @@ const planOption: PlanOptionInput[] = [
     },
 
     model_IA_ressource: "std",
-    credit_IA: 3,
-    credit_conversion: "100",
-    size_max: "1Mb",
+    credit_IA: 5,
+    credit_conversion: "15",
+    size_max: "5Mb",
     remove_bg: true,
     change_bg_color: true,
     tools_qt: "2/6",
@@ -75,8 +103,8 @@ const planOption: PlanOptionInput[] = [
     },
     model_IA_ressource: "improved",
     credit_IA: 150,
-    credit_conversion: "unlimited",
-    size_max: "5Mb",
+    credit_conversion: "150",
+    size_max: "10Mb",
     remove_bg: true,
     change_bg_color: true,
     tools_qt: "6/6",

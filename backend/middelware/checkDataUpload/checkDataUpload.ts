@@ -1,6 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import type { UploadedFile } from "express-fileupload";
 import { logger } from "../../logger.js";
+import { planOption } from "../../data/planOption.js";
+import { getActivePlanCodeForUser, getUserByEmail } from "../../DB/queriesSQL/queriesSQL.js";
 
 // Types MIME autorisÃ©s
 const ALLOWED_MIMES = new Set([
@@ -11,10 +13,12 @@ const ALLOWED_MIMES = new Set([
 ]);
 
 // Taille max par dÃ©faut (5 MB)
-const DEFAULT_MAX_SIZE_BYTES = 5 * 1024 * 1024;
+const MB = 1024 * 1024;
+// Fallback safety net (used if planOption is missing/misconfigured)
+const DEFAULT_MAX_SIZE_BYTES = 5 * MB;
 
 export type ImageValidationOptions = {
-  maxSizeBytes?: number;
+  maxSizeBytes?: number | ((req: Request) => number | Promise<number>);
   allowedMimes?: Set<string>;
 };
 
@@ -88,6 +92,33 @@ function sniffMimeFromBuffer(
   return null;
 }
 
+function parseSizeMaxToBytes(sizeMax: unknown): number | null {
+  if (typeof sizeMax !== "string") return null;
+  const trimmed = sizeMax.trim().toLowerCase();
+  const match = trimmed.match(/^(\d+(?:\.\d+)?)\s*(mb|m)$/i);
+  if (!match) return null;
+  const value = Number(match[1]);
+  if (!Number.isFinite(value) || value <= 0) return null;
+  return Math.round(value * MB);
+}
+
+async function resolveMaxUploadBytesFromPlanOptions(req: Request): Promise<number> {
+  const email = (req as any)?.payload?.email as string | undefined;
+  const isAuthenticated = typeof email === "string" && email.trim().length > 0;
+
+  if (!isAuthenticated) {
+    const visitorCfg = planOption.find((p) => p.name === "visitor");
+    return parseSizeMaxToBytes(visitorCfg?.size_max) ?? DEFAULT_MAX_SIZE_BYTES;
+  }
+
+  const user = await getUserByEmail(email);
+  if (!user) return DEFAULT_MAX_SIZE_BYTES;
+
+  const planCode = (await getActivePlanCodeForUser(user.id)) || "free";
+  const cfg = planOption.find((p) => p.name === planCode);
+  return parseSizeMaxToBytes(cfg?.size_max) ?? DEFAULT_MAX_SIZE_BYTES;
+}
+
 // ---------- Middleware factory ----------
 
 /**
@@ -99,10 +130,10 @@ export function validateImageUpload(
   fieldName: string,
   options?: ImageValidationOptions
 ) {
-  const maxSize = options?.maxSizeBytes ?? DEFAULT_MAX_SIZE_BYTES;
+  const maxSizeOpt = options?.maxSizeBytes;
   const allowed = options?.allowedMimes ?? ALLOWED_MIMES;
 
-  return (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const requestMeta = {
       requestId: (req as any).requestId,
       method: req.method,
@@ -112,6 +143,40 @@ export function validateImageUpload(
     };
 
     // VÃ©rifie la prÃ©sence du fichier via express-fileupload
+    let maxSize = DEFAULT_MAX_SIZE_BYTES;
+    try {
+      if (typeof maxSizeOpt === "function") {
+        const resolved = await maxSizeOpt(req);
+        if (
+          typeof resolved === "number" &&
+          Number.isFinite(resolved) &&
+          resolved > 0
+        ) {
+          maxSize = resolved;
+        }
+      } else if (
+        typeof maxSizeOpt === "number" &&
+        Number.isFinite(maxSizeOpt) &&
+        maxSizeOpt > 0
+      ) {
+        maxSize = maxSizeOpt;
+      } else {
+        // Default behavior: dynamic max size based on planOption + visitor/auth context.
+        maxSize = await resolveMaxUploadBytesFromPlanOptions(req);
+      }
+    } catch (err: any) {
+      logger.error("validateImageUpload::max_size_resolver_failed", {
+        ...requestMeta,
+        status: 500,
+        message: err?.message ?? String(err),
+      });
+      return res.status(500).json({
+        error: true,
+        message: "Erreur interne lors de la validation du fichier.",
+        requestId: (req as any).requestId,
+      });
+    }
+
     const files = (req as any).files as
       | undefined
       | Record<string, UploadedFile | UploadedFile[]>;
