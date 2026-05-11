@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks"
 import { api } from "@/utils/axiosConfig";
 import { sessionSignal } from "@/stores/session";
 import type { AxiosError } from "axios";
+import { isAuthentified } from "@/utils/request/isAuthentified";
 
 type FilterOptions = {
   brightness: number;
@@ -124,6 +125,17 @@ const releaseObjectUrl = (url?: string | null) => {
     URL.revokeObjectURL(url);
   }
 };
+
+function readAuthToken(): string | null {
+  const raw = localStorage.getItem("session") || "";
+  if (!raw) return sessionSignal?.value?.token ?? null;
+  try {
+    const parsed = JSON.parse(raw);
+    return sessionSignal?.value?.token ?? parsed?.token ?? null;
+  } catch {
+    return sessionSignal?.value?.token ?? null;
+  }
+}
 
 const ImageConverter = ({
   converterTextContent,
@@ -467,6 +479,22 @@ const ImageConverter = ({
     if (!file) {
       setStatus({ state: "error", message: converterTextContent.statusNoFile });
       return;
+    }
+
+    // If a token exists, verify auth before starting the conversion request.
+    // This avoids starting a long request that will be rejected by the backend (expired token).
+    const token = readAuthToken();
+    if (token) {
+      try {
+        setStatus({ state: "loading", message: converterTextContent.statusLoading });
+        await isAuthentified();
+      } catch {
+        setStatus({
+          state: "error",
+          message: "Session expirée. Merci de te reconnecter puis réessayer.",
+        });
+        return;
+      }
     }
 
     // Visitor anti-abuse: backend enforces 1MB, but we short-circuit for UX.

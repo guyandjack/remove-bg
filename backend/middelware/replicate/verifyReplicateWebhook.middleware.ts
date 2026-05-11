@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
+import { logger } from "../../logger.js";
 
 type VerifyReplicateWebhookOptions = {
   /**
@@ -93,28 +94,59 @@ export function verifyReplicateWebhook(
       const webhookSignature = getHeader(req, "webhook-signature");
 
       if (!webhookId || !webhookTimestamp || !webhookSignature) {
+        logger.warn("verifyReplicateWebhook::missing_headers", {
+          requestId: (req as any).requestId,
+          hasId: Boolean(webhookId),
+          hasTimestamp: Boolean(webhookTimestamp),
+          hasSignature: Boolean(webhookSignature),
+        });
         return res.status(401).send("Unauthorized");
       }
 
       // Raw body is mandatory (Buffer)
       const rawBody = (req as any).body;
       if (!Buffer.isBuffer(rawBody) || rawBody.length === 0) {
+        logger.warn("verifyReplicateWebhook::missing_raw_body", {
+          requestId: (req as any).requestId,
+          webhookId,
+        });
         return res.status(401).send("Unauthorized");
       }
 
       const timestampSeconds = parseTimestampSeconds(webhookTimestamp);
       if (!timestampSeconds) {
+        logger.warn("verifyReplicateWebhook::invalid_timestamp", {
+          requestId: (req as any).requestId,
+          webhookId,
+          webhookTimestamp,
+        });
         return res.status(401).send("Unauthorized");
       }
 
       const nowSeconds = Math.floor(Date.now() / 1000);
       const ageSeconds = Math.abs(nowSeconds - timestampSeconds);
       if (ageSeconds > toleranceSeconds) {
+        logger.warn("verifyReplicateWebhook::timestamp_out_of_tolerance", {
+          requestId: (req as any).requestId,
+          webhookId,
+          ageSeconds,
+          toleranceSeconds,
+        });
         return res.status(401).send("Unauthorized");
       }
 
       const secret = process.env.REPLICATE_WEBHOOK_SECRET ?? "";
-      const key = extractBase64KeyFromSecret(secret);
+      let key: Buffer;
+      try {
+        key = extractBase64KeyFromSecret(secret);
+      } catch (err: any) {
+        logger.error("verifyReplicateWebhook::missing_or_invalid_secret", {
+          requestId: (req as any).requestId,
+          webhookId,
+          message: err?.message ?? String(err),
+        });
+        return res.status(401).send("Unauthorized");
+      }
 
       const signedContent = `${webhookId}.${timestampSeconds}.${rawBody.toString("utf8")}`;
       const expectedSignature = crypto
@@ -124,18 +156,28 @@ export function verifyReplicateWebhook(
 
       const candidates = parseSignatureHeader(webhookSignature);
       if (!candidates.length) {
+        logger.warn("verifyReplicateWebhook::unsupported_signature_format", {
+          requestId: (req as any).requestId,
+          webhookId,
+        });
         return res.status(401).send("Unauthorized");
       }
 
       const ok = candidates.some((sig) => safeEqualBase64(expectedSignature, sig));
       if (!ok) {
+        logger.warn("verifyReplicateWebhook::signature_mismatch", {
+          requestId: (req as any).requestId,
+          webhookId,
+        });
         return res.status(401).send("Unauthorized");
       }
 
       return next();
     } catch {
+      logger.warn("verifyReplicateWebhook::unhandled_error", {
+        requestId: (req as any).requestId,
+      });
       return res.status(401).send("Unauthorized");
     }
   };
 }
-

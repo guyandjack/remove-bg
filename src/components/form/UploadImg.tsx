@@ -9,9 +9,6 @@ import { InputFile } from "../input/InputFile";
 
 //import des data
 
-
-
-
 const ACCEPTED_MIME = new Set([
   "image/jpeg",
   "image/png",

@@ -95,6 +95,9 @@ const corsOptions: CorsOptions = {
     "Authorization",
     "Accept",
     "X-Requested-With",
+    // Async job creation uses an idempotency key header (preflight must allow it)
+    "Idempotency-Key",
+    "X-Idempotency-Key",
   ],
 };
 app.use(cors(corsOptions));

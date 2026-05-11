@@ -195,7 +195,7 @@ Le fichier `backend/.env` contient des **secrets** (clés API, tokens, mots de p
 - Annulation SaaS / consentement marketing / demande de suppression: `docs/backend-subscription-cancel.md`
 - Dashboard Billing & Account (UX + endpoints): `docs/dashboard-billing-account.md`
 - Stripe upgrade/downgrade (plan change): `docs/stripe-plan-change.md`
-- Replicate remove-bg (flow async en cours): table DB `remove_bg_jobs` + variables `REPLICATE_WEBHOOK_URL`, `REPLICATE_WEBHOOK_SECRET` (dev) et `BASE_URL_PROD` (preprod/prod)
+- Replicate remove-bg (flow async en cours): table DB `RemoveBgJobs` + variables `REPLICATE_WEBHOOK_URL`, `REPLICATE_WEBHOOK_SECRET` (dev) et `BASE_URL_PROD` (preprod/prod)
 
 À confirmer / à faire selon votre contexte :
 
@@ -211,3 +211,90 @@ Le fichier `backend/.env` contient des **secrets** (clés API, tokens, mots de p
   - Télécharger les modèles : `python scripts/fetch_models.py` (local) ou via Docker compose (voir plus haut).
 - Port déjà utilisé :
   - Python : `8000`, Backend : `3000`, Front : `5173`.
+
+
+
+# Exposer un serveur local avec Cloudflare Tunnel (Windows)
+
+## 1. Lancer le serveur local
+
+Depuis le dossier du projet :
+
+```powershell
+npm run dev
+```
+
+Vérifier le port utilisé par le serveur (exemple : `3000`).
+
+---
+
+## 2. Ouvrir un second terminal PowerShell
+
+Lancer Cloudflare Tunnel :
+
+```powershell
+& "$env:LOCALAPPDATA\Microsoft\WinGet\Links\cloudflared.exe" tunnel --url http://localhost:3000
+```
+
+Remplacer `3000` par le port réel si nécessaire.
+
+Conserver ce terminal ouvert.
+
+---
+
+## 3. Récupérer l’URL publique
+
+Cloudflare affiche une URL du type :
+
+```text
+https://xxxx.trycloudflare.com
+```
+
+Cette URL expose le serveur local sur Internet.
+
+---
+
+## 4. Tester le tunnel avec curl sous Windows
+
+Windows peut produire une erreur SSL avec `curl.exe`.
+Utiliser l’option `--ssl-no-revoke`.
+
+### Tester la racine :
+
+```powershell
+curl.exe --ssl-no-revoke -i https://xxxx.trycloudflare.com
+```
+
+### Tester une route API :
+
+```powershell
+curl.exe --ssl-no-revoke -i https://xxxx.trycloudflare.com/api/route
+```
+
+### Tester un endpoint POST :
+
+```powershell
+curl.exe --ssl-no-revoke -X POST -i https://xxxx.trycloudflare.com/api/route
+```
+
+---
+
+## Résumé rapide
+
+### Terminal 1
+
+```powershell
+npm run dev
+```
+
+### Terminal 2
+
+```powershell
+& "$env:LOCALAPPDATA\Microsoft\WinGet\Links\cloudflared.exe" tunnel --url http://localhost:3000
+```
+
+### Terminal 3
+
+```powershell
+curl.exe --ssl-no-revoke -i https://xxxx.trycloudflare.com/api/route
+```

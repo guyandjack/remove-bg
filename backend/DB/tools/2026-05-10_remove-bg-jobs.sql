@@ -7,6 +7,9 @@
 -- - output_url is stored as TEXT to support long signed URLs.
 -- - Webhook idempotency is handled separately via ProcessedWebhookEvent
 --   (provider='replicate', id=<webhook-id>), to be wired in step C.
+--
+-- If you already created the table with an older ENUM for `status`,
+-- run `backend/DB/tools/2026-05-10_remove-bg-jobs_status_enum_processing.sql`.
 
 CREATE TABLE IF NOT EXISTS `RemoveBgJobs` (
   id                      VARCHAR(36)  NOT NULL PRIMARY KEY,
@@ -25,12 +28,12 @@ CREATE TABLE IF NOT EXISTS `RemoveBgJobs` (
   updated_at              TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   completed_at            DATETIME     NULL,
 
-  UNIQUE KEY uniq_remove_bg_user_idempotency (user_id, idempotency_key),
-  UNIQUE KEY uniq_remove_bg_request (request_id),
-  UNIQUE KEY uniq_remove_bg_prediction (replicate_prediction_id),
-  INDEX idx_remove_bg_user (user_id),
-  INDEX idx_remove_bg_status (status),
-  INDEX idx_remove_bg_created_at (created_at),
+  UNIQUE KEY uniq_remove_bg_repl_user_idempotency (user_id, idempotency_key),
+  UNIQUE KEY uniq_remove_bg_repl_request (request_id),
+  UNIQUE KEY uniq_remove_bg_repl_prediction (replicate_prediction_id),
+  INDEX idx_remove_bg_repl_user (user_id),
+  INDEX idx_remove_bg_repl_status (status),
+  INDEX idx_remove_bg_repl_created_at (created_at),
 
   CONSTRAINT fk_remove_bg_job_user
     FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE SET NULL

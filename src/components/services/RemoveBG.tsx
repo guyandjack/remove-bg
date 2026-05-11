@@ -528,7 +528,10 @@ const RemoveBg = ({
         // Si l'appel a été annulé (changement de page, nouveau fichier, etc.), on ne remonte pas d'erreur UI.
         const canceled =
           abortController.signal.aborted ||
-          (axiosError as any)?.code === "ERR_CANCELED";
+          (axiosError as any)?.code === "ERR_CANCELED" ||
+          (err as any)?.name === "AbortError" ||
+          (typeof (err as any)?.message === "string" &&
+            String((err as any).message).includes("BodyStreamBuffer"));
         if (canceled) return;
 
         // Debug minimal “Network Error” (sans données sensibles)
@@ -679,8 +682,26 @@ const RemoveBg = ({
   };
 
   const confirmProcessing = () => {
-    if (!selectedFile || isProcessing) return;
-    setFileToProcess(selectedFile);
+    // Intentionally async-safe even though onClick doesn't await.
+    (async () => {
+      if (!selectedFile || isProcessing) return;
+
+      // If we have a token, verify auth before starting the processing request.
+      const token = readAuthToken();
+      if (token) {
+        try {
+          setIsProcessing(true);
+          await isAuthentified();
+        } catch (err) {
+          setIsProcessing(false);
+          setProcessingError("Session expirée. Merci de te reconnecter puis réessayer.");
+          return;
+        }
+      }
+
+      setIsProcessing(false);
+      setFileToProcess(selectedFile);
+    })().catch(() => {});
   };
 
   const retrieveJobResult = async () => {
@@ -777,12 +798,12 @@ const RemoveBg = ({
         </ul>
       ) : null}
       <div id="editor" className="mt-6 lg:grow pb-[200px]">
-        {jobRequestId && !responseApi && (
+        {jobRequestId && processingError && !responseApi && (
           <div className="mx-auto max-w-xl px-4">
-            <div className="alert alert-info">
-              <div className="flex flex-col gap-2">
-                <div>
-                  Statut: <b>{jobStatus || "processing"}</b>
+            <div className="alert alert-warning">
+              <div className="flex flex-col gap-3">
+                <div className="text-sm">
+                  {processingError}
                 </div>
                 <button
                   className="btn btn-outline"

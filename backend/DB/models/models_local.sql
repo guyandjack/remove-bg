@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS `ProcessedWebhookEvent` (
 -- Remove BG jobs (Replicate async flow source of truth)
 -- request_id: UUID client-side (idempotency key)
 -- replicate_prediction_id: filled once the prediction is created
-CREATE TABLE IF NOT EXISTS `remove_bg_jobs` (
+CREATE TABLE IF NOT EXISTS `RemoveBgJobs` (
   id                     VARCHAR(36)  NOT NULL PRIMARY KEY,
   user_id                VARCHAR(36)  NULL,
   request_id             VARCHAR(64)  NOT NULL,
@@ -212,12 +212,12 @@ CREATE TABLE IF NOT EXISTS `remove_bg_jobs` (
   updated_at             TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   completed_at           DATETIME     NULL,
 
-  UNIQUE KEY uniq_remove_bg_user_idempotency (user_id, idempotency_key),
-  UNIQUE KEY uniq_remove_bg_request (request_id),
-  UNIQUE KEY uniq_remove_bg_prediction (replicate_prediction_id),
-  INDEX idx_remove_bg_user (user_id),
-  INDEX idx_remove_bg_status (status),
-  INDEX idx_remove_bg_created_at (created_at),
+  UNIQUE KEY uniq_remove_bg_repl_user_idempotency (user_id, idempotency_key),
+  UNIQUE KEY uniq_remove_bg_repl_request (request_id),
+  UNIQUE KEY uniq_remove_bg_repl_prediction (replicate_prediction_id),
+  INDEX idx_remove_bg_repl_user (user_id),
+  INDEX idx_remove_bg_repl_status (status),
+  INDEX idx_remove_bg_repl_created_at (created_at),
 
   CONSTRAINT fk_remove_bg_job_user
     FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE SET NULL
