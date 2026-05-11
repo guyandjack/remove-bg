@@ -77,12 +77,12 @@ const corsOptions: CorsOptions = {
 
       //pre_prod
       "https://preprod.wizpix.ch",
-      "http://preprod.wizpix.ch",
-      "www.preprod.wizpix.ch",
-      
+      "https://api.preprod.wizpix.ch",
+            
       
       //production
       "https://wizpix.ch", 
+      "https://api.wizpix.ch", 
     ];
     if (!origin) callback(null, true); // requêtes locales (ex: Postman)
     else if (allowedOrigins.includes(origin)) callback(null, true);
