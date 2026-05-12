@@ -187,6 +187,61 @@ export type RemoveBgJobStatus =
   | "failed"
   | "canceled";
 
+function stringifyJsonForDb(value: unknown): string | null {
+  if (value == null) return null;
+
+  // MariaDB (prod) matérialise JSON via LONGTEXT + CHECK(json_valid(...)).
+  // Donc on doit binder une string JSON valide, jamais un objet JS non-stringifié.
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      // Empty string is not valid JSON under json_valid(''), so store JSON string instead.
+      return JSON.stringify(value);
+    }
+
+    // If already valid JSON text, keep it as-is to avoid double-encoding.
+    try {
+      JSON.parse(trimmed);
+      return trimmed;
+    } catch {
+      // Not JSON => store it as a JSON string.
+      return JSON.stringify(value);
+    }
+  }
+
+  if (typeof value === "number" || typeof value === "boolean") {
+    return JSON.stringify(value);
+  }
+
+  // Objects/arrays: safe stringify with circular-reference handling.
+  const seen = new WeakSet<object>();
+  const json = JSON.stringify(value, (_key, v) => {
+    if (v && typeof v === "object") {
+      const asObj = v as object;
+      if (seen.has(asObj)) return "[Circular]";
+      seen.add(asObj);
+    }
+    if (typeof v === "bigint") {
+      // JSON does not support BigInt: keep it representable.
+      return v.toString();
+    }
+    return v;
+  });
+
+  // Guard rail: avoid gigantic payloads that can hit max_allowed_packet.
+  // Keep it JSON-valid even when reduced.
+  const MAX_CHARS = 1_000_000;
+  if (json && json.length > MAX_CHARS) {
+    return JSON.stringify({
+      truncated: true,
+      originalLength: json.length,
+      preview: json.slice(0, 50_000),
+    });
+  }
+
+  return json ?? null;
+}
+
 export interface RemoveBgJob extends RowDataPacket {
   id: ID;
   user_id: ID | null;
@@ -374,6 +429,7 @@ export async function setRemoveBgJobRunning(params: {
     throw new Error("RemoveBgJobs.replicate_prediction_id is required");
   }
   const connexion = await getDb();
+  const replicatePayloadJson = stringifyJsonForDb(params.replicatePayload ?? null);
 
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE RemoveBgJobs
@@ -389,7 +445,7 @@ export async function setRemoveBgJobRunning(params: {
       replicatePredictionId,
       params.replicateStatus ?? null,
       params.inputImageUrl ?? null,
-      params.replicatePayload ?? null,
+      replicatePayloadJson,
       requestId,
       replicatePredictionId,
     ],
@@ -411,6 +467,7 @@ export async function markRemoveBgJobSucceeded(params: {
   }
   const now = params.completedAt ?? new Date();
   const connexion = await getDb();
+  const replicatePayloadJson = stringifyJsonForDb(params.replicatePayload ?? null);
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE RemoveBgJobs
      SET status = 'succeeded',
@@ -424,7 +481,7 @@ export async function markRemoveBgJobSucceeded(params: {
     [
       outputImageUrl,
       params.replicateStatus ?? null,
-      params.replicatePayload ?? null,
+      replicatePayloadJson,
       now,
       requestId,
     ],
@@ -445,6 +502,7 @@ export async function markRemoveBgJobFailed(params: {
 
   const now = params.completedAt ?? new Date();
   const connexion = await getDb();
+  const replicatePayloadJson = stringifyJsonForDb(params.replicatePayload ?? null);
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE RemoveBgJobs
      SET status = 'failed',
@@ -457,7 +515,7 @@ export async function markRemoveBgJobFailed(params: {
     [
       errorMessage,
       params.replicateStatus ?? null,
-      params.replicatePayload ?? null,
+      replicatePayloadJson,
       now,
       requestId,
     ],
@@ -479,6 +537,7 @@ export async function markRemoveBgJobCanceled(params: {
     : null;
 
   const connexion = await getDb();
+  const replicatePayloadJson = stringifyJsonForDb(params.replicatePayload ?? null);
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE RemoveBgJobs
      SET status = 'canceled',
@@ -491,7 +550,7 @@ export async function markRemoveBgJobCanceled(params: {
     [
       errorMessage,
       params.replicateStatus ?? null,
-      params.replicatePayload ?? null,
+      replicatePayloadJson,
       now,
       requestId,
     ],
@@ -530,6 +589,7 @@ export async function backfillRemoveBgJobOutputIfMissing(params: {
   const now = params.completedAt ?? new Date();
 
   const connexion = await getDb();
+  const replicatePayloadJson = stringifyJsonForDb(params.replicatePayload ?? null);
   const [res] = await connexion.execute<ResultSetHeader>(
     `UPDATE RemoveBgJobs
      SET output_image_url = COALESCE(NULLIF(output_image_url, ''), ?),
@@ -542,7 +602,7 @@ export async function backfillRemoveBgJobOutputIfMissing(params: {
     [
       outputImageUrl,
       params.replicateStatus ?? null,
-      params.replicatePayload ?? null,
+      replicatePayloadJson,
       now,
       requestId,
     ],

@@ -1,4 +1,27 @@
 services:
+  db:
+    image: mariadb:10.6.21
+    ports:
+      - "3306:3306"
+    environment:
+      # Credentials: alignés avec `backend/.env` (DB_USER_DEV=root, DB_NAME_DEV=wiz_pix).
+      # Le mot de passe est volontairement lisible ici car il existe déjà dans `backend/.env`.
+      MARIADB_ROOT_PASSWORD: "Poweradmin65!"
+      MARIADB_DATABASE: "wiz_pix"
+    command:
+      - --character-set-server=latin1
+      - --collation-server=latin1_swedish_ci
+      - --character-set-client-handshake=FALSE
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./backend/DB/models/models_local.sql:/docker-entrypoint-initdb.d/1-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-pPoweradmin65!"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
   ml:
     build:
       context: ./wizpix-ml-service
@@ -34,11 +57,16 @@ services:
       - /app/node_modules
     environment:
       NODE_ENV: "development"
+      # Force le backend (dans Docker) à utiliser MariaDB du compose,
+      # même si `backend/.env` contient DB_HOST_DEV=localhost.
+      DB_HOST_DEV: "db"
       # Le backend Express appelle le service Python via SERVICE_URL_DEV (cf. backend/.env, removeBg.controler.ts)
       SERVICE_URL_DEV: "http://ml:8000"
       # utile si ton Express a des CORS
       FRONT_ORIGIN: "http://localhost:5173"
     depends_on:
+      db:
+        condition: service_healthy
       ml:
         condition: service_healthy
     command: nodemon --config nodemon.json
@@ -57,3 +85,6 @@ services:
     depends_on:
       - backend
     command: npm run dev -- --host 0.0.0.0 --port 5173
+
+volumes:
+  mariadb_data:

@@ -56,6 +56,9 @@ export async function connectDb(): Promise<Pool> {
     user,
     password,
     database,
+    // Parité prod (MariaDB): la session utilise utf8mb4 côté client/connection/results
+    // même si le serveur est en latin1 par défaut.
+    charset: "utf8mb4",
     connectionLimit: 10,
   });
 

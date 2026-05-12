@@ -11,9 +11,13 @@
 -- -- Reset DEV (optionnel) :
 -- DROP DATABASE IF EXISTS `wiz_pix`;
 
+-- NOTE (prod parity):
+-- En production tu es sur MariaDB 10.6.x avec `character_set_server=latin1` et `collation_server=latin1_swedish_ci`.
+-- On garde les tables en utf8mb4 (comme en prod via DEFAULT CHARSET=utf8mb4), mais on aligne la base sur latin1
+-- pour reproduire les comportements "par défaut" (charset/collation) lorsque non spécifiés.
 CREATE DATABASE IF NOT EXISTS `wiz_pix`
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
+  CHARACTER SET latin1
+  COLLATE latin1_swedish_ci;
 
 USE `wiz_pix`;
 
@@ -205,7 +209,10 @@ CREATE TABLE IF NOT EXISTS `RemoveBgJobs` (
   replicate_status       VARCHAR(32)  NULL,
   input_image_url        TEXT         NULL,
   output_image_url       TEXT         NULL,
-  replicate_payload      JSON         NULL,
+  -- MariaDB 10.6: `JSON` est un alias de LONGTEXT avec un CHECK `json_valid(...)`.
+  -- Pour coller au `SHOW CREATE TABLE` prod et reproduire les différences MySQL vs MariaDB en local,
+  -- on déclare explicitement la forme matérialisée.
+  replicate_payload      LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`replicate_payload`)),
   error_message          TEXT         NULL,
   credits_debited_at     DATETIME     NULL,
   created_at             TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
