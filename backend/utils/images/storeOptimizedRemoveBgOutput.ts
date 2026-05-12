@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import axios from "axios";
+import crypto from "node:crypto";
 
 import { optimizeTransparentRaster } from "./optimizeTransparentRaster.js";
 
@@ -45,6 +46,25 @@ async function pickWritablePublicDir(): Promise<string> {
   return path.join(cwd, "public");
 }
 
+export async function resolveStoredRemoveBgOutputPath(params: {
+  requestId: string;
+  token: string;
+  extension?: string;
+}): Promise<{ dirPath: string; filePath: string; filename: string }> {
+  const requestId = String(params.requestId || "").trim();
+  const token = String(params.token || "").trim();
+  const ext = String(params.extension || "png").trim().toLowerCase() || "png";
+  if (!requestId) throw new Error("resolveStoredRemoveBgOutputPath: requestId is required");
+  if (!token) throw new Error("resolveStoredRemoveBgOutputPath: token is required");
+  const publicDir = await pickWritablePublicDir();
+  const dirPath = path.join(publicDir, "removebg");
+  const base = safeFilenameBase(requestId);
+  const safeToken = token.replace(/[^a-z0-9]+/gi, "");
+  const filename = `${base}.${safeToken}.${ext}`;
+  const filePath = path.join(dirPath, filename);
+  return { dirPath, filePath, filename };
+}
+
 export async function storeOptimizedRemoveBgOutput(params: {
   requestId: string;
   sourceUrl: string;
@@ -55,6 +75,7 @@ export async function storeOptimizedRemoveBgOutput(params: {
   bytesRaw: number;
   bytesOptimized: number;
   filePath: string;
+  token: string;
 }> {
   const requestId = String(params.requestId || "").trim();
   const sourceUrl = String(params.sourceUrl || "").trim();
@@ -82,21 +103,25 @@ export async function storeOptimizedRemoveBgOutput(params: {
     inputContentType: rawContentType,
   });
 
-  const publicDir = await pickWritablePublicDir();
-  const dirPath = path.join(publicDir, "removebg");
-  const base = safeFilenameBase(requestId);
-  const filename = `${base}.${optimized.extension}`;
-  const filePath = path.join(dirPath, filename);
+  const token = crypto.randomBytes(16).toString("hex");
+  const { filePath, filename } = await resolveStoredRemoveBgOutputPath({
+    requestId,
+    token,
+    extension: optimized.extension,
+  });
 
   await atomicWriteFile({ filePath, data: optimized.buffer });
 
-  // Exposed by app.ts: `app.use("/public", express.static(publicDir))`
-  const publicUrl = `${publicBaseUrl}/public/removebg/${encodeURIComponent(filename)}`;
+  // Serve through one-shot endpoint that deletes the file after delivery.
+  const publicUrl = `${publicBaseUrl}/api/services/remove-bg-replicate/jobs/${encodeURIComponent(
+    requestId,
+  )}/output?token=${encodeURIComponent(token)}`;
 
   return {
     publicUrl,
     bytesRaw: rawBuffer.length,
     bytesOptimized: optimized.buffer.length,
     filePath,
+    token,
   };
 }

@@ -17,6 +17,7 @@ import { removeBgByReplicate } from "../controleur/services/removeBgByReplicate.
 import { createRemoveBgReplicateJob } from "../controleur/services/removeBgReplicateJobs.controler.js";
 import { getRemoveBgReplicateJob } from "../controleur/services/getRemoveBgReplicateJob.controller.js";
 import { streamRemoveBgReplicateJobEvents } from "../controleur/services/removeBgReplicateJobEvents.controller.js";
+import { downloadRemoveBgReplicateJobOutput } from "../controleur/services/downloadRemoveBgReplicateJobOutput.controller.js";
 import { magicEraser } from "../controleur/services/magicEraser.controler.js";
 import { removeBgVisitorByReplicate } from "../controleur/services/removeBgVisitorByReplicate.controler.js";
 import { imageConverterVisitor } from "../controleur/services/imageConverterVisitor.controler.js";
@@ -95,6 +96,14 @@ router.get(
   "/remove-bg-replicate/jobs/:requestId/events",
   verifyAuth,
   streamRemoveBgReplicateJobEvents,
+);
+
+// One-shot download endpoint (deletes the optimized file after delivery).
+// No auth header is required because browsers don't send Authorization on <img src>.
+// Access is protected by an unguessable token embedded in the URL stored in DB.
+router.get(
+  "/remove-bg-replicate/jobs/:requestId/output",
+  downloadRemoveBgReplicateJobOutput,
 );
 
 
