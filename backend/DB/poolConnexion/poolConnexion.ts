@@ -1,4 +1,4 @@
-/// <reference types="node" />
+
 
 import "dotenv/config";
 import { createPool, type Pool } from "mysql2/promise";
