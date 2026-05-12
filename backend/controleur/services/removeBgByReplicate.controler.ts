@@ -4,6 +4,7 @@ import axios, { type AxiosError } from "axios";
 import type { RequestHandler } from "express";
 import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload.js";
 import { logger } from "../../logger.js";
+import { optimizeTransparentRaster } from "../../utils/images/optimizeTransparentRaster.js";
 import {
   getActiveUsageBillingPeriod,
   getUserByEmail,
@@ -242,17 +243,22 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
         signal: abortController.signal,
       });
 
-      const { buffer, contentType } = await outputToBinary(output);
+      const { buffer: rawBuffer, contentType: rawContentType } =
+        await outputToBinary(output);
+      const optimized = await optimizeTransparentRaster({
+        input: rawBuffer,
+        inputContentType: rawContentType,
+      });
       const filename = sanitizeFilename(image.originalName);
-      const extension = extensionFromContentType(contentType);
+      const extension = optimized.extension;
 
-      res.setHeader("Content-Type", contentType || "image/png");
+      res.setHeader("Content-Type", optimized.contentType);
       res.setHeader(
         "Content-Disposition",
         `inline; filename="${filename}-bg-removed.${extension}"`
       );
       // Indique explicitement la taille pour aider certains proxies/navigateurs.
-      res.setHeader("Content-Length", String(buffer.length));
+      res.setHeader("Content-Length", String(optimized.buffer.length));
       // Cette réponse est un artefact dérivé d'un upload utilisateur: pas de cache.
       res.setHeader("Cache-Control", "no-store");
 
@@ -263,7 +269,7 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
           logger.warn("removeBgByReplicate::client_disconnected", {
             requestId,
             durationMs: Date.now() - sendStartedAt,
-            bytesPlanned: buffer.length,
+            bytesPlanned: optimized.buffer.length,
           });
         }
       });
@@ -272,7 +278,8 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
         requestId,
         durationMs: Date.now() - startedAt,
         modelKey,
-        outputBytes: buffer.length,
+        outputBytes: optimized.buffer.length,
+        outputBytesRaw: rawBuffer.length,
         userId: user.id,
       });
 
@@ -316,7 +323,7 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
         });
       }
 
-      return res.status(200).send(buffer);
+      return res.status(200).send(optimized.buffer);
     } catch (error) {
       const err = error as any;
       const axiosError = error as AxiosError;

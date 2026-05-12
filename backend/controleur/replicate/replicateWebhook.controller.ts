@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import { logger } from "../../logger.js";
+import { getPublicBackendBaseUrl } from "../../utils/publicBackendUrl.js";
 import {
   tryMarkWebhookEventReceived,
   markWebhookEventProcessed,
@@ -14,6 +15,7 @@ import {
   markRemoveBgJobCreditsDebited,
 } from "../../DB/queriesSQL/queriesSQL.js";
 import { publishRemoveBgJobUpdatedPayload } from "../../services/removeBgJobs/removeBgJobEvents.js";
+import { storeOptimizedRemoveBgOutput } from "../../utils/images/storeOptimizedRemoveBgOutput.js";
 
 function parseJsonBody(req: any): any | null {
   const body = req?.body;
@@ -119,9 +121,45 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
     if (replicateStatus === "succeeded") {
       const outputUrl = extractOutputUrl(payload?.output);
       if (outputUrl) {
+        let finalOutputUrl = outputUrl;
+        try {
+          const publicBase = getPublicBackendBaseUrl();
+          if (publicBase) {
+            const stored = await storeOptimizedRemoveBgOutput({
+              requestId: job.request_id,
+              sourceUrl: outputUrl,
+              publicBaseUrl: publicBase,
+            });
+            finalOutputUrl = stored.publicUrl;
+            logger.info("replicateWebhook::output_optimized", {
+              requestId,
+              webhookId,
+              predictionId,
+              jobId: job.id,
+              bytesRaw: stored.bytesRaw,
+              bytesOptimized: stored.bytesOptimized,
+            });
+          } else {
+            logger.warn("replicateWebhook::output_optimize_skip_no_public_base", {
+              requestId,
+              webhookId,
+              predictionId,
+              jobId: job.id,
+            });
+          }
+        } catch (err: any) {
+          logger.warn("replicateWebhook::output_optimize_failed", {
+            requestId,
+            webhookId,
+            predictionId,
+            jobId: job.id,
+            message: err?.message ?? String(err),
+          });
+        }
+
         await markRemoveBgJobSucceeded({
           requestId: job.request_id,
-          outputImageUrl: outputUrl,
+          outputImageUrl: finalOutputUrl,
           replicateStatus,
           replicatePayload: payload,
           completedAt,

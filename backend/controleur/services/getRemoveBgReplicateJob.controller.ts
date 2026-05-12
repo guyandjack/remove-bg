@@ -2,6 +2,8 @@ import Replicate from "replicate";
 import type { RequestHandler } from "express";
 
 import { logger } from "../../logger.js";
+import { getPublicBackendBaseUrl } from "../../utils/publicBackendUrl.js";
+import { storeOptimizedRemoveBgOutput } from "../../utils/images/storeOptimizedRemoveBgOutput.js";
 import {
   backfillRemoveBgJobOutputIfMissing,
   getRemoveBgJobByRequestId,
@@ -21,6 +23,11 @@ function extractOutputUrl(output: unknown): string | null {
 export const getRemoveBgReplicateJob: RequestHandler = async (req, res) => {
   const httpRequestId = (req as any).requestId;
   const requestIdParam = String(req.params?.requestId ?? "").trim();
+  const host = req.get("host") || "";
+  const protoHeader = (req.headers["x-forwarded-proto"] as string | undefined)
+    ?.split(",")[0]
+    ?.trim();
+  const requestBaseUrl = host ? `${protoHeader || req.protocol}://${host}` : "";
 
   const { email } =
     ((req as any).payload as { email?: string } | undefined) || {};
@@ -79,9 +86,37 @@ export const getRemoveBgReplicateJob: RequestHandler = async (req, res) => {
         const outputUrl = extractOutputUrl((prediction as any)?.output);
 
         if (replicateStatus === "succeeded" && outputUrl) {
+          let finalOutputUrl = outputUrl;
+          try {
+            const publicBase = getPublicBackendBaseUrl() || requestBaseUrl;
+            if (publicBase) {
+              const stored = await storeOptimizedRemoveBgOutput({
+                requestId: job.request_id,
+                sourceUrl: outputUrl,
+                publicBaseUrl: publicBase,
+              });
+              finalOutputUrl = stored.publicUrl;
+              logger.info("getRemoveBgReplicateJob::output_optimized", {
+                requestId: httpRequestId,
+                jobId: job.id,
+                jobRequestId: job.request_id,
+                predictionId: job.replicate_prediction_id,
+                bytesRaw: stored.bytesRaw,
+                bytesOptimized: stored.bytesOptimized,
+              });
+            }
+          } catch (err: any) {
+            logger.warn("getRemoveBgReplicateJob::output_optimize_failed", {
+              requestId: httpRequestId,
+              jobId: job.id,
+              predictionId: job.replicate_prediction_id,
+              message: err?.message ?? String(err),
+            });
+          }
+
           const updated = await backfillRemoveBgJobOutputIfMissing({
             requestId: job.request_id,
-            outputImageUrl: outputUrl,
+            outputImageUrl: finalOutputUrl,
             replicateStatus,
             replicatePayload: prediction as any,
             completedAt: new Date(),
@@ -127,4 +162,3 @@ export const getRemoveBgReplicateJob: RequestHandler = async (req, res) => {
     completedAt: job.completed_at,
   });
 };
-
