@@ -3,7 +3,7 @@ import fs from "node:fs";
 import fsPromises from "node:fs/promises";
 
 import { logger } from "../../logger.js";
-import { getRemoveBgJobByRequestId } from "../../DB/queriesSQL/queriesSQL.js";
+import { getRemoveBgVisitorJobByRequestId } from "../../DB/queriesSQL/queriesSQL.js";
 import { resolveStoredRemoveBgOutputPath } from "../../utils/images/storeOptimizedRemoveBgOutput.js";
 
 function extractTokenFromUrl(url: string): string | null {
@@ -25,7 +25,10 @@ function isSucceeded(status: unknown): boolean {
   return String(status || "").toLowerCase() === "succeeded";
 }
 
-export const downloadRemoveBgReplicateJobOutput: RequestHandler = async (req, res) => {
+export const downloadRemoveBgVisitorReplicateJobOutput: RequestHandler = async (
+  req,
+  res,
+) => {
   const httpRequestId = (req as any).requestId;
   const requestIdParam = String(req.params?.requestId ?? "").trim();
   const token = String(req.query?.token ?? "").trim();
@@ -38,7 +41,7 @@ export const downloadRemoveBgReplicateJobOutput: RequestHandler = async (req, re
     });
   }
 
-  const job = await getRemoveBgJobByRequestId(requestIdParam);
+  const job = await getRemoveBgVisitorJobByRequestId(requestIdParam);
   if (!job) {
     return res.status(404).json({
       error: true,
@@ -55,8 +58,6 @@ export const downloadRemoveBgReplicateJobOutput: RequestHandler = async (req, re
     });
   }
 
-  // One-shot privacy guard:
-  // only allow download when the presented token matches what we previously issued.
   const expectedToken = extractTokenFromUrl(String(job.output_image_url));
   if (!expectedToken || expectedToken !== token) {
     return res.status(403).json({
@@ -97,7 +98,7 @@ export const downloadRemoveBgReplicateJobOutput: RequestHandler = async (req, re
           requestId: httpRequestId,
         });
       }
-      logger.warn("downloadRemoveBgJobOutput::read_failed", {
+      logger.warn("downloadRemoveBgVisitorJobOutput::read_failed", {
         requestId: httpRequestId,
         jobRequestId: job.request_id,
         filename,

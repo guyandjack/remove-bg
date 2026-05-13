@@ -10,11 +10,20 @@ import {
   markRemoveBgJobSucceeded,
   markRemoveBgJobFailed,
   markRemoveBgJobCanceled,
+  getRemoveBgVisitorJobByReplicatePredictionId,
+  getRemoveBgVisitorJobByRequestId,
+  setRemoveBgVisitorJobRunning,
+  markRemoveBgVisitorJobSucceeded,
+  markRemoveBgVisitorJobFailed,
+  markRemoveBgVisitorJobCanceled,
   getActiveUsageBillingPeriod,
   recordCreditUsage,
   markRemoveBgJobCreditsDebited,
 } from "../../DB/queriesSQL/queriesSQL.js";
-import { publishRemoveBgJobUpdatedPayload } from "../../services/removeBgJobs/removeBgJobEvents.js";
+import {
+  publishRemoveBgJobUpdatedPayload,
+  publishRemoveBgJobUpdatedPayloadToChannel,
+} from "../../services/removeBgJobs/removeBgJobEvents.js";
 import { storeOptimizedRemoveBgOutput } from "../../utils/images/storeOptimizedRemoveBgOutput.js";
 
 function parseJsonBody(req: any): any | null {
@@ -44,11 +53,27 @@ function extractOutputUrl(output: unknown): string | null {
   return null;
 }
 
+function toFiniteNumber(v: unknown): number | null {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function getQueryParam(req: any, name: string): string | null {
+  const raw = (req as any)?.query?.[name];
+  if (Array.isArray(raw)) return raw[0] ? String(raw[0]).trim() : null;
+  const value = String(raw ?? "").trim();
+  return value ? value : null;
+}
+
 export const replicateWebhook: RequestHandler = async (req, res) => {
   const requestId = (req as any).requestId;
   const webhookId = getHeader(req, "webhook-id");
   const eventId = webhookId ? `replicate:${webhookId}` : null;
   const receivedAt = new Date();
+  const requestIdHint =
+    getQueryParam(req, "requestId") ?? getQueryParam(req, "request_id");
+  const sourceHint = (getQueryParam(req, "source") || "").toLowerCase();
+  const startedAtMs = Date.now();
 
   // Respond quickly: acknowledge receipt once we've made the request idempotent.
   // If the idempotency table is unavailable, return 500 so Replicate retries.
@@ -98,13 +123,34 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
   }
 
   try {
-    const job = await getRemoveBgJobByReplicatePredictionId(predictionId);
-    if (!job) {
+    const lookupStartedAtMs = Date.now();
+    // A webhook can arrive before our API call has updated the DB with replicate_prediction_id.
+    // We therefore support a requestId hint via query params for stronger identification.
+    const userJob =
+      (await getRemoveBgJobByReplicatePredictionId(predictionId).catch(() => null)) ??
+      (requestIdHint
+        ? await getRemoveBgJobByRequestId(requestIdHint).catch(() => null)
+        : null);
+
+    const visitorJob =
+      userJob
+        ? null
+        : (await getRemoveBgVisitorJobByReplicatePredictionId(predictionId).catch(() => null)) ??
+          (requestIdHint
+            ? await getRemoveBgVisitorJobByRequestId(requestIdHint).catch(() => null)
+            : null);
+
+    const jobKind = userJob ? ("user" as const) : visitorJob ? ("visitor" as const) : null;
+    const job: any = userJob ?? visitorJob;
+
+    if (!jobKind || !job) {
       logger.warn("replicateWebhook::job_not_found", {
         requestId,
         webhookId,
         predictionId,
         replicateStatus,
+        requestIdHint,
+        sourceHint,
       });
       if (eventId) {
         try {
@@ -113,6 +159,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
       }
       return res.status(200).json({ ok: true });
     }
+    const lookupMs = Date.now() - lookupStartedAtMs;
 
     const completedAt = new Date();
     const previousStatus = job.status;
@@ -123,12 +170,19 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
       if (outputUrl) {
         let finalOutputUrl = outputUrl;
         try {
+          const downloadStartedAtMs = Date.now();
           const publicBase = getPublicBackendBaseUrl();
           if (publicBase) {
             const stored = await storeOptimizedRemoveBgOutput({
               requestId: job.request_id,
               sourceUrl: outputUrl,
               publicBaseUrl: publicBase,
+              outputEndpointPath:
+                jobKind === "visitor"
+                  ? `/api/services/public/remove-bg/jobs/${encodeURIComponent(
+                      job.request_id,
+                    )}/output`
+                  : undefined,
             });
             finalOutputUrl = stored.publicUrl;
             logger.info("replicateWebhook::output_optimized", {
@@ -138,6 +192,16 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
               jobId: job.id,
               bytesRaw: stored.bytesRaw,
               bytesOptimized: stored.bytesOptimized,
+              lookupMs,
+              downloadOptimizeMs: Date.now() - downloadStartedAtMs,
+              downloadMs: stored.timingsMs.download,
+              optimizeMs: stored.timingsMs.optimize,
+              writeMs: stored.timingsMs.write,
+              storeTotalMs: stored.timingsMs.total,
+              metrics: {
+                predict_time: toFiniteNumber(payload?.metrics?.predict_time),
+                total_time: toFiniteNumber(payload?.metrics?.total_time),
+              },
             });
           } else {
             logger.warn("replicateWebhook::output_optimize_skip_no_public_base", {
@@ -145,6 +209,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
               webhookId,
               predictionId,
               jobId: job.id,
+              lookupMs,
             });
           }
         } catch (err: any) {
@@ -154,19 +219,32 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
             predictionId,
             jobId: job.id,
             message: err?.message ?? String(err),
+            lookupMs,
           });
         }
 
-        await markRemoveBgJobSucceeded({
-          requestId: job.request_id,
-          outputImageUrl: finalOutputUrl,
-          replicateStatus,
-          replicatePayload: payload,
-          completedAt,
-        });
+        if (jobKind === "visitor") {
+          await markRemoveBgVisitorJobSucceeded({
+            requestId: job.request_id,
+            outputImageUrl: finalOutputUrl,
+            replicateStatus,
+            replicatePayload: payload,
+            completedAt,
+          });
+        } else {
+          await markRemoveBgJobSucceeded({
+            requestId: job.request_id,
+            outputImageUrl: finalOutputUrl,
+            replicateStatus,
+            replicatePayload: payload,
+            completedAt,
+          });
+        }
 
         // Debit credits strictly on succeeded, and only once.
-        if (!job.user_id) {
+        if (jobKind !== "user") {
+          // Visitors do not have credits.
+        } else if (!job.user_id) {
           logger.warn("replicateWebhook::credits_skip_missing_user", {
             requestId,
             webhookId,
@@ -234,9 +312,92 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
 
         // Notify SSE subscribers (payload is derived from DB, which remains source of truth).
         try {
-          const latest = await getRemoveBgJobByRequestId(job.request_id);
+          if (jobKind === "visitor") {
+            const latest = await getRemoveBgVisitorJobByRequestId(job.request_id);
+            if (latest) {
+              publishRemoveBgJobUpdatedPayloadToChannel(`visitor:${latest.request_id}`, {
+                requestId: latest.request_id,
+                status: latest.status,
+                outputImageUrl: latest.output_image_url,
+                errorMessage: latest.error_message,
+                createdAt: latest.created_at,
+                completedAt: latest.completed_at,
+              });
+            }
+          } else {
+            const latest = await getRemoveBgJobByRequestId(job.request_id);
+            if (latest) {
+              publishRemoveBgJobUpdatedPayload({
+                requestId: latest.request_id,
+                status: latest.status,
+                outputImageUrl: latest.output_image_url,
+                errorMessage: latest.error_message,
+                createdAt: latest.created_at,
+                completedAt: latest.completed_at,
+              });
+            }
+          }
+        } catch {}
+      } else {
+        if (jobKind === "visitor") {
+          await markRemoveBgVisitorJobFailed({
+            requestId: job.request_id,
+            errorMessage: "Format de sortie Replicate non supporte.",
+            replicateStatus,
+            replicatePayload: payload,
+            completedAt,
+          });
+          try {
+            const latest = await getRemoveBgVisitorJobByRequestId(job.request_id);
+            if (latest) {
+              publishRemoveBgJobUpdatedPayloadToChannel(`visitor:${latest.request_id}`, {
+                requestId: latest.request_id,
+                status: latest.status,
+                outputImageUrl: latest.output_image_url,
+                errorMessage: latest.error_message,
+                createdAt: latest.created_at,
+                completedAt: latest.completed_at,
+              });
+            }
+          } catch {}
+        } else {
+          await markRemoveBgJobFailed({
+            requestId: job.request_id,
+            errorMessage: "Format de sortie Replicate non supporte.",
+            replicateStatus,
+            replicatePayload: payload,
+            completedAt,
+          });
+          try {
+            const latest = await getRemoveBgJobByRequestId(job.request_id);
+            if (latest) {
+              publishRemoveBgJobUpdatedPayload({
+                requestId: latest.request_id,
+                status: latest.status,
+                outputImageUrl: latest.output_image_url,
+                errorMessage: latest.error_message,
+                createdAt: latest.created_at,
+                completedAt: latest.completed_at,
+              });
+            }
+          } catch {}
+        }
+      }
+    } else if (replicateStatus === "failed") {
+      if (jobKind === "visitor") {
+        await markRemoveBgVisitorJobFailed({
+          requestId: job.request_id,
+          errorMessage:
+            (typeof payload?.error === "string" && payload.error) ||
+            "Le service de traitement a echoue.",
+          replicateStatus,
+          replicatePayload: payload,
+          completedAt,
+        });
+        try {
+          const latest = await getRemoveBgVisitorJobByRequestId(job.request_id);
           if (latest) {
-            publishRemoveBgJobUpdatedPayload({
+            publishRemoveBgJobUpdatedPayloadToChannel(`visitor:${latest.request_id}`, {
               requestId: latest.request_id,
               status: latest.status,
               outputImageUrl: latest.output_image_url,
@@ -249,7 +410,9 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
       } else {
         await markRemoveBgJobFailed({
           requestId: job.request_id,
-          errorMessage: "Format de sortie Replicate non supporte.",
+          errorMessage:
+            (typeof payload?.error === "string" && payload.error) ||
+            "Le service de traitement a echoue.",
           replicateStatus,
           replicatePayload: payload,
           completedAt,
@@ -268,71 +431,93 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
           }
         } catch {}
       }
-    } else if (replicateStatus === "failed") {
-      await markRemoveBgJobFailed({
-        requestId: job.request_id,
-        errorMessage:
-          (typeof payload?.error === "string" && payload.error) ||
-          "Le service de traitement a echoue.",
-        replicateStatus,
-        replicatePayload: payload,
-        completedAt,
-      });
-      try {
-        const latest = await getRemoveBgJobByRequestId(job.request_id);
-        if (latest) {
-          publishRemoveBgJobUpdatedPayload({
-            requestId: latest.request_id,
-            status: latest.status,
-            outputImageUrl: latest.output_image_url,
-            errorMessage: latest.error_message,
-            createdAt: latest.created_at,
-            completedAt: latest.completed_at,
-          });
-        }
-      } catch {}
     } else if (replicateStatus === "canceled") {
-      await markRemoveBgJobCanceled({
-        requestId: job.request_id,
-        errorMessage: "Traitement annule.",
-        replicateStatus,
-        replicatePayload: payload,
-        completedAt,
-      });
-      try {
-        const latest = await getRemoveBgJobByRequestId(job.request_id);
-        if (latest) {
-          publishRemoveBgJobUpdatedPayload({
-            requestId: latest.request_id,
-            status: latest.status,
-            outputImageUrl: latest.output_image_url,
-            errorMessage: latest.error_message,
-            createdAt: latest.created_at,
-            completedAt: latest.completed_at,
-          });
-        }
-      } catch {}
+      if (jobKind === "visitor") {
+        await markRemoveBgVisitorJobCanceled({
+          requestId: job.request_id,
+          errorMessage: "Traitement annule.",
+          replicateStatus,
+          replicatePayload: payload,
+          completedAt,
+        });
+        try {
+          const latest = await getRemoveBgVisitorJobByRequestId(job.request_id);
+          if (latest) {
+            publishRemoveBgJobUpdatedPayloadToChannel(`visitor:${latest.request_id}`, {
+              requestId: latest.request_id,
+              status: latest.status,
+              outputImageUrl: latest.output_image_url,
+              errorMessage: latest.error_message,
+              createdAt: latest.created_at,
+              completedAt: latest.completed_at,
+            });
+          }
+        } catch {}
+      } else {
+        await markRemoveBgJobCanceled({
+          requestId: job.request_id,
+          errorMessage: "Traitement annule.",
+          replicateStatus,
+          replicatePayload: payload,
+          completedAt,
+        });
+        try {
+          const latest = await getRemoveBgJobByRequestId(job.request_id);
+          if (latest) {
+            publishRemoveBgJobUpdatedPayload({
+              requestId: latest.request_id,
+              status: latest.status,
+              outputImageUrl: latest.output_image_url,
+              errorMessage: latest.error_message,
+              createdAt: latest.created_at,
+              completedAt: latest.completed_at,
+            });
+          }
+        } catch {}
+      }
     } else if (replicateStatus) {
       // For "starting"/"processing"/etc: keep DB up to date but do not set completed_at.
-      await setRemoveBgJobRunning({
-        requestId: job.request_id,
-        replicatePredictionId: predictionId,
-        replicateStatus,
-        replicatePayload: payload,
-      });
-      try {
-        const latest = await getRemoveBgJobByRequestId(job.request_id);
-        if (latest) {
-          publishRemoveBgJobUpdatedPayload({
-            requestId: latest.request_id,
-            status: latest.status,
-            outputImageUrl: latest.output_image_url,
-            errorMessage: latest.error_message,
-            createdAt: latest.created_at,
-            completedAt: latest.completed_at,
-          });
-        }
-      } catch {}
+      if (jobKind === "visitor") {
+        await setRemoveBgVisitorJobRunning({
+          requestId: job.request_id,
+          replicatePredictionId: predictionId,
+          replicateStatus,
+          replicatePayload: payload,
+        });
+        try {
+          const latest = await getRemoveBgVisitorJobByRequestId(job.request_id);
+          if (latest) {
+            publishRemoveBgJobUpdatedPayloadToChannel(`visitor:${latest.request_id}`, {
+              requestId: latest.request_id,
+              status: latest.status,
+              outputImageUrl: latest.output_image_url,
+              errorMessage: latest.error_message,
+              createdAt: latest.created_at,
+              completedAt: latest.completed_at,
+            });
+          }
+        } catch {}
+      } else {
+        await setRemoveBgJobRunning({
+          requestId: job.request_id,
+          replicatePredictionId: predictionId,
+          replicateStatus,
+          replicatePayload: payload,
+        });
+        try {
+          const latest = await getRemoveBgJobByRequestId(job.request_id);
+          if (latest) {
+            publishRemoveBgJobUpdatedPayload({
+              requestId: latest.request_id,
+              status: latest.status,
+              outputImageUrl: latest.output_image_url,
+              errorMessage: latest.error_message,
+              createdAt: latest.created_at,
+              completedAt: latest.completed_at,
+            });
+          }
+        } catch {}
+      }
     }
 
     logger.info("replicateWebhook::job_transition", {
@@ -340,6 +525,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
       webhookId,
       predictionId,
       jobId: job.id,
+      kind: jobKind,
       from: { status: previousStatus, replicate_status: previousReplicateStatus },
       to: {
         status:
@@ -352,6 +538,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
                 : "processing",
         replicate_status: replicateStatus,
       },
+      totalMs: Date.now() - startedAtMs,
     });
   } catch (err: any) {
     logger.error("replicateWebhook::update_failed", {
@@ -360,6 +547,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
       predictionId,
       replicateStatus,
       message: err?.message ?? String(err),
+      totalMs: Date.now() - startedAtMs,
     });
     // Let Replicate retry (we're idempotent by webhook-id).
     return res.status(500).json({ ok: false });

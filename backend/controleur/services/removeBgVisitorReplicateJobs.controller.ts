@@ -4,14 +4,17 @@ import Replicate from "replicate";
 import type { RequestHandler } from "express";
 import type { ValidatedImage } from "../../middelware/checkDataUpload/checkDataUpload.js";
 import { logger } from "../../logger.js";
+import { getHashedVisitorIp } from "../../utils/visitorIpHash.js";
 import { getPublicBackendBaseUrl } from "../../utils/publicBackendUrl.js";
+import { tryConsumeRemoveBgTrial } from "../../DB/queriesSQL/visitorQuota.queries.js";
 import {
-  createRemoveBgJobIdempotent,
-  getRemoveBgJobByUserIdAndIdempotencyKey,
-  setRemoveBgJobRunning,
-  getUserByEmail,
+  createRemoveBgVisitorJobIdempotent,
+  getRemoveBgVisitorJobByVisitorHashAndIdempotencyKey,
+  setRemoveBgVisitorJobRunning,
 } from "../../DB/queriesSQL/queriesSQL.js";
-import { publishRemoveBgJobUpdatedPayload } from "../../services/removeBgJobs/removeBgJobEvents.js";
+import {
+  publishRemoveBgJobUpdatedPayloadToChannel,
+} from "../../services/removeBgJobs/removeBgJobEvents.js";
 
 const modelType = {
   portrait:
@@ -67,7 +70,17 @@ function getRequestIdFromClient(req: any): string | null {
   return value ? value : null;
 }
 
-export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
+function setVisitorQuotaHeaders(res: any, snapshot: { used: number; limit: number }) {
+  res.setHeader(
+    "Access-Control-Expose-Headers",
+    "X-Wizpix-Visitor-Quota-Service,X-Wizpix-Visitor-Quota-Used,X-Wizpix-Visitor-Quota-Limit",
+  );
+  res.setHeader("X-Wizpix-Visitor-Quota-Service", "remove_bg");
+  res.setHeader("X-Wizpix-Visitor-Quota-Used", String(snapshot.used));
+  res.setHeader("X-Wizpix-Visitor-Quota-Limit", String(snapshot.limit));
+}
+
+export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res) => {
   const httpRequestId = (req as any).requestId;
   const requestMeta = {
     requestId: httpRequestId,
@@ -76,26 +89,29 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
   };
 
   try {
-    const { email } =
-      ((req as any).payload as { email?: string } | undefined) || {};
-    if (!email) {
-      logger.warn("removeBgReplicateJob::unauthorized_missing_payload", requestMeta);
-      return res.status(401).json({
+    const replicateToken =
+      process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_KEY_WIZPIX;
+    if (!replicateToken) {
+      logger.error(
+        "removeBgVisitorReplicateJob::missing_replicate_token",
+        requestMeta,
+      );
+      return res.status(500).json({
         error: true,
-        message: "Unauthorized: missing user payload",
+        code: "CONFIG_MISSING",
+        message:
+          "Configuration manquante: REPLICATE_API_TOKEN (ou REPLICATE_API_KEY_WIZPIX).",
         requestId: httpRequestId,
       });
     }
 
-    const user = await getUserByEmail(email);
-    if (!user) {
-      logger.warn("removeBgReplicateJob::user_not_found", {
-        ...requestMeta,
-        email,
-      });
-      return res.status(401).json({
+    const image = (req as any).imageValidated as ValidatedImage | undefined;
+    if (!image) {
+      logger.warn("removeBgVisitorReplicateJob::missing_validated_image", requestMeta);
+      return res.status(400).json({
         error: true,
-        message: "Unauthorized: user not found",
+        code: "INVALID_IMAGE",
+        message: "Aucune image valide n'a ete detectee.",
         requestId: httpRequestId,
       });
     }
@@ -104,27 +120,20 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
     if (!idempotencyKey) {
       return res.status(400).json({
         error: true,
+        code: "MISSING_IDEMPOTENCY_KEY",
         message: "Missing idempotencyKey",
         requestId: httpRequestId,
       });
     }
 
-    const image = (req as any).imageValidated as ValidatedImage | undefined;
-    if (!image) {
-      return res.status(400).json({
-        error: true,
-        message: "Aucune image valide n'a ete detectee.",
-        requestId: httpRequestId,
-      });
-    }
+    const { hashedIp, hashSuffix } = getHashedVisitorIp(req);
 
-    // Try to reuse an existing job (idempotency contract).
-    const existing = await getRemoveBgJobByUserIdAndIdempotencyKey({
-      userId: user.id,
+    const existing = await getRemoveBgVisitorJobByVisitorHashAndIdempotencyKey({
+      visitorHashedIp: hashedIp,
       idempotencyKey,
     });
     if (existing) {
-      publishRemoveBgJobUpdatedPayload({
+      publishRemoveBgJobUpdatedPayloadToChannel(`visitor:${existing.request_id}`, {
         requestId: existing.request_id,
         status: existing.status,
         outputImageUrl: existing.output_image_url,
@@ -135,43 +144,52 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
       return res.status(200).json({
         requestId: existing.request_id,
         jobId: existing.id,
+        accessToken: existing.access_token,
         predictionId: existing.replicate_prediction_id,
         status: existing.status,
       });
     }
 
-    // Create a new job row.
-    const requestId = getRequestIdFromClient(req) ?? crypto.randomUUID();
-    const job = await createRemoveBgJobIdempotent({
-      requestId,
-      idempotencyKey,
-      userId: user.id,
-    });
-
-    const replicateToken =
-      process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_KEY_WIZPIX;
-    if (!replicateToken) {
-      logger.error("removeBgReplicateJob::missing_replicate_token", requestMeta);
-      return res.status(500).json({
+    // Visitor quota is consumed at job creation time (cost is incurred even if the user disconnects).
+    const snapshot = await tryConsumeRemoveBgTrial(hashedIp);
+    setVisitorQuotaHeaders(res, snapshot);
+    if (!snapshot.allowed) {
+      logger.info("removeBgVisitorReplicateJob::quota_blocked", {
+        ...requestMeta,
+        visitorHashSuffix: hashSuffix,
+        used: snapshot.used,
+        limit: snapshot.limit,
+      });
+      return res.status(429).json({
         error: true,
+        code: "VISITOR_QUOTA_EXCEEDED",
         message:
-          "Configuration manquante: REPLICATE_API_TOKEN (ou REPLICATE_API_KEY_WIZPIX).",
+          `Quota visiteur depasse: ${snapshot.limit} suppression d'arriere-plan maximum par mois.`,
         requestId: httpRequestId,
+        quota: { service: "remove_bg", used: snapshot.used, limit: snapshot.limit },
       });
     }
 
+    const requestId = getRequestIdFromClient(req) ?? crypto.randomUUID();
+    const job = await createRemoveBgVisitorJobIdempotent({
+      requestId,
+      idempotencyKey,
+      visitorHashedIp: hashedIp,
+    });
+
     const publicBase = getPublicBackendBaseUrl();
     if (!publicBase) {
-      logger.error("removeBgReplicateJob::missing_public_backend_url", requestMeta);
+      logger.error("removeBgVisitorReplicateJob::missing_public_backend_url", requestMeta);
       return res.status(500).json({
         error: true,
+        code: "CONFIG_MISSING",
         message:
           "Configuration manquante: REPLICATE_WEBHOOK_URL (dev) ou BASE_URL_PROD (prod).",
         requestId: httpRequestId,
       });
     }
 
-    const webhookUrl = `${publicBase}/api/replicate/webhook?source=remove_bg_user&requestId=${encodeURIComponent(
+    const webhookUrl = `${publicBase}/api/replicate/webhook?source=remove_bg_visitor&requestId=${encodeURIComponent(
       job.request_id,
     )}`;
 
@@ -184,33 +202,32 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
     const modelIdentifier = modelType[modelKey];
     const version = extractVersionFromIdentifier(modelIdentifier);
 
-    // Async: create the prediction and return immediately (do not wait).
     const prediction = await replicate.predictions.create({
       version,
-      input: {
-        image: image.buffer,
-      },
+      input: { image: image.buffer },
       webhook: webhookUrl,
       webhook_events_filter: ["start", "completed"],
     } as any);
 
     const predictionId = String((prediction as any)?.id ?? "").trim() || null;
     if (!predictionId) {
-      logger.error("removeBgReplicateJob::prediction_create_missing_id", requestMeta);
+      logger.error("removeBgVisitorReplicateJob::prediction_create_missing_id", requestMeta);
       return res.status(502).json({
         error: true,
+        code: "UPSTREAM_ERROR",
         message: "Replicate a renvoye une reponse invalide (prediction id manquant).",
         requestId: httpRequestId,
       });
     }
 
-    await setRemoveBgJobRunning({
+    await setRemoveBgVisitorJobRunning({
       requestId: job.request_id,
       replicatePredictionId: predictionId,
       replicateStatus: String((prediction as any)?.status ?? "") || "starting",
       replicatePayload: prediction as any,
     });
-    publishRemoveBgJobUpdatedPayload({
+
+    publishRemoveBgJobUpdatedPayloadToChannel(`visitor:${job.request_id}`, {
       requestId: job.request_id,
       status: "processing",
       outputImageUrl: null,
@@ -222,17 +239,19 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
     return res.status(201).json({
       requestId: job.request_id,
       jobId: job.id,
+      accessToken: job.access_token,
       predictionId,
       status: "processing",
     });
   } catch (err: any) {
-    logger.error("removeBgReplicateJob::unhandled_error", {
+    logger.error("removeBgVisitorReplicateJob::unhandled_error", {
       requestId: (req as any).requestId,
       message: err?.message ?? String(err),
       stack: err?.stack,
     });
     return res.status(500).json({
       error: true,
+      code: "INTERNAL_ERROR",
       message: "Erreur interne du serveur.",
       requestId: (req as any).requestId,
     });

@@ -13,38 +13,44 @@ type RemoveBgJobEvent =
 
 type Listener = (event: RemoveBgJobEvent) => void;
 
-// In-memory bus, keyed by requestId to avoid broadcasting to all clients.
-const listenersByRequestId = new Map<string, Set<Listener>>();
+// In-memory bus, keyed by channel to avoid broadcasting to all clients.
+// Channel is usually `requestId`, but can be namespaced (e.g. `visitor:<requestId>`).
+const listenersByChannel = new Map<string, Set<Listener>>();
 
-function normalizeRequestId(input: string): string {
+function normalizeChannel(input: string): string {
   return String(input || "").trim();
 }
 
 export function subscribeRemoveBgJobEvents(
-  requestId: string,
+  requestIdOrChannel: string,
   listener: Listener,
 ): () => void {
-  const key = normalizeRequestId(requestId);
-  if (!key) {
-    return () => {};
-  }
+  return subscribeRemoveBgJobEventsChannel(requestIdOrChannel, listener);
+}
 
-  const set = listenersByRequestId.get(key) ?? new Set<Listener>();
+export function subscribeRemoveBgJobEventsChannel(
+  channel: string,
+  listener: Listener,
+): () => void {
+  const key = normalizeChannel(channel);
+  if (!key) return () => {};
+
+  const set = listenersByChannel.get(key) ?? new Set<Listener>();
   set.add(listener);
-  listenersByRequestId.set(key, set);
+  listenersByChannel.set(key, set);
 
   return () => {
-    const current = listenersByRequestId.get(key);
+    const current = listenersByChannel.get(key);
     if (!current) return;
     current.delete(listener);
-    if (current.size === 0) listenersByRequestId.delete(key);
+    if (current.size === 0) listenersByChannel.delete(key);
   };
 }
 
 export function publishRemoveBgJobUpdated(requestId: string) {
-  const key = normalizeRequestId(requestId);
+  const key = normalizeChannel(requestId);
   if (!key) return;
-  const set = listenersByRequestId.get(key);
+  const set = listenersByChannel.get(key);
   if (!set || set.size === 0) return;
   const event: RemoveBgJobEvent = {
     type: "job.updated",
@@ -61,9 +67,9 @@ export function publishRemoveBgJobUpdated(requestId: string) {
 }
 
 export function publishRemoveBgJobCreated(payload: RemoveBgJobSsePayload) {
-  const key = normalizeRequestId(payload.requestId);
+  const key = normalizeChannel(payload.requestId);
   if (!key) return;
-  const set = listenersByRequestId.get(key);
+  const set = listenersByChannel.get(key);
   if (!set || set.size === 0) return;
   const event: RemoveBgJobEvent = {
     type: "job.created",
@@ -78,13 +84,20 @@ export function publishRemoveBgJobCreated(payload: RemoveBgJobSsePayload) {
 }
 
 export function publishRemoveBgJobUpdatedPayload(payload: RemoveBgJobSsePayload) {
-  const key = normalizeRequestId(payload.requestId);
+  return publishRemoveBgJobUpdatedPayloadToChannel(payload.requestId, payload);
+}
+
+export function publishRemoveBgJobUpdatedPayloadToChannel(
+  channel: string,
+  payload: RemoveBgJobSsePayload,
+) {
+  const key = normalizeChannel(channel);
   if (!key) return;
-  const set = listenersByRequestId.get(key);
+  const set = listenersByChannel.get(key);
   if (!set || set.size === 0) return;
   const event: RemoveBgJobEvent = {
     type: "job.updated",
-    payload: { ...payload, requestId: key },
+    payload: { ...payload },
     at: new Date().toISOString(),
   };
   set.forEach((listener) => {

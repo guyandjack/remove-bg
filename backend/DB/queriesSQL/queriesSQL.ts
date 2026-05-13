@@ -260,6 +260,23 @@ export interface RemoveBgJob extends RowDataPacket {
   completed_at: Date | null;
 }
 
+export interface RemoveBgVisitorJob extends RowDataPacket {
+  id: ID;
+  visitor_hashed_ip: string;
+  request_id: string;
+  idempotency_key: string;
+  access_token: string;
+  replicate_prediction_id: string | null;
+  status: RemoveBgJobStatus;
+  replicate_status: string | null;
+  output_image_url: string | null;
+  replicate_payload: any | null;
+  error_message: string | null;
+  created_at: Date;
+  updated_at: Date;
+  completed_at: Date | null;
+}
+
 export async function tryMarkWebhookEventReceived(params: {
   id: string;
   provider?: string;
@@ -321,6 +338,29 @@ function normalizeRemoveBgRequestId(input: unknown): string {
 
 function normalizeRemoveBgIdempotencyKey(input: unknown): string {
   return normalizeRemoveBgShortKey(input, "RemoveBgJobs.idempotency_key");
+}
+
+function normalizeRemoveBgVisitorRequestId(input: unknown): string {
+  return normalizeRemoveBgShortKey(input, "RemoveBgVisitorJobs.request_id");
+}
+
+function normalizeRemoveBgVisitorIdempotencyKey(input: unknown): string {
+  return normalizeRemoveBgShortKey(input, "RemoveBgVisitorJobs.idempotency_key");
+}
+
+function normalizeRemoveBgVisitorAccessToken(input: unknown): string {
+  return normalizeRemoveBgShortKey(input, "RemoveBgVisitorJobs.access_token");
+}
+
+function normalizeVisitorHashedIp(input: unknown): string {
+  const value = String(input ?? "").trim();
+  if (!value) {
+    throw new Error("RemoveBgVisitorJobs.visitor_hashed_ip is required");
+  }
+  if (!/^[a-f0-9]{64}$/i.test(value)) {
+    throw new Error("RemoveBgVisitorJobs.visitor_hashed_ip is invalid");
+  }
+  return value.toLowerCase();
 }
 
 export async function createRemoveBgJobIdempotent(params: {
@@ -601,6 +641,244 @@ export async function backfillRemoveBgJobOutputIfMissing(params: {
        AND (output_image_url IS NULL OR output_image_url = '')`,
     [
       outputImageUrl,
+      params.replicateStatus ?? null,
+      replicatePayloadJson,
+      now,
+      requestId,
+    ],
+  );
+  return (res.affectedRows ?? 0) > 0;
+}
+
+// ------------------------------------------------------
+// Remove BG visitor jobs (Replicate async flow, no auth)
+// ------------------------------------------------------
+export async function createRemoveBgVisitorJobIdempotent(params: {
+  requestId: string;
+  idempotencyKey: string;
+  visitorHashedIp: string;
+  accessToken?: string;
+}): Promise<RemoveBgVisitorJob> {
+  const requestId = normalizeRemoveBgVisitorRequestId(params.requestId);
+  const idempotencyKey = normalizeRemoveBgVisitorIdempotencyKey(params.idempotencyKey);
+  const visitorHashedIp = normalizeVisitorHashedIp(params.visitorHashedIp);
+  const accessToken = normalizeRemoveBgVisitorAccessToken(
+    params.accessToken ?? crypto.randomBytes(16).toString("hex"),
+  );
+
+  const connexion = await getDb();
+  const id = crypto.randomUUID();
+
+  try {
+    await connexion.execute<ResultSetHeader>(
+      `INSERT INTO RemoveBgVisitorJobs (id, visitor_hashed_ip, request_id, idempotency_key, access_token, status)
+       VALUES (?, ?, ?, ?, ?, 'pending')`,
+      [id, visitorHashedIp, requestId, idempotencyKey, accessToken],
+    );
+    const created = await getRemoveBgVisitorJobById(id);
+    if (!created) {
+      throw new Error("RemoveBgVisitorJobs insert succeeded but row not found");
+    }
+    return created;
+  } catch (err: any) {
+    if (err && err.code === "ER_DUP_ENTRY") {
+      const byRequest = await getRemoveBgVisitorJobByRequestId(requestId);
+      if (byRequest) return byRequest;
+
+      const byVisitorKey = await getRemoveBgVisitorJobByVisitorHashAndIdempotencyKey({
+        visitorHashedIp,
+        idempotencyKey,
+      });
+      if (byVisitorKey) return byVisitorKey;
+
+      throw new Error(
+        "Duplicate RemoveBgVisitorJobs insert but existing row could not be loaded",
+      );
+    }
+    throw err;
+  }
+}
+
+export async function getRemoveBgVisitorJobById(
+  id: ID,
+): Promise<RemoveBgVisitorJob | null> {
+  const connexion = await getDb();
+  const [rows] = await connexion.execute<RemoveBgVisitorJob[]>(
+    `SELECT * FROM RemoveBgVisitorJobs WHERE id = ? LIMIT 1`,
+    [id],
+  );
+  return rows[0] ?? null;
+}
+
+export async function getRemoveBgVisitorJobByRequestId(
+  requestId: string,
+): Promise<RemoveBgVisitorJob | null> {
+  const normalized = normalizeRemoveBgVisitorRequestId(requestId);
+  const connexion = await getDb();
+  const [rows] = await connexion.execute<RemoveBgVisitorJob[]>(
+    `SELECT * FROM RemoveBgVisitorJobs WHERE request_id = ? LIMIT 1`,
+    [normalized],
+  );
+  return rows[0] ?? null;
+}
+
+export async function getRemoveBgVisitorJobByVisitorHashAndIdempotencyKey(params: {
+  visitorHashedIp: string;
+  idempotencyKey: string;
+}): Promise<RemoveBgVisitorJob | null> {
+  const visitorHashedIp = normalizeVisitorHashedIp(params.visitorHashedIp);
+  const idempotencyKey = normalizeRemoveBgVisitorIdempotencyKey(params.idempotencyKey);
+  const connexion = await getDb();
+  const [rows] = await connexion.execute<RemoveBgVisitorJob[]>(
+    `SELECT * FROM RemoveBgVisitorJobs WHERE visitor_hashed_ip = ? AND idempotency_key = ? LIMIT 1`,
+    [visitorHashedIp, idempotencyKey],
+  );
+  return rows[0] ?? null;
+}
+
+export async function getRemoveBgVisitorJobByReplicatePredictionId(
+  replicatePredictionId: string,
+): Promise<RemoveBgVisitorJob | null> {
+  const normalized = String(replicatePredictionId ?? "").trim();
+  if (!normalized) {
+    throw new Error("RemoveBgVisitorJobs.replicate_prediction_id is required");
+  }
+  const connexion = await getDb();
+  const [rows] = await connexion.execute<RemoveBgVisitorJob[]>(
+    `SELECT * FROM RemoveBgVisitorJobs WHERE replicate_prediction_id = ? LIMIT 1`,
+    [normalized],
+  );
+  return rows[0] ?? null;
+}
+
+export async function setRemoveBgVisitorJobRunning(params: {
+  requestId: string;
+  replicatePredictionId: string;
+  replicateStatus?: string | null;
+  replicatePayload?: any | null;
+}): Promise<boolean> {
+  const requestId = normalizeRemoveBgVisitorRequestId(params.requestId);
+  const replicatePredictionId = String(params.replicatePredictionId ?? "").trim();
+  if (!replicatePredictionId) {
+    throw new Error("RemoveBgVisitorJobs.replicate_prediction_id is required");
+  }
+  const connexion = await getDb();
+  const replicatePayloadJson = stringifyJsonForDb(params.replicatePayload ?? null);
+
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE RemoveBgVisitorJobs
+     SET status = 'processing',
+         replicate_prediction_id = ?,
+         replicate_status = COALESCE(?, replicate_status),
+         replicate_payload = COALESCE(?, replicate_payload)
+     WHERE request_id = ?
+       AND status IN ('pending','processing')
+       AND (replicate_prediction_id IS NULL OR replicate_prediction_id = ?)`,
+    [
+      replicatePredictionId,
+      params.replicateStatus ?? null,
+      replicatePayloadJson,
+      requestId,
+      replicatePredictionId,
+    ],
+  );
+  return (res.affectedRows ?? 0) > 0;
+}
+
+export async function markRemoveBgVisitorJobSucceeded(params: {
+  requestId: string;
+  outputImageUrl: string;
+  replicateStatus?: string | null;
+  replicatePayload?: any | null;
+  completedAt?: Date;
+}): Promise<boolean> {
+  const requestId = normalizeRemoveBgVisitorRequestId(params.requestId);
+  const outputImageUrl = String(params.outputImageUrl ?? "").trim();
+  if (!outputImageUrl) {
+    throw new Error("RemoveBgVisitorJobs.output_image_url is required");
+  }
+  const now = params.completedAt ?? new Date();
+  const connexion = await getDb();
+  const replicatePayloadJson = stringifyJsonForDb(params.replicatePayload ?? null);
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE RemoveBgVisitorJobs
+     SET status = 'succeeded',
+         output_image_url = ?,
+         replicate_status = COALESCE(?, replicate_status),
+         replicate_payload = COALESCE(?, replicate_payload),
+         error_message = NULL,
+         completed_at = ?
+     WHERE request_id = ?
+       AND status <> 'succeeded'`,
+    [
+      outputImageUrl,
+      params.replicateStatus ?? null,
+      replicatePayloadJson,
+      now,
+      requestId,
+    ],
+  );
+  return (res.affectedRows ?? 0) > 0;
+}
+
+export async function markRemoveBgVisitorJobFailed(params: {
+  requestId: string;
+  errorMessage: string;
+  replicateStatus?: string | null;
+  replicatePayload?: any | null;
+  completedAt?: Date;
+}): Promise<boolean> {
+  const requestId = normalizeRemoveBgVisitorRequestId(params.requestId);
+  const errorMessage = String(params.errorMessage ?? "").trim();
+  if (!errorMessage) throw new Error("RemoveBgVisitorJobs.error_message is required");
+
+  const now = params.completedAt ?? new Date();
+  const connexion = await getDb();
+  const replicatePayloadJson = stringifyJsonForDb(params.replicatePayload ?? null);
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE RemoveBgVisitorJobs
+     SET status = 'failed',
+         error_message = ?,
+         replicate_status = COALESCE(?, replicate_status),
+         replicate_payload = COALESCE(?, replicate_payload),
+         completed_at = ?
+     WHERE request_id = ?
+       AND status <> 'succeeded'`,
+    [
+      errorMessage,
+      params.replicateStatus ?? null,
+      replicatePayloadJson,
+      now,
+      requestId,
+    ],
+  );
+  return (res.affectedRows ?? 0) > 0;
+}
+
+export async function markRemoveBgVisitorJobCanceled(params: {
+  requestId: string;
+  errorMessage?: string | null;
+  replicateStatus?: string | null;
+  replicatePayload?: any | null;
+  completedAt?: Date;
+}): Promise<boolean> {
+  const requestId = normalizeRemoveBgVisitorRequestId(params.requestId);
+  const now = params.completedAt ?? new Date();
+  const errorMessage = params.errorMessage ? String(params.errorMessage).trim() : null;
+
+  const connexion = await getDb();
+  const replicatePayloadJson = stringifyJsonForDb(params.replicatePayload ?? null);
+  const [res] = await connexion.execute<ResultSetHeader>(
+    `UPDATE RemoveBgVisitorJobs
+     SET status = 'canceled',
+         error_message = ?,
+         replicate_status = COALESCE(?, replicate_status),
+         replicate_payload = COALESCE(?, replicate_payload),
+         completed_at = ?
+     WHERE request_id = ?
+       AND status <> 'succeeded'`,
+    [
+      errorMessage,
       params.replicateStatus ?? null,
       replicatePayloadJson,
       now,

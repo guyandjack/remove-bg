@@ -69,6 +69,7 @@ export async function storeOptimizedRemoveBgOutput(params: {
   requestId: string;
   sourceUrl: string;
   publicBaseUrl: string;
+  outputEndpointPath?: string;
   timeoutMs?: number;
 }): Promise<{
   publicUrl: string;
@@ -76,6 +77,12 @@ export async function storeOptimizedRemoveBgOutput(params: {
   bytesOptimized: number;
   filePath: string;
   token: string;
+  timingsMs: {
+    download: number;
+    optimize: number;
+    write: number;
+    total: number;
+  };
 }> {
   const requestId = String(params.requestId || "").trim();
   const sourceUrl = String(params.sourceUrl || "").trim();
@@ -89,19 +96,24 @@ export async function storeOptimizedRemoveBgOutput(params: {
       ? params.timeoutMs
       : 120_000;
 
+  const startedAtMs = Date.now();
+  const downloadStartedAtMs = Date.now();
   const resp = await axios.get<ArrayBuffer>(sourceUrl, {
     responseType: "arraybuffer",
     timeout: timeoutMs,
     // Some signed URLs may redirect; axios follows redirects by default.
   });
+  const downloadMs = Date.now() - downloadStartedAtMs;
 
   const rawBuffer = Buffer.from(resp.data);
   const rawContentType = String(resp.headers?.["content-type"] || "image/png");
 
+  const optimizeStartedAtMs = Date.now();
   const optimized = await optimizeTransparentRaster({
     input: rawBuffer,
     inputContentType: rawContentType,
   });
+  const optimizeMs = Date.now() - optimizeStartedAtMs;
 
   const token = crypto.randomBytes(16).toString("hex");
   const { filePath, filename } = await resolveStoredRemoveBgOutputPath({
@@ -110,12 +122,18 @@ export async function storeOptimizedRemoveBgOutput(params: {
     extension: optimized.extension,
   });
 
+  const writeStartedAtMs = Date.now();
   await atomicWriteFile({ filePath, data: optimized.buffer });
+  const writeMs = Date.now() - writeStartedAtMs;
+  const totalMs = Date.now() - startedAtMs;
+
+  const outputEndpointPath =
+    String(params.outputEndpointPath || "").trim() ||
+    `/api/services/remove-bg-replicate/jobs/${encodeURIComponent(requestId)}/output`;
 
   // Serve through one-shot endpoint that deletes the file after delivery.
-  const publicUrl = `${publicBaseUrl}/api/services/remove-bg-replicate/jobs/${encodeURIComponent(
-    requestId,
-  )}/output?token=${encodeURIComponent(token)}`;
+  // Note: outputEndpointPath must not include a querystring; we append token ourselves.
+  const publicUrl = `${publicBaseUrl}${outputEndpointPath}?token=${encodeURIComponent(token)}`;
 
   return {
     publicUrl,
@@ -123,5 +141,11 @@ export async function storeOptimizedRemoveBgOutput(params: {
     bytesOptimized: optimized.buffer.length,
     filePath,
     token,
+    timingsMs: {
+      download: downloadMs,
+      optimize: optimizeMs,
+      write: writeMs,
+      total: totalMs,
+    },
   };
 }
