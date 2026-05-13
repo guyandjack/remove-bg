@@ -185,6 +185,7 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
     const version = extractVersionFromIdentifier(modelIdentifier);
 
     // Async: create the prediction and return immediately (do not wait).
+    const replicateCreateStartedAt = Date.now();
     const prediction = await replicate.predictions.create({
       version,
       input: {
@@ -193,6 +194,7 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
       webhook: webhookUrl,
       webhook_events_filter: ["start", "completed"],
     } as any);
+    const replicateCreateMs = Date.now() - replicateCreateStartedAt;
 
     const predictionId = String((prediction as any)?.id ?? "").trim() || null;
     if (!predictionId) {
@@ -209,6 +211,16 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
       replicatePredictionId: predictionId,
       replicateStatus: String((prediction as any)?.status ?? "") || "starting",
       replicatePayload: prediction as any,
+    });
+    logger.info("removeBgReplicateJob::prediction_created", {
+      requestId: httpRequestId,
+      jobRequestId: job.request_id,
+      jobId: job.id,
+      predictionId,
+      replicateCreateMs,
+      inputBytes: image.size,
+      inputMime: image.mime,
+      modelKey,
     });
     publishRemoveBgJobUpdatedPayload({
       requestId: job.request_id,

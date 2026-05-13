@@ -4,6 +4,14 @@ import sharp from "sharp";
 import type { ValidatedImage } from "../checkDataUpload/checkDataUpload.js";
 import { logger } from "../../logger.js";
 
+function getClientRequestId(req: Request): string | null {
+  const fromBody =
+    ((req as any).body?.requestId as string | undefined) ??
+    ((req as any).body?.request_id as string | undefined);
+  const value = String(fromBody ?? "").trim();
+  return value ? value : null;
+}
+
 function parseMaxWidth(): number {
   const raw = String(process.env.REMOVEBG_MAX_INPUT_WIDTH ?? "").trim();
   if (!raw) return 1080;
@@ -92,21 +100,47 @@ export function limitRemoveBgInputMaxWidth(
 
   return async (req: Request, res: Response, next: NextFunction) => {
     const requestId = (req as any).requestId;
+    const clientRequestId = getClientRequestId(req);
     const image = (req as any).imageValidated as ValidatedImage | undefined;
     if (!image || !Buffer.isBuffer(image.buffer) || image.buffer.length === 0) {
       return next();
     }
 
     try {
+      const totalStartedAt = Date.now();
+      const metaStartedAt = Date.now();
       const meta = await sharp(image.buffer, { failOnError: false }).metadata();
+      const metaMs = Date.now() - metaStartedAt;
       const w = effectiveWidth(meta);
       if (!w || w <= maxWidth) {
+        // Keep logs low-noise by default (most images may already be small).
+        // Enable with REMOVEBG_LOG_INPUT_RESIZE_SKIP=true.
+        const logSkip =
+          String(process.env.REMOVEBG_LOG_INPUT_RESIZE_SKIP ?? "false")
+            .trim()
+            .toLowerCase() === "true";
+        if (logSkip) {
+          logger.info("limitRemoveBgInputMaxWidth::skip", {
+            requestId,
+            clientRequestId,
+            mime: image.mime,
+            width: meta.width ?? null,
+            height: meta.height ?? null,
+            orientation: meta.orientation ?? null,
+            effectiveWidth: w,
+            maxWidth,
+            bytes: image.size,
+            metaMs,
+            totalMs: Date.now() - totalStartedAt,
+          });
+        }
         return next();
       }
 
-      const startedAt = Date.now();
+      const resizeStartedAt = Date.now();
       const resized = await resizeBuffer({ image, maxWidth });
       (req as any).imageValidated = resized;
+      const resizeMs = Date.now() - resizeStartedAt;
 
       // Ensure downstream code sees the correct extension if the input used the jpg alias.
       // `ValidatedImage.extension` is only used for filenames; mime remains the source of truth.
@@ -133,14 +167,18 @@ export function limitRemoveBgInputMaxWidth(
 
       logger.info("limitRemoveBgInputMaxWidth::resized", {
         requestId,
+        clientRequestId,
         mime: image.mime,
         width: meta.width ?? null,
         height: meta.height ?? null,
         orientation: meta.orientation ?? null,
+        effectiveWidth: w,
         maxWidth,
         bytesBefore: image.size,
         bytesAfter: resized.size,
-        durationMs: Date.now() - startedAt,
+        metaMs,
+        resizeMs,
+        totalMs: Date.now() - totalStartedAt,
       });
 
       return next();
@@ -148,6 +186,7 @@ export function limitRemoveBgInputMaxWidth(
       // Don't fail the request if resizing fails; fall back to original.
       logger.warn("limitRemoveBgInputMaxWidth::failed", {
         requestId,
+        clientRequestId,
         message: err?.message ?? String(err),
       });
       return next();

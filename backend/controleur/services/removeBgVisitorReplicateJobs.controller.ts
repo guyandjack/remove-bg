@@ -202,12 +202,14 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
     const modelIdentifier = modelType[modelKey];
     const version = extractVersionFromIdentifier(modelIdentifier);
 
+    const replicateCreateStartedAt = Date.now();
     const prediction = await replicate.predictions.create({
       version,
       input: { image: image.buffer },
       webhook: webhookUrl,
       webhook_events_filter: ["start", "completed"],
     } as any);
+    const replicateCreateMs = Date.now() - replicateCreateStartedAt;
 
     const predictionId = String((prediction as any)?.id ?? "").trim() || null;
     if (!predictionId) {
@@ -225,6 +227,17 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
       replicatePredictionId: predictionId,
       replicateStatus: String((prediction as any)?.status ?? "") || "starting",
       replicatePayload: prediction as any,
+    });
+
+    logger.info("removeBgVisitorReplicateJob::prediction_created", {
+      requestId: httpRequestId,
+      jobRequestId: job.request_id,
+      jobId: job.id,
+      predictionId,
+      replicateCreateMs,
+      inputBytes: image.size,
+      inputMime: image.mime,
+      modelKey,
     });
 
     publishRemoveBgJobUpdatedPayloadToChannel(`visitor:${job.request_id}`, {

@@ -42,6 +42,13 @@ function writeSseEvent(res: any, event: string, data: any) {
   res.write("\n");
 }
 
+function parseMaxSseDurationMs(): number {
+  const raw = String(process.env.REMOVEBG_SSE_MAX_DURATION_MS ?? "").trim();
+  if (!raw) return 180_000; // 3 minutes default
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 180_000;
+}
+
 export const streamRemoveBgReplicateJobEvents: RequestHandler = async (req, res) => {
   const httpRequestId = (req as any).requestId;
   const requestIdParam = String(req.params?.requestId ?? "").trim();
@@ -188,10 +195,26 @@ export const streamRemoveBgReplicateJobEvents: RequestHandler = async (req, res)
     } catch {}
   }, heartbeatMs);
 
+  const maxDurationMs = parseMaxSseDurationMs();
+  const maxTimer = setTimeout(() => {
+    try {
+      writeSseEvent(res, "timeout", {
+        requestId: job.request_id,
+        status: "processing",
+        message: "sse_timeout",
+      });
+    } catch {}
+    try {
+      res.end();
+    } catch {}
+  }, maxDurationMs);
+  (maxTimer as any).unref?.();
+
   const close = () => {
     try {
       clearInterval(heartbeat);
       clearInterval(poll);
+      clearTimeout(maxTimer);
       unsubscribe();
     } catch {}
   };

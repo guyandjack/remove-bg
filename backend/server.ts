@@ -23,6 +23,7 @@ dotenv.config({ path: path.join(__dirname, ".env") });
 import http from "node:http";
 import app from "./app.js"; // Instance Express déjà configurée (TS/ESM: sans extension)
 import { logger } from "./logger.js";
+import { startRemoveBgOutputCleanup } from "./services/cleanup/removeBgOutputCleanup.js";
 
 // -----------------------------------------------------------------------------
 // 3) Normalisation du port & lecture des variables
@@ -51,6 +52,20 @@ app.set("port", PORT);
 // 4) Création du serveur HTTP et options réseau
 // -----------------------------------------------------------------------------
 const server: http.Server = http.createServer(app);
+
+// -----------------------------------------------------------------------------
+// Remove BG output cleanup (cron-like)
+// -----------------------------------------------------------------------------
+let stopRemoveBgCleanup: (() => void) | null = null;
+startRemoveBgOutputCleanup()
+  .then((stop) => {
+    stopRemoveBgCleanup = stop;
+  })
+  .catch((err: any) => {
+    logger.warn("removeBgOutputCleanup::start_failed", {
+      message: err?.message ?? String(err),
+    });
+  });
 
 // (Optionnel mais recommandé en prod)
 // Évite certains timeouts par défaut trop courts/longs et les sockets zombies.
@@ -166,6 +181,9 @@ process.on("SIGUSR2", () => {
  * @param onClosed Optionnel: callback après fermeture (ex: redémarrage nodemon)
  */
 function gracefulShutdown(code: number, onClosed?: () => void) {
+  try {
+    stopRemoveBgCleanup?.();
+  } catch {}
   // Empêche de nouvelles connexions et attend la fin des requêtes en cours
   server.close((err?: Error) => {
     if (err) {

@@ -58,6 +58,20 @@ function toFiniteNumber(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function parseIsoDate(value: unknown): Date | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const d = new Date(trimmed);
+  return Number.isFinite(d.getTime()) ? d : null;
+}
+
+function diffMs(a: Date | null, b: Date | null): number | null {
+  if (!a || !b) return null;
+  const ms = b.getTime() - a.getTime();
+  return Number.isFinite(ms) ? ms : null;
+}
+
 function getQueryParam(req: any, name: string): string | null {
   const raw = (req as any)?.query?.[name];
   if (Array.isArray(raw)) return raw[0] ? String(raw[0]).trim() : null;
@@ -202,6 +216,19 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
                 predict_time: toFiniteNumber(payload?.metrics?.predict_time),
                 total_time: toFiniteNumber(payload?.metrics?.total_time),
               },
+              replicateTiming: (() => {
+                const createdAt = parseIsoDate(payload?.created_at);
+                const startedAt = parseIsoDate(payload?.started_at);
+                const completedAt = parseIsoDate(payload?.completed_at);
+                return {
+                  createdAt: createdAt ? createdAt.toISOString() : null,
+                  startedAt: startedAt ? startedAt.toISOString() : null,
+                  completedAt: completedAt ? completedAt.toISOString() : null,
+                  queueMs: diffMs(createdAt, startedAt),
+                  runMs: diffMs(startedAt, completedAt),
+                  totalMs: diffMs(createdAt, completedAt),
+                };
+              })(),
             });
           } else {
             logger.warn("replicateWebhook::output_optimize_skip_no_public_base", {

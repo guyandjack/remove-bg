@@ -197,6 +197,7 @@ Le fichier `backend/.env` contient des **secrets** (clés API, tokens, mots de p
 - Stripe upgrade/downgrade (plan change): `docs/stripe-plan-change.md`
 - Replicate remove-bg (flow async en cours): table DB `RemoveBgJobs` + variables `REPLICATE_WEBHOOK_URL`, `REPLICATE_WEBHOOK_SECRET` (dev) et `BASE_URL_PROD` (preprod/prod)
 - Replicate remove-bg (pré-traitement upload): resize serveur si largeur > 1080px via `REMOVEBG_MAX_INPUT_WIDTH` (défaut 1080)
+- Replicate remove-bg (cleanup fichiers): cron interne sur `public/removebg` via `REMOVEBG_OUTPUT_TTL_SECONDS` (défaut 120s)
 
 À confirmer / à faire selon votre contexte :
 
