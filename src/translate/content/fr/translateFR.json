@@ -340,7 +340,7 @@
     "previewTitle": "Aperçu",
     "previewAlt": "Aperçu converti",
     "previewEmpty": "Aucun aperçu disponible.",
-    "previewHint": "",
+    "previewHint": " ",
     "summaryDimensions": "Dimensions ciblées",
     "summaryFormat": "Format",
     "summaryQuality": "Qualité",

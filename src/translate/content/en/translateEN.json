@@ -338,7 +338,7 @@
     "previewTitle": "Preview",
     "previewAlt": "Converted preview",
     "previewEmpty": "No preview yet. Add a file to see how your settings look.",
-    "previewHint": "This preview gives an instant look at your settings.",
+    "previewHint": " ",
     "summaryDimensions": "Target dimensions",
     "summaryFormat": "Format",
     "summaryQuality": "Quality",

@@ -1,10 +1,20 @@
+//import des hooks
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "preact/hooks";
+//import des instances
 import { planOptionsSignal } from "@/stores/planOptions";
 import { sessionSignal } from "@/stores/session";
 import { api } from "@/utils/axiosConfig";
+import type { AxiosError } from "axios";
+//import des fonctions
 import { getMaxUploadForUser } from "@/utils/planOptionLimits";
 import { isAuthentified } from "@/utils/request/isAuthentified";
-import type { AxiosError } from "axios";
-import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
+import { setFileNameDownload } from "@/utils/setFileNameDownload";
 
 type FilterOptions = {
   brightness: number;
@@ -87,9 +97,6 @@ type ConverterTextContent = {
   filterBlurHelper: string;
 };
 
-
-
-
 const MIN_SIZE = 32;
 const MAX_SIZE = 6000;
 
@@ -146,14 +153,16 @@ const ImageConverter = ({
 }) => {
   const userLoged = sessionSignal?.value?.authentified;
   const [visitorBlocked, setVisitorBlocked] = useState(false);
-  
-  
+
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
-  const [naturalSize, setNaturalSize] = useState<{ width: number; height: number }>(
-    { width: 0, height: 0 }
+  const [imageElement, setImageElement] = useState<HTMLImageElement | null>(
+    null,
   );
+  const [naturalSize, setNaturalSize] = useState<{
+    width: number;
+    height: number;
+  }>({ width: 0, height: 0 });
   const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
   const [options, setOptions] = useState<ConverterOptions>({
     width: 1024,
@@ -338,8 +347,15 @@ const ImageConverter = ({
     }
   };
 
-  const handleDimensionChange = (dimension: "width" | "height", value: number) => {
-    const safeValue = clamp(Number.isNaN(value) ? MIN_SIZE : value, MIN_SIZE, MAX_SIZE);
+  const handleDimensionChange = (
+    dimension: "width" | "height",
+    value: number,
+  ) => {
+    const safeValue = clamp(
+      Number.isNaN(value) ? MIN_SIZE : value,
+      MIN_SIZE,
+      MAX_SIZE,
+    );
     setOptions((prev) => {
       let nextWidth = dimension === "width" ? safeValue : prev.width;
       let nextHeight = dimension === "height" ? safeValue : prev.height;
@@ -347,9 +363,17 @@ const ImageConverter = ({
       if (prev.keepAspect && naturalSize.width && naturalSize.height) {
         const originalRatio = naturalSize.width / naturalSize.height || 1;
         if (dimension === "width") {
-          nextHeight = clamp(Math.round(nextWidth / originalRatio), MIN_SIZE, MAX_SIZE);
+          nextHeight = clamp(
+            Math.round(nextWidth / originalRatio),
+            MIN_SIZE,
+            MAX_SIZE,
+          );
         } else {
-          nextWidth = clamp(Math.round(nextHeight * originalRatio), MIN_SIZE, MAX_SIZE);
+          nextWidth = clamp(
+            Math.round(nextHeight * originalRatio),
+            MIN_SIZE,
+            MAX_SIZE,
+          );
         }
       }
 
@@ -365,7 +389,7 @@ const ImageConverter = ({
 
   const handleDimensionInput = (
     dimension: "width" | "height",
-    rawValue: string
+    rawValue: string,
   ) => {
     setDimensionInputs((prev) => ({ ...prev, [dimension]: rawValue }));
     if (rawValue.trim() === "") return;
@@ -387,7 +411,10 @@ const ImageConverter = ({
         return { ...prev, [dimension]: options[dimension].toString() };
       }
       handleDimensionChange(dimension, parsed);
-      return { ...prev, [dimension]: clamp(parsed, MIN_SIZE, MAX_SIZE).toString() };
+      return {
+        ...prev,
+        [dimension]: clamp(parsed, MIN_SIZE, MAX_SIZE).toString(),
+      };
     });
   };
 
@@ -465,16 +492,18 @@ const ImageConverter = ({
     if (!convertedAsset) return;
     const anchor = document.createElement("a");
     anchor.href = convertedAsset.url;
-    anchor.download = convertedAsset.filename;
+    const originalName = convertedAsset.filename.split(".")[0];
+    const addName = setFileNameDownload("converted-at");
+    anchor.download = originalName + "-" + addName;
     anchor.click();
   };
 
-  const deleteConvertedAsset = () => {
+  /* const deleteConvertedAsset = () => {
     if (!convertedAsset) return;
     releaseObjectUrl(convertedAsset.url);
     setConvertedAsset(null);
     setStatus({ state: "idle", message: converterTextContent.statusDeleted });
-  };
+  }; */
 
   const handleSubmit = async (event: Event) => {
     event.preventDefault();
@@ -488,7 +517,10 @@ const ImageConverter = ({
     const token = readAuthToken();
     if (token) {
       try {
-        setStatus({ state: "loading", message: converterTextContent.statusLoading });
+        setStatus({
+          state: "loading",
+          message: converterTextContent.statusLoading,
+        });
         await isAuthentified();
       } catch {
         setStatus({
@@ -524,11 +556,14 @@ const ImageConverter = ({
         quality: options.quality,
         keepAspect: options.keepAspect,
         filters: options.filters,
-      })
+      }),
     );
 
     try {
-      setStatus({ state: "loading", message: converterTextContent.statusLoading });
+      setStatus({
+        state: "loading",
+        message: converterTextContent.statusLoading,
+      });
       const response = await api.post(IMAGE_CONVERTER_ENDPOINT, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         responseType: "blob",
@@ -537,7 +572,7 @@ const ImageConverter = ({
       releaseObjectUrl(convertedAsset?.url);
       const url = URL.createObjectURL(blob);
       const filenameFromHeader = parseFilenameFromDisposition(
-        response.headers?.["content-disposition"] as string | undefined
+        response.headers?.["content-disposition"] as string | undefined,
       );
       const filename = filenameFromHeader || buildOutputFilename();
       setConvertedAsset({ url, filename });
@@ -552,7 +587,11 @@ const ImageConverter = ({
       let backendCode: string | null = null;
 
       const data = axiosError.response?.data;
-      if (data && typeof data === "object" && typeof data.message === "string") {
+      if (
+        data &&
+        typeof data === "object" &&
+        typeof data.message === "string"
+      ) {
         backendMessage = data.message;
         backendCode = typeof data.code === "string" ? data.code : null;
       } else if (data instanceof Blob) {
@@ -571,7 +610,9 @@ const ImageConverter = ({
       setStatus({
         state: "error",
         message:
-          backendMessage || axiosError.message || converterTextContent.statusError,
+          backendMessage ||
+          axiosError.message ||
+          converterTextContent.statusError,
       });
 
       if (!userLoged && backendCode === "VISITOR_QUOTA_EXCEEDED") {
@@ -898,15 +939,19 @@ const ImageConverter = ({
             >
               {converterTextContent.actionClear}
             </button>
-            <button
-              type="submit"
-              className={`btn btn-outline btn-success btn-md ${
-                status.state === "loading" ? "loading" : ""
-              }`}
-              disabled={!file || status.state === "loading" || visitorBlocked}
-            >
-              {converterTextContent.actionConvert}
-            </button>
+            {status.state !== "loading" ? (
+              <button
+                type="submit"
+                className={"btn btn-outline btn-success btn-md w-[100px]"}
+                disabled={!file || visitorBlocked}
+              >
+                {converterTextContent.actionConvert}
+              </button>
+            ) : (
+              <div className={"w-[100px] flex justify-center items-center"}>
+                <span className="loading loading-bars loading-md text-info"></span>
+              </div>
+            )}
           </footer>
           {(status.message && status.message.length > 0) ||
           status.state !== "idle" ? (
@@ -976,14 +1021,14 @@ const ImageConverter = ({
               {converterTextContent.downloadConverted}
             </button>
 
-            <button
+            {/* <button
               type="button"
               className="btn btn-outline btn-info btn-md"
               onClick={deleteConvertedAsset}
               disabled={!convertedAsset}
             >
               {converterTextContent.deleteConverted}
-            </button>
+            </button> */}
           </div>
 
           {/* {convertedAsset ? (

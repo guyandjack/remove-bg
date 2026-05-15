@@ -1,6 +1,9 @@
 //import des hooks
 import { useState } from "preact/hooks";
 
+//import des fonctions
+import { setFileNameDownload } from "@/utils/setFileNameDownload";
+
 // Le crédit est consommé au moment du traitement (Replicate), pas au téléchargement.
 
 type FileSystemWritableFileStreamLike = {
@@ -36,15 +39,11 @@ type DownloadLinkTextContent = {
   fileTypeDescription: string;
 };
 
-const now = new Date();
 
-const DEFAULT_DOWNLOAD_NAME = `remove-bg-${now.getFullYear()}-${String(
-  now.getMonth() + 1,
-).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}_${String(
-  now.getHours(),
-).padStart(2, "0")}-${String(now.getMinutes()).padStart(2, "0")}-${String(
-  now.getSeconds(),
-).padStart(2, "0")}.png`;;
+
+
+
+const DEFAULT_DOWNLOAD_NAME = setFileNameDownload("removed-bg");
 
 const buildBlobFromSource = async (
   source: string,
