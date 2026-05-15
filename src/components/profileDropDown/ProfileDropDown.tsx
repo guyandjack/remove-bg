@@ -56,15 +56,17 @@ const ProfileDropDown = ({ content }: ProfileDropDownType) => {
         sessionSignal.value = null;
         localStorage.removeItem("session");
         localStorage.removeItem("wizpix:last_service");
-
+        localStorage.removeItem("wizpix:account_deletion_feedback");
+        
         setIsLoader(false);
         setIsStatus("success");
         
       }
     } catch {
       sessionSignal.value = null;
-      localStorage.removeItem("wizpix:last_service");
       localStorage.removeItem("session");
+      localStorage.removeItem("wizpix:last_service");
+      localStorage.removeItem("wizpix:account_deletion_feedback");
       setIsLoader(false);
       setIsStatus("success");
       
