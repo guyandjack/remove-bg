@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { api } from "@/utils/axiosConfig";
-import { sessionSignal } from "@/stores/session";
 import { planOptionsSignal } from "@/stores/planOptions";
-import type { AxiosError } from "axios";
-import { isAuthentified } from "@/utils/request/isAuthentified";
+import { sessionSignal } from "@/stores/session";
+import { api } from "@/utils/axiosConfig";
 import { getMaxUploadForUser } from "@/utils/planOptionLimits";
+import { isAuthentified } from "@/utils/request/isAuthentified";
+import type { AxiosError } from "axios";
+import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 type FilterOptions = {
   brightness: number;
@@ -652,7 +652,7 @@ const ImageConverter = ({
 
   return (
     <section className="w-full max-w-[1300px] mx-auto py-12 px-4">
-      <header className="text-center flex flex-col gap-2 mb-10">
+      <header className="text-center flex flex-col gap-2 mb-20">
         <p className="text-sm uppercase tracking-[0.3em] text-primary">
           {converterTextContent.headerTagline}
         </p>
@@ -686,14 +686,14 @@ const ImageConverter = ({
             </p>
             <button
               type="button"
-              className="btn btn-primary btn-sm"
+              className="btn btn-outline btn-info btn-md"
               onClick={() => fileInputRef.current?.click()}
             >
               {converterTextContent.dropzoneButton}
             </button>
           </div>
 
-          <section className="bg-base-200 rounded-2xl p-5 space-y-5 shadow-sm">
+          <section className="flex flex-col justify-start items-left gap-4 bg-base-200 rounded-2xl p-5  shadow-sm">
             <header className="flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-xl font-semibold">
@@ -705,7 +705,7 @@ const ImageConverter = ({
               </div>
               <button
                 type="button"
-                className="btn btn-ghost btn-xs"
+                className="btn btn-outline btn-info btn-sm"
                 onClick={resetSizing}
                 disabled={!naturalSize.width}
               >
@@ -769,7 +769,7 @@ const ImageConverter = ({
             </div>
           </section>
 
-          <section className="bg-base-200 rounded-2xl p-5 space-y-5 shadow-sm">
+          <section className="flex flex-col justify-start items-left gap-4 bg-base-200 rounded-2xl p-5 shadow-sm">
             <header className="flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-xl font-semibold">
@@ -833,7 +833,7 @@ const ImageConverter = ({
             </label>
           </section>
 
-          <section className="bg-base-200 rounded-2xl p-5 space-y-4 shadow-sm">
+          <section className="flex flex-col justify-start items-left gap-4 bg-base-200 rounded-2xl p-5 shadow-sm">
             <header className="flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-xl font-semibold">
@@ -845,14 +845,15 @@ const ImageConverter = ({
               </div>
               <button
                 type="button"
-                className="btn btn-ghost btn-xs"
+                className="btn btn-outline btn-info btn-sm"
                 onClick={resetFilters}
+                disabled={!file && !previewDataUrl}
               >
                 {converterTextContent.filtersReset}
               </button>
             </header>
 
-            <div className="space-y-4">
+            <div className="flex flex-col justify-start items-left gap-4">
               {filterDescriptors.map((filter) => (
                 <label key={filter.key} className="form-control">
                   <div className="flex items-center justify-between">
@@ -891,7 +892,7 @@ const ImageConverter = ({
           <footer className="flex flex-wrap gap-3 justify-end">
             <button
               type="button"
-              className="btn btn-ghost"
+              className="btn btn-outline btn-info btn-md"
               onClick={clearAll}
               disabled={!file && !previewDataUrl}
             >
@@ -899,7 +900,7 @@ const ImageConverter = ({
             </button>
             <button
               type="submit"
-              className={`btn btn-success ${
+              className={`btn btn-outline btn-success btn-md ${
                 status.state === "loading" ? "loading" : ""
               }`}
               disabled={!file || status.state === "loading" || visitorBlocked}
@@ -960,7 +961,7 @@ const ImageConverter = ({
           <div className="flex flex-wrap gap-3 ">
             <button
               type="button"
-              className="btn btn-outline btn-sm"
+              className="btn btn-outline btn-info btn-md"
               onClick={() => fileInputRef.current?.click()}
             >
               {converterTextContent.changeImage}
@@ -968,7 +969,7 @@ const ImageConverter = ({
 
             <button
               type="button"
-              className="btn btn-secondary btn-sm"
+              className="btn btn-outline btn-success btn-md"
               onClick={downloadConverted}
               disabled={!convertedAsset}
             >
@@ -977,7 +978,7 @@ const ImageConverter = ({
 
             <button
               type="button"
-              className="btn btn-error btn-sm btn-outline"
+              className="btn btn-outline btn-info btn-md"
               onClick={deleteConvertedAsset}
               disabled={!convertedAsset}
             >

@@ -7,7 +7,8 @@ type PlanOption = {
   prices?: Record<CurrencyCode, number>;
   credit_IA: number;
   credit_conversion: string;
-  size_max?: string;
+  img_input: string;
+  img_output: string;
   remove_bg: boolean;
   change_bg_color: boolean;
   tools_qt: string;
@@ -29,7 +30,8 @@ type TableLang = {
   formats: string;
   remove_bg: string;
   conversion: string;
-  size_max: string;
+  img_input: string;
+  img_output: string;
   per_month: string;
   conversions_suffix: string;
   change_bg_color: string;
@@ -42,6 +44,9 @@ type TableLang = {
   bundle: string;
   api: string;
   api_external: string;
+  ressourceIA_free: string;
+  ressourceIA_hobby: string;
+  ressourceIA_pro: string;
 };
 
 type PricingComparisonTableProps = {
@@ -136,7 +141,9 @@ const normalizeSizeMax = (sizeMax: string | undefined): string | null => {
                  <td className="font-medium">{lang.model_IA_ressource}</td>
                  {plans.map((p) => (
                    <td key={`model-${p.name}`} className="text-center">
-                     {p.model_IA_ressource}
+                     {p.name === "free"
+                       ? lang.ressourceIA_free
+                       : lang.ressourceIA_hobby}
                    </td>
                  ))}
                </tr>
@@ -154,33 +161,31 @@ const normalizeSizeMax = (sizeMax: string | undefined): string | null => {
                    </td>
                  ))}
                </tr>
-                <tr className="hover:bg-base-200/40">
-                  <td className="font-medium">{lang.conversion}</td>
-                  {plans.map((p) => (
-                    <td key={`conversion-${p.name}`} className="text-center">
-                      {(() => {
-                        const normalized = normalizeConversionCredits(p.credit_conversion);
-                        return normalized === "∞"
-                          ? normalized
-                          : `${normalized} ${lang.conversions_suffix}`;
-                      })()}
-                    </td>
-                  ))}
-                </tr>
-                <tr className="hover:bg-base-200/40">
-                  <td className="font-medium">{lang.size_max}</td>
-                  {plans.map((p) => (
-                    <td key={`size_max-${p.name}`} className="text-center">
-                      {normalizeSizeMax(p.size_max) ?? (
-                        <span className="text-base-content/50">-</span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-                <tr className="hover:bg-base-200/40">
-                  <td
-                    className="font-medium"
-                    dangerouslySetInnerHTML={{
+
+               <tr className="hover:bg-base-200/40">
+                 <td className="font-medium">{lang.img_input}</td>
+                 {plans.map((p) => (
+                   <td key={`size_max-${p.name}`} className="text-center">
+                     {normalizeSizeMax(p.img_input) ?? (
+                       <span className="text-base-content/50">-</span>
+                     )}
+                   </td>
+                 ))}
+               </tr>
+               <tr className="hover:bg-base-200/40">
+                 <td className="font-medium">{lang.img_output}</td>
+                 {plans.map((p) => (
+                   <td key={`size_max-${p.name}`} className="text-center">
+                     {normalizeSizeMax(p.img_output) ?? (
+                       <span className="text-base-content/50">-</span>
+                     )}
+                   </td>
+                 ))}
+               </tr>
+               <tr className="hover:bg-base-200/40">
+                 <td
+                   className="font-medium"
+                   dangerouslySetInnerHTML={{
                      __html: lang.tools.replace(/\n/g, "<br/>"),
                    }}
                  ></td>
@@ -260,6 +265,21 @@ const normalizeSizeMax = (sizeMax: string | undefined): string | null => {
                    </td>
                  ))}
                </tr> */}
+               <tr className="hover:bg-base-200/40">
+                 <td className="font-medium">{lang.conversion}</td>
+                 {plans.map((p) => (
+                   <td key={`conversion-${p.name}`} className="text-center">
+                     {(() => {
+                       const normalized = normalizeConversionCredits(
+                         p.credit_conversion,
+                       );
+                       return normalized === "∞"
+                         ? normalized
+                         : `${normalized} ${lang.conversions_suffix}`;
+                     })()}
+                   </td>
+                 ))}
+               </tr>
              </tbody>
            </table>
          </div>

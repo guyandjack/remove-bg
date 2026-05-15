@@ -1144,7 +1144,7 @@ const ImgEditor = ({
           {renderActiveOptionContent(activePicker)}
         </div>
         <div className={"lg:w-full h-[15%]"}>
-          {credit >= 1 ? (
+         
             <div className={"my-3"}>
               <DownloadLink
                 currentSource={currentSource}
@@ -1152,9 +1152,7 @@ const ImgEditor = ({
                 textContent={downloadLinkTextContent}
               />
             </div>
-          ) : (
-            <a href="/" className="service-link-info">{downloadLinkTextContent.noCredits} </a>
-          )}
+          
           <button
             type="button"
             className="btn btn-warning"

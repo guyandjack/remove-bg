@@ -127,7 +127,8 @@
     "credit": "Crédits",
     "remove_bg": "Suppression de l'arrière-plan",
     "conversion": "Conversion d'image",
-    "size_max": "Taille max",
+    "img_input": "Poids max du fichier à traiter",
+    "img_output": "Dimensions max du fichier traité",
     "per_month": "/ mois",
     "conversions_suffix": "conversions / mois",
     "change_bg_color": "Changement du fond avec couleur unie",
@@ -139,7 +140,10 @@
     "bg_IA_generation": "Génération d'arrière-plan par IA",
     "bundle": "Traitement par lot",
     "api": "API",
-    "api_external": "API externe"
+    "api_external": "API externe",
+    "ressourceIA_free": "Standard",
+    "ressourceIA_hobby": "Amélioré",
+    "ressourceIA_pro": "Pro"
   },
 
   "priceCard": {
@@ -157,6 +161,7 @@
     "api": "API",
     "bundle": "Traitement par lot",
     "subscribe": "Je choisis ce plan"
+    
   },
 
   "heroHome": {
@@ -214,7 +219,7 @@
     "id": "convert",
     "src": "",
     "title": "Conversion d’images",
-    "description": "Convertit et redimensionne vos images au format et à la taille souhaités, sans perte de qualité notable."
+    "description": "Convertit et redimensionne vos images au format et à la taille souhaités."
   },
   "card_4": {
     "id": "product",
@@ -311,7 +316,7 @@
   "imageConverter": {
     "headerTagline": "Conversion d'images",
     "headerTitle": "Prépare ton image, ajuste et convertis",
-    "headerDescription": "Téléverse un fichier, choisis les dimensions, l’extension finale et applique quelques filtres avant d’envoyer la conversion. Tout le rendu final sera assuré par Sharp côté serveur.",
+    "headerDescription": "Téléverse un fichier, choisis les dimensions, l’extension finale et applique quelques filtres avant d’envoyer la conversion.",
     "dropzonePrompt": "Dépose ton image ici ou utilise le bouton.",
     "dropzoneButton": "Sélectionner une image",
     "dimensionsTitle": "Dimensions",
@@ -334,8 +339,8 @@
     "actionConvert": "Convertir",
     "previewTitle": "Aperçu",
     "previewAlt": "Aperçu converti",
-    "previewEmpty": "Aucun aperçu pour l’instant. Ajoute un fichier pour voir le rendu de tes réglages.",
-    "previewHint": "Cette prévisualisation donne un aperçu instantané de tes réglages.",
+    "previewEmpty": "Aucun aperçu disponible.",
+    "previewHint": "",
     "summaryDimensions": "Dimensions ciblées",
     "summaryFormat": "Format",
     "summaryQuality": "Qualité",
@@ -405,7 +410,7 @@
   "downloadLink": {
     "pending": "En cours...",
     "download": "Télécharger",
-    "noCredits": "Choisis un plan pour utiliser le service",
+    "noCredits": "Télécharger votre image",
     "errorPrefix": "Une erreur est survenue :",
     "invalidSource": "Source de téléchargement invalide.",
     "retrieveError": "Impossible de récupérer le fichier.",
@@ -609,10 +614,10 @@
     "intro": "Les présentes mentions légales ont pour objet de définir les informations relatives à l’éditeur, à l’hébergeur et aux conditions générales d’utilisation du site 'wizpix' de suppression d’arrière-plan d’images (ci-après « le Service »).",
 
     "article1_title": "1. Éditeur du site",
-    "article1_text": "Le site et le Service sont édités par :\n\nRaison sociale : Helveclick \nAdresse du siège social : Helveclick Dupanloup Guillaume Chemin du Mont Paisible 1 3963 Crans-Montana\nNuméro d’identification ou SIRET :\nAdresse e-mail de contact : <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a> \nResponsable de la publication : Dupanloup Guillaume \n\nL’éditeur est responsable du contenu publié sur le site et de la gestion du Service.",
+    "article1_text": "Le site et le Service sont édités par :\n\nRaison sociale : Helveclick \nAdresse du siège social : Helveclick Chemin du Mont Paisible 1 3963 Crans-Montana\nNuméro d’identification ou SIRET :\nAdresse e-mail de contact : <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a> \nResponsable de la publication : Helveclick \n\nL’éditeur est responsable du contenu publié sur le site et de la gestion du Service.",
 
     "article2_title": "2. Hébergeur du site",
-    "article2_text": "Le site est hébergé par :\n\nNom de l’hébergeur : PlanetHoster \nAdresse :  \nSite web : \n E-mail de contact :  \n\nL’hébergeur assure la disponibilité technique du Service conformément à ses conditions générales.",
+    "article2_text": "Nom de l’hébergeur : PlanetHoster \nSiège Social (Québec) : 4416 Louis-B.-Mayer, Laval, Québec, H7P 0G1, Canada  \nSite web : https://www.planethoster.ch/fr \n  Tel: (FR) +33 1 59 12 00 07 -- (CH) +41 22 51 80 559 -- (CA) +1 855 774-4678 \n\nL’hébergeur assure la disponibilité technique du Service conformément à ses conditions générales.",
 
     "article3_title": "3. Propriété intellectuelle",
     "article3_text": "L’ensemble du contenu du site et du Service, y compris, sans limitation, les textes, images, graphismes, logos, icônes, sons, vidéos, codes sources et algorithmes, est la propriété exclusive du Prestataire, sauf mention contraire.\n\nToute reproduction, représentation, modification, publication, transmission ou adaptation de tout ou partie du contenu du site, quel que soit le moyen ou le procédé utilisé, est interdite sans autorisation écrite préalable du Prestataire.\n\nToute utilisation non autorisée constitue une violation des droits de propriété intellectuelle et peut entraîner des poursuites judiciaires conformément au droit suisse et européen.",

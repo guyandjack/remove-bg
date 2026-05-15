@@ -11,7 +11,7 @@ import { login } from "@/utils/axiosConfig";
 import { useTranslation } from "react-i18next";
 
 //import des composants enfants
-import { BtnGoogleLogin } from "@/components/button/loginGoogle";
+//import { BtnGoogleLogin } from "@/components/button/loginGoogle";
 import { Loader } from "@/components/loader/Loader";
 
 //import des fonctions
@@ -86,7 +86,7 @@ const FormLogin = () => {
   } = useForm<FormValuesForgot>({
     mode: "onTouched",
     defaultValues: {
-      email: "guillaume-d@tutanota.com"
+      email: ""
     }
   });
 

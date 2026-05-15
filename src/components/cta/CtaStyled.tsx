@@ -43,7 +43,7 @@ const CtaStyled = ({ content }: CtaProps) => {
                 /* class="font-semibold rounded-lg mx-auto inline-flex items-center justify-center bg-white py-4 px-9 hover:bg-opacity-90" */
                 data-id="/pricing"
                 href="/pricing"
-                className={` ${content.color_choice} w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-success/80 hover:bg-success/50 transition duration-300 ease-in-out `}
+                className={`link-cta`}
                 dangerouslySetInnerHTML={{ __html: content.label_choice }}
                 onClick={(e) => {
                   setActiveLink(e);
@@ -53,7 +53,7 @@ const CtaStyled = ({ content }: CtaProps) => {
                 <a
                   data-id="/services"
                   href="/services"
-                  className={` ${content.color_test} w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out `}
+                  className={`link-cta`}
                   dangerouslySetInnerHTML={{ __html: content.label_test }}
                   onClick={(e) => {
                     setActiveLink(e);

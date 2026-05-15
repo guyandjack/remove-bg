@@ -38,9 +38,7 @@ const FinalCTA = ({ content }: FinalCTAProps) => {
                 data-id="/pricing"
                 onClick={(e) => setActiveLink(e)}
                 href={"/pricing"}
-                className={
-                  "w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-success/80 hover:bg-success/50 transition duration-300 ease-in-out"
-                }
+                className={"link-cta"}
               >
                 {content.btn_1}
               </a>
@@ -48,9 +46,7 @@ const FinalCTA = ({ content }: FinalCTAProps) => {
                 data-id="/services"
                 onClick={(e) => setActiveLink(e)}
                 href={"/services"}
-                className={
-                  "w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out"
-                }
+                className={"link-cta"}
               >
                 {content.btn_2}
               </a>

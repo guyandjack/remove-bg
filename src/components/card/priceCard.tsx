@@ -191,7 +191,7 @@ const PriceCard = ({
 
   return (
     <div
-      className={`card w-[350px] h-[500px] bg-base-100 shadow-sm border ${borderColor} bg-component ${
+      className={`card w-[350px] h-[400px] bg-base-100 shadow-sm border ${borderColor} bg-component ${
         isCurrentPlan ? "ring-2 ring-primary" : ""
       }`}
     >
@@ -239,7 +239,7 @@ const PriceCard = ({
             <a
               data-id={"/signup"}
               href={`/signup?plan=${option.name}&currency=${currency}`}
-              className={`transition-all btn ${bgColor} btn-block text-base text-black hover:opacity-60`}
+              className={`transition-all btn ${bgColor} btn-block opacity-85 text-base text-black hover:opacity-100 hover:-translate-y-1`}
               onClick={(e) => setActiveLink(e)}
             >
               {lang.subscribe}

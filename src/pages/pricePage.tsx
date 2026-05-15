@@ -30,13 +30,14 @@ type PlanKey =
   | "credit"
   | "conversions_suffix"
   | "unlimited"
-  | "size_max"
+  | "img_input"
+  | "img_output"
   | "tools"
   | "gomme_magique"
   | "Image_pexels"
   | "api"
   | "bundle"
-  | "subscribe";
+  | "subscribe" ;
 
 type PlanText = Record<PlanKey, string>;
 
@@ -59,6 +60,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
   const activePlanOptions = planOptions.filter(
     (plan) => plan.active !== false
   );
+  
   const [currency, setCurrency] = useState<CurrencyCode>("CHF");
   const [finalizeStatus, setFinalizeStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [finalizeMessage, setFinalizeMessage] = useState<string | null>(null);
@@ -73,13 +75,15 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
     credit: t("priceCard.credit"),
     conversions_suffix: t("priceCard.conversions_suffix"),
     unlimited: t("priceCard.unlimited"),
-    size_max: t("priceCard.size_max"),
+    img_input: t("priceCard.img_input"),
+    img_output: t("priceCard.img_ouput"),
     tools: t("priceCard.tools"),
     gomme_magique: t("priceCard.gomme_magique"),
     Image_pexels: t("priceCard.img_pexels"),
     api: t("priceCard.api"),
     bundle: t("priceCard.bundle"),
     subscribe: t("priceCard.subscribe"),
+    
   };
 
   const textLangTab = {
@@ -92,7 +96,8 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
     formats: t("priceTab.formats"),
     remove_bg: t("priceTab.remove_bg"),
     conversion: t("priceTab.conversion"),
-    size_max: t("priceTab.size_max"),
+    img_input: t("priceTab.img_input"),
+    img_output: t("priceTab.img_output"),
     per_month: t("priceTab.per_month"),
     conversions_suffix: t("priceTab.conversions_suffix"),
     change_bg_color: t("priceTab.change_bg_color"),
@@ -105,6 +110,9 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
     bundle: t("priceTab.bundle"),
     api: t("priceTab.api"),
     api_external: t("priceTab.api_external"),
+    ressourceIA_free: t("priceTab.ressourceIA_free"),
+    ressourceIA_hobby: t("priceTab.ressourceIA_hobby"),
+    ressourceIA_pro: t("priceTab.ressourceIA_pro"),
   };
 
   const textLangFaq = [
@@ -401,7 +409,10 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         >
           {t("pricing.title_h2_tab")}
         </h2>
-        <PricingComparisonTable lang={textLangTab} option={activePlanOptions} currency={currency} />
+        <PricingComparisonTable
+          lang={textLangTab}
+          option={activePlanOptions}
+          currency={currency} />
       </div>
 
       {/* FAQ*/}

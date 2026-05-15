@@ -36,7 +36,15 @@ type DownloadLinkTextContent = {
   fileTypeDescription: string;
 };
 
-const DEFAULT_DOWNLOAD_NAME = "image-composed.png";
+const now = new Date();
+
+const DEFAULT_DOWNLOAD_NAME = `remove-bg-${now.getFullYear()}-${String(
+  now.getMonth() + 1,
+).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}_${String(
+  now.getHours(),
+).padStart(2, "0")}-${String(now.getMinutes()).padStart(2, "0")}-${String(
+  now.getSeconds(),
+).padStart(2, "0")}.png`;;
 
 const buildBlobFromSource = async (
   source: string,
@@ -161,33 +169,22 @@ const DownloadLink = ({ currentSource, credit, textContent }: DownloadLinkProps)
 
   return (
     <div>
-      {disabled ? (
+      {
         <button
-          className={`btn btn-outline border border-error text-error `}
+          className={`btn btn-outline btn-success`}
           aria-disabled={disabled}
-          disabled
+          disabled={disabled}
         >
-          {credit > 0
-            ? isPending
-              ? textContent.pending
-              : textContent.download
-            : textContent.noCredits}
+          
+          <a
+            href={disabled ? "undefined" : currentSource}
+            download={`remove-bg-${Date.now()*3600}.png`}
+            onClick={handleClick}
+          >
+            {isPending ? textContent.pending : textContent.download}
+          </a>
         </button>
-      ) : (
-        <a
-          className={`btn btn-outline`}
-          href={disabled ? "#" : currentSource}
-          download="image-composed.png"
-          onClick={handleClick}
-          aria-disabled={disabled}
-        >
-          {credit > 0
-            ? isPending
-              ? textContent.pending
-              : textContent.download
-            : textContent.noCredits}
-        </a>
-      )}
+      }
       {showToast.status !== "idle" ? (
         <div className="toast toast-center toast-middle">
           {showToast.status === "error" ? (

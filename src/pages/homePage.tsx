@@ -352,7 +352,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
           </div> }
         </div>
       </div> */}
-      <div className={"w-full"}>
+      <div className={"w-full p-10 lg:p-15"}>
         <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
@@ -376,7 +376,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
           </ul>
         </div>
       </div>
-      <div className={"w-full bg-component py-[50px]"}>
+      <div className={"w-full bg-component p-20"}>
         <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
@@ -404,7 +404,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
         </div>
       </div>
 
-      <div className={"w-full pt-[200px]"}>
+      <div className={"w-full pt-[100px] lg:pt[200px]"}>
         <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
@@ -418,7 +418,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
           </div>
         </div>
       </div>
-      <div className={"w-full py-[200px] bg-page"}>
+      <div className={"w-full py-[100px] lg:[200px] bg-page"}>
         <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
@@ -452,7 +452,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
         </div>
       </div>
 
-      <div className={"w-full pt-[200px]"}>
+      <div className={"w-full pt-[100px] lg:pt[200px]"}>
         <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"

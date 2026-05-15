@@ -22,6 +22,10 @@ import iconSocial from "@/assets/images/icon/icon-reseau-opt.svg";
 import iconProduct from "@/assets/images/icon/icon-projecteurs-opt.svg";
 import iconConvert from "@/assets/images/icon/icon-convertir-opt.svg";
 
+//import des fonctions
+import { setActiveLink } from "@/utils/setActiveLink";
+import { setDocumentTitle } from "@/utils/setDocumentTitle";
+
 //declaration des types
 type UploadImgType = {
   label: string;
@@ -55,6 +59,11 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
   console.log("isLoged: ", userLoged);
 
   const containerService = useRef<HTMLDivElement | null>(null);
+
+   useEffect(() => {
+     setActiveLink();
+     setDocumentTitle();
+   }, [routeKey]);
 
   // Plan options are used for frontend limits (max upload size, etc.).
   // We hydrate from cache for instant UX, then refresh from API so updates propagate.
@@ -314,7 +323,7 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
   }, [service]);
 
   return (
-    <div className="page-container">
+    <div className="page-container gap-10">
       <div
         className={
           "relative w-full mx-auto max-w-[1300px] py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px]"
@@ -342,7 +351,7 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
       <div
         id="container-service"
         ref={containerService}
-        className={"w-full max-w-[1300px]"}
+        className={"w-full max-w-[1300px] mt-8 mg:mt-10 lg:mt-15"}
       >
         <LazyMotion features={domAnimation}>
           <AnimatePresence>

@@ -130,7 +130,8 @@
     "formats": "Export formats",
     "remove_bg": "Background removal",
     "conversion": "Image conversion",
-    "size_max": "Max size",
+    "img_input": "Upload limit",
+    "img_output": "Output max width",
     "per_month": "/ month",
     "conversions_suffix": "conversions / month",
     "change_bg_color": "Background change with solid color",
@@ -142,7 +143,10 @@
     "bg_IA_generation": "AI-generated background",
     "bundle": "Batch processing",
     "api": "API",
-    "api_external": "External API"
+    "api_external": "External API",
+    "ressourceIA_free": "Standard",
+    "ressourceIA_hobby": "Improve",
+    "ressourceIA_pro": "Pro"
   },
 
   "priceCard": {
@@ -160,6 +164,7 @@
     "api": "API",
     "bundle": "Batch processing",
     "subscribe": "I choose this plan"
+    
   },
   "heroHome": {
     "title_h1": "Remove&nbsp;the&nbsp;background from&nbsp;your&nbsp;images with&nbsp;AI",
@@ -215,7 +220,7 @@
       "id": "convert",
       "src": "",
       "title": "Image conversion",
-      "description": "Converts and resizes your images to the desired format and dimensions, with no noticeable quality loss."
+      "description": "Converts and resizes your images to the desired format and dimensions."
     },
     "card_4": {
       "id": "product",
@@ -605,10 +610,10 @@
     "intro": "This legal notice aims to define the information related to the publisher, the hosting provider, and the general terms of use of the website for background removal (hereinafter referred to as 'the Service').",
 
     "article1_title": "1. Website Publisher",
-    "article1_text": "The website and the Service are published by:\n\nCompany name: Helveclick\nRegistered office address: Helveclick Dupanloup Guillaume, Chemin du Mont Paisible 1, 3963 Crans-Montana, Switzerland\nCompany identification or SIRET number:\nContact email address: <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>\nPublication manager: Dupanloup Guillaume\n\nThe publisher is responsible for the content published on the website and for managing the Service.",
+    "article1_text": "The website and the Service are published by:\n\nCompany name: Helveclick\nRegistered office address: Helveclick , Chemin du Mont Paisible 1, 3963 Crans-Montana, Switzerland\nCompany identification or SIRET number:\nContact email address: <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>\nPublication manager: Helveclick\n\nThe publisher is responsible for the content published on the website and for managing the Service.",
 
-    "article2_title": "2. Hosting Provider",
-    "article2_text": "The website is hosted by:\n\nHosting provider: PlanetHoster\nAddress:\nWebsite:\nContact email:\n\nThe hosting provider ensures the technical availability of the Service in accordance with its general terms and conditions.",
+    "article2_title": "2. Website Hosting Provider",
+    "article2_text": "Hosting provider: PlanetHoster \nHead Office (Quebec): 4416 Louis-B.-Mayer, Laval, Quebec, H7P 0G1, Canada \nWebsite: https://www.planethoster.ch/en \nTel: (FR) +33 1 59 12 00 07 -- (CH) +41 22 51 80 559 -- (CA) +1 855 774-4678 \n\nThe hosting provider ensures the technical availability of the Service in accordance with its general terms and conditions.",
 
     "article3_title": "3. Intellectual Property",
     "article3_text": "All content on the website and within the Service, including but not limited to text, images, graphics, logos, icons, sounds, videos, source code, and algorithms, is the exclusive property of the Provider, unless otherwise stated.\n\nAny reproduction, representation, modification, publication, transmission, or adaptation of all or part of the website content, by any means or process, is prohibited without the prior written authorization of the Provider.\n\nAny unauthorized use constitutes an infringement of intellectual property rights and may result in legal action under Swiss and European law.",

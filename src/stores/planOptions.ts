@@ -8,7 +8,8 @@ export type PlanOption = {
   stripePriceIds?: Record<"CHF" | "EUR" | "USD", string>;
   credit_IA: number;
   credit_conversion: string;
-  size_max?: string;
+  img_input: string;
+  img_output: string;
   tools_qt: string;
   tool_name: string[];
   format: string;

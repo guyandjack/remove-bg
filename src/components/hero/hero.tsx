@@ -45,13 +45,13 @@ const Hero = ({ content }: ContentProps) => {
             className="self-center text-center py-[20px] text-xl w-[80%] lg:self-start lg:text-left"
             dangerouslySetInnerHTML={{ __html: content.title_h2 }}
           ></h2>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 lg:gap-8 justify-center">
             <a
               data-id="/pricing"
               onClick={(e) => setActiveLink(e)}
               href={"/pricing"}
-              className={
-                "w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-success/80 hover:bg-success/50 transition duration-300 ease-in-out"
+              className={"link-cta"
+                /* "w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-success/80 hover:bg-success/50 transition duration-300 ease-in-out" */
               }
               dangerouslySetInnerHTML={{ __html: content.btn_choice }}
             ></a>
@@ -59,8 +59,8 @@ const Hero = ({ content }: ContentProps) => {
               data-id="/services"
               onClick={(e) => setActiveLink(e)}
               href={"/services"}
-              className={
-                "w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out"
+              className={"link-cta"
+                /* "w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out" */
               }
               dangerouslySetInnerHTML={{ __html: content.btn_test }}
             >

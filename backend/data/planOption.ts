@@ -8,7 +8,8 @@ type PlanOptionInput = {
   stripePriceIds: Record<CurrencyCode, string>;
   credit_IA: number;
   credit_conversion: string;
-  size_max: string;
+  img_input: string;
+  img_output: string;
   remove_bg: boolean;
   change_bg_color: boolean;
   tools_qt: string;
@@ -44,8 +45,10 @@ const planOption: PlanOptionInput[] = [
     },
     model_IA_ressource: "std",
     credit_IA: 100,
+
     credit_conversion: "10",
-    size_max: "5Mb",
+    img_input: "5Mb",
+    img_output: "512px",
     remove_bg: true,
     change_bg_color: false,
     tools_qt: "0/6",
@@ -72,7 +75,8 @@ const planOption: PlanOptionInput[] = [
     model_IA_ressource: "std",
     credit_IA: 5,
     credit_conversion: "15",
-    size_max: "5Mb",
+    img_input: "5Mb",
+    img_output: "512 px",
     remove_bg: true,
     change_bg_color: true,
     tools_qt: "2/6",
@@ -104,7 +108,8 @@ const planOption: PlanOptionInput[] = [
     model_IA_ressource: "improved",
     credit_IA: 150,
     credit_conversion: "150",
-    size_max: "10Mb",
+    img_input: "10Mb",
+    img_output: "1080 px",
     remove_bg: true,
     change_bg_color: true,
     tools_qt: "6/6",
@@ -144,7 +149,8 @@ const planOption: PlanOptionInput[] = [
     model_IA_ressource: "pro",
     credit_IA: 300,
     credit_conversion: "300",
-    size_max: "15Mb",
+    img_input: "15Mb",
+    img_output: "1080 px",
     remove_bg: true,
     change_bg_color: true,
     tools_qt: "6/6",
