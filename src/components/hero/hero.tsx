@@ -2,10 +2,11 @@
 //import desfonctions
 import { setActiveLink } from "@/utils/setActiveLink";
 
+import * as m from "motion/react-m";
 
 
 //import des composant enfant
-import {Diff} from "@/components/diff/diff";
+import { Diff } from "@/components/diff/diff";
 
 
 type HeroContentKey =
@@ -31,7 +32,16 @@ type ContentProps = {
 const Hero = ({ content }: ContentProps) => {
   return (
     <section className="w-full">
-      <div className="flex flex-col justify-start items-center gap-y-15 lg:flex-row lg:justify-evenly lg:h-[calc(100vh-120px)]">
+      <m.div
+        className="flex flex-col justify-start items-center gap-y-15 lg:flex-row lg:justify-evenly lg:h-[calc(100vh-120px)]"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.7,
+          ease: "easeOut",
+        }}
+        style={{ willChange: "transform, opacity" }}
+      >
         <div
           className={
             "w-full lg:w-[50%] flex-shrink flex flex-col justify-start items-center my-[0px]"
@@ -63,14 +73,13 @@ const Hero = ({ content }: ContentProps) => {
                 /* "w-[200px] py-[15px] text-center font-bold rounded-full text-black bg-primary/80 hover:bg-primary/50 transition duration-300 ease-in-out" */
               }
               dangerouslySetInnerHTML={{ __html: content.btn_test }}
-            >
-            </a>
+            ></a>
           </div>
         </div>
         <div className={"w-full max-w-[450px] lg:w-[50%]"}>
           <Diff tag={[]} />
         </div>
-      </div>
+      </m.div>
     </section>
   );
 };

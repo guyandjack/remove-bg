@@ -5,24 +5,29 @@ import { LocationProvider, Router, ErrorBoundary, Route, useLocation } from "pre
 // Types are inferred; no explicit JSX.Element return type needed
 
 //import des pages
+//pages navigations
 import { HomePage } from "./src/pages/homePage";
 import { ServicesPage } from "./src/pages/servicesPage";
-import { SignUpPage } from "./src/pages/signUpPage";
 import { PricePage } from "./src/pages/pricePage";
 import { ContactPage } from "./src/pages/contactPage";
+//Pages auth
+import { SignUpPage } from "./src/pages/signUpPage";
+import { LoginPage } from "./src/pages/loginPage";
+//Pages legals
+import { LegalPage } from "./src/pages/legalPage";
 import { TermsPage } from "./src/pages/termsPage";
 import { PrivacyPage } from "./src/pages/privacyPage";
-import { LegalPage } from "./src/pages/LegalPage";
-import { LoginPage } from "./src/pages/loginPage";
 import { CgvPage } from "./src/pages/cgvPage";
+//page user logged
 import { DashboardPage } from "./src/pages/dashboardPage";
-//import { CguPage} from "./src/pages/cguPage";
-import { Page404 } from "./src/pages/404Page";
-import { ResetPasswordPage } from "./src/pages/reset-passwordPage";
 import { BillingSuccessPage } from "./src/pages/billingSuccessPage";
+import { ResetPasswordPage } from "./src/pages/reset-passwordPage";
+//page error 404
+import { Page404 } from "./src/pages/404Page";
+
 
 //import des composants
-import { NavBar } from "./src/components/navBar";
+import { NavBar } from "./src/components/NavBar";
 import { Footer } from "./src/components/footer/Footer";
 
 export function App() {
