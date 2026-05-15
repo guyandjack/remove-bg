@@ -7,7 +7,7 @@ import { api } from "@/utils/axiosConfig";
 import { type PlanOption, setPlanOptions } from "@/stores/planOptions";
 
 //import des librairies
-import { AnimatePresence, LazyMotion, domAnimation } from "motion/react";
+import { AnimatePresence } from "motion/react";
 import * as m from "motion/react-m";
 
 //import des composants enfants
@@ -353,48 +353,46 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
         ref={containerService}
         className={"w-full max-w-[1300px] mt-8 mg:mt-10 lg:mt-15"}
       >
-        <LazyMotion features={domAnimation}>
-          <AnimatePresence>
-            {service === "remove" ? (
-              <m.div
-                key="background-preview"
-                className=""
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <RemoveBg
-                  removeTextContent={removeBgContent}
-                  uploadTextContent={textUploadImgComponent}
-                  imgEditorTextContent={imgEditorContent}
-                  downloadLinkTextContent={downloadLinkContent}
-                />
-              </m.div>
-            ) : null}
-            {service === "social" ? (
-              <m.div
-                key="social-picture"
-                className="w-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <SocialPicture />
-              </m.div>
-            ) : null}
-            {service === "convert" ? (
-              <m.div
-                key="image-converter"
-                className="w-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <ImageConverter converterTextContent={converterContent} />
-              </m.div>
-            ) : null}
-          </AnimatePresence>
-        </LazyMotion>
+        <AnimatePresence>
+          {service === "remove" ? (
+            <m.div
+              key="background-preview"
+              className=""
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <RemoveBg
+                removeTextContent={removeBgContent}
+                uploadTextContent={textUploadImgComponent}
+                imgEditorTextContent={imgEditorContent}
+                downloadLinkTextContent={downloadLinkContent}
+              />
+            </m.div>
+          ) : null}
+          {service === "social" ? (
+            <m.div
+              key="social-picture"
+              className="w-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <SocialPicture />
+            </m.div>
+          ) : null}
+          {service === "convert" ? (
+            <m.div
+              key="image-converter"
+              className="w-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <ImageConverter converterTextContent={converterContent} />
+            </m.div>
+          ) : null}
+        </AnimatePresence>
       </div>
     </div>
   );
