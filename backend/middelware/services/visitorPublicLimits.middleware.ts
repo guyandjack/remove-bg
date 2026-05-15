@@ -23,7 +23,7 @@ const allowedMimes = new Set([
 
 const validateVisitorImageUpload = validateImageUpload("file", {
   maxSizeBytes:
-    parseSizeMaxToBytes(planOption.find((p) => p.name === "visitor")?.size_max) ??
+    parseSizeMaxToBytes(planOption.find((p) => p.name === "visitor")?.img_input) ??
     DEFAULT_VISITOR_MAX_BYTES,
   allowedMimes,
 });

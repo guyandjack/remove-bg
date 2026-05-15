@@ -73,7 +73,7 @@ const planOption: PlanOptionInput[] = [
     },
 
     model_IA_ressource: "std",
-    credit_IA: 5,
+    credit_IA: 8,
     credit_conversion: "15",
     img_input: "5Mb",
     img_output: "512 px",

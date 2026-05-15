@@ -71,7 +71,7 @@ router.post(
 router.post(
   "/public/remove-bg",
   validateVisitorImageUpload,
-  limitRemoveBgInputMaxWidth({ maxWidth: 1080 }),
+  limitRemoveBgInputMaxWidth(),
   attachRemoveBgQuality,
   removeBgVisitorByReplicate,
 );
@@ -80,7 +80,7 @@ router.post(
 router.post(
   "/public/remove-bg/jobs",
   validateVisitorImageUpload,
-  limitRemoveBgInputMaxWidth({ maxWidth: 1080 }),
+  limitRemoveBgInputMaxWidth(),
   attachRemoveBgQuality,
   createRemoveBgVisitorReplicateJob,
 );
@@ -110,7 +110,7 @@ router.post(
   "/remove-bg-replicate",
   verifyAuth,
   validateRemoveBgUpload,
-  limitRemoveBgInputMaxWidth({ maxWidth: 1080 }),
+  limitRemoveBgInputMaxWidth(),
   attachRemoveBgQuality,
   removeBgByReplicate
 );
@@ -120,7 +120,7 @@ router.post(
   "/remove-bg-replicate/jobs",
   verifyAuth,
   validateRemoveBgUpload,
-  limitRemoveBgInputMaxWidth({ maxWidth: 1080 }),
+  limitRemoveBgInputMaxWidth(),
   attachRemoveBgQuality,
   createRemoveBgReplicateJob
 );

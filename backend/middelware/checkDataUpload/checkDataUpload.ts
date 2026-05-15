@@ -108,7 +108,7 @@ async function resolveMaxUploadBytesFromPlanOptions(req: Request): Promise<numbe
 
   if (!isAuthenticated) {
     const visitorCfg = planOption.find((p) => p.name === "visitor");
-    return parseSizeMaxToBytes(visitorCfg?.size_max) ?? DEFAULT_MAX_SIZE_BYTES;
+    return parseSizeMaxToBytes(visitorCfg?.img_input) ?? DEFAULT_MAX_SIZE_BYTES;
   }
 
   const user = await getUserByEmail(email);
@@ -116,7 +116,7 @@ async function resolveMaxUploadBytesFromPlanOptions(req: Request): Promise<numbe
 
   const planCode = (await getActivePlanCodeForUser(user.id)) || "free";
   const cfg = planOption.find((p) => p.name === planCode);
-  return parseSizeMaxToBytes(cfg?.size_max) ?? DEFAULT_MAX_SIZE_BYTES;
+  return parseSizeMaxToBytes(cfg?.img_input) ?? DEFAULT_MAX_SIZE_BYTES;
 }
 
 // ---------- Middleware factory ----------

@@ -3,6 +3,13 @@ import sharp from "sharp";
 
 import type { ValidatedImage } from "../checkDataUpload/checkDataUpload.js";
 import { logger } from "../../logger.js";
+import {
+  getActivePlanCodeForUser,
+  getUserByEmail,
+} from "../../DB/queriesSQL/queriesSQL.js";
+import {
+  pickRemoveBgInputMaxWidth,
+} from "../../services/removeBg/removeBgInputMaxWidth.js";
 
 function getClientRequestId(req: Request): string | null {
   const fromBody =
@@ -12,11 +19,15 @@ function getClientRequestId(req: Request): string | null {
   return value ? value : null;
 }
 
-function parseMaxWidth(): number {
-  const raw = String(process.env.REMOVEBG_MAX_INPUT_WIDTH ?? "").trim();
-  if (!raw) return 1080;
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1080;
+function normalizeNonEmptyString(candidate: unknown): string | null {
+  if (typeof candidate !== "string") return null;
+  const v = candidate.trim();
+  return v ? v : null;
+}
+
+function normalizePlanCode(candidate: unknown): string | null {
+  const v = normalizeNonEmptyString(candidate);
+  return v ? v.toLowerCase() : null;
 }
 
 function effectiveWidth(meta: sharp.Metadata): number | null {
@@ -79,6 +90,46 @@ async function resizeBuffer(params: {
   };
 }
 
+async function resolveUserPlanCodeFromRequest(req: Request): Promise<string | null> {
+  const cached = normalizePlanCode((req as any).activePlanCode);
+  if (cached) return cached;
+
+  const email = normalizeNonEmptyString((req as any)?.payload?.email);
+  if (!email) return null;
+
+  try {
+    const user = await getUserByEmail(email);
+    if (!user) return null;
+    const planCode = await getActivePlanCodeForUser(user.id);
+    const normalized = normalizePlanCode(planCode);
+    if (normalized) (req as any).activePlanCode = normalized;
+    return normalized;
+  } catch {
+    return null;
+  }
+}
+
+async function resolveMaxWidthForRequest(
+  req: Request,
+  opt?: number | ((req: Request) => number | Promise<number>),
+): Promise<number> {
+  try {
+    if (typeof opt === "number" && Number.isFinite(opt) && opt > 0) {
+      return Math.floor(opt);
+    }
+    if (typeof opt === "function") {
+      const resolved = await opt(req);
+      if (typeof resolved === "number" && Number.isFinite(resolved) && resolved > 0) {
+        return Math.floor(resolved);
+      }
+    }
+  } catch {}
+
+  const isAuthenticated = Boolean(normalizeNonEmptyString((req as any)?.payload?.email));
+  const planCode = isAuthenticated ? await resolveUserPlanCodeFromRequest(req) : null;
+  return pickRemoveBgInputMaxWidth({ isAuthenticated, planCode });
+}
+
 /**
  * Limits the width of an uploaded image (pre-Replicate) to reduce:
  * - Replicate compute time
@@ -91,13 +142,8 @@ async function resizeBuffer(params: {
  * - tries to preserve colour profile (`withMetadata()`)
  */
 export function limitRemoveBgInputMaxWidth(
-  options: { maxWidth?: number } = {},
+  options: { maxWidth?: number | ((req: Request) => number | Promise<number>) } = {},
 ) {
-  const maxWidth =
-    typeof options.maxWidth === "number" && options.maxWidth > 0
-      ? Math.floor(options.maxWidth)
-      : parseMaxWidth();
-
   return async (req: Request, res: Response, next: NextFunction) => {
     const requestId = (req as any).requestId;
     const clientRequestId = getClientRequestId(req);
@@ -107,6 +153,7 @@ export function limitRemoveBgInputMaxWidth(
     }
 
     try {
+      const maxWidth = await resolveMaxWidthForRequest(req, options.maxWidth);
       const totalStartedAt = Date.now();
       const metaStartedAt = Date.now();
       const meta = await sharp(image.buffer, { failOnError: false }).metadata();

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { test } from "./run";
+import { test } from "./run.ts";
 
 // Copy of the internal logic in `backend/DB/queriesSQL/queriesSQL.ts`.
 // Goal: ensure we always produce a JSON-valid string for MariaDB's

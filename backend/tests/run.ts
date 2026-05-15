@@ -9,9 +9,10 @@ export function test(name: string, fn: TestCase["fn"]) {
 
 async function main() {
   // Register test files
-  await import("./access.test");
-  await import("./planChange.test");
-  await import("./json_payload_db_compat.test");
+  await import("./access.test.ts");
+  await import("./planChange.test.ts");
+  await import("./json_payload_db_compat.test.ts");
+  await import("./removeBgInputMaxWidth.test.ts");
 
   let failed = 0;
   for (const t of tests) {
