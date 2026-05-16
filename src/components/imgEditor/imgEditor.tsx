@@ -644,11 +644,7 @@ const ImgEditor = ({
 
     if (activePicker === "image") {
       if (planUser === "free") {
-        return (
-          <p className="mt-4 text-sm text-warning">
-            {textContent.restrictedOption}
-          </p>
-        );
+        setActivePicker("color");
       }
       return (
         <div className="mt-3 lg:max-h-[65%] lg:w-full ">

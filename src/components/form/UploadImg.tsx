@@ -161,9 +161,9 @@ const UploadImg = ({
           <div className="mt-6">
             <div className="grid grid-cols-1 gap-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-base-content/70 truncate">
+                {/* <span className="text-sm text-base-content/70 truncate">
                   {fileName || content.filename}
-                </span>
+                </span> */}
                 {previewUrl ? (
                   <div className="flex items-center gap-2">
                     {onConfirm ? (
@@ -196,9 +196,9 @@ const UploadImg = ({
                       alt="Apercu de l'image uploadee"
                       className="max-h-64 w-auto rounded-lg shadow-md object-contain bg-base-100"
                     />
-                    <figcaption className="text-xs text-base-content/60">
-                      Apercu
-                    </figcaption>
+                    {/* <figcaption className="text-xs text-base-content/60">
+                      {}
+                    </figcaption> */}
                   </figure>
                 ) : (
                   <div className="flex h-44 items-center justify-center text-base-content/50">

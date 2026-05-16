@@ -257,7 +257,7 @@ const RemoveBg = ({
 
   const choicePlan = (e?: MouseEvent) => {
     const elementList = planChoiceEl?.current;
-    console.log("plan type: ", typePlan);
+    
     //si pas d'event et pas de plan c'est option de style par defaut
     if (!e && typePlan === "free" && elementList) {
       const buttons =
