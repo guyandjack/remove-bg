@@ -43,7 +43,6 @@ type DownloadLinkTextContent = {
 
 
 
-const DEFAULT_DOWNLOAD_NAME = setFileNameDownload("removed-bg");
 
 const buildBlobFromSource = async (
   source: string,
@@ -70,17 +69,18 @@ const triggerFallbackDownload = (blob: Blob, fileName: string) => {
 
 const saveImageToDestination = async (
   source: string,
-  textContent: DownloadLinkTextContent
+  textContent: DownloadLinkTextContent,
+  fileName: string,
 ) => {
   const blob = await buildBlobFromSource(source, textContent);
   if (typeof window === "undefined") {
-    triggerFallbackDownload(blob, DEFAULT_DOWNLOAD_NAME);
+    triggerFallbackDownload(blob, fileName);
     return;
   }
   const maybePicker = (window as WindowWithFilePicker).showSaveFilePicker;
   if (typeof maybePicker === "function") {
     const handle = await maybePicker({
-      suggestedName: DEFAULT_DOWNLOAD_NAME,
+      suggestedName: fileName,
       types: [
         {
           description: textContent.fileTypeDescription,
@@ -97,7 +97,7 @@ const saveImageToDestination = async (
     await writable.close();
     return;
   }
-  triggerFallbackDownload(blob, DEFAULT_DOWNLOAD_NAME);
+  triggerFallbackDownload(blob, fileName);
 };
 
 type DownloadLinkProps = {
@@ -139,8 +139,10 @@ const DownloadLink = ({ currentSource, credit, textContent }: DownloadLinkProps)
     e.preventDefault(); // on prend le contrôle du download pour éviter les doubles appels
     setIsPending(true);
 
+    const dowloadName = setFileNameDownload("remove-bg");
+
     try {
-      await saveImageToDestination(currentSource, textContent);
+      await saveImageToDestination(currentSource, textContent, dowloadName);
     } catch (err) {
       setShowToast({
         status: "error",
@@ -160,7 +162,7 @@ const DownloadLink = ({ currentSource, credit, textContent }: DownloadLinkProps)
             success: "",
           },
         });
-      }, 2500);
+      }, 100000);
     }
   };
 

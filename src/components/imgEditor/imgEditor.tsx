@@ -8,7 +8,7 @@
 // - Permettre de revenir à l’image d’origine (sans fond) et de télécharger le résultat.
 
 //import des hooks
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { AnimatePresence, LazyMotion, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
 
@@ -101,12 +101,15 @@ type Bg = { type: "color"; value: string } | { type: "image"; value: string };
 
 type BgValue = Bg | null;
 
+type ToolId = "color" | "image" | "erase" | "social";
+
 
 
 // Miniatures locales (fallback si aucune recherche Pexels)
 const backgroundImages:[] = [];
 const MAX_PEXELS_PAGES = 5;
 const EDITOR_FADE_DURATION = 180;
+const TOOL_CAROUSEL_SLIDE_DURATION = 180;
 
 const ImgEditor = ({
   src,
@@ -127,7 +130,10 @@ const ImgEditor = ({
   const [currentSource, setCurrentSource] = useState<string>(src); // image actuellement affichée dans l’éditeur
   const [isComposing, setIsComposing] = useState(false); // spinner pendant la composition canvas
   const [selectedBg, setSelectedBg] = useState<BgValue>(null); // dernier fond choisi
-  const [activePicker, setActivePicker] = useState<"color" | "image" | "erase" | "social">("color"); // onglet actif
+  const [toolCarouselIndex, setToolCarouselIndex] = useState(0);
+  const [toolCarouselDirection, setToolCarouselDirection] = useState<
+    "left" | "right" | null
+  >(null);
   const [isPending, setIsPending] = useState(false);
   const [isColorPicker, setIsColorPicker] = useState(false); // affichage du composant colorpicker
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
@@ -468,7 +474,6 @@ const ImgEditor = ({
     if (isPreviewVisible) {
       hidePreviewWindow();
     }
-    setActivePicker("erase");
     setIsEraserVisible(true);
     setIsSendingEraser(false);
     resetEraserSurface();
@@ -478,8 +483,49 @@ const ImgEditor = ({
     resetEraserSurface();
     setIsEraserVisible(false);
     setIsSendingEraser(false);
-    setActivePicker("color");
   };
+
+  const toolCarouselItems = useMemo(() => {
+    // Liste minimale par plan (performance + UX). À enrichir lors de l'ajout de nouveaux outils/plans.
+    if (planUser === "free") return ["color"] as ToolId[];
+    return ["color", "image"] as ToolId[];
+  }, [planUser]);
+
+  // Clamp l'index quand la liste d'outils change (ex: hobby -> free).
+  useEffect(() => {
+    setToolCarouselIndex((previous) => {
+      if (toolCarouselItems.length === 0) return 0;
+      return Math.max(0, Math.min(previous, toolCarouselItems.length - 1));
+    });
+  }, [toolCarouselItems.length]);
+
+  // Le tool actif est piloté par l'index du carousel (pas par un clic direct sur le bouton).
+  const activeTool =
+    toolCarouselItems[toolCarouselIndex] ?? toolCarouselItems[0] ?? "color";
+
+  const goToPrevTool = () => {
+    if (toolCarouselItems.length <= 1) return;
+    setToolCarouselDirection("left");
+    setToolCarouselIndex((previous) =>
+      previous <= 0 ? toolCarouselItems.length - 1 : previous - 1,
+    );
+  };
+
+  const goToNextTool = () => {
+    if (toolCarouselItems.length <= 1) return;
+    setToolCarouselDirection("right");
+    setToolCarouselIndex((previous) =>
+      previous >= toolCarouselItems.length - 1 ? 0 : previous + 1,
+    );
+  };
+
+  useEffect(() => {
+    if (!toolCarouselDirection) return;
+    const timeout = window.setTimeout(() => {
+      setToolCarouselDirection(null);
+    }, TOOL_CAROUSEL_SLIDE_DURATION);
+    return () => window.clearTimeout(timeout);
+  }, [toolCarouselDirection]);
 
   const getPointerPosition = (event: PointerEvent) => {
     const canvas = eraserCanvasRef.current;
@@ -665,34 +711,26 @@ const ImgEditor = ({
   const activeBackground =
     isPreviewVisible && previewSelection ? previewSelection : selectedBg;
 
-  const renderActiveOptionContent = (activePiker:any) => {
-    if (activePicker === "color") {
+  const renderActiveOptionContent = (activeTool: ToolId) => {
+
+    if (activeTool === "color") {
       return (
-        <div
-          className={
-            "flex flex-row flex-wrap justify-evenly w-full lg:flex-col lg:items-start gap-5"
-          }
-        >
-          <div className="min-h-[400px] w-auto lg:w-full">
-            <ReactColorPicker setLastChoice={setLastPikerColor} />
-          </div>
+        <div className="flex flex-row justify-center items-center p-4 bg-white rounded-xl">
+          <ReactColorPicker setLastChoice={setLastPikerColor} />
         </div>
       );
     }
 
-    if (activePicker === "image") {
-      if (planUser === "free") {
-        setActivePicker("color");
-      }
+    if (activeTool === "image") {
       return (
-        <div className="mt-3 lg:max-h-[65%] lg:w-full ">
+        <div className="lg:w-full h-full">
           <p className="text-start text-base-content/70 mb-[10px]">
             {textContent.imageSearchIntro}
           </p>
 
           <div className="mb-3">
             <form
-              className="join w-full lg:w-full"
+              className="join w-full"
               onSubmit={(e) => {
                 e.preventDefault();
                 fetchImages(searchTerm, 1);
@@ -702,7 +740,7 @@ const ImgEditor = ({
                 id="search"
                 type="search"
                 placeholder={textContent.imageSearchPlaceholder}
-                className="input input-bordered join-item w-full bg-base-200 text-base-content placeholder:text-base-content/60"
+                className="input input-bordered join-item bg-base-200 text-base-content placeholder:text-base-content/60 max-w-[200px]"
                 pattern="[A-Za-z0-9 \\-_'.,]{1,50}"
                 aria-label={textContent.imageSearchAriaLabel}
                 maxLength={50}
@@ -756,7 +794,7 @@ const ImgEditor = ({
           </div>
 
           <div>
-            { <ul className="w-[80%] flex gap-3 pb-2 overflow-auto flex-wrap lg:w-full lg:max-h-[300px]">
+            { <ul className="w-[80%] flex gap-3 pb-2 overflow-auto flex-wrap lg:w-full">
               {(pexelsImages.length > 0 ? pexelsImages : backgroundImages).map(
                 (item: any) => {
                   const thumb = typeof item === "string" ? item : item.tiny;
@@ -832,8 +870,62 @@ const ImgEditor = ({
     return null;
   };
 
+  const toolDefinitions = useMemo(() => {
+    const ColorIcon = (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="size-5"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z"
+        />
+      </svg>
+    );
+
+    const ImageIcon = (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="size-5"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+        />
+      </svg>
+    );
+
+    return {
+      color: {
+        id: "color" as const,
+        label: textContent.tabColorPicker,
+        icon: ColorIcon,
+      },
+      image: {
+        id: "image" as const,
+        label: textContent.tabImagePicker,
+        icon: ImageIcon,
+      },
+    };
+  }, [textContent.tabColorPicker, textContent.tabImagePicker]);
+
+  const activeToolDefinition =
+    toolDefinitions[activeTool as "color" | "image"] ?? toolDefinitions.color;
+
   return (
-    <div className="w-full mx-auto min-h-[80vh] flex flex-col justify-between items-center gap-3 lg:flex-row lg:h-[80vh] ">
+    <div className="w-full mx-auto min-h-[80vh] flex flex-col justify-between items-center gap-3 lg:flex-row lg:h-[800px]">
       {/* Zone éditeur Filerobot */}
       <div className="relative w-full h-full rounded-xl ring-1 ring-base-200 bg-base-100/60 backdrop-blur-sm lg:min-w-[550px]">
         {isComposing && (
@@ -1048,66 +1140,102 @@ const ImgEditor = ({
 
       <div
         className={
-          "bg-component rounded-lg w-full flex flex-col justify-between items-center lg:w-[400px] lg:h-[100%] lg:shrink-0 p-[10px]"
+          "bg-component rounded-lg w-full flex flex-col justify-between items-center lg:w-[400px] h-[100%] p-[10px] lg:shrink-0"
         }
       >
         {/* Commandes: onglets, reset, téléchargement */}
-        <div className={"lg:h-[25%] lg:w-full "}>
+        <div className={"tool-select lg:w-full lg:h-[15%]"}>
           <h2 className={"p-[5px] text-xl text-center "}>
             {textContent.title}
           </h2>
-          <div className="my-4 border-b border-t py-[10px] border-white/30 flex flex-col justify-start items-center gap-y-4 ">
-            {planUser !== "free" ?
-              <button 
+          <div className="my-4 border-b border-t py-[10px] border-white/30 flex flex-row items-center justify-between ">
+            <button
               type="button"
-              className={`w-[220px] btn ${activePicker === "color" ? "btn-success" : "btn-ghost"
-                } hover:bg-success/50`}
-              onClick={() => {
-                setActivePicker("color");
-              }}
+              className="btn btn-ghost btn-sm"
+              onClick={goToPrevTool}
+              disabled={
+                toolCarouselItems.length <= 1 ||
+                isPreviewVisible ||
+                isEraserVisible
+              }
+              aria-label="Outil précédent"
+              title="Outil précédent"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={1.5}
+                strokeWidth={2}
                 stroke="currentColor"
-                className="size-6"
+                className="size-5"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z"
+                  d="M15.75 19.5 8.25 12l7.5-7.5"
                 />
               </svg>
-              <span>{textContent.tabColorPicker}</span>
-            </button> : null}
-            {planUser !== "free" ? (
-              <>
+            </button>
+
+            <div className="relative w-full overflow-hidden">
+              <div
+                className={`flex flex-row justify-center items-cente w-full transition-transform duration-200 ease-out ${
+                  toolCarouselDirection === "left"
+                    ? "-translate-x-2"
+                    : toolCarouselDirection === "right"
+                      ? "translate-x-2"
+                      : "translate-x-0"
+                }`}
+                style={{ willChange: "transform" }}
+              >
                 <button
                   type="button"
-                  className={`w-[220px] btn  ${
-                    activePicker === "image" ? "btn-success" : "btn-ghost"
-                  } hover:bg-success/50`}
-                  onClick={() => setActivePicker("image")}
+                  className={`btn btn-ghost btn-sm`}
+                  aria-live="polite"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                    />
-                  </svg>
-                  <span>{textContent.tabImagePicker}</span>
+                  {activeToolDefinition.icon}
+                  <span className="truncate">{activeToolDefinition.label}</span>
                 </button>
-                {/* <button
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={goToNextTool}
+              disabled={
+                toolCarouselItems.length <= 1 ||
+                isPreviewVisible ||
+                isEraserVisible
+              }
+              aria-label="Outil suivant"
+              title="Outil suivant"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="size-5"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.25 4.5 15.75 12l-7.5 7.5"
+                />
+              </svg>
+            </button>
+
+            <div className="min-w-[48px] text-center text-xs text-base-content/70 tabular-nums">
+              {toolCarouselItems.length === 0
+                ? "0/0"
+                : `${toolCarouselIndex + 1}/${toolCarouselItems.length}`}
+            </div>
+
+            {/* <button
                   type="button"
                   className={`w-[180px] btn  ${
                     activePicker === "erase" ? "btn-success" : "btn-ghost"
@@ -1138,7 +1266,7 @@ const ImgEditor = ({
                   </svg>
                   <span>Magic eraser</span>
                 </button> */}
-                {/* <button
+            {/* <button
                   type="button"
                   className={`w-[180px] btn  ${
                     activePicker === "social" ? "btn-success" : "btn-ghost"
@@ -1169,24 +1297,28 @@ const ImgEditor = ({
                   </svg>
                   <span>Social content</span>
                 </button> */}
-              </>
-            ) : null}
           </div>
         </div>
 
-        <div id="active-option" className="w-full lg:max-h-[65%] lg:w-full">
-          {renderActiveOptionContent(activePicker)}
+        <div
+          id="active-option"
+          className="flex flex-col justify-center items-center lg:h-[72%]  lg:w-full"
+        >
+          {renderActiveOptionContent(activeTool)}
         </div>
-        <div className={"lg:w-full h-[15%]"}>
-         
-            <div className={"my-3"}>
-              <DownloadLink
-                currentSource={currentSource}
-                credit={credit}
-                textContent={downloadLinkTextContent}
-              />
-            </div>
-          
+        <div
+          className={
+            "flex flex-col justify-between items-center gap-2 lg:flex-row lg:w-full lg:h-[8%]"
+          }
+        >
+          <div className={"my-2"}>
+            <DownloadLink
+              currentSource={currentSource}
+              credit={credit}
+              textContent={downloadLinkTextContent}
+            />
+          </div>
+
           <button
             type="button"
             className="btn btn-warning"
