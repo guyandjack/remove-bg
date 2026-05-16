@@ -144,14 +144,16 @@ const DownloadLink = ({ currentSource, credit, textContent }: DownloadLinkProps)
     try {
       await saveImageToDestination(currentSource, textContent, dowloadName);
     } catch (err) {
-      setShowToast({
-        status: "error",
-        message: {
-          error: `${textContent.errorPrefix} ${String(err)}`,
-          success: "",
-        },
-      });
-      console.error("Erreur durant le clic de téléchargement :", err);
+      if ((err as Error).name !== "AbortError") {
+        
+        setShowToast({
+          status: "error",
+          message: {
+            error: `${textContent.errorPrefix} ${String(err)}`,
+            success: "",
+          },
+        });
+      };
     } finally {
       setTimeout(() => {
         setIsPending(false);
@@ -162,7 +164,7 @@ const DownloadLink = ({ currentSource, credit, textContent }: DownloadLinkProps)
             success: "",
           },
         });
-      }, 100000);
+      }, 3000);
     }
   };
 
@@ -189,6 +191,7 @@ const DownloadLink = ({ currentSource, credit, textContent }: DownloadLinkProps)
       {showToast.status !== "idle" ? (
         <div className="toast toast-center toast-middle">
           {showToast.status === "error" ? (
+
             <div className="alert alert-info">
               <span>{showToast.message.error}</span>
             </div>
