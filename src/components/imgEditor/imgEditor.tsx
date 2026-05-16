@@ -37,7 +37,6 @@ import BgSport from "@/assets/images/sport.jpg";
 //import des data
 import { socialImgPreset } from "@/data/content/components/editor/socialImgPreset";
 
-
 //declaration des types
 // Types auxiliaires
 type PexelsImage = { tiny: string; large: string };
@@ -103,10 +102,8 @@ type BgValue = Bg | null;
 
 type ToolId = "color" | "image" | "erase" | "social";
 
-
-
 // Miniatures locales (fallback si aucune recherche Pexels)
-const backgroundImages:[] = [];
+const backgroundImages: [] = [];
 const MAX_PEXELS_PAGES = 5;
 const EDITOR_FADE_DURATION = 180;
 const TOOL_CAROUSEL_SLIDE_DURATION = 180;
@@ -180,8 +177,8 @@ const ImgEditor = ({
       setSearchError("");
       const response = await api.get(
         `/api/pexels/images/?theme=${encodeURIComponent(
-          value
-        )}&lang=${encodeURIComponent(language)}&page=${safePage}`
+          value,
+        )}&lang=${encodeURIComponent(language)}&page=${safePage}`,
         /* { headers: { "Content-Type": "application/json" }, timeout: 10000 } */
       );
       const data = response?.data || {};
@@ -336,7 +333,7 @@ const ImgEditor = ({
 
   const updateEditorSource = (
     source: string,
-    options: { animate?: boolean } = {}
+    options: { animate?: boolean } = {},
   ) => {
     const shouldAnimate = options.animate ?? true;
 
@@ -358,7 +355,10 @@ const ImgEditor = ({
             if (result?.imageBase64) setCurrentSource(result.imageBase64);
           },
         };
-        editorRef.current = new FIE(container, { ...baseConfig, ...planConfig });
+        editorRef.current = new FIE(container, {
+          ...baseConfig,
+          ...planConfig,
+        });
         editorRef.current.render();
         return;
       }
@@ -609,7 +609,7 @@ const ImgEditor = ({
   const sendMagicEraseRequest = async () => {
     if (!eraserMaskData) {
       setEraserError(
-        "Dessinez une zone à effacer avant de valider l'empreinte."
+        "Dessinez une zone à effacer avant de valider l'empreinte.",
       );
       return;
     }
@@ -633,12 +633,18 @@ const ImgEditor = ({
         {
           responseType: "blob",
           timeout: 60000,
-        }
+        },
       );
 
-      const remaining = Number(response.headers?.["x-wizpix-credits-remaining"]);
+      const remaining = Number(
+        response.headers?.["x-wizpix-credits-remaining"],
+      );
       const used = Number(response.headers?.["x-wizpix-credits-used"]);
-      if (Number.isFinite(remaining) && Number.isFinite(used) && sessionSignal.value) {
+      if (
+        Number.isFinite(remaining) &&
+        Number.isFinite(used) &&
+        sessionSignal.value
+      ) {
         const updated = {
           ...sessionSignal.value,
           credits: { used_last_24h: used, remaining_last_24h: remaining },
@@ -660,7 +666,7 @@ const ImgEditor = ({
       setEraserError(
         error?.response?.data?.message ||
           error?.message ||
-          "Impossible d'effacer cette zone. Veuillez réessayer."
+          "Impossible d'effacer cette zone. Veuillez réessayer.",
       );
     } finally {
       setIsSendingEraser(false);
@@ -676,10 +682,7 @@ const ImgEditor = ({
   };
 
   // Compose et applique directement le fond choisi (couleur ou image)
-  const applyBackground = async (
-    bg: Bg,
-    composedOverride?: string | null
-  ) => {
+  const applyBackground = async (bg: Bg, composedOverride?: string | null) => {
     try {
       setIsComposing(true);
       setSelectedBg(bg);
@@ -712,7 +715,6 @@ const ImgEditor = ({
     isPreviewVisible && previewSelection ? previewSelection : selectedBg;
 
   const renderActiveOptionContent = (activeTool: ToolId) => {
-
     if (activeTool === "color") {
       return (
         <div className="flex flex-row justify-center items-center p-4 bg-white rounded-xl">
@@ -794,9 +796,12 @@ const ImgEditor = ({
           </div>
 
           <div>
-            { <ul className="w-[80%] flex gap-3 pb-2 overflow-auto flex-wrap lg:w-full">
-              {(pexelsImages.length > 0 ? pexelsImages : backgroundImages).map(
-                (item: any) => {
+            {
+              <ul className="w-[80%] flex gap-3 pb-2 overflow-auto flex-wrap lg:w-full">
+                {(pexelsImages.length > 0
+                  ? pexelsImages
+                  : backgroundImages
+                ).map((item: any) => {
                   const thumb = typeof item === "string" ? item : item.tiny;
                   const large = typeof item === "string" ? item : item.large;
                   const isActiveBg =
@@ -822,9 +827,9 @@ const ImgEditor = ({
                       </button>
                     </li>
                   );
-                }
-              )}
-            </ul> }
+                })}
+              </ul>
+            }
           </div>
         </div>
       );
@@ -1189,14 +1194,12 @@ const ImgEditor = ({
                 }`}
                 style={{ willChange: "transform" }}
               >
-                <button
-                  type="button"
-                  className={`btn btn-ghost btn-sm`}
-                  aria-live="polite"
-                >
+                <div
+                  className={"flex justify-start items-center gap-4"}
+                  aria-live="polite">
                   {activeToolDefinition.icon}
                   <span className="truncate">{activeToolDefinition.label}</span>
-                </button>
+                </div>
               </div>
             </div>
 
