@@ -11,7 +11,8 @@ type PlanKey =
   | "credit"
   | "conversions_suffix"
   | "unlimited"
-  | "size_max"
+  | "img_input"
+  | "img_output"
   | "tools"
   | "gomme_magique"
   | "Image_pexels"
@@ -29,7 +30,8 @@ type PlanOption = {
   lower_plan_option?: string;
   credit_IA: number;
   credit_conversion: string;
-  size_max?: string;
+  img_input: string;
+  img_output: string;
   remove_bg: boolean;
   change_bg_color: boolean;
   tools_qt: string;
@@ -99,7 +101,7 @@ const PriceCard = ({
     return mbNormalized.replace(/(\d)(MB)\b/i, "$1 $2");
   };
 
-  const sizeMaxDisplay = normalizeSizeMax(option.size_max);
+  const sizeMaxDisplay = normalizeSizeMax(option.img_input);
 
   const parseConversionCredits = (
     value: string
@@ -176,7 +178,7 @@ const PriceCard = ({
     sizeMaxDisplay
       ? {
           key: "size_max",
-          title: `${lang.size_max}: ${sizeMaxDisplay}`,
+          title: `${lang.img_input}: ${sizeMaxDisplay}`,
         }
       : null,
     option.gomme_magique

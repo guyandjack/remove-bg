@@ -12,6 +12,9 @@ import { PriceCard } from "@/components/card/priceCard";
 import { Faq } from "@/components/faq/Faq";
 import { PricingComparisonTable } from "@/components/table/PriceTable";
 
+//import librairie animation
+import * as m from "motion/react-m";
+
 //import des fonctions
 import {
   PlanOption,
@@ -307,19 +310,23 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
     <div className={"page-container"}>
       <div
         className={
-          "relative w-full mx-auto max-w-[1300px] py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px] "
+          "relative w-full mx-auto max-w-[1300px] py-[20px] px-[10px] flex flex-col justify-start items-center gap-[30px] "
         }
       >
         {finalizeStatus !== "idle" ? (
-          <div className={"absolute top-[-50px] left-0 right-0 mx-auto max-w-[600px]"}>
+          <div
+            className={
+              "absolute top-[-50px] left-0 right-0 mx-auto max-w-[600px]"
+            }
+          >
             <div
               role="alert"
               className={`alert ${
                 finalizeStatus === "success"
                   ? "alert-success"
                   : finalizeStatus === "error"
-                  ? "alert-error"
-                  : "alert-info"
+                    ? "alert-error"
+                    : "alert-info"
               }`}
             >
               <span>{finalizeMessage}</span>
@@ -350,7 +357,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
             __html: t("pricing.intro").replace(/\n/g, "<br/>"),
           }}
         ></p>
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4 lg:absolute right-0 bottom-[20px]">
           <span className="text-base font-semibold">
             {t("pricing.currency")}
           </span>
@@ -384,24 +391,52 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
       </div>
       {/*card price*/}
 
-      <ul
-        className={
-          "relative w-full max-w-[1300px] mx-auto py-[50px] flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-evenly lg:gap-[0px]"
-        }
-      >
-        {activePlanOptions.map((items) => {
-          return (
-            <li key={items.name} className={"max-w-[350px] min-w-[300px]"}>
-              <PriceCard lang={textLangCard} option={items} currency={currency} />
-            </li>
-          );
-        })}
-      </ul>
+      
+        <ul
+          className={
+            "relative w-full max-w-[1300px] mx-auto my-[50px]  flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-evenly lg:gap-[0px]"
+          }
+          
+        >
+          {activePlanOptions.map((items, index) => {
+            return (
+              <m.li
+                key={items.name}
+                className={"max-w-[350px] min-w-[300px]"}
+                
+                initial={{
+                  opacity: 0,
+                  rotateY: -12,
+                  
+                }}
+                animate={{
+                  opacity: 1,
+                  rotateY: 0,
+                  
+                }}
+                transition={{
+                  delay: index * 0.2,
+                  duration: 0.7,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                style={{
+                  transformPerspective: 1000,
+                  willChange: "transform, opacity",
+                }}
+              >
+                <PriceCard
+                  lang={textLangCard}
+                  option={items}
+                  currency={currency}
+                />
+              </m.li>
+            );
+          })}
+        </ul>
+      
 
       {/* tableau de comparaison*/}
-      <div
-        className={"w-full max-w-[1300px] mx-auto py-[50px] "}
-      >
+      <div className={"w-full max-w-[1300px] mx-auto py-[50px] "}>
         <h2
           className={
             "font-bold text-3xl text-center text-info lg:text-left lg:self-start"
@@ -412,7 +447,8 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         <PricingComparisonTable
           lang={textLangTab}
           option={activePlanOptions}
-          currency={currency} />
+          currency={currency}
+        />
       </div>
 
       {/* FAQ*/}
