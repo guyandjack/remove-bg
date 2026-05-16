@@ -244,6 +244,17 @@ const ImgEditor = ({
       document.removeEventListener("contextmenu", blockContext);
       editorRef.current?.terminate?.();
     };
+  }, []);
+
+  // Mise à jour de la config Filerobot lors du changement de plan (sans recréer l'instance).
+  useEffect(() => {
+    const editor = editorRef.current;
+    const FIE = FIERef.current ?? (window as any).FilerobotImageEditor;
+    if (!editor || !FIE) return;
+    FIERef.current = FIE;
+    const { TABS, TOOLS } = FIE;
+    const planConfig = getConfigForPlan(planUser, TABS, TOOLS);
+    editor.render({ ...planConfig });
   }, [planUser]);
 
   // 2) Changement de sujet (src): réinitialise l’éditeur et les sélections
@@ -322,17 +333,44 @@ const ImgEditor = ({
     options: { animate?: boolean } = {}
   ) => {
     const shouldAnimate = options.animate ?? true;
-    if (!FIERef.current || !containerRef.current) return;
+
+    const renderInPlace = () => {
+      const container = containerRef.current;
+      const FIE = FIERef.current ?? (window as any).FilerobotImageEditor;
+      if (!FIE || !container) return;
+      FIERef.current = FIE;
+
+      const { TABS, TOOLS } = FIE;
+      const planConfig = getConfigForPlan(planUser, TABS, TOOLS);
+
+      // Crée l'instance une seule fois, puis utilise `render(additionalConfig)` pour les updates.
+      if (!editorRef.current) {
+        const baseConfig = {
+          source,
+          resetOnImageSourceChange: true,
+          onSave: (result: any) => {
+            if (result?.imageBase64) setCurrentSource(result.imageBase64);
+          },
+        };
+        editorRef.current = new FIE(container, { ...baseConfig, ...planConfig });
+        editorRef.current.render();
+        return;
+      }
+
+      editorRef.current.render({ source, ...planConfig });
+    };
+
+    if (!containerRef.current) return;
     if (!shouldAnimate) {
       clearEditorTransitionTimers();
       setIsEditorTransitioning(false);
-      renderEditor(source);
+      renderInPlace();
       return;
     }
     setIsEditorTransitioning(true);
     clearEditorTransitionTimers();
     editorFadeOutTimeoutRef.current = window.setTimeout(() => {
-      renderEditor(source);
+      renderInPlace();
       editorFadeInTimeoutRef.current = window.setTimeout(() => {
         setIsEditorTransitioning(false);
         editorFadeInTimeoutRef.current = null;
