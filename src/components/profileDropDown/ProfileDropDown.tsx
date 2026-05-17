@@ -96,7 +96,7 @@ const ProfileDropDown = ({ content }: ProfileDropDownType) => {
       </button>
       <ul
         tabIndex={-1}
-        className="menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+        className="menu-sm dropdown-content bg-component rounded-box z-1 mt-3 w-52 p-2 shadow"
       >
         <li className="p-1 cursor-pointer rounded-lg hover:bg-base-300 hover:translate-x-1 transition-all">
           <a

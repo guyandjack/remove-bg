@@ -102,14 +102,14 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
   }, [routeKey]);
 
   return (
-    <div className="page-container">
-      <div className="max-w-xl mx-auto mt-10 card bg-base-100 border border-base-300 shadow-sm">
+    <div className="page-container h-[100vh] lg:h-[calc(100vh_-_315px)]">
+      <div className="max-w-xl mx-auto mt-10 card bg-component border border-base-300 shadow-sm">
         <div className="card-body">
           <h1 className="text-2xl font-bold">{t("billingSuccess.title")}</h1>
           <p className="text-base-content/70">{message}</p>
           {state === "processing" || state === "loading" ? (
             <div className="mt-4 flex items-center gap-2">
-              <span className="loading loading-bars loading-spinner loading-sm" />
+              <span className="loading loading-bars loading-sm" />
               <span className="text-sm text-base-content/70">{t("billingSuccess.doNotRetry")}</span>
             </div>
           ) : null}
