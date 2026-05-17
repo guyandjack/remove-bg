@@ -1,5 +1,13 @@
 //import des librairies
 import crypto from "node:crypto";
+import { logger } from "../logger.js";
+import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.js";
+import { buildLogoUrl } from "../utils/publicAssetUrl.js";
+import {
+  createSmtpTransporter,
+  resolveMailAppName,
+  resolveMailSender,
+} from "../utils/mailer.js";
 
 //import des fonctions
 
@@ -46,6 +54,63 @@ const normalizeCurrency = (code?: string | null): CurrencyCode => {
 };
 
 const OTP_MAX_ATTEMPTS = 5;
+
+function resolveTemplateLocaleFromRequest(req: any): "fr" | "en" {
+  const header = req?.headers?.["accept-language"];
+  const raw = Array.isArray(header) ? header[0] : header;
+  const first = String(raw || "").split(",")[0].trim().toLowerCase();
+  return first.startsWith("fr") ? "fr" : "en";
+}
+
+async function sendAccountCreatedEmail(params: {
+  req: any;
+  toEmail: string;
+  locale: "fr" | "en";
+}) {
+  const isProd = process.env.NODE_ENV === "production";
+  try {
+    const transporter = createSmtpTransporter(isProd);
+    if (!transporter) {
+      logger.warn("signup.account_created::smtp_not_configured", {
+        email: params.toEmail,
+      });
+      return;
+    }
+
+    const appName = resolveMailAppName();
+    const sender = resolveMailSender(isProd);
+    const urlLogo = buildLogoUrl({ req: params.req, isProd });
+    const name = String(params.toEmail).split("@")[0] || "";
+
+    const subject =
+      params.locale === "fr"
+        ? isProd
+          ? "Confirmation de création de compte"
+          : "[DEV] Confirmation de création de compte"
+        : isProd
+        ? "Account creation confirmation"
+        : "[DEV] Account creation confirmation";
+
+    const { html: mjmlHtml } = await renderMjmlTemplate(
+      `account.created.${params.locale}.mjml`,
+      { email: name, urlLogo },
+      params.locale
+    );
+
+    const html = mjmlHtml && mjmlHtml.trim().length > 0 ? mjmlHtml : undefined;
+    await transporter.sendMail({
+      from: `"${appName}" <${sender}>`,
+      to: params.toEmail,
+      subject,
+      html,
+    });
+  } catch (mailErr: any) {
+    logger.warn("signup.account_created::email_failed", {
+      email: params.toEmail,
+      message: mailErr?.message || String(mailErr),
+    });
+  }
+}
 
 const createNewAccountUser: RequestHandler = async (req, res) => {
   try {
@@ -308,6 +373,13 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
           subscriptionId: null,
           hint: "",
         };
+
+        // Email transactionnel (best-effort) : confirmation de création de compte (sans lien/bouton)
+        void sendAccountCreatedEmail({
+          req,
+          toEmail: email,
+          locale: resolveTemplateLocaleFromRequest(req),
+        });
 
         return res.status(200).json(formatedObject);
       }

@@ -3,7 +3,7 @@
     <mj-section padding-bottom="20px" padding-top="20px">
       <mj-column vertical-align="top" width="100%">
         <mj-image
-          src="http://localhost:3000/public/logo/logo_9_white.svg"
+          src="{{urlLogo}}"
           alt=""
           align="center"
           border="none"

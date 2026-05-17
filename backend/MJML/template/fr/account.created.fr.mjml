@@ -16,12 +16,8 @@
         ></mj-image>
       </mj-column>
     </mj-section>
-    
-    <mj-section
-      
-      padding-bottom="20px"
-      padding-top="20px"
-    >
+
+    <mj-section padding-bottom="20px" padding-top="20px">
       <mj-column vertical-align="middle" width="100%">
         <mj-text
           align="left"
@@ -30,9 +26,11 @@
           font-family="open Sans Helvetica, Arial, sans-serif"
           padding-left="25px"
           padding-right="25px"
-          >Bonjour<span style="color: #f4bf51"> {{email}}</span><br /><br />
-          Bienvenue chez Wiz Pix</mj-text
         >
+          Bonjour<span style="color: #f4bf51"> {{email}}</span><br /><br />
+          Ton compte Wiz Pix est maintenant créé
+        </mj-text>
+
         <mj-text
           align="left"
           color="#ffffff"
@@ -40,38 +38,22 @@
           font-family="open Sans Helvetica, Arial, sans-serif"
           padding-left="25px"
           padding-right="25px"
-          line-height="1.2"
-          >Pour terminer la création de ton compte
-          </mj-text>
-          <mj-button
-            padding="5px"
-            background-color="#2fd4bf"
-          >
-            {{plan}}
-          </mj-button>
-          <mj-text
+          line-height="1.4"
+        >
+          La création de ton compte a bien été confirmée.
+        </mj-text>
+
+        <mj-text
           align="left"
           color="#ffffff"
           font-size="16px"
           font-family="open Sans Helvetica, Arial, sans-serif"
           padding-left="25px"
           padding-right="25px"
-          line-height="1.2">
-          confirme ton adresse email en copiant le code ci-dessous dans la fenetre du site internet.(valable 10mn)</mj-text
+          line-height="1.4"
         >
-
-        <mj-button
-          align="center"
-          color="#1e293b"
-          background-color="#f4bf51"
-          font-size="15px"
-          font-family="open Sans Helvetica, Arial, sans-serif"
-          font-weight="5"
-          letter-spacing="5px"
-          padding-left="25px"
-          padding-right="25px"
-          >{{code}}</mj-button
-        >
+          Tu peux maintenant te connecter avec ton adresse email.
+        </mj-text>
 
         <mj-text
           align="left"
@@ -80,10 +62,12 @@
           font-family="open Sans Helvetica, Arial, sans-serif"
           padding-left="25px"
           padding-right="25px"
-          >Merci, <br />
-          L' équipe Wizard of Pixels</mj-text
         >
+          Merci, <br />
+          L'équipe Wizard of Pixels
+        </mj-text>
       </mj-column>
     </mj-section>
   </mj-body>
 </mjml>
+
