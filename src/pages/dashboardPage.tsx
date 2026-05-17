@@ -70,6 +70,10 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
   const [deletionFeedbackToken, setDeletionFeedbackToken] = useState<
     string | null
   >(null);
+  const [pendingDeletionToast, setPendingDeletionToast] = useState<{
+    status: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState<string>("");
   const [planModalStep, setPlanModalStep] = useState<"select" | "confirm">(
     "select",
@@ -283,14 +287,6 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
 
     setMarketingSubmitting("loading");
     setMarketingMessage(null);
-    // Optimistic update
-    setBillingState({
-      ...billingState,
-      marketing: {
-        ...billingState.marketing,
-        marketing_consent: nextValue,
-      },
-    });
     try {
       const resp = await api.post("/api/marketing/consent", {
         marketing_consent: nextValue,
@@ -299,6 +295,18 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         throw new Error("marketing_update_failed");
       setMarketingSubmitting("success");
       {
+        // Update local UI only after backend validation (no optimistic flip).
+        setBillingState((prev) =>
+          prev
+            ? {
+                ...prev,
+                marketing: {
+                  ...prev.marketing,
+                  marketing_consent: nextValue,
+                },
+              }
+            : prev,
+        );
         const msg = t("dashboardPage.billing.marketing.success");
         setMarketingMessage(msg);
         pushActionToast({ status: "success", message: msg });
@@ -313,7 +321,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         setMarketingMessage(msg);
         pushActionToast({ status: "error", message: msg });
       }
-      // Rollback by reloading state
+      // Reload state (source of truth) to avoid any stale UI.
       try {
         const st = await api.get("/api/account/billing-account");
         if (st?.data?.success) setBillingState(st.data as any);
@@ -334,8 +342,15 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
       {
         const msg = t("dashboardPage.billing.account.deletionSuccess");
         setDeletionMessage(msg);
-        pushActionToast({ status: "success", message: msg });
+        // Toast is displayed only AFTER the post-action modal is closed.
+        setPendingDeletionToast({ status: "success", message: msg });
       }
+
+      // Refresh local billing state so the UI is immediately consistent (actions disabled, etc.).
+      try {
+        const st = await api.get("/api/account/billing-account");
+        if (st?.data?.success) setBillingState(st.data as any);
+      } catch {}
 
       const feedbackToken =
         typeof resp?.data?.deletion_feedback_token === "string"
@@ -360,24 +375,34 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
   };
 
   const closeDeletionFeedbackModal = () => {
-    // Finalize deletion on the client side AFTER collecting (or skipping) feedback.
-    try {
-      localStorage.removeItem("session");
-    } catch {}
-    try {
-      sessionSignal.value = {
-        ...(sessionSignal.value as any),
-        token: null,
-        authentified: false,
-      } as any;
-    } catch {}
+    // Close modal first, then show feedback (toast), then finalize local logout.
     try {
       const dialog = document.getElementById(
         "account_deletion_feedback_modal",
       ) as HTMLDialogElement | null;
       dialog?.close?.();
     } catch {}
-    location.route("/");
+
+    if (pendingDeletionToast) {
+      pushActionToast(pendingDeletionToast);
+      setPendingDeletionToast(null);
+    }
+
+    // Finalize deletion on the client side AFTER collecting (or skipping) feedback.
+    // Small delay so the toast can be perceived after the modal closes (UX).
+    window.setTimeout(() => {
+      try {
+        localStorage.removeItem("session");
+      } catch {}
+      try {
+        sessionSignal.value = {
+          ...(sessionSignal.value as any),
+          token: null,
+          authentified: false,
+        } as any;
+      } catch {}
+      location.route("/");
+    }, 1200);
   };
 
   const openPlanChangeModal = async () => {
@@ -681,7 +706,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                   </p>
                 </div>
                 <button
-                  className={`${dashboardActionBtn} btn-outline`}
+                  className={`btn-marketing ${dashboardActionBtn} btn-outline`}
                   disabled={
                     marketingSubmitting === "loading" ||
                     billingState?.account?.account_deletion_requested
@@ -738,7 +763,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                   </div>
                 </div>
                 <button
-                  className={`${dashboardActionBtn} btn-error`}
+                  className={`btn-delete-account ${dashboardActionBtn} btn-error`}
                   disabled={
                     deletionSubmitting === "loading" ||
                     billingState?.account?.account_deletion_requested ||
