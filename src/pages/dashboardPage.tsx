@@ -628,7 +628,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <button
-                    className={`${dashboardActionBtn} btn-primary`}
+                    className={`${dashboardActionBtn} btn-info btn-outline`}
                     onClick={openPlanChangeModal}
                   >
                     {t("dashboardPage.billing.subscription.changeCta")}
@@ -706,7 +706,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                   </p>
                 </div>
                 <button
-                  className={`btn-marketing ${dashboardActionBtn} btn-outline`}
+                  className={`btn-marketing ${dashboardActionBtn} btn-outline btn-info`}
                   disabled={
                     marketingSubmitting === "loading" ||
                     billingState?.account?.account_deletion_requested
@@ -819,7 +819,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
 
             {/* Plan change modal */}
             <dialog id="plan_change_modal" className="modal">
-              <div className="modal-box max-w-5xl pt-8">
+              <div className="modal-box max-w-5xl pt-8 border border-base-100/70">
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="font-bold text-lg">
                     {t("dashboardPage.billing.subscription.changeModalTitle")}
@@ -838,7 +838,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
 
                 {planModalStep === "select" ? (
                   <div className="">
-                    <div className="rounded-xl border border-base-300 p-4">
+                    <div className="rounded-xl border border-base-300 bg-component p-4">
                       <p className="text-sm text-base-content/70">
                         <span className="font-semibold">
                           {t("dashboardPage.billing.subscription.subtitle")}
