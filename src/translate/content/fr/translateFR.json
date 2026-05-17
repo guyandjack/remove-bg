@@ -53,11 +53,12 @@
     "btnSubmit": "Créer votre compte",
     "btnGoogle": "Continuer avec Google",
     "passwordError": "Mot de passe trop faible",
-    "textSuccess": "Un mail de confirmation a été envoyé",
-    "textError": "Une erreur s'est produite, compte annulé",
+    "loadingSubmit": "Envoi du code…",
+    "textSuccess": "Un code de vérification a été envoyé.",
+    "textError": "Impossible d’envoyer le code de vérification. Réessayez.",
     "question": "Déjà membre",
     "link": "Connectez-vous",
-    "httpError": "Une erreur http c'est produite, veuillez vérifier votre connexion."
+    "httpError": "Une erreur HTTP s'est produite. Vérifiez votre connexion."
   },
 
   "otpInput": {
@@ -66,8 +67,13 @@
     "btnResend": "Renvoyer un code",
     "errorRequire": "Champs requis",
     "errorPattern": "Format invalide",
-    "textSuccess": "Création du compte reussi",
-    "textError": "Impossible de créer le compte"
+    "loadingVerify": "Vérification du code…",
+    "loadingResend": "Envoi d’un nouveau code…",
+    "invalidCode": "Code invalide ou expiré. Demandez un nouveau code.",
+    "resendSuccess": "Un nouveau code a été envoyé.",
+    "resendError": "Impossible d’envoyer un nouveau code. Réessayez.",
+    "textSuccess": "Compte créé. Redirection…",
+    "textError": "Impossible de valider le code. Réessayez."
   },
   "formLogin": {
     "title": "Connexion à votre espace",

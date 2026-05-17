@@ -1,6 +1,6 @@
 //import des hooks
 import { useRef, useState } from "preact/hooks";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 //import des librairies
 import axios from "axios";
@@ -11,8 +11,6 @@ import { BtnGoogleLogin } from "@/components/button/loginGoogle";
 import { OtpInput } from "@/components/form/OtpInput";
 import { Loader } from "@/components/loader/Loader";
 
-//import des fonctions
-import { axiosError } from "@/utils/axiosError";
 import { localOrProd } from "@/utils/localOrProd";
 import { REGEX } from "@/shared/validationRegex";
 
@@ -64,7 +62,7 @@ const FormSignUp = () => {
   const lang = i18n.resolvedLanguage || i18n.language;
   //state qui gere l' validite de la reponse.
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   //gere en partie l' affichage du loader
   const [isLoader, setIsLoader] = useState(false);
@@ -98,7 +96,6 @@ const FormSignUp = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    reset,
     watch,
   } = useForm<FormValues>({
     mode: "onTouched",
@@ -118,9 +115,17 @@ const FormSignUp = () => {
   const email = watch("email");
 
   //permet la soumission du formulaire
-  const onSubmit = async (data: FormValues) => {
-    //afficha du loader
-    setIsLoader(true);
+  const onSubmit = async (
+    data: FormValues
+  ): Promise<{ ok: boolean; kind: "initial" | "resend"; error?: string }> => {
+    const kind = data.id === "resend" ? "resend" : "initial";
+
+    // UX: le loader + le toast du parent ne doivent apparaître que pour la soumission initiale.
+    // Le "resend" est géré par le composant OTP (loader + message).
+    if (kind === "initial") {
+      setIsLoader(true);
+      setErrorMessage(null);
+    }
 
     dataUser.current = data;
 
@@ -137,25 +142,25 @@ const FormSignUp = () => {
         }
       );
 
-      
-
       if (!response) {
-        setErrorMessage(
-          t("formSignup.httpError")
-        );
-        setStatus("error");
-        return;
+        const message = t("formSignUp.httpError");
+        if (kind === "initial") {
+          setErrorMessage(message);
+          setStatus("error");
+        }
+        return { ok: false, kind, error: message };
       }
 
-      
-
-      setIsLoader(false);
-      setStatus("success");
-      setDisplayOtp(true);
+      if (kind === "initial") {
+        setStatus("success");
+        setDisplayOtp(true);
+      }
+      return { ok: true, kind };
     } catch (error) {
-      setIsLoader(false);
-      setStatus("error");
-      setDisplayOtp(false);
+      if (kind === "initial") {
+        setStatus("error");
+        setDisplayOtp(false);
+      }
       if (axios.isAxiosError(error)) {
         const payload = error.response?.data;
         console.log("signup error payload:", payload);
@@ -164,18 +169,26 @@ const FormSignUp = () => {
             typeof payload === "string"
               ? payload
               : payload.message || t("formSignUp.httpError");
-          setErrorMessage(serverMessage);
+          if (kind === "initial") setErrorMessage(serverMessage);
+          return { ok: false, kind, error: serverMessage };
         } else {
-          setErrorMessage(t("formSignUp.httpError"));
+          const message = t("formSignUp.httpError");
+          if (kind === "initial") setErrorMessage(message);
+          return { ok: false, kind, error: message };
         }
       } else {
         console.error("signup unexpected error:", error);
-        setErrorMessage(t("formSignUp.httpError"));
+        const message = t("formSignUp.httpError");
+        if (kind === "initial") setErrorMessage(message);
+        return { ok: false, kind, error: message };
       }
     } finally {
-      setTimeout(() => {
-        setStatus("idle");
-      }, 5000);
+      if (kind === "initial") {
+        setIsLoader(false);
+        setTimeout(() => {
+          setStatus("idle");
+        }, 5000);
+      }
     }
   };
 
@@ -395,6 +408,7 @@ const FormSignUp = () => {
                   disabled={
                     pw !== cpw || //password differents
                     isSubmitting || //soumission du formulaire
+                    isLoader || //soumission via resend (appel direct sans handleSubmit)
                     !email || //si formulaire pas rempli entierement
                     !pw ||
                     !cpw ||
@@ -407,6 +421,9 @@ const FormSignUp = () => {
                 </button>
 
                 <div class="mt-5 h-[1px] w-full bg-gray-500 "></div>
+                {isLoader && !displayOtp ? (
+                  <Loader top="top-[90%]" text={t("formSignUp.loadingSubmit")} />
+                ) : null}
 
                 {/* <div className="relative w-full flex flex-col justify-center items-center mt-4">
                   <BtnGoogleLogin
@@ -415,7 +432,7 @@ const FormSignUp = () => {
                       isLoader || status !== "idle" || displayOtp || true
                     }
                   />
-                  {isLoader ? <Loader top="top-20" /> : null}
+                 
                 </div> */}
                 <div
                   className={`btn w-100 transition-all duration-500 transform 
@@ -434,7 +451,9 @@ const FormSignUp = () => {
                 >
                   {status === "success"
                     ? t("formSignUp.textSuccess")
-                    : !errorMessage ? t("formSignUp.textError"): errorMessage}
+                    : !errorMessage
+                      ? t("formSignUp.textError")
+                      : errorMessage}
                 </div>
               </div>
               {
@@ -458,6 +477,11 @@ const FormSignUp = () => {
                 dataUser={dataUser.current}
                 textSuccess={t("otpInput.textSuccess")}
                 textError={t("otpInput.textError")}
+                resendSuccessText={t("otpInput.resendSuccess")}
+                resendErrorText={t("otpInput.resendError")}
+                verifyInvalidText={t("otpInput.invalidCode")}
+                loaderVerifyText={t("otpInput.loadingVerify")}
+                loaderResendText={t("otpInput.loadingResend")}
               />
             ) : null}
           </div>

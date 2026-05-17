@@ -1,21 +1,18 @@
 // OtpInput.tsx (ou .jsx)
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { useLocation } from "preact-iso";
+import type { JSX } from "preact";
 
 //import des librairies
 import axios from "axios";
 import { useForm } from "react-hook-form";
-//import { signal, computed, effect } from "@preact/signals";
 
 //import des composnta enfants
 import { Loader } from "@/components/loader/Loader";
 
-//import des fonctions
-import { axiosError } from "@/utils/axiosError";
 import { localOrProd } from "@/utils/localOrProd";
-import { setSessionFromApiResponse, privileges } from "@/stores/session";
+import { setSessionFromApiResponse } from "@/stores/session";
 import { REGEX } from "@/shared/validationRegex";
-//import { navigateWithLink } from "@/utils/navigateWithLink";
 
 import type { FormValues as SignUpFormValues } from "./FormSignUp";
 
@@ -29,10 +26,17 @@ type OtpInputProps = {
   dataUser: SignUpFormValues | null;
   errorRequire: string;
   errorPattern: string;
-  onResend: (data: SignUpFormValues) => void | Promise<void>;
+  onResend: (
+    data: SignUpFormValues
+  ) => Promise<{ ok: boolean; kind: "initial" | "resend"; error?: string }>;
   className?: string; // classes wrapper
   textSuccess: string;
   textError: string;
+  resendSuccessText: string;
+  resendErrorText: string;
+  verifyInvalidText: string;
+  loaderVerifyText: string;
+  loaderResendText: string;
   emailUser?: string;
 };
 
@@ -57,6 +61,11 @@ function OtpInput({
   className = "",
   textSuccess,
   textError,
+  resendSuccessText,
+  resendErrorText,
+  verifyInvalidText,
+  loaderVerifyText,
+  loaderResendText,
   emailUser,
 }: OtpInputProps) {
   const {
@@ -64,7 +73,6 @@ function OtpInput({
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
-    getValues,
     trigger,
   } = useForm<OtpFormValues>({ mode: "onChange", defaultValues: { otp: "" } });
 
@@ -73,9 +81,14 @@ function OtpInput({
 
   //state qui gere l' validite de la reponse.
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [statusMessage, setStatusMessage] = useState<string>("");
+  const statusTimeoutRef = useRef<number | null>(null);
 
   //gere en partie l' affichage du loader
   const [isLoader, setIsLoader] = useState(false);
+  const [loadingReason, setLoadingReason] = useState<null | "verify" | "resend">(
+    null
+  );
 
   // Initialise le tableau de refs
   const slots = useMemo(() => Array.from({ length }, (_, i) => i), [length]);
@@ -88,22 +101,58 @@ function OtpInput({
     }
   }, [autoFocus]);
 
+  useEffect(() => {
+    return () => {
+      if (statusTimeoutRef.current) window.clearTimeout(statusTimeoutRef.current);
+    };
+  }, []);
+
+  const showStatus = (
+    next: "success" | "error",
+    message: string,
+    durationMs = 3500
+  ) => {
+    if (statusTimeoutRef.current) window.clearTimeout(statusTimeoutRef.current);
+    setStatus(next);
+    setStatusMessage(message);
+    statusTimeoutRef.current = window.setTimeout(() => {
+      setStatus("idle");
+      setStatusMessage("");
+      statusTimeoutRef.current = null;
+    }, durationMs);
+  };
+
+  const clearOtpInputs = () => {
+    setValues(Array(length).fill(""));
+    setValue("otp", "", { shouldDirty: true, shouldValidate: true });
+  };
+
   //fonction apppeler lors du resend des infos users
-  const resend = (e: any) => {
-    const idBtn: string = e.target.id.toString();
-    //verif
-    if (idBtn !== "resend") {
+  const resend = async (e: Event) => {
+    const idBtn = (e.currentTarget as HTMLButtonElement | null)?.id;
+    if (idBtn !== "resend") return;
+
+    clearOtpInputs();
+    inputsRef.current[0]?.focus();
+
+    if (!dataUser) {
+      showStatus("error", resendErrorText);
       return;
     }
-    
-    inputsRef.current.forEach((input, index) => {
-      setAt(index, "");
-      
-    })
-    inputsRef.current[0]?.focus();
-    if (!dataUser) return;
-    const payload = { ...dataUser, id: idBtn };
-    onResend(payload);
+
+    setIsLoader(true);
+    setLoadingReason("resend");
+    try {
+      const result = await onResend({ ...dataUser, id: idBtn });
+      if (result.ok) showStatus("success", resendSuccessText);
+      else showStatus("error", result.error || resendErrorText);
+    } catch (error) {
+      console.error("resend otp unexpected error:", error);
+      showStatus("error", resendErrorText);
+    } finally {
+      setIsLoader(false);
+      setLoadingReason(null);
+    }
   };
 
   const focusIndex = (i: number) => {
@@ -149,7 +198,7 @@ function OtpInput({
 
   const handleKeyDown = (
     i: number,
-    e: React.KeyboardEvent<HTMLInputElement>
+    e: JSX.TargetedKeyboardEvent<HTMLInputElement>
   ) => {
     const key = e.key;
 
@@ -185,7 +234,7 @@ function OtpInput({
 
   const handlePaste = (
     i: number,
-    e: React.ClipboardEvent<HTMLInputElement>
+    e: JSX.TargetedClipboardEvent<HTMLInputElement>
   ) => {
     e.preventDefault();
     const text = (e.clipboardData?.getData("text") || "").replace(/\D/g, "");
@@ -203,11 +252,24 @@ function OtpInput({
       const last = Math.min(i + text.length - 1, length - 1);
       focusIndex(last < length - 1 ? last + 1 : last);
 
+      const code = next.join("").slice(0, length);
+      const complete = code.length === length && next.every((v) => v !== "");
+      setValue("otp", code, {
+        shouldDirty: true,
+        shouldValidate: complete,
+      });
+      if (complete) {
+        trigger("otp").then((valid) => {
+          if (valid) handleSubmit(onSubmitOtp)();
+        });
+      }
+
       return next;
     });
   };
 
   const onSubmitOtp = async (data: OtpFormValues) => {
+    setLoadingReason("verify");
     setIsLoader(true);
     try {
       const mailUser: any = emailUser || dataUser?.email;
@@ -224,16 +286,13 @@ function OtpInput({
       );
 
       const result = response.data;
-      if (result.status !== "success") {
-        alert("une erreur c'est produite, veuillez demander un autre code");
-        return
+      if (!result || result.status !== "success") {
+        showStatus("error", verifyInvalidText);
+        return;
       }
       if (result.status === "success" && result.plan.code === "free") {
-       
         setSessionFromApiResponse(result);
-        setIsLoader(false);
-        setStatus("success");
-        
+        showStatus("success", textSuccess, 2000);
         setTimeout(() => {
           location.route("/services");
         }, 2000);
@@ -242,14 +301,18 @@ function OtpInput({
         window.location.href = result.redirectUrl;
       }
     } catch (error) {
-      setIsLoader(false);
-      setStatus("error");
-      axiosError(setStatus, error);
+      if (axios.isAxiosError(error)) {
+        const payload = error.response?.data;
+        const serverMessage =
+          typeof payload === "string" ? payload : payload?.message;
+        showStatus("error", serverMessage || textError);
+      } else {
+        console.error("otp verify unexpected error:", error);
+        showStatus("error", textError);
+      }
     } finally {
-      //get token?
-      setTimeout(() => {
-        setStatus("idle");
-      }, 3000);
+      setIsLoader(false);
+      setLoadingReason(null);
     }
   };
 
@@ -273,9 +336,8 @@ function OtpInput({
             onChange={(e) => handleChange(idx, e.currentTarget.value)}
             onKeyDown={(e) => handleKeyDown(idx, e)}
             onPaste={(e) => handlePaste(idx, e)}
-            disabled={values.length < 6}
+            disabled={isSubmitting || isLoader || status !== "idle"}
             aria-label={`Code ${idx + 1}`}
-            readOnly={isSubmitting || isLoader || status !== "idle"}
             className={[
               // DaisyUI + Tailwind : case carrée, centrée
               "input input-bordered",
@@ -338,11 +400,15 @@ function OtpInput({
           }
         `}
         >
-          {status === "success" ? textSuccess : null}
-          {status === "error" ? textError : null}
+          {statusMessage}
         </span>
       </p>
-      {isLoader ? <Loader top="top-[100%]" /> : null}
+      {isLoader ? (
+        <Loader
+          top="top-[100%]"
+          text={loadingReason === "resend" ? loaderResendText : loaderVerifyText}
+        />
+      ) : null}
     </form>
   );
 }

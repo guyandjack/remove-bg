@@ -55,8 +55,9 @@
     "btnSubmit": "Create your account",
     "btnGoogle": "Continue with Google",
     "passwordError": "Password too weak",
-    "textSuccess": "A confirmation email has been sent",
-    "textError": "An error occurred, account canceled",
+    "loadingSubmit": "Sending code…",
+    "textSuccess": "A verification code has been sent.",
+    "textError": "Unable to send the verification code. Please try again.",
     "question": "Already a member?",
     "link": "Log in",
     "httpError": "An HTTP error has occurred. Please check your connection."
@@ -68,8 +69,13 @@
     "btnResend": "Resend a code",
     "errorRequire": "Field required",
     "errorPattern": "Invalid format",
-    "textSuccess": "Account creation successful",
-    "textError": "Unable to create account"
+    "loadingVerify": "Verifying code…",
+    "loadingResend": "Sending a new code…",
+    "invalidCode": "Invalid or expired code. Please request a new one.",
+    "resendSuccess": "A new code has been sent.",
+    "resendError": "Unable to send a new code. Please try again.",
+    "textSuccess": "Account created. Redirecting…",
+    "textError": "Unable to validate the code. Please try again."
   },
 
   "formLogin": {
