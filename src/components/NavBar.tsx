@@ -260,59 +260,107 @@ const NavBar = () => {
       ) : null}
       <nav className="navbar bg-navbar shadow-sm backdrop-blur-sm">
         <div className="navbar-start">
-          <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-              {
+          <div className="drawer lg:hidden">
+            <input
+              id="navbar-drawer"
+              type="checkbox"
+              className="drawer-toggle"
+              aria-label="Open navigation menu"
+            />
+            <div className="drawer-content">
+              <label
+                htmlFor="navbar-drawer"
+                role="button"
+                className="btn btn-ghost"
+                aria-label="Open menu"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-8 w-8"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  {" "}
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
                     d="M4 6h16M4 12h8m-8 6h16"
-                  />{" "}
+                  />
                 </svg>
-              }
+              </label>
             </div>
-            <ul
-              tabIndex={-1}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
-            >
-              {navBarContent.map((link) => {
-                const label = t(`navBar.${link.key}`);
-                return link.key === "home" ||
-                  link.key === "pricing" ||
-                  link.key === "service" ||
-                  (link.key === "signup" && !isDisplay?.authentified) ||
-                  (link.key === "login" && !isDisplay?.authentified) ||
-                  (link.key === "dashboard" && isDisplay?.authentified) ? (
-                  <li key={link.href}>
-                    <a
-                      data-id={link.href}
-                      className={[
-                        //ajout de la tramsition
-                        "transition-all duration-300 ease-out",
-                        "hover:text-primary",
-                      ].join(" ")}
-                      href={link.href}
-                      onClick={(e) => setActiveLink(e)}
+
+            <div className="drawer-side z-50">
+              <label htmlFor="navbar-drawer" className="drawer-overlay" />
+              <aside className="min-h-full w-80 bg-base-100 shadow-xl transition-transform duration-300 ease-out">
+                <div className="flex items-center justify-between px-4 py-4 border-b border-base-200">
+                  <a className="block w-[40px]" href={"/"}>
+                    {themeSignal.value === "winter" ? (
+                      <AnimatedLogoTinyBlack />
+                    ) : (
+                      <AnimatedLogoTinyWhite />
+                    )}
+                  </a>
+                  <label
+                    htmlFor="navbar-drawer"
+                    role="button"
+                    className="btn btn-ghost btn-sm"
+                    aria-label="Close menu"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="h-5 w-5"
                     >
-                      {label}
-                    </a>
-                  </li>
-                ) : null;
-              })}
-            </ul>
+                      <path
+                        fillRule="evenodd"
+                        d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </label>
+                </div>
+
+                <ul className="menu p-4 text-base-content">
+                  {navBarContent.map((link) => {
+                    const label = t(`navBar.${link.key}`);
+                    return link.key === "home" ||
+                      link.key === "pricing" ||
+                      link.key === "service" ||
+                      (link.key === "signup" && !isDisplay?.authentified) ||
+                      (link.key === "login" && !isDisplay?.authentified) ||
+                      (link.key === "dashboard" && isDisplay?.authentified) ? (
+                      <li key={link.href}>
+                        <a
+                          data-id={link.href}
+                          className={[
+                            "transition-all duration-300 ease-out",
+                            "hover:text-primary",
+                          ].join(" ")}
+                          href={link.href}
+                          onClick={(e) => {
+                            setActiveLink(e);
+                            if (typeof window === "undefined") return;
+                            const drawer = document.getElementById(
+                              "navbar-drawer",
+                            ) as HTMLInputElement | null;
+                            if (drawer) drawer.checked = false;
+                          }}
+                        >
+                          {label}
+                        </a>
+                      </li>
+                    ) : null;
+                  })}
+                </ul>
+              </aside>
+            </div>
           </div>
 
           {tinyLogo ? (
-            <a className={"block w-[50px]"} href={"/"}>
+            <a className={"block w-[40px]"} href={"/"}>
               {themeSignal.value === "winter" ? (
                 <AnimatedLogoTinyBlack />
               ) : (

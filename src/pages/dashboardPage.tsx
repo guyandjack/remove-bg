@@ -87,7 +87,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
   }>({ status: "idle", message: null });
   const actionToastTimeoutRef = useRef<number | null>(null);
   const { t } = useTranslation();
-  const dashboardActionBtn = "btn btn-sm min-w-[220px]";
+  const dashboardActionBtn = "btn btn-sm w-auto lg:min-w-[220px]";
   const location = useLocation();
 
   const currency: CurrencyCode = "CHF";
@@ -706,7 +706,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
 
             {/* Compte */}
             <div className="mt-4 rounded-xl bg-component border border-error/40 p-4">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start flex-wrap justify-between gap-4">
                 <div>
                   <h3 className="font-semibold text-error">
                     {t("dashboardPage.billing.account.title")}
