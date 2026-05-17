@@ -104,6 +104,7 @@ type DownloadLinkProps = {
   currentSource: string; // dataURL ou URL de l'image finale
   credit: number;
   textContent: DownloadLinkTextContent;
+  
 };
 
 type StatusError = "error" | "valid" | "idle";
@@ -156,6 +157,7 @@ const DownloadLink = ({ currentSource, credit, textContent }: DownloadLinkProps)
       };
     } finally {
       setTimeout(() => {
+        
         setIsPending(false);
         setShowToast({
           status: "idle",

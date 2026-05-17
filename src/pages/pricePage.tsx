@@ -68,7 +68,10 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
   const [finalizeStatus, setFinalizeStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [finalizeMessage, setFinalizeMessage] = useState<string | null>(null);
 
-  const IsCreateAccount = isSignup;
+  const [isCreateAccount, setIscreateAccount] = useState<boolean>(isSignup);
+
+  const textAlert: string = t("pricePage.alert");
+  
 
   const textLangCard: PlanText = {
     tag: t("priceCard.tag"),
@@ -381,59 +384,89 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
             ))}
           </div>
         </div>
-        {IsCreateAccount ? (
-          <div className={"absolute top-[-10px] left-[10px] z-100"}>
-            <div role="alert" className="alert alert-warning alert-outline">
-              <span>Pour s'inscrire, choisissez un plan.</span>
+        {isCreateAccount ? (
+          <m.div
+            className={"absolute top-[-10px] right-[10px] z-100"}
+            initial={{
+              opacity: 0,
+              y: -12,
+            }}
+            animate={{
+              opacity: [0, 1, 0],
+              y: [-12, 0, 0],
+            }}
+            transition={{
+              duration: 8,
+              times: [0, 0.01, 1],
+              ease: "easeInOut",
+            }}
+            style={{
+              willChange: "transform, opacity",
+            }}
+          >
+            <div
+              role="alert"
+              className="alert alert-horizontal alert-outline alert-warning"
+            >
+              {
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  className="stroke-warning h-6 w-6 shrink-0"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+              }
+              <span className={"text-sm text-base-content"}>{textAlert}</span>
             </div>
-          </div>
+          </m.div>
         ) : null}
       </div>
       {/*card price*/}
 
-      
-        <ul
-          className={
-            "relative w-full max-w-[1300px] mx-auto my-[50px]  flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-evenly lg:gap-[0px]"
-          }
-          
-        >
-          {activePlanOptions.map((items, index) => {
-            return (
-              <m.li
-                key={items.name}
-                className={"max-w-[350px] min-w-[300px]"}
-                
-                initial={{
-                  opacity: 0,
-                  rotateY: -12,
-                  
-                }}
-                animate={{
-                  opacity: 1,
-                  rotateY: 0,
-                  
-                }}
-                transition={{
-                  delay: index * 0.2,
-                  duration: 0.7,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                style={{
-                  transformPerspective: 1000,
-                  willChange: "transform, opacity",
-                }}
-              >
-                <PriceCard
-                  lang={textLangCard}
-                  option={items}
-                  currency={currency}
-                />
-              </m.li>
-            );
-          })}
-        </ul>
-      
+      <ul
+        className={
+          "relative w-full max-w-[1300px] mx-auto my-[50px]  flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-evenly lg:gap-[0px]"
+        }
+      >
+        {activePlanOptions.map((items, index) => {
+          return (
+            <m.li
+              key={items.name}
+              className={"max-w-[350px] min-w-[300px]"}
+              initial={{
+                opacity: 0,
+                rotateY: -12,
+              }}
+              animate={{
+                opacity: 1,
+                rotateY: 0,
+              }}
+              transition={{
+                delay: index * 0.2,
+                duration: 1,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              style={{
+                transformPerspective: 1000,
+                willChange: "transform, opacity",
+              }}
+            >
+              <PriceCard
+                lang={textLangCard}
+                option={items}
+                currency={currency}
+              />
+            </m.li>
+          );
+        })}
+      </ul>
 
       {/* tableau de comparaison*/}
       <div className={"w-full max-w-[1300px] mx-auto py-[50px] "}>

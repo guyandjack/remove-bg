@@ -166,6 +166,10 @@
     "subscribe": "I choose this plan"
     
   },
+
+  "pricePage":{
+    "alert":"For signup select a plan."
+  },
   "heroHome": {
     "title_h1": "Remove&nbsp;the&nbsp;background from&nbsp;your&nbsp;images with&nbsp;AI",
     "title_h2": "Whether you're a professional or a photo editing enthusiast, choose simplicity,<span class='text-secondary text-2xl'> for&nbsp;maximum&nbsp;time&nbsp;savings</span>.",

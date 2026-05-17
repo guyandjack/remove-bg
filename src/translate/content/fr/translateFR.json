@@ -10,11 +10,10 @@
     "logout": "Déconnexion"
   },
 
-  "dropDownProfile":{
+  "dropDownProfile": {
     "credits": "Crédits",
-    "dashboard":"Tableau de board",
-    "logout":"Déconnexion"
-
+    "dashboard": "Tableau de board",
+    "logout": "Déconnexion"
   },
 
   "footer": {
@@ -82,7 +81,7 @@
     "passwordError": "Mot de passe non valide",
     "textSuccess": "Vous êtes connecté",
     "textError": "Une erreur s'est produite",
-    "pattern":"Email non valide"
+    "pattern": "Email non valide"
   },
   "formForgot": {
     "title": "Récupérer votre mot de passe",
@@ -161,7 +160,10 @@
     "api": "API",
     "bundle": "Traitement par lot",
     "subscribe": "Je choisis ce plan"
-    
+  },
+
+  "pricePage": {
+    "alert": "Pour s'inscrire, choisissez un plan."
   },
 
   "heroHome": {
@@ -202,33 +204,32 @@
   },
 
   "serviceCardContent": {
-    "title":"Nos services",
-  "card_1": {
-    "id": "remove",
-    "src": "",
-    "title": "Suppression d’arrière-plan",
-    "description": "Supprime automatiquement l’arrière-plan de vos images pour obtenir des visuels propres et prêts à l’usage."
+    "title": "Nos services",
+    "card_1": {
+      "id": "remove",
+      "src": "",
+      "title": "Suppression d’arrière-plan",
+      "description": "Supprime automatiquement l’arrière-plan de vos images pour obtenir des visuels propres et prêts à l’usage."
+    },
+    "card_2": {
+      "id": "social",
+      "src": "",
+      "title": "Images pour réseaux sociaux",
+      "description": "Formate et optimise vos images pour les principaux réseaux sociaux afin de garantir un rendu professionnel."
+    },
+    "card_3": {
+      "id": "convert",
+      "src": "",
+      "title": "Conversion d’images",
+      "description": "Convertit et redimensionne vos images au format et à la taille souhaités."
+    },
+    "card_4": {
+      "id": "product",
+      "src": "",
+      "title": "Mise en scène de produits",
+      "description": "Met en valeur vos produits en les plaçant dans des mises en scène adaptées pour la vente ou la présentation."
+    }
   },
-  "card_2": {
-    "id": "social",
-    "src": "",
-    "title": "Images pour réseaux sociaux",
-    "description": "Formate et optimise vos images pour les principaux réseaux sociaux afin de garantir un rendu professionnel."
-  },
-  "card_3": {
-    "id": "convert",
-    "src": "",
-    "title": "Conversion d’images",
-    "description": "Convertit et redimensionne vos images au format et à la taille souhaités."
-  },
-  "card_4": {
-    "id": "product",
-    "src": "",
-    "title": "Mise en scène de produits",
-    "description": "Met en valeur vos produits en les plaçant dans des mises en scène adaptées pour la vente ou la présentation."
-  }
-},
-
 
   "cta": {
     "title_home_1": "Commencez à traiter vos images.",
@@ -237,14 +238,13 @@
   },
 
   "ctaFinal": {
-  "title_home": "Modifiez vos images dès maintenant",
-  "intro_home": "Rejoignez des centaines d'utilisateurs qui traitent leurs images en quelques secondes avec une qualité professionnelle.",
-  "btn_pricing": "Je choisis un plan",
-  "btn_service": "Je veux tester la qualité",
-  "info_1": "Aucun numéro de carte requis pour le plan gratuit",
-  "info_2": "Annulez votre abonnement à tout moment"
-},
-
+    "title_home": "Modifiez vos images dès maintenant",
+    "intro_home": "Rejoignez des centaines d'utilisateurs qui traitent leurs images en quelques secondes avec une qualité professionnelle.",
+    "btn_pricing": "Je choisis un plan",
+    "btn_service": "Je veux tester la qualité",
+    "info_1": "Aucun numéro de carte requis pour le plan gratuit",
+    "info_2": "Annulez votre abonnement à tout moment"
+  },
 
   "featureCardContent": {
     "card_1": {
@@ -418,88 +418,88 @@
   },
 
   "faqHome": {
-  "title": "Questions fréquentes",
+    "title": "Questions fréquentes",
 
-  "question_1": "Le site respecte-t-il le RGPD&nbsp;?",
-  "reponse_1": "Oui. Notre plateforme est entièrement conforme au RGPD. Les données personnelles ne sont collectées que lorsqu’elles sont strictement nécessaires (inscription ou formulaire de contact). Vous disposez à tout moment d’un droit d’accès, de rectification et de suppression de vos données. <a class='faq-link' href='/privacy'>Consultez notre politique de confidentialité</a> pour en savoir plus sur l’utilisation des images avec nos services.",
+    "question_1": "Le site respecte-t-il le RGPD&nbsp;?",
+    "reponse_1": "Oui. Notre plateforme est entièrement conforme au RGPD. Les données personnelles ne sont collectées que lorsqu’elles sont strictement nécessaires (inscription ou formulaire de contact). Vous disposez à tout moment d’un droit d’accès, de rectification et de suppression de vos données. <a class='faq-link' href='/privacy'>Consultez notre politique de confidentialité</a> pour en savoir plus sur l’utilisation des images avec nos services.",
 
-  "question_2": "À qui s’adresse ce service de suppression d’arrière-plan&nbsp;?",
-  "reponse_2": "Notre outil s’adresse aux créateurs de contenu, e-commerçants, photographes, graphistes, étudiants, ainsi qu’à toute personne souhaitant obtenir rapidement des images détourées, prêtes pour un usage professionnel ou personnel.",
+    "question_2": "À qui s’adresse ce service de suppression d’arrière-plan&nbsp;?",
+    "reponse_2": "Notre outil s’adresse aux créateurs de contenu, e-commerçants, photographes, graphistes, étudiants, ainsi qu’à toute personne souhaitant obtenir rapidement des images détourées, prêtes pour un usage professionnel ou personnel.",
 
-  "question_3": "Le site est-il sécurisé&nbsp;?",
-  "reponse_3": "Oui. Aucune donnée n’est partagée avec des tiers, aucun cookie de suivi n’est utilisé sur notre site, et les paiements sont traités par Stripe, un prestataire certifié PCI-DSS garantissant un haut niveau de sécurité.",
+    "question_3": "Le site est-il sécurisé&nbsp;?",
+    "reponse_3": "Oui. Aucune donnée n’est partagée avec des tiers, aucun cookie de suivi n’est utilisé sur notre site, et les paiements sont traités par Stripe, un prestataire certifié PCI-DSS garantissant un haut niveau de sécurité.",
 
-  "question_4": "Comment utiliser le service&nbsp;?",
-  "reponse_4": "Il vous suffit de choisir un plan (gratuit ou payant), de créer un compte, puis d’importer vos images. Le traitement démarre automatiquement et vous pouvez télécharger le résultat en quelques secondes. <a class='faq-link' href='/privacy'>Consultez notre politique de confidentialité</a> pour plus d’informations sur l’utilisation des images.",
+    "question_4": "Comment utiliser le service&nbsp;?",
+    "reponse_4": "Il vous suffit de choisir un plan (gratuit ou payant), de créer un compte, puis d’importer vos images. Le traitement démarre automatiquement et vous pouvez télécharger le résultat en quelques secondes. <a class='faq-link' href='/privacy'>Consultez notre politique de confidentialité</a> pour plus d’informations sur l’utilisation des images.",
 
-  "question_5": "Le plan gratuit est-il vraiment gratuit&nbsp;?",
-  "reponse_5": "Oui, totalement. Certaines fonctionnalités avancées sont limitées, mais aucune carte bancaire n’est requise et vous disposez de crédits mensuels pour utiliser le service sans frais.",
+    "question_5": "Le plan gratuit est-il vraiment gratuit&nbsp;?",
+    "reponse_5": "Oui, totalement. Certaines fonctionnalités avancées sont limitées, mais aucune carte bancaire n’est requise et vous disposez de crédits mensuels pour utiliser le service sans frais.",
 
-  "question_6": "Mes images servent-elles à entraîner les modèles d’IA&nbsp;?",
-  "reponse_6": "Non. Notre partenaire Replicate, qui fournit et héberge les modèles d’IA de traitement d’images, indique que les images ne sont pas utilisées pour entraîner des modèles. <a class='faq-link' href='/privacy'>Consultez notre politique de confidentialité</a> pour plus de détails.",
+    "question_6": "Mes images servent-elles à entraîner les modèles d’IA&nbsp;?",
+    "reponse_6": "Non. Notre partenaire Replicate, qui fournit et héberge les modèles d’IA de traitement d’images, indique que les images ne sont pas utilisées pour entraîner des modèles. <a class='faq-link' href='/privacy'>Consultez notre politique de confidentialité</a> pour plus de détails.",
 
-  "question_7": "Quels risques existent pour mes données personnelles&nbsp;?",
-  "reponse_7": "Aucun risque notable. Nous collectons uniquement votre adresse IP (pour la sécurisation de notre API) ainsi que les informations que vous fournissez volontairement (inscription ou formulaire de contact). Aucune donnée sensible n’est demandée ni stockée.",
+    "question_7": "Quels risques existent pour mes données personnelles&nbsp;?",
+    "reponse_7": "Aucun risque notable. Nous collectons uniquement votre adresse IP (pour la sécurisation de notre API) ainsi que les informations que vous fournissez volontairement (inscription ou formulaire de contact). Aucune donnée sensible n’est demandée ni stockée.",
 
-  "question_8": "Combien de temps mes images sont-elles conservées&nbsp;?",
-  "reponse_8": "Notre service ne conserve pas vos images. Nous agissons uniquement comme intermédiaire entre vous et les modèles d’IA de traitement.",
+    "question_8": "Combien de temps mes images sont-elles conservées&nbsp;?",
+    "reponse_8": "Notre service ne conserve pas vos images. Nous agissons uniquement comme intermédiaire entre vous et les modèles d’IA de traitement.",
 
-  "question_9": "Puis-je annuler mon abonnement à tout moment&nbsp;?",
-  "reponse_9": "Oui. Vous pouvez annuler votre abonnement à tout moment depuis votre espace personnel. L’annulation désactive le renouvellement automatique sans interrompre votre accès jusqu’à la fin de la période en cours.",
+    "question_9": "Puis-je annuler mon abonnement à tout moment&nbsp;?",
+    "reponse_9": "Oui. Vous pouvez annuler votre abonnement à tout moment depuis votre espace personnel. L’annulation désactive le renouvellement automatique sans interrompre votre accès jusqu’à la fin de la période en cours.",
 
-  "question_10": "L’annulation donne-t-elle droit à un remboursement&nbsp;?",
-  "reponse_10": "Non. Conformément à nos conditions d’abonnement, les périodes déjà réglées restent dues jusqu’à leur échéance, même en cas d’annulation anticipée.",
+    "question_10": "L’annulation donne-t-elle droit à un remboursement&nbsp;?",
+    "reponse_10": "Non. Conformément à nos conditions d’abonnement, les périodes déjà réglées restent dues jusqu’à leur échéance, même en cas d’annulation anticipée.",
 
-  "question_11": "Quelle est la qualité des résultats obtenus&nbsp;?",
-  "reponse_11": "Les modèles d’IA utilisés ont été entraînés pour produire un détourage propre, précis et professionnel, même sur des images complexes. Les abonnés payants bénéficient d’une qualité optimisée et d’options avancées.",
+    "question_11": "Quelle est la qualité des résultats obtenus&nbsp;?",
+    "reponse_11": "Les modèles d’IA utilisés ont été entraînés pour produire un détourage propre, précis et professionnel, même sur des images complexes. Les abonnés payants bénéficient d’une qualité optimisée et d’options avancées.",
 
-  "question_12": "Y a-t-il une limite au nombre d’images que je peux traiter&nbsp;?",
-  "reponse_12": "Oui. Chaque plan inclut un quota mensuel de crédits correspondant au nombre d’utilisations des outils d’IA. Votre solde est consultable à tout moment dans votre tableau de bord.",
+    "question_12": "Y a-t-il une limite au nombre d’images que je peux traiter&nbsp;?",
+    "reponse_12": "Oui. Chaque plan inclut un quota mensuel de crédits correspondant au nombre d’utilisations des outils d’IA. Votre solde est consultable à tout moment dans votre tableau de bord.",
 
-  "question_13": "Le service fonctionne-t-il sur mobile&nbsp;?",
-  "reponse_13": "Oui. Notre service est compatible avec smartphones, tablettes et ordinateurs. Toutefois, pour une meilleure expérience utilisateur, nous recommandons l’utilisation sur un écran suffisamment large pour exploiter pleinement les outils de retouche.",
+    "question_13": "Le service fonctionne-t-il sur mobile&nbsp;?",
+    "reponse_13": "Oui. Notre service est compatible avec smartphones, tablettes et ordinateurs. Toutefois, pour une meilleure expérience utilisateur, nous recommandons l’utilisation sur un écran suffisamment large pour exploiter pleinement les outils de retouche.",
 
-  "question_14": "Que faire si une image est mal détourée&nbsp;?",
-  "reponse_14": "Vous pouvez réessayer avec une image de meilleure qualité ou utiliser nos outils de retouche (selon votre plan). En cas de problème persistant, notre support est disponible pour vous accompagner.",
+    "question_14": "Que faire si une image est mal détourée&nbsp;?",
+    "reponse_14": "Vous pouvez réessayer avec une image de meilleure qualité ou utiliser nos outils de retouche (selon votre plan). En cas de problème persistant, notre support est disponible pour vous accompagner.",
 
-  "question_15": "Proposez-vous une API&nbsp;?",
-  "reponse_15": "Une API sera prochainement disponible pour les plans professionnels afin d’intégrer la suppression d’arrière-plan dans vos applications, workflows ou boutiques e-commerce.",
+    "question_15": "Proposez-vous une API&nbsp;?",
+    "reponse_15": "Une API sera prochainement disponible pour les plans professionnels afin d’intégrer la suppression d’arrière-plan dans vos applications, workflows ou boutiques e-commerce.",
 
-  "question_16": "Mes informations de paiement sont-elles stockées&nbsp;?",
-  "reponse_16": "Non. Toutes les données de paiement sont traitées exclusivement par Stripe. Nous n’y avons jamais accès et ne les conservons pas."
-},
+    "question_16": "Mes informations de paiement sont-elles stockées&nbsp;?",
+    "reponse_16": "Non. Toutes les données de paiement sont traitées exclusivement par Stripe. Nous n’y avons jamais accès et ne les conservons pas."
+  },
 
   "faqPricing": {
-  "question_1": "Puis-je annuler mon abonnement à tout moment&nbsp;?",
-  "reponse_1": "Oui. Vous pouvez annuler votre abonnement à tout moment depuis votre espace personnel. L’annulation désactive simplement le renouvellement automatique. Votre accès reste actif jusqu’à la fin de la période déjà payée.",
+    "question_1": "Puis-je annuler mon abonnement à tout moment&nbsp;?",
+    "reponse_1": "Oui. Vous pouvez annuler votre abonnement à tout moment depuis votre espace personnel. L’annulation désactive simplement le renouvellement automatique. Votre accès reste actif jusqu’à la fin de la période déjà payée.",
 
-  "question_2": "L’annulation donne-t-elle droit à un remboursement&nbsp;?",
-  "reponse_2": "Non. Conformément à notre politique et à la législation applicable, les abonnements déjà commencés ne sont pas remboursables. Vous conservez toutefois l’accès au service jusqu’à l’échéance de votre abonnement en cours.",
+    "question_2": "L’annulation donne-t-elle droit à un remboursement&nbsp;?",
+    "reponse_2": "Non. Conformément à notre politique et à la législation applicable, les abonnements déjà commencés ne sont pas remboursables. Vous conservez toutefois l’accès au service jusqu’à l’échéance de votre abonnement en cours.",
 
-  "question_3": "Puis-je changer de formule (upgrade ou downgrade)&nbsp;?",
-  "reponse_3": "Oui. Vous pouvez modifier votre abonnement à tout moment en choisissant une formule supérieure ou inférieure selon vos besoins.",
+    "question_3": "Puis-je changer de formule (upgrade ou downgrade)&nbsp;?",
+    "reponse_3": "Oui. Vous pouvez modifier votre abonnement à tout moment en choisissant une formule supérieure ou inférieure selon vos besoins.",
 
-  "question_4": "Que se passe-t-il si je passe à une formule supérieure&nbsp;?",
-  "reponse_4": "Si vous choisissez une formule supérieure, elle est appliquée immédiatement. Vous bénéficiez alors des avantages du nouveau plan. La date de facturation est ajustée à la date de souscription du nouvel abonnement.",
+    "question_4": "Que se passe-t-il si je passe à une formule supérieure&nbsp;?",
+    "reponse_4": "Si vous choisissez une formule supérieure, elle est appliquée immédiatement. Vous bénéficiez alors des avantages du nouveau plan. La date de facturation est ajustée à la date de souscription du nouvel abonnement.",
 
-  "question_5": "Que se passe-t-il si je rétrograde vers une formule inférieure&nbsp;?",
-  "reponse_5": "Le passage à une formule inférieure prend effet au prochain cycle de facturation mensuel. Vous conservez jusqu’à cette date les fonctionnalités de votre formule actuelle.",
+    "question_5": "Que se passe-t-il si je rétrograde vers une formule inférieure&nbsp;?",
+    "reponse_5": "Le passage à une formule inférieure prend effet au prochain cycle de facturation mensuel. Vous conservez jusqu’à cette date les fonctionnalités de votre formule actuelle.",
 
-  "question_6": "Comment fonctionne le paiement de l’abonnement&nbsp;?",
-  "reponse_6": "Le paiement est mensuel et s’effectue par carte bancaire via Stripe, une plateforme sécurisée. Nous ne conservons aucune donnée bancaire sensible.",
+    "question_6": "Comment fonctionne le paiement de l’abonnement&nbsp;?",
+    "reponse_6": "Le paiement est mensuel et s’effectue par carte bancaire via Stripe, une plateforme sécurisée. Nous ne conservons aucune donnée bancaire sensible.",
 
-  "question_7": "Puis-je tester le service avant de m’abonner&nbsp;?",
-  "reponse_7": "Oui. Un plan gratuit est disponible et vous permet de tester la qualité du service avec un nombre limité de crédits mensuels. Aucun numéro de carte bancaire n’est requis.",
+    "question_7": "Puis-je tester le service avant de m’abonner&nbsp;?",
+    "reponse_7": "Oui. Un plan gratuit est disponible et vous permet de tester la qualité du service avec un nombre limité de crédits mensuels. Aucun numéro de carte bancaire n’est requis.",
 
-  "question_8": "Que se passe-t-il si mes crédits mensuels sont épuisés&nbsp;?",
-  "reponse_8": "Lorsque vos crédits sont épuisés, vous ne pouvez plus utiliser le service jusqu’à leur réinitialisation automatique le mois suivant. Vous pouvez également passer à une formule supérieure à tout moment pour obtenir plus de crédits.",
+    "question_8": "Que se passe-t-il si mes crédits mensuels sont épuisés&nbsp;?",
+    "reponse_8": "Lorsque vos crédits sont épuisés, vous ne pouvez plus utiliser le service jusqu’à leur réinitialisation automatique le mois suivant. Vous pouvez également passer à une formule supérieure à tout moment pour obtenir plus de crédits.",
 
-  "question_9": "L’abonnement se renouvelle-t-il automatiquement&nbsp;?",
-  "reponse_9": "Oui. L’abonnement se renouvelle automatiquement chaque mois afin d’assurer la continuité du service. Vous pouvez désactiver le renouvellement depuis votre espace personnel.",
+    "question_9": "L’abonnement se renouvelle-t-il automatiquement&nbsp;?",
+    "reponse_9": "Oui. L’abonnement se renouvelle automatiquement chaque mois afin d’assurer la continuité du service. Vous pouvez désactiver le renouvellement depuis votre espace personnel.",
 
-  "question_10": "Puis-je utiliser le service sur plusieurs appareils&nbsp;?",
-  "reponse_10": "Oui. Votre abonnement est lié à votre compte. Vous pouvez accéder au service depuis n’importe quel appareil, à condition d’être connecté."
-},
+    "question_10": "Puis-je utiliser le service sur plusieurs appareils&nbsp;?",
+    "reponse_10": "Oui. Votre abonnement est lié à votre compte. Vous pouvez accéder au service depuis n’importe quel appareil, à condition d’être connecté."
+  },
 
   "contact": {
     "title": "Vous avez des questions&nbsp;?\nNous vous répondons&nbsp;!",
@@ -512,102 +512,102 @@
     "intro": "Choisissez un forfait abordable qui&nbsp;comprend les meilleures fonctionnalités pour&nbsp;vos&nbsp;besoins.",
     "title_h2_tab": "Comparatif des abonnements",
     "title_h2_faq": "Questions fréquentes",
-    "currency":"Choix de la devise"
+    "currency": "Choix de la devise"
   },
 
   "terms": {
-  "title": "Conditions Générales d’Utilisation (CGU)",
+    "title": "Conditions Générales d’Utilisation (CGU)",
 
-  "intro": "Les présentes Conditions Génales d’Utilisation (ci-après « CGU »)<br> régissent l’accès et l’utilisation du service Wizpix (ci-après « le Service »).<br> En utilisant le Service, l’utilisateur reconnaît avoir pris connaissance des présentes conditions <br>et les accepter sans réserve.",
+    "intro": "Les présentes Conditions Génales d’Utilisation (ci-après « CGU »)<br> régissent l’accès et l’utilisation du service Wizpix (ci-après « le Service »).<br> En utilisant le Service, l’utilisateur reconnaît avoir pris connaissance des présentes conditions <br>et les accepter sans réserve.",
 
-  "article1_title": "1. Objet du Service",
-  "article1_text": "Wizpix fournit un service en ligne permettant de traiter des images via des modèles d’intelligence artificielle afin de supprimer ou modifier l’arrière-plan.\n\nLe Service agit comme un intermédiaire technique entre l’utilisateur et des prestataires tiers fournissant des modèles d’IA.",
+    "article1_title": "1. Objet du Service",
+    "article1_text": "Wizpix fournit un service en ligne permettant de traiter des images via des modèles d’intelligence artificielle afin de supprimer ou modifier l’arrière-plan.\n\nLe Service agit comme un intermédiaire technique entre l’utilisateur et des prestataires tiers fournissant des modèles d’IA.",
 
-  "article2_title": "2. Accès au Service",
-  "article2_text": "L’accès au Service est réservé aux personnes majeures ou disposant d’une autorisation légale.\n\nLa création d’un compte est nécessaire pour accéder à certaines fonctionnalités. L’utilisateur s’engage à fournir des informations exactes et à assurer la confidentialité de ses identifiants.\n\nToute activité effectuée via le compte de l’utilisateur est réputée avoir été réalisée par celui-ci.",
+    "article2_title": "2. Accès au Service",
+    "article2_text": "L’accès au Service est réservé aux personnes majeures ou disposant d’une autorisation légale.\n\nLa création d’un compte est nécessaire pour accéder à certaines fonctionnalités. L’utilisateur s’engage à fournir des informations exactes et à assurer la confidentialité de ses identifiants.\n\nToute activité effectuée via le compte de l’utilisateur est réputée avoir été réalisée par celui-ci.",
 
-  "article3_title": "3. Contenu et responsabilité de l’utilisateur",
-  "article3_text": "L’utilisateur est seul responsable des contenus qu’il utilise via le Service.\n\nIl s’interdit strictement d’utiliser le Service pour traiter des contenus :\n- illégaux, violents, haineux ou contraires à l’ordre public,\n- portant atteinte aux droits de tiers (droit à l’image, droit d’auteur, propriété intellectuelle),\n- non conformes aux lois applicables.\n\nWizpix peut suspendre ou supprimer tout compte en cas de violation des présentes conditions et signaler toute activité illégale aux autorités compétentes.",
+    "article3_title": "3. Contenu et responsabilité de l’utilisateur",
+    "article3_text": "L’utilisateur est seul responsable des contenus qu’il utilise via le Service.\n\nIl s’interdit strictement d’utiliser le Service pour traiter des contenus :\n- illégaux, violents, haineux ou contraires à l’ordre public,\n- portant atteinte aux droits de tiers (droit à l’image, droit d’auteur, propriété intellectuelle),\n- non conformes aux lois applicables.\n\nWizpix peut suspendre ou supprimer tout compte en cas de violation des présentes conditions et signaler toute activité illégale aux autorités compétentes.",
 
-  "article4_title": "4. Traitement des images",
-  "article4_text": "Les images sont transmises à des prestataires tiers spécialisés (notamment Replicate, États-Unis) via une API sécurisée afin d’être traitées.\n\nWizpix ne stocke aucune image et n’en conserve aucune copie après traitement.\n\nAucune donnée permettant d’identifier l’utilisateur n’est transmise avec les images.\n\nL’utilisateur reconnaît que le traitement est automatisé et que les résultats peuvent varier selon la qualité des images et les modèles utilisés.",
+    "article4_title": "4. Traitement des images",
+    "article4_text": "Les images sont transmises à des prestataires tiers spécialisés (notamment Replicate, États-Unis) via une API sécurisée afin d’être traitées.\n\nWizpix ne stocke aucune image et n’en conserve aucune copie après traitement.\n\nAucune donnée permettant d’identifier l’utilisateur n’est transmise avec les images.\n\nL’utilisateur reconnaît que le traitement est automatisé et que les résultats peuvent varier selon la qualité des images et les modèles utilisés.",
 
-  "article5_title": "5. Droits sur les images",
-  "article5_text": "L’utilisateur conserve l’intégralité des droits sur les images qu’il soumet ainsi que sur les résultats générés.\n\nIl est libre d’utiliser les images traitées sans restriction, y compris à des fins commerciales (site e-commerce, marketing, communication, etc.).\n\nWizpix ne revendique aucun droit de propriété sur les contenus traités.",
+    "article5_title": "5. Droits sur les images",
+    "article5_text": "L’utilisateur conserve l’intégralité des droits sur les images qu’il soumet ainsi que sur les résultats générés.\n\nIl est libre d’utiliser les images traitées sans restriction, y compris à des fins commerciales (site e-commerce, marketing, communication, etc.).\n\nWizpix ne revendique aucun droit de propriété sur les contenus traités.",
 
-  "article6_title": "6. Utilisation du Service",
-  "article6_text": "Le Service est fourni pour un usage légal.\n\nToute utilisation abusive, notamment automatisée, frauduleuse ou visant à contourner les limitations du Service, est interdite.\n\nWizpix se réserve le droit de limiter, suspendre ou interrompre l’accès au Service en cas d’abus ou pour des raisons techniques.",
+    "article6_title": "6. Utilisation du Service",
+    "article6_text": "Le Service est fourni pour un usage légal.\n\nToute utilisation abusive, notamment automatisée, frauduleuse ou visant à contourner les limitations du Service, est interdite.\n\nWizpix se réserve le droit de limiter, suspendre ou interrompre l’accès au Service en cas d’abus ou pour des raisons techniques.",
 
-  "article7_title": "7. Abonnements et paiement",
-  "article7_text": "Certaines fonctionnalités du Service sont accessibles via des abonnements payants.\n\nLes paiements sont traités par un prestataire tiers (Stripe). Wizpix n’a aucun accès aux données de paiement.\n\nLes abonnements sont reconduits automatiquement sauf résiliation.\n\nSauf disposition légale contraire, les sommes versées ne sont pas remboursables.",
+    "article7_title": "7. Abonnements et paiement",
+    "article7_text": "Certaines fonctionnalités du Service sont accessibles via des abonnements payants.\n\nLes paiements sont traités par un prestataire tiers (Stripe). Wizpix n’a aucun accès aux données de paiement.\n\nLes abonnements sont reconduits automatiquement sauf résiliation.\n\nSauf disposition légale contraire, les sommes versées ne sont pas remboursables.",
 
-  "article8_title": "8. Données personnelles",
-  "article8_text": "Wizpix collecte uniquement les données nécessaires au fonctionnement du Service (email, mot de passe chiffré, données de contact).\n\nAucune image n’est stockée.\n\nPour plus d’informations, l’utilisateur est invité à consulter la <a class='faq-link' href='/privacy'>Politique de confidentialité.</a>",
+    "article8_title": "8. Données personnelles",
+    "article8_text": "Wizpix collecte uniquement les données nécessaires au fonctionnement du Service (email, mot de passe chiffré, données de contact).\n\nAucune image n’est stockée.\n\nPour plus d’informations, l’utilisateur est invité à consulter la <a class='faq-link' href='/privacy'>Politique de confidentialité.</a>",
 
-  "article9_title": "9. Propriété intellectuelle",
-  "article9_text": "Le Service, son code, son interface et ses technologies sont protégés par les lois sur la propriété intellectuelle.\n\nToute reproduction, modification ou exploitation non autorisée est interdite.\n\nL’utilisateur conserve ses droits sur ses contenus.",
+    "article9_title": "9. Propriété intellectuelle",
+    "article9_text": "Le Service, son code, son interface et ses technologies sont protégés par les lois sur la propriété intellectuelle.\n\nToute reproduction, modification ou exploitation non autorisée est interdite.\n\nL’utilisateur conserve ses droits sur ses contenus.",
 
-  "article10_title": "10. Responsabilité",
-  "article10_text": "Le Service est fourni « tel quel ».\n\nWizpix ne garantit pas un fonctionnement ininterrompu ou exempt d’erreur.\n\nDans les limites autorisées par la loi, Wizpix ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service, y compris en cas de perte de données ou de résultats non conformes.",
+    "article10_title": "10. Responsabilité",
+    "article10_text": "Le Service est fourni « tel quel ».\n\nWizpix ne garantit pas un fonctionnement ininterrompu ou exempt d’erreur.\n\nDans les limites autorisées par la loi, Wizpix ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service, y compris en cas de perte de données ou de résultats non conformes.",
 
-  "article11_title": "11. Suspension et résiliation",
-  "article11_text": "Wizpix peut suspendre ou résilier un compte en cas de violation des présentes CGU ou d’utilisation abusive du Service.\n\nLa résiliation ne donne lieu à aucun remboursement des périodes déjà payées.",
+    "article11_title": "11. Suspension et résiliation",
+    "article11_text": "Wizpix peut suspendre ou résilier un compte en cas de violation des présentes CGU ou d’utilisation abusive du Service.\n\nLa résiliation ne donne lieu à aucun remboursement des périodes déjà payées.",
 
-  "article12_title": "12. Droit applicable",
-  "article12_text": "Les présentes CGU sont régies par le droit suisse.\n\nEn cas de litige, les tribunaux compétents du canton de Vaud sont seuls compétents, sauf disposition légale impérative contraire.",
+    "article12_title": "12. Droit applicable",
+    "article12_text": "Les présentes CGU sont régies par le droit suisse.\n\nEn cas de litige, les tribunaux compétents du canton de Vaud sont seuls compétents, sauf disposition légale impérative contraire.",
 
-  "article13_title": "13. Modifications",
-  "article13_text": "Wizpix se réserve le droit de modifier les présentes CGU à tout moment. La version applicable est celle publiée sur le site.",
+    "article13_title": "13. Modifications",
+    "article13_text": "Wizpix se réserve le droit de modifier les présentes CGU à tout moment. La version applicable est celle publiée sur le site.",
 
-  "conclusion": "En utilisant le Service, l’utilisateur reconnaît accepter pleinement les présentes CGU."
-},
+    "conclusion": "En utilisant le Service, l’utilisateur reconnaît accepter pleinement les présentes CGU."
+  },
 
   "privacy": {
-  "title": "Politique de confidentialité",
+    "title": "Politique de confidentialité",
 
-  "intro": "La présente politique de confidentialité décrit la manière dont Wizpix collecte, utilise et protège les données personnelles dans le cadre de l’utilisation de son service de suppression d’arrière-plan d’images. Wizpix adopte une approche de minimisation des données et de transparence (« privacy by design »).",
+    "intro": "La présente politique de confidentialité décrit la manière dont Wizpix collecte, utilise et protège les données personnelles dans le cadre de l’utilisation de son service de suppression d’arrière-plan d’images. Wizpix adopte une approche de minimisation des données et de transparence (« privacy by design »).",
 
-  "article1_title": "1. Responsable du traitement",
-  "article1_text": "Wizpix agit en tant que responsable du traitement des données personnelles au sens du Règlement Général sur la Protection des Données (RGPD) et de la législation suisse applicable (LPD).\n\nCertains prestataires interviennent en tant que responsables de traitement indépendants ou sous-traitants, tels que décrits ci-dessous.",
+    "article1_title": "1. Responsable du traitement",
+    "article1_text": "Wizpix agit en tant que responsable du traitement des données personnelles au sens du Règlement Général sur la Protection des Données (RGPD) et de la législation suisse applicable (LPD).\n\nCertains prestataires interviennent en tant que responsables de traitement indépendants ou sous-traitants, tels que décrits ci-dessous.",
 
-  "article2_title": "2. Données collectées",
-  "article2_text": "Wizpix collecte uniquement les données strictement nécessaires à la fourniture du service :\n\n- Adresse e-mail (création de compte)\n- Mot de passe (stocké sous forme chiffrée)\n- Données transmises volontairement via le formulaire de contact\n- Adresse IP (à des fins de sécurité)\n\nAucune donnée de paiement n’est collectée ni stockée par Wizpix.\n\nAucune image n’est stockée sur les serveurs de Wizpix.",
+    "article2_title": "2. Données collectées",
+    "article2_text": "Wizpix collecte uniquement les données strictement nécessaires à la fourniture du service :\n\n- Adresse e-mail (création de compte)\n- Mot de passe (stocké sous forme chiffrée)\n- Données transmises volontairement via le formulaire de contact\n- Adresse IP (à des fins de sécurité)\n\nAucune donnée de paiement n’est collectée ni stockée par Wizpix.\n\nAucune image n’est stockée sur les serveurs de Wizpix.",
 
-  "article3_title": "3. Paiement (Stripe)",
-  "article3_text": "Les paiements sont traités directement par Stripe, qui agit en tant que responsable de traitement indépendant.\n\nLes informations de paiement sont saisies directement par l’utilisateur sur l’interface sécurisée de Stripe. Wizpix collecte uniquement le prénom et le nom transmis via Stripe lors du paiement, exclusivement à des fins d’amélioration de l’expérience utilisateur (UX).\n\nPour plus d’informations : <a class='faq-link' href='https://stripe.com/privacy'>https://stripe.com.privacy</a>",
+    "article3_title": "3. Paiement (Stripe)",
+    "article3_text": "Les paiements sont traités directement par Stripe, qui agit en tant que responsable de traitement indépendant.\n\nLes informations de paiement sont saisies directement par l’utilisateur sur l’interface sécurisée de Stripe. Wizpix collecte uniquement le prénom et le nom transmis via Stripe lors du paiement, exclusivement à des fins d’amélioration de l’expérience utilisateur (UX).\n\nPour plus d’informations : <a class='faq-link' href='https://stripe.com/privacy'>https://stripe.com.privacy</a>",
 
-  "article4_title": "4. Traitement des images (Replicate)",
-  "article4_text": "Wizpix agit comme un intermédiaire technique entre l’utilisateur et des modèles d’intelligence artificielle fournis par Replicate, Inc. (États-Unis).\n\nLes images sont transmises via une API sécurisée exclusivement pour leur traitement, puis immédiatement renvoyées à l’utilisateur.\n\nAucune donnée permettant d’identifier l’utilisateur (telle que l’adresse e-mail ou les informations de compte) n’est transmise avec les images.\n\nSelon la documentation publique de Replicate, les données traitées via leur API ne sont pas utilisées pour entraîner des modèles publics et sont conservées uniquement le temps nécessaire au traitement.\n\nWizpix ne contrôle pas les traitements effectués par Replicate, qui agit en tant que sous-traitant ou prestataire technique.\n\nPour plus d’informations : <a class='faq-link' href='https://replicate.com/privacy'>https://replicate.com/privacy</a>",
+    "article4_title": "4. Traitement des images (Replicate)",
+    "article4_text": "Wizpix agit comme un intermédiaire technique entre l’utilisateur et des modèles d’intelligence artificielle fournis par Replicate, Inc. (États-Unis).\n\nLes images sont transmises via une API sécurisée exclusivement pour leur traitement, puis immédiatement renvoyées à l’utilisateur.\n\nAucune donnée permettant d’identifier l’utilisateur (telle que l’adresse e-mail ou les informations de compte) n’est transmise avec les images.\n\nSelon la documentation publique de Replicate, les données traitées via leur API ne sont pas utilisées pour entraîner des modèles publics et sont conservées uniquement le temps nécessaire au traitement.\n\nWizpix ne contrôle pas les traitements effectués par Replicate, qui agit en tant que sous-traitant ou prestataire technique.\n\nPour plus d’informations : <a class='faq-link' href='https://replicate.com/privacy'>https://replicate.com/privacy</a>",
 
-  "article5_title": "5. Finalités du traitement",
-  "article5_text": "Les données sont utilisées exclusivement pour :\n\n- Fournir et faire fonctionner le service\n- Gérer les comptes utilisateurs\n- Répondre aux demandes via le support\n- Assurer la sécurité et l’intégrité du service\n\nAucune donnée n’est utilisée à des fins publicitaires, de profilage ou de suivi.",
+    "article5_title": "5. Finalités du traitement",
+    "article5_text": "Les données sont utilisées exclusivement pour :\n\n- Fournir et faire fonctionner le service\n- Gérer les comptes utilisateurs\n- Répondre aux demandes via le support\n- Assurer la sécurité et l’intégrité du service\n\nAucune donnée n’est utilisée à des fins publicitaires, de profilage ou de suivi.",
 
-  "article6_title": "6. Base légale",
-  "article6_text": "Le traitement repose sur :\n\n- L’exécution du service (contrat)\n- Le consentement de l’utilisateur (création de compte, contact)\n- L’intérêt légitime (sécurité du service)",
+    "article6_title": "6. Base légale",
+    "article6_text": "Le traitement repose sur :\n\n- L’exécution du service (contrat)\n- Le consentement de l’utilisateur (création de compte, contact)\n- L’intérêt légitime (sécurité du service)",
 
-  "article7_title": "7. Cookies",
-  "article7_text": "Wizpix utilise uniquement un cookie strictement nécessaire au fonctionnement du service. Ce cookie permet de maintenir la session utilisateur.\n\nAucun cookie de suivi, d’analyse ou publicitaire n’est utilisé.",
+    "article7_title": "7. Cookies",
+    "article7_text": "Wizpix utilise uniquement un cookie strictement nécessaire au fonctionnement du service. Ce cookie permet de maintenir la session utilisateur.\n\nAucun cookie de suivi, d’analyse ou publicitaire n’est utilisé.",
 
-  "article8_title": "8. Conservation des données",
-  "article8_text": "Les données sont conservées uniquement pendant la durée nécessaire :\n\n- Données de compte : jusqu’à suppression du compte\n- Données de contact : durée limitée au traitement de la demande\n- Images : aucune conservation par Wizpix",
+    "article8_title": "8. Conservation des données",
+    "article8_text": "Les données sont conservées uniquement pendant la durée nécessaire :\n\n- Données de compte : jusqu’à suppression du compte\n- Données de contact : durée limitée au traitement de la demande\n- Images : aucune conservation par Wizpix",
 
-  "article9_title": "9. Partage des données",
-  "article9_text": "Les données personnelles ne sont jamais vendues.\n\nLes seules interactions avec des tiers sont :\n- Stripe : traitement des paiements (directement via leur interface)\n- Replicate : traitement des images uniquement\n\nAucune autre donnée personnelle n’est transmise à des tiers.",
+    "article9_title": "9. Partage des données",
+    "article9_text": "Les données personnelles ne sont jamais vendues.\n\nLes seules interactions avec des tiers sont :\n- Stripe : traitement des paiements (directement via leur interface)\n- Replicate : traitement des images uniquement\n\nAucune autre donnée personnelle n’est transmise à des tiers.",
 
-  "article10_title": "10. Transferts internationaux",
-  "article10_text": "L’utilisation du service peut impliquer un transfert de données vers des prestataires situés hors de l’Union européenne, notamment aux États-Unis (Replicate).\n\nCes transferts sont limités aux données strictement nécessaires au traitement technique (images uniquement) et s’effectuent via des connexions sécurisées.",
+    "article10_title": "10. Transferts internationaux",
+    "article10_text": "L’utilisation du service peut impliquer un transfert de données vers des prestataires situés hors de l’Union européenne, notamment aux États-Unis (Replicate).\n\nCes transferts sont limités aux données strictement nécessaires au traitement technique (images uniquement) et s’effectuent via des connexions sécurisées.",
 
-  "article11_title": "11. Sécurité",
-  "article11_text": "Wizpix met en œuvre des mesures techniques et organisationnelles adaptées, notamment :\n\n- Chiffrement des communications (HTTPS)\n- Stockage sécurisé des mots de passe\n- Accès limité aux données\n\nToutefois, aucun système ne peut garantir une sécurité absolue.",
+    "article11_title": "11. Sécurité",
+    "article11_text": "Wizpix met en œuvre des mesures techniques et organisationnelles adaptées, notamment :\n\n- Chiffrement des communications (HTTPS)\n- Stockage sécurisé des mots de passe\n- Accès limité aux données\n\nToutefois, aucun système ne peut garantir une sécurité absolue.",
 
-  "article12_title": "12. Droits de l’utilisateur",
-  "article12_text": "Conformément au RGPD, vous disposez des droits suivants :\n\n- Accès à vos données\n- Rectification ou suppression\n- Limitation ou opposition au traitement\n\nVous pouvez exercer ces droits via le formulaire de contact.",
+    "article12_title": "12. Droits de l’utilisateur",
+    "article12_text": "Conformément au RGPD, vous disposez des droits suivants :\n\n- Accès à vos données\n- Rectification ou suppression\n- Limitation ou opposition au traitement\n\nVous pouvez exercer ces droits via le formulaire de contact.",
 
-  "article13_title": "13. Modifications",
-  "article13_text": "Wizpix peut modifier cette politique à tout moment. La version applicable est celle publiée sur le site.",
+    "article13_title": "13. Modifications",
+    "article13_text": "Wizpix peut modifier cette politique à tout moment. La version applicable est celle publiée sur le site.",
 
-  "conclusion": "Wizpix s’engage à collecter le minimum de données, à être transparent sur leur utilisation et à protéger la vie privée de ses utilisateurs."
-},
+    "conclusion": "Wizpix s’engage à collecter le minimum de données, à être transparent sur leur utilisation et à protéger la vie privée de ses utilisateurs."
+  },
 
   "legal": {
     "title": "Mentions Légales",
@@ -644,51 +644,51 @@
     "conclusion": "En accédant au site et en utilisant le Service, l’utilisateur reconnaît avoir pris connaissance des présentes mentions légales et les accepte sans réserve."
   },
   "cgv": {
-  "title": "Conditions Générales de Vente (CGV)",
+    "title": "Conditions Générales de Vente (CGV)",
 
-  "intro": "Les présentes Conditions Générales de Vente (ci-après « CGV »)<br> régissent les relations contractuelles entre Wizpix (ci-après « le Prestataire »)<br> et tout utilisateur souscrivant à une offre payante (ci-après « le Client »).<br> En souscrivant un abonnement, le Client accepte les présentes CGV sans réserve.",
+    "intro": "Les présentes Conditions Générales de Vente (ci-après « CGV »)<br> régissent les relations contractuelles entre Wizpix (ci-après « le Prestataire »)<br> et tout utilisateur souscrivant à une offre payante (ci-après « le Client »).<br> En souscrivant un abonnement, le Client accepte les présentes CGV sans réserve.",
 
-  "article1_title": "1. Objet",
-  "article1_text": "Wizpix propose un service en ligne de traitement d’images via intelligence artificielle, accessible sous forme d’abonnement (Software as a Service).",
+    "article1_title": "1. Objet",
+    "article1_text": "Wizpix propose un service en ligne de traitement d’images via intelligence artificielle, accessible sous forme d’abonnement (Software as a Service).",
 
-  "article2_title": "2. Abonnement",
-  "article2_text": "Le Service est proposé sous forme d’abonnements mensuels.\n\nChaque abonnement donne accès à un certain nombre de crédits mensuels permettant d’utiliser les fonctionnalités du Service.\n\nLes crédits sont personnels, non transférables et non cumulables d’un mois sur l’autre.",
+    "article2_title": "2. Abonnement",
+    "article2_text": "Le Service est proposé sous forme d’abonnements mensuels.\n\nChaque abonnement donne accès à un certain nombre de crédits mensuels permettant d’utiliser les fonctionnalités du Service.\n\nLes crédits sont personnels, non transférables et non cumulables d’un mois sur l’autre.",
 
-  "article3_title": "3. Crédits et limitations",
-  "article3_text": "Chaque action de traitement consomme un crédit.\n\nUne fois le quota mensuel de crédits épuisé, les fonctionnalités payantes ne sont plus accessibles jusqu’à la réinitialisation mensuelle.\n\nLe Client peut toutefois continuer à utiliser les fonctionnalités gratuites éventuellement disponibles.",
+    "article3_title": "3. Crédits et limitations",
+    "article3_text": "Chaque action de traitement consomme un crédit.\n\nUne fois le quota mensuel de crédits épuisé, les fonctionnalités payantes ne sont plus accessibles jusqu’à la réinitialisation mensuelle.\n\nLe Client peut toutefois continuer à utiliser les fonctionnalités gratuites éventuellement disponibles.",
 
-  "article4_title": "4. Durée et renouvellement",
-  "article4_text": "L’abonnement est conclu pour une durée mensuelle et est renouvelé automatiquement à chaque échéance, sauf résiliation par le Client.\n\nLe Client peut résilier à tout moment. La résiliation prend effet à la fin de la période en cours.\n\nLe Service reste accessible jusqu’à cette date.",
+    "article4_title": "4. Durée et renouvellement",
+    "article4_text": "L’abonnement est conclu pour une durée mensuelle et est renouvelé automatiquement à chaque échéance, sauf résiliation par le Client.\n\nLe Client peut résilier à tout moment. La résiliation prend effet à la fin de la période en cours.\n\nLe Service reste accessible jusqu’à cette date.",
 
-  "article5_title": "5. Modification d’abonnement",
-  "article5_text": "Le Client peut modifier son abonnement à tout moment.\n\n- En cas de passage à une formule supérieure (upgrade) :\nLe nouvel abonnement prend effet immédiatement. Une nouvelle période de facturation commence à la date du changement.\nLes crédits restants de l’ancien abonnement sont perdus.\n\n- En cas de passage à une formule inférieure (downgrade) :\nLe changement prend effet à la fin de la période de facturation en cours.\nLe Client conserve les fonctionnalités de son abonnement actuel jusqu’à cette échéance.",
+    "article5_title": "5. Modification d’abonnement",
+    "article5_text": "Le Client peut modifier son abonnement à tout moment.\n\n- En cas de passage à une formule supérieure (upgrade) :\nLe nouvel abonnement prend effet immédiatement. Une nouvelle période de facturation commence à la date du changement.\nLes crédits restants de l’ancien abonnement sont perdus.\n\n- En cas de passage à une formule inférieure (downgrade) :\nLe changement prend effet à la fin de la période de facturation en cours.\nLe Client conserve les fonctionnalités de son abonnement actuel jusqu’à cette échéance.",
 
-  "article6_title": "6. Prix et paiement",
-  "article6_text": "Les prix sont indiqués au moment de la souscription.\n\nLes paiements sont traités par un prestataire tiers (Stripe). Wizpix n’a aucun accès aux données de paiement.\n\nLe paiement est exigible à chaque période de facturation.",
+    "article6_title": "6. Prix et paiement",
+    "article6_text": "Les prix sont indiqués au moment de la souscription.\n\nLes paiements sont traités par un prestataire tiers (Stripe). Wizpix n’a aucun accès aux données de paiement.\n\nLe paiement est exigible à chaque période de facturation.",
 
-  "article7_title": "7. Absence de remboursement",
-  "article7_text": "Les abonnements ne sont pas remboursables.\n\nAucun remboursement total ou partiel ne sera effectué en cas de résiliation en cours de période.\n\nLe Client conserve l’accès au Service jusqu’à la fin de la période déjà payée.",
+    "article7_title": "7. Absence de remboursement",
+    "article7_text": "Les abonnements ne sont pas remboursables.\n\nAucun remboursement total ou partiel ne sera effectué en cas de résiliation en cours de période.\n\nLe Client conserve l’accès au Service jusqu’à la fin de la période déjà payée.",
 
-  "article8_title": "8. Accès au service",
-  "article8_text": "Wizpix met en œuvre des moyens raisonnables pour assurer l’accès au Service.\n\nLe Service peut être temporairement suspendu pour maintenance, mise à jour ou en cas de problème technique.\n\nAucune compensation ne sera due en cas d’interruption temporaire.",
+    "article8_title": "8. Accès au service",
+    "article8_text": "Wizpix met en œuvre des moyens raisonnables pour assurer l’accès au Service.\n\nLe Service peut être temporairement suspendu pour maintenance, mise à jour ou en cas de problème technique.\n\nAucune compensation ne sera due en cas d’interruption temporaire.",
 
-  "article9_title": "9. Responsabilité",
-  "article9_text": "Le Service est fourni « tel quel ».\n\nWizpix ne garantit pas un fonctionnement ininterrompu ni des résultats parfaits.\n\nDans les limites autorisées par la loi, Wizpix ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service.",
+    "article9_title": "9. Responsabilité",
+    "article9_text": "Le Service est fourni « tel quel ».\n\nWizpix ne garantit pas un fonctionnement ininterrompu ni des résultats parfaits.\n\nDans les limites autorisées par la loi, Wizpix ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service.",
 
-  "article10_title": "10. Données personnelles",
-  "article10_text": "Le traitement des données personnelles est régi par la <a href=\"/privacy\">Politique de confidentialité</a>.",
+    "article10_title": "10. Données personnelles",
+    "article10_text": "Le traitement des données personnelles est régi par la <a href=\"/privacy\">Politique de confidentialité</a>.",
 
-  "article11_title": "11. Suspension et résiliation",
-  "article11_text": "Wizpix peut suspendre ou résilier un compte en cas de violation des CGV ou d’utilisation abusive.\n\nAucun remboursement ne sera dû dans ce cas.",
+    "article11_title": "11. Suspension et résiliation",
+    "article11_text": "Wizpix peut suspendre ou résilier un compte en cas de violation des CGV ou d’utilisation abusive.\n\nAucun remboursement ne sera dû dans ce cas.",
 
-  "article12_title": "12. Droit applicable",
-  "article12_text": "Les présentes CGV sont régies par le droit suisse.\n\nEn cas de litige, les tribunaux compétents du canton de Vaud sont seuls compétents, sauf disposition légale contraire.",
+    "article12_title": "12. Droit applicable",
+    "article12_text": "Les présentes CGV sont régies par le droit suisse.\n\nEn cas de litige, les tribunaux compétents du canton de Vaud sont seuls compétents, sauf disposition légale contraire.",
 
-  "article13_title": "13. Modifications",
-  "article13_text": "Wizpix se réserve le droit de modifier les présentes CGV à tout moment. La version applicable est celle publiée sur le site.",
+    "article13_title": "13. Modifications",
+    "article13_text": "Wizpix se réserve le droit de modifier les présentes CGV à tout moment. La version applicable est celle publiée sur le site.",
 
-  "conclusion": "En souscrivant un abonnement, le Client reconnaît accepter les présentes CGV."
-},
+    "conclusion": "En souscrivant un abonnement, le Client reconnaît accepter les présentes CGV."
+  },
   "servicePageTitle": {
     "title_h1": "Testez la qualité des services",
     "title_h1_loged": "Utilisez nos services"
@@ -800,8 +800,7 @@
       "success": "Si un compte existe, un email a été envoyé.",
       "error": "Erreur lors de la demande. Réessayez."
     }
-  }
-  ,
+  },
   "billingSuccess": {
     "title": "Confirmation de paiement",
     "processing": "Confirmation du paiement en cours.",

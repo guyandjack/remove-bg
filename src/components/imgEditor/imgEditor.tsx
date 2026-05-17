@@ -1196,7 +1196,8 @@ const ImgEditor = ({
               >
                 <div
                   className={"flex justify-start items-center gap-4"}
-                  aria-live="polite">
+                  aria-live="polite"
+                >
                   {activeToolDefinition.icon}
                   <span className="truncate">{activeToolDefinition.label}</span>
                 </div>
@@ -1319,6 +1320,7 @@ const ImgEditor = ({
               currentSource={currentSource}
               credit={credit}
               textContent={downloadLinkTextContent}
+              
             />
           </div>
 
