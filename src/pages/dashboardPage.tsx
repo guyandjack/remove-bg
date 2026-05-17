@@ -11,13 +11,13 @@ import { FormDeleteReasonAccount } from "@/components/form/formDeleteReasonAccou
 //instance axios
 import { api } from "@/utils/axiosConfig";
 
-//import des fonctions 
+//import des fonctions
 import { initSessionFromLocalStorage, sessionSignal } from "@/stores/session";
 import { isAuthentified } from "@/utils/request/isAuthentified";
 import { setActiveLink } from "@/utils/setActiveLink";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
 
-type SubmitState = "idle" | "loading" | "success" | "error"; 
+type SubmitState = "idle" | "loading" | "success" | "error";
 type CurrencyCode = "CHF" | "EUR" | "USD";
 type BillingAccountState = {
   customer?: {
@@ -53,22 +53,34 @@ type PropsPage = {
   routeKey: string;
 };
 
-const DashboardPage = ({routeKey}: PropsPage) => {
+const DashboardPage = ({ routeKey }: PropsPage) => {
   const [cancelSubmitting, setCancelSubmitting] = useState<SubmitState>("idle");
   const [cancelMessage, setCancelMessage] = useState<string | null>(null);
-  const [billingSubmitting, setBillingSubmitting] = useState<SubmitState>("idle");
-  const [billingState, setBillingState] = useState<BillingAccountState | null>(null);
-  const [marketingSubmitting, setMarketingSubmitting] = useState<SubmitState>("idle");
+  const [billingSubmitting, setBillingSubmitting] =
+    useState<SubmitState>("idle");
+  const [billingState, setBillingState] = useState<BillingAccountState | null>(
+    null,
+  );
+  const [marketingSubmitting, setMarketingSubmitting] =
+    useState<SubmitState>("idle");
   const [marketingMessage, setMarketingMessage] = useState<string | null>(null);
-  const [deletionSubmitting, setDeletionSubmitting] = useState<SubmitState>("idle");
+  const [deletionSubmitting, setDeletionSubmitting] =
+    useState<SubmitState>("idle");
   const [deletionMessage, setDeletionMessage] = useState<string | null>(null);
-  const [deletionFeedbackToken, setDeletionFeedbackToken] = useState<string | null>(null);
+  const [deletionFeedbackToken, setDeletionFeedbackToken] = useState<
+    string | null
+  >(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState<string>("");
-  const [planModalStep, setPlanModalStep] = useState<"select" | "confirm">("select");
+  const [planModalStep, setPlanModalStep] = useState<"select" | "confirm">(
+    "select",
+  );
   const [availablePlans, setAvailablePlans] = useState<any[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<any | null>(null);
-  const [planChangeSubmitting, setPlanChangeSubmitting] = useState<SubmitState>("idle");
-  const [planChangeMessage, setPlanChangeMessage] = useState<string | null>(null);
+  const [planChangeSubmitting, setPlanChangeSubmitting] =
+    useState<SubmitState>("idle");
+  const [planChangeMessage, setPlanChangeMessage] = useState<string | null>(
+    null,
+  );
   const [actionToast, setActionToast] = useState<{
     status: "idle" | "success" | "error" | "info";
     message: string | null;
@@ -116,15 +128,17 @@ const DashboardPage = ({routeKey}: PropsPage) => {
         location.route(`/login?redirect=${redirect}`);
         return;
       }
-      
+
       // 2) Verify with API (uses axios interceptors for refresh)
       try {
         await isAuthentified();
         if (!mounted) return;
         if (sessionSignal?.value && sessionSignal.value.authentified !== true) {
-          sessionSignal.value = { ...sessionSignal.value, authentified: true } as any;
+          sessionSignal.value = {
+            ...sessionSignal.value,
+            authentified: true,
+          } as any;
         }
-
 
         // Fetch billing/account state for the dashboard (subscription/marketing/account flags)
         setBillingSubmitting("loading");
@@ -164,34 +178,45 @@ const DashboardPage = ({routeKey}: PropsPage) => {
     };
   }, []);
 
-  const pushActionToast = (payload: { status: "success" | "error" | "info"; message: string }) => {
+  const pushActionToast = (payload: {
+    status: "success" | "error" | "info";
+    message: string;
+  }) => {
     setActionToast({ status: payload.status, message: payload.message });
     if (typeof window === "undefined") return;
-    if (actionToastTimeoutRef.current) window.clearTimeout(actionToastTimeoutRef.current);
+    if (actionToastTimeoutRef.current)
+      window.clearTimeout(actionToastTimeoutRef.current);
     actionToastTimeoutRef.current = window.setTimeout(() => {
       setActionToast({ status: "idle", message: null });
       actionToastTimeoutRef.current = null;
     }, 4500);
   };
 
-  const creditsRemaining = sessionSignal?.value?.credits?.remaining_last_24h ?? 0;
+  const creditsRemaining =
+    sessionSignal?.value?.credits?.remaining_last_24h ?? 0;
   const creditsUsed = sessionSignal?.value?.credits?.used_last_24h ?? 0;
-  const planName = sessionSignal?.value?.plan?.name || sessionSignal?.value?.plan?.code || "-";
+  const planName =
+    sessionSignal?.value?.plan?.name || sessionSignal?.value?.plan?.code || "-";
   const userDisplayName = (() => {
     const first = billingState?.customer?.first_name?.trim() || "";
     const last = billingState?.customer?.last_name?.trim() || "";
     const full = `${first} ${last}`.trim();
     if (full) return full;
-    return sessionSignal?.value?.user?.first_name || sessionSignal?.value?.user?.email || "-";
+    return (
+      sessionSignal?.value?.user?.first_name ||
+      sessionSignal?.value?.user?.email ||
+      "-"
+    );
   })();
-  const billingPeriodRange = (():any => {
+  const billingPeriodRange = ((): any => {
     const start = billingState?.subscription?.period_start_date || "";
     const end = billingState?.subscription?.period_end_date || "";
     //if (start && end) return `Du ${start} <br>au ${end}`;
-    if (start && end) return {
-      start: start,
-      end: end
-    };
+    if (start && end)
+      return {
+        start: start,
+        end: end,
+      };
     if (end) return end;
     return "-";
   })();
@@ -270,7 +295,8 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       const resp = await api.post("/api/marketing/consent", {
         marketing_consent: nextValue,
       });
-      if (resp?.data?.success !== true) throw new Error("marketing_update_failed");
+      if (resp?.data?.success !== true)
+        throw new Error("marketing_update_failed");
       setMarketingSubmitting("success");
       {
         const msg = t("dashboardPage.billing.marketing.success");
@@ -311,10 +337,15 @@ const DashboardPage = ({routeKey}: PropsPage) => {
         pushActionToast({ status: "success", message: msg });
       }
 
-      const feedbackToken = typeof resp?.data?.deletion_feedback_token === "string" ? resp.data.deletion_feedback_token : null;
+      const feedbackToken =
+        typeof resp?.data?.deletion_feedback_token === "string"
+          ? resp.data.deletion_feedback_token
+          : null;
       // Always open the modal. Redirection is only driven by the modal close/submit flow.
       setDeletionFeedbackToken(feedbackToken);
-      const dialog = document.getElementById("account_deletion_feedback_modal") as HTMLDialogElement | null;
+      const dialog = document.getElementById(
+        "account_deletion_feedback_modal",
+      ) as HTMLDialogElement | null;
       dialog?.showModal?.();
     } catch {
       setDeletionSubmitting("error");
@@ -334,10 +365,16 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       localStorage.removeItem("session");
     } catch {}
     try {
-      sessionSignal.value = { ...(sessionSignal.value as any), token: null, authentified: false } as any;
+      sessionSignal.value = {
+        ...(sessionSignal.value as any),
+        token: null,
+        authentified: false,
+      } as any;
     } catch {}
     try {
-      const dialog = document.getElementById("account_deletion_feedback_modal") as HTMLDialogElement | null;
+      const dialog = document.getElementById(
+        "account_deletion_feedback_modal",
+      ) as HTMLDialogElement | null;
       dialog?.close?.();
     } catch {}
     location.route("/");
@@ -360,7 +397,9 @@ const DashboardPage = ({routeKey}: PropsPage) => {
     } catch {
       setAvailablePlans([]);
     } finally {
-      const dialog = document.getElementById("plan_change_modal") as HTMLDialogElement | null;
+      const dialog = document.getElementById(
+        "plan_change_modal",
+      ) as HTMLDialogElement | null;
       dialog?.showModal?.();
     }
   };
@@ -370,7 +409,9 @@ const DashboardPage = ({routeKey}: PropsPage) => {
     setSelectedPlan(null);
     setPlanChangeMessage(null);
     setPlanChangeSubmitting("idle");
-    const dialog = document.getElementById("plan_change_modal") as HTMLDialogElement | null;
+    const dialog = document.getElementById(
+      "plan_change_modal",
+    ) as HTMLDialogElement | null;
     dialog?.close?.();
   };
 
@@ -379,7 +420,8 @@ const DashboardPage = ({routeKey}: PropsPage) => {
     sessionSignal?.value?.plan?.code ||
     "";
 
-  const currentPlan = availablePlans.find((p) => p?.name === currentPlanCode) || null;
+  const currentPlan =
+    availablePlans.find((p) => p?.name === currentPlanCode) || null;
   const selectablePlans = availablePlans.filter(
     (p) =>
       p?.name &&
@@ -388,7 +430,9 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       p.name !== "pro",
   );
 
-  const resolveSelectedChangeType = (plan: any): "upgrade" | "downgrade" | "same" => {
+  const resolveSelectedChangeType = (
+    plan: any,
+  ): "upgrade" | "downgrade" | "same" => {
     if (!currentPlan) return "upgrade";
     const currentPrice = Number(currentPlan?.price ?? 0);
     const targetPrice = Number(plan?.price ?? 0);
@@ -408,27 +452,40 @@ const DashboardPage = ({routeKey}: PropsPage) => {
         currency: currency,
       });
       if (resp?.data?.success !== true) throw new Error("change_plan_failed");
-      if (resp?.data?.redirectUrl && typeof resp.data.redirectUrl === "string") {
+      if (
+        resp?.data?.redirectUrl &&
+        typeof resp.data.redirectUrl === "string"
+      ) {
         setPlanChangeSubmitting("success");
-        setPlanChangeMessage(resp?.data?.message || t("dashboardPage.billing.subscription.checkoutRedirect"));
+        setPlanChangeMessage(
+          resp?.data?.message ||
+            t("dashboardPage.billing.subscription.checkoutRedirect"),
+        );
         setTimeout(() => {
           window.location.assign(resp.data.redirectUrl);
         }, 400);
         return;
       }
       setPlanChangeSubmitting("success");
-      setPlanChangeMessage(resp?.data?.message || t("dashboardPage.billing.subscription.changePlanSuccess"));
+      setPlanChangeMessage(
+        resp?.data?.message ||
+          t("dashboardPage.billing.subscription.changePlanSuccess"),
+      );
       try {
         const st = await api.get("/api/account/billing-account");
         if (st?.data?.success) setBillingState(st.data as any);
       } catch {}
       setTimeout(() => {
-        const dialog = document.getElementById("plan_change_modal") as HTMLDialogElement | null;
+        const dialog = document.getElementById(
+          "plan_change_modal",
+        ) as HTMLDialogElement | null;
         dialog?.close?.();
       }, 800);
     } catch {
       setPlanChangeSubmitting("error");
-      setPlanChangeMessage(t("dashboardPage.billing.subscription.changePlanError"));
+      setPlanChangeMessage(
+        t("dashboardPage.billing.subscription.changePlanError"),
+      );
     } finally {
       setTimeout(() => setPlanChangeSubmitting("idle"), 2500);
     }
@@ -463,17 +520,17 @@ const DashboardPage = ({routeKey}: PropsPage) => {
       </div>
 
       <div className="flex flex-col md:flex-row md:flex-wrap md:justify-center  gap-4">
-        <div className="w-[200px] h-[100px] stat bg-base-100 rounded-xl border border-base-300">
+        <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
           <div className="stat-title">{t("dashboardPage.stats.user")}</div>
           <div className="stat-value text-primary truncate text-base">
             {userDisplayName}
           </div>
         </div>
-        <div className="w-[200px] h-[100px] stat bg-base-100 rounded-xl border border-base-300">
+        <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
           <div className="stat-title">{t("dashboardPage.stats.planTitle")}</div>
           <div className="stat-value text-success">{planName}</div>
         </div>
-        <div className="w-[200px] h-[100px] stat bg-base-100 rounded-xl border border-base-300">
+        <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
           <div className="stat-desc">
             {t("dashboardPage.stats.billingPeriod")}
           </div>
@@ -494,14 +551,14 @@ const DashboardPage = ({routeKey}: PropsPage) => {
             </p>
           </div>
         </div>
-        <div className="w-[200px] h-[100px] stat bg-base-100 rounded-xl border border-base-300">
+        <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
           <div className="stat-title">
             {t("dashboardPage.stats.creditsRemainingTitle")}
           </div>
           <div className="stat-value text-primary">{creditsRemaining}</div>
         </div>
 
-        <div className="w-[200px] h-[100px] stat bg-base-100 rounded-xl border border-base-300">
+        <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
           <div className="stat-title">
             {t("dashboardPage.stats.creditsUsedTitle")}
           </div>
@@ -524,7 +581,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
             ) : null}
 
             {/* Abonnement */}
-            <div className="mt-4 rounded-xl border border-base-300 p-4">
+            <div className="mt-4 rounded-xl bg-component border border-base-300 p-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h3 className="font-semibold">
@@ -610,7 +667,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
             </div>
 
             {/* Préférences marketing */}
-            <div className="mt-4 rounded-xl border border-base-300 p-4">
+            <div className="mt-4 rounded-xl bg-component border border-base-300 p-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h3 className="font-semibold">
@@ -648,17 +705,17 @@ const DashboardPage = ({routeKey}: PropsPage) => {
             </div>
 
             {/* Compte */}
-            <div className="mt-4 rounded-xl border border-error/40 p-4">
+            <div className="mt-4 rounded-xl bg-component border border-error/40 p-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h3 className="font-semibold text-error">
                     {t("dashboardPage.billing.account.title")}
                   </h3>
-                  <p className="text-base-content/70 text-sm mt-1">
+                  {/*  <p className="text-base-content/70 text-sm mt-1">
                     {billingState?.account?.account_deletion_requested
                       ? t("dashboardPage.billing.account.deletionRequested")
                       : t("dashboardPage.billing.account.deletionNotRequested")}
-                  </p>
+                  </p> */}
                   <p className="text-base-content/70 text-sm mt-2">
                     {t("dashboardPage.billing.account.deletionWarning")}
                   </p>
@@ -737,7 +794,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
 
             {/* Plan change modal */}
             <dialog id="plan_change_modal" className="modal">
-              <div className="modal-box max-w-5xl">
+              <div className="modal-box max-w-5xl pt-8">
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="font-bold text-lg">
                     {t("dashboardPage.billing.subscription.changeModalTitle")}
@@ -755,11 +812,11 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                 </p>
 
                 {planModalStep === "select" ? (
-                  <div className="mt-4">
+                  <div className="">
                     <div className="rounded-xl border border-base-300 p-4">
                       <p className="text-sm text-base-content/70">
                         <span className="font-semibold">
-                          Abonnement actuel :
+                          {t("dashboardPage.billing.subscription.subtitle")}
                         </span>{" "}
                         <span className="capitalize">
                           {currentPlanCode || "-"}
@@ -778,27 +835,29 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                         </p>
                       </div>
                     </div>
-                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                      {selectablePlans.map((p) => (
-                        <div key={p.name} className="flex justify-center">
-                          <PriceCard
-                            lang={textLangCard as any}
-                            option={p}
-                            currency={currency}
-                            onSelect={() => {
-                              setSelectedPlan(p);
-                              setPlanModalStep("confirm");
-                            }}
-                            isCurrentPlan={false}
-                            currentBadgeLabel={t(
-                              "dashboardPage.billing.subscription.currentBadge",
-                            )}
-                            disabled={p?.active === false}
-                            disabledBadgeLabel="Indisponible"
-                          />
-                        </div>
-                      ))}
-                    </div>
+                    <ul className="mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {selectablePlans.map((p) =>
+                        p.name === "visitor" ? null : (
+                          <li key={p.name} className="flex justify-center">
+                            <PriceCard
+                              lang={textLangCard as any}
+                              option={p}
+                              currency={currency}
+                              onSelect={() => {
+                                setSelectedPlan(p);
+                                setPlanModalStep("confirm");
+                              }}
+                              isCurrentPlan={false}
+                              currentBadgeLabel={t(
+                                "dashboardPage.billing.subscription.currentBadge",
+                              )}
+                              disabled={p?.active === false}
+                              disabledBadgeLabel="Indisponible"
+                            />
+                          </li>
+                        ),
+                      )}
+                    </ul>
                     {selectablePlans.length === 0 ? (
                       <p className="text-sm text-base-content/70 mt-4">
                         {t(
@@ -892,25 +951,58 @@ const DashboardPage = ({routeKey}: PropsPage) => {
                   onClose={closeDeletionFeedbackModal}
                   onSubmitted={closeDeletionFeedbackModal}
                   content={{
-                    title: t("dashboardPage.billing.account.deletionFeedback.title"),
-                    subtitle: t("dashboardPage.billing.account.deletionFeedback.subtitle"),
-                    expensive: t("dashboardPage.billing.account.deletionFeedback.expensive"),
-                    no_more_use: t("dashboardPage.billing.account.deletionFeedback.no_more_use"),
-                    bad_quality_result: t("dashboardPage.billing.account.deletionFeedback.bad_quality_result"),
-                    difficult: t("dashboardPage.billing.account.deletionFeedback.difficult"),
-                    bad_UX: t("dashboardPage.billing.account.deletionFeedback.bad_UX"),
-                    found_alternative: t("dashboardPage.billing.account.deletionFeedback.found_alternative"),
-                    other_reason: t("dashboardPage.billing.account.deletionFeedback.other_reason"),
-                    placeholder: t("dashboardPage.billing.account.deletionFeedback.placeholder"),
-                    button_submit: t("dashboardPage.billing.account.deletionFeedback.button_submit"),
-                    button_close: t("dashboardPage.billing.account.deletionFeedback.button_close"),
-                    success: t("dashboardPage.billing.account.deletionFeedback.success"),
-                    error: t("dashboardPage.billing.account.deletionFeedback.error"),
-                    validation_error: t("dashboardPage.billing.account.deletionFeedback.validation_error"),
+                    title: t(
+                      "dashboardPage.billing.account.deletionFeedback.title",
+                    ),
+                    subtitle: t(
+                      "dashboardPage.billing.account.deletionFeedback.subtitle",
+                    ),
+                    expensive: t(
+                      "dashboardPage.billing.account.deletionFeedback.expensive",
+                    ),
+                    no_more_use: t(
+                      "dashboardPage.billing.account.deletionFeedback.no_more_use",
+                    ),
+                    bad_quality_result: t(
+                      "dashboardPage.billing.account.deletionFeedback.bad_quality_result",
+                    ),
+                    difficult: t(
+                      "dashboardPage.billing.account.deletionFeedback.difficult",
+                    ),
+                    bad_UX: t(
+                      "dashboardPage.billing.account.deletionFeedback.bad_UX",
+                    ),
+                    found_alternative: t(
+                      "dashboardPage.billing.account.deletionFeedback.found_alternative",
+                    ),
+                    other_reason: t(
+                      "dashboardPage.billing.account.deletionFeedback.other_reason",
+                    ),
+                    placeholder: t(
+                      "dashboardPage.billing.account.deletionFeedback.placeholder",
+                    ),
+                    button_submit: t(
+                      "dashboardPage.billing.account.deletionFeedback.button_submit",
+                    ),
+                    button_close: t(
+                      "dashboardPage.billing.account.deletionFeedback.button_close",
+                    ),
+                    success: t(
+                      "dashboardPage.billing.account.deletionFeedback.success",
+                    ),
+                    error: t(
+                      "dashboardPage.billing.account.deletionFeedback.error",
+                    ),
+                    validation_error: t(
+                      "dashboardPage.billing.account.deletionFeedback.validation_error",
+                    ),
                   }}
                 />
               </div>
-              <div className="modal-backdrop" onClick={closeDeletionFeedbackModal} />
+              <div
+                className="modal-backdrop"
+                onClick={closeDeletionFeedbackModal}
+              />
             </dialog>
           </div>
         </section>
@@ -921,7 +1013,7 @@ const DashboardPage = ({routeKey}: PropsPage) => {
             <p className="text-base-content/70">
               {t("dashboardPage.password.description")}
             </p>
-            <div className="mt-3">
+            <div className="mt-3 p-4 rounded-xl bg-component border border-base-300">
               <FormResetPassword mode="dashboard" embedded />
             </div>
           </div>
