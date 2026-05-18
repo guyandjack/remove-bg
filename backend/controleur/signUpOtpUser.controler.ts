@@ -425,7 +425,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
           plan: { code: planCode },
           credits: null,
           subscriptionId: null,
-          hint: "",
+          hint: (response as any)?.hint || "",
         });
       }
 
