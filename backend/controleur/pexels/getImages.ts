@@ -1,5 +1,6 @@
 //import des fonctions
 import { pexelsConnect } from "../../function/pexelsConnect.js";
+import { buildPexelsCroppedImageUrl } from "../../function/pexelsImageUrl.js";
 
 //import des types
 import type { RequestHandler } from "express";
@@ -53,9 +54,25 @@ const getImages: RequestHandler = async (req, res) => {
             page: pageNumber,
         });
         if (!response) {
-            res.status(500).json("error HTTP code: pex-1")
+            return res.status(500).json("error HTTP code: pex-1")
         }
-        res.status(200).json(response);
+
+        // Ajoute une URL custom 2000x2000 (crop) pour chaque photo.
+        // Le front peut l'utiliser pour garantir une résolution suffisante.
+        const photos = Array.isArray((response as any)?.photos) ? (response as any).photos : [];
+        const photosWithCustom = photos.map((photo: any) => {
+            const original = photo?.src?.original;
+            if (typeof original !== "string") return photo;
+            return {
+                ...photo,
+                customImage: buildPexelsCroppedImageUrl(original, { width: 2000, height: 2000 }),
+            };
+        });
+
+        return res.status(200).json({
+            ...(response as any),
+            photos: photosWithCustom,
+        });
     } catch (error:any) {
         console.log("error: ", error || error.message);
         res.status(500).json("error server code: pex-2" + error)
@@ -65,4 +82,4 @@ const getImages: RequestHandler = async (req, res) => {
 
 export {getImages}
 
-// All requests made with the client will be authenticated
+

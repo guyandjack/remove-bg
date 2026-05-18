@@ -37,8 +37,9 @@ async function composeBackground(
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   } else {
     const bgImg = await loadImage(background.value);
-    // Étire l’image de fond sur la surface du canvas
-    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+    // Dessine le fond en mode "cover" (comme background-size: cover)
+    // pour éviter toute déformation (aucun étirement non proportionnel).
+    drawImageCover(ctx, bgImg, canvas.width, canvas.height);
   }
 
   // Dessine le sujet par‑dessus le fond
@@ -46,6 +47,26 @@ async function composeBackground(
 
   // Retourne une dataURL PNG (transparence conservée si présente)
   return canvas.toDataURL("image/png");
+}
+
+/**
+ * Dessine une image sur toute la zone (targetW/targetH) en préservant son ratio.
+ * Le dépassement est rogné (cover), comme en CSS.
+ */
+function drawImageCover(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  targetW: number,
+  targetH: number
+) {
+  const sourceW = img.width || 1;
+  const sourceH = img.height || 1;
+  const scale = Math.max(targetW / sourceW, targetH / sourceH);
+  const drawW = sourceW * scale;
+  const drawH = sourceH * scale;
+  const dx = (targetW - drawW) / 2;
+  const dy = (targetH - drawH) / 2;
+  ctx.drawImage(img, dx, dy, drawW, drawH);
 }
 
 /**

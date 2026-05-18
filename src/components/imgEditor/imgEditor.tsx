@@ -186,7 +186,13 @@ const ImgEditor = ({
       const images: PexelsImage[] = photos
         .map((p) => ({
           tiny: p?.src?.tiny,
-          large: p?.src?.large2x || p?.src?.large || p?.src?.original,
+          // Le backend peut injecter une URL custom (crop 2000x2000) pour éviter le manque de résolution.
+          // Fallback: utilise les tailles Pexels standards.
+          large:
+            p?.customImage ||
+            p?.src?.large2x ||
+            p?.src?.large ||
+            p?.src?.original,
         }))
         .filter((i) => i.tiny && i.large);
       setPexelsImages(images);
@@ -470,7 +476,7 @@ const ImgEditor = ({
     requestAnimationFrame(() => initializeEraserCanvas());
   };
 
-  const openMagicEraser = () => {
+   const openMagicEraser = () => {
     if (isPreviewVisible) {
       hidePreviewWindow();
     }
@@ -483,7 +489,7 @@ const ImgEditor = ({
     resetEraserSurface();
     setIsEraserVisible(false);
     setIsSendingEraser(false);
-  };
+  }; 
 
   const toolCarouselItems = useMemo(() => {
     // Liste minimale par plan (performance + UX). À enrichir lors de l'ajout de nouveaux outils/plans.

@@ -10,8 +10,10 @@ const pexelsCheckReqParams: RequestHandler = (req, res, next) => {
   const tabError: string[] = [];
   const queryKeys = Object.keys(req.query);
 
-  // 1) Deux paramètres obligatoires (ex: theme + lang)
-  if (queryKeys.length < 2) {
+  // 1) Paramètres attendus :
+  // - /images : theme + lang (page optionnel)
+  // - /image  : id (lang optionnel)
+  if (queryKeys.length < 1) {
     tabError.push("nombre de parametre incorrect code 8");
     return res.status(400).json({ tabError });
   }
@@ -35,11 +37,33 @@ const pexelsCheckReqParams: RequestHandler = (req, res, next) => {
     : req.query.page;
   const idValue = Array.isArray(req.query.id) ? req.query.id[0] : req.query.id;
 
-  if (typeof themeValue !== "string" || !themeRegex.test(themeValue)) {
+  if (themeValue !== undefined && themeValue !== null && typeof themeValue !== "string") {
     tabError.push("error on value param theme code 10");
   }
 
-  if (typeof langValue !== "string" || !langRegex.test(langValue)) {
+  if (idValue !== undefined && idValue !== null && typeof idValue !== "string") {
+    tabError.push("error on value param id code 13");
+  }
+
+  const hasTheme = typeof themeValue === "string" && themeValue.trim().length > 0;
+  const hasId = typeof idValue === "string" && idValue.trim().length > 0;
+
+  if (!hasTheme && !hasId) {
+    tabError.push("parametre theme ou id manquant code 10/13");
+  }
+
+  if (hasTheme && !themeRegex.test(themeValue as string)) {
+    tabError.push("error on value param theme code 10");
+  }
+
+  const hasLang = typeof langValue === "string" && langValue.trim().length > 0;
+  if (hasTheme) {
+    // Pour la recherche, la langue est requise car elle est utilisée pour locale.
+    if (!hasLang || !langRegex.test(langValue as string)) {
+      tabError.push("error on value param lang code 11");
+    }
+  } else if (hasLang && !langRegex.test(langValue as string)) {
+    // Pour /image, lang est optionnel mais si présent il doit être valide.
     tabError.push("error on value param lang code 11");
   }
 
@@ -49,9 +73,7 @@ const pexelsCheckReqParams: RequestHandler = (req, res, next) => {
     tabError.push("error on value param page code 12");
   }
 
-  if (idValue !== undefined && idValue !== null && typeof idValue !== "string") {
-    tabError.push("error on value param id code 13");
-  } else if (typeof idValue === "string" && idValue && !idRegex.test(idValue)) {
+  if (hasId && !idRegex.test(idValue as string)) {
     tabError.push("error on value param id code 13");
   }
 
