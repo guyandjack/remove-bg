@@ -2,6 +2,10 @@ import type { RequestHandler } from "express";
 import { logger } from "../../logger.js";
 import { getStripeClient } from "../../function/stripe/stripeClient.js";
 import {
+  formatBillingLockMessage,
+  getStripeBillingLock,
+} from "../../function/stripe/stripeBillingGuards.js";
+import {
   getActiveSubscription,
   getPlanByCode,
   getUserByEmail,
@@ -106,6 +110,17 @@ export const changePlanController: RequestHandler = async (req, res) => {
       });
     }
 
+    const lock = await getStripeBillingLock({
+      stripe,
+      stripeSubscriptionId: subscription.stripe_subscription_id,
+    });
+    if (lock.locked) {
+      return res.status(409).json({
+        success: false,
+        message: formatBillingLockMessage({ locale, lock }),
+      });
+    }
+
     const stripeSub: any = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id, {
       expand: ["items.data.price"],
     } as any);
@@ -118,6 +133,28 @@ export const changePlanController: RequestHandler = async (req, res) => {
 
     try {
       await stripe.subscriptions.update(subscription.stripe_subscription_id, { cancel_at_period_end: true } as any);
+
+      // Validation: ensure Stripe confirms cancel_at_period_end=true before persisting local pending downgrade.
+      try {
+        const refreshed: any = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id);
+        if (Boolean(refreshed?.cancel_at_period_end) !== true) {
+          return res.status(502).json({
+            success: false,
+            message:
+              locale === "fr"
+                ? "Stripe nâ€™a pas confirmÃ© lâ€™annulation Ã  Ã©chÃ©ance. RÃ©essayez."
+                : "Stripe did not confirm the scheduled cancellation. Please retry.",
+          });
+        }
+      } catch {
+        return res.status(502).json({
+          success: false,
+          message:
+            locale === "fr"
+              ? "Impossible de valider lâ€™Ã©tat Stripe aprÃ¨s mise Ã  jour."
+              : "Unable to validate Stripe state after update.",
+        });
+      }
     } catch (err: any) {
       logger.error("subscription.change_plan::stripe_cancel_to_free_failed", {
         userId: user.id,
@@ -168,6 +205,17 @@ export const changePlanController: RequestHandler = async (req, res) => {
     });
   }
 
+  const billingLock = await getStripeBillingLock({
+    stripe,
+    stripeSubscriptionId: subscription.stripe_subscription_id,
+  });
+  if (billingLock.locked) {
+    return res.status(409).json({
+      success: false,
+      message: formatBillingLockMessage({ locale, lock: billingLock }),
+    });
+  }
+
   // Load Stripe subscription with item id + current_period_end
   const stripeSub: any = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id, {
     expand: ["items.data.price"],
@@ -189,11 +237,12 @@ export const changePlanController: RequestHandler = async (req, res) => {
   if (changeType === "upgrade") {
     // Immediate upgrade with proration. Do NOT mark plan active in DB until webhook confirms.
     try {
-      const updated: any = await stripe.subscriptions.update(subscription.stripe_subscription_id, {
+      await stripe.subscriptions.update(subscription.stripe_subscription_id, {
         items: [{ id: subscriptionItemId, price: targetStripePriceId }],
-        proration_behavior: "create_prorations",
-        // Try to invoice & pay immediately (may still require action depending on payment method).
-        payment_behavior: "pending_if_incomplete",
+        // Force immediate invoice + payment attempt for the proration delta.
+        proration_behavior: "always_invoice",
+        // Hard-fail if payment cannot be completed immediately (prevents pending payments).
+        payment_behavior: "error_if_incomplete",
         expand: ["latest_invoice.payment_intent", "items.data.price"],
       } as any);
 
@@ -205,15 +254,10 @@ export const changePlanController: RequestHandler = async (req, res) => {
         stripe_schedule_id: null,
       });
 
-      const piStatus = updated?.latest_invoice?.payment_intent?.status as string | undefined;
-      const requiresAction = piStatus === "requires_action" || piStatus === "requires_payment_method";
-
       return res.status(200).json({
         success: true,
         change_type: "upgrade",
         pending: true,
-        requires_action: Boolean(requiresAction),
-        payment_intent_status: piStatus ?? null,
         message:
           locale === "fr"
             ? "Upgrade demandé. Le nouveau plan sera activé après confirmation de paiement."
@@ -224,7 +268,23 @@ export const changePlanController: RequestHandler = async (req, res) => {
         userId: user.id,
         message: err?.message || String(err),
       });
-      return res.status(502).json({ success: false, message: "Stripe update failed." });
+
+      const statusCode = Number(err?.statusCode ?? 0);
+      if (statusCode === 402) {
+        return res.status(402).json({
+          success: false,
+          message:
+            locale === "fr"
+              ? "Paiement refusÃ© ou non validable immÃ©diatement. Lâ€™upgrade nâ€™a pas Ã©tÃ© appliquÃ©."
+              : "Payment failed or cannot be completed immediately. Upgrade was not applied.",
+        });
+      }
+
+      return res.status(502).json({
+        success: false,
+        message:
+          locale === "fr" ? "Ã‰chec Stripe lors de lâ€™upgrade." : "Stripe upgrade failed.",
+      });
     }
   }
 
@@ -255,6 +315,29 @@ export const changePlanController: RequestHandler = async (req, res) => {
         },
       ],
     });
+
+    // Validation: ensure Stripe confirms the schedule exists and is in an expected state.
+    try {
+      const refreshed: any = await (stripe as any).subscriptionSchedules.retrieve(schedule.id);
+      const st = String(refreshed?.status || "");
+      if (!["active", "not_started"].includes(st)) {
+        return res.status(502).json({
+          success: false,
+          message:
+            locale === "fr"
+              ? "Stripe nâ€™a pas confirmÃ© la programmation du downgrade. RÃ©essayez."
+              : "Stripe did not confirm the scheduled downgrade. Please retry.",
+        });
+      }
+    } catch {
+      return res.status(502).json({
+        success: false,
+        message:
+          locale === "fr"
+            ? "Impossible de valider lâ€™Ã©tat Stripe aprÃ¨s programmation."
+            : "Unable to validate Stripe state after scheduling.",
+      });
+    }
 
     await updateSubscription(subscription.id, {
       pending_plan_id: targetPlan.id,

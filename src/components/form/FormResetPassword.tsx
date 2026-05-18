@@ -317,8 +317,14 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
                 aria-invalid={!!errors.password || undefined}
                 {...register("password", {
                   required: t("formContact.required"),
-                  minLength: { value: validationLimits.password.min, message: t("formReset.passwordError") },
-                  maxLength: { value: validationLimits.password.max, message: t("formReset.passwordError") },
+                  minLength: {
+                    value: validationLimits.password.min,
+                    message: t("formReset.passwordError"),
+                  },
+                  maxLength: {
+                    value: validationLimits.password.max,
+                    message: t("formReset.passwordError"),
+                  },
                   pattern: {
                     value: REGEX.password,
                     message: t("formReset.passwordError"),
@@ -404,6 +410,14 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
               }
               disabled={submitDisabled}
             >
+              {isLoader && status === "idle" ? (
+               
+                  <span
+                    className={`loading loading-bars loading-sm loading-info text-info`}
+                  ></span>
+                
+              ) : null}
+
               {mode === "dashboard"
                 ? "Mettre à jour le mot de passe"
                 : t("formReset.btnSubmit")}
@@ -413,7 +427,7 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
                 {t("formReset.btnBack")}
               </a>
             ) : null}
-            {isLoader ? <Loader top="top-[100%]" /> : null}
+            {/* {isLoader ? <Loader top="top-[100%]" /> : null} */}
             <div
               className={`btn w-full transition-all duration-500 transform ${
                 status === "idle" ? "opacity-0 translate-y-0" : ""
@@ -429,10 +443,10 @@ const FormResetPassword = ({ mode = "reset", embedded = false }: Props) => {
             >
               {status === "idle"
                 ? ""
-                : statusMessage ??
+                : (statusMessage ??
                   (status === "success"
                     ? t("formReset.textSuccess")
-                    : t("formReset.textError"))}
+                    : t("formReset.textError")))}
             </div>
           </div>
         </form>

@@ -243,9 +243,13 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         const st = await api.get("/api/account/billing-account");
         if (st?.data?.success) setBillingState(st.data as any);
       } catch {}
-    } catch (e) {
+    } catch (e: any) {
       setCancelSubmitting("error");
-      const msg = t("dashboardPage.subscription.cancelError");
+      const apiMsg =
+        typeof e?.response?.data?.message === "string"
+          ? (e.response.data.message as string)
+          : null;
+      const msg = apiMsg || t("dashboardPage.subscription.cancelError");
       setCancelMessage(msg);
       pushActionToast({ status: "error", message: msg });
     } finally {
@@ -270,9 +274,13 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         const st = await api.get("/api/account/billing-account");
         if (st?.data?.success) setBillingState(st.data as any);
       } catch {}
-    } catch {
+    } catch (e: any) {
       setCancelSubmitting("error");
-      const msg = t("dashboardPage.billing.subscription.resumeError");
+      const apiMsg =
+        typeof e?.response?.data?.message === "string"
+          ? (e.response.data.message as string)
+          : null;
+      const msg = apiMsg || t("dashboardPage.billing.subscription.resumeError");
       setCancelMessage(msg);
       pushActionToast({ status: "error", message: msg });
     } finally {
@@ -362,10 +370,14 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         "account_deletion_feedback_modal",
       ) as HTMLDialogElement | null;
       dialog?.showModal?.();
-    } catch {
+    } catch (e: any) {
       setDeletionSubmitting("error");
       {
-        const msg = t("dashboardPage.billing.account.deletionError");
+        const apiMsg =
+          typeof e?.response?.data?.message === "string"
+            ? (e.response.data.message as string)
+            : null;
+        const msg = apiMsg || t("dashboardPage.billing.account.deletionError");
         setDeletionMessage(msg);
         pushActionToast({ status: "error", message: msg });
       }
@@ -506,10 +518,14 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         ) as HTMLDialogElement | null;
         dialog?.close?.();
       }, 800);
-    } catch {
+    } catch (e: any) {
       setPlanChangeSubmitting("error");
+      const apiMsg =
+        typeof e?.response?.data?.message === "string"
+          ? (e.response.data.message as string)
+          : null;
       setPlanChangeMessage(
-        t("dashboardPage.billing.subscription.changePlanError"),
+        apiMsg || t("dashboardPage.billing.subscription.changePlanError"),
       );
     } finally {
       setTimeout(() => setPlanChangeSubmitting("idle"), 2500);
@@ -646,7 +662,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                       onClick={handleResumeSubscription}
                     >
                       {cancelSubmitting === "loading" ? (
-                        <span className="loading loading-bars loading-spinner loading-sm" />
+                        <span className="loading loading-bars loading-sm text-info" />
                       ) : null}
                       {t("dashboardPage.billing.subscription.resumeCta")}
                     </button>
@@ -666,7 +682,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                       }}
                     >
                       {cancelSubmitting === "loading" ? (
-                        <span className="loading loading-bars loading-spinner loading-sm" />
+                        <span className="loading loading-bars loading-sm text-info" />
                       ) : null}
                       {t("dashboardPage.billing.subscription.cancelCta")}
                     </button>
@@ -714,7 +730,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                   onClick={handleToggleMarketingConsent}
                 >
                   {marketingSubmitting === "loading" ? (
-                    <span className="loading loading-bars loading-sm" />
+                    <span className="loading loading-bars loading-sm text-info" />
                   ) : null}
                   {billingState?.marketing?.marketing_consent
                     ? t("dashboardPage.billing.marketing.disableCta")
@@ -772,7 +788,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                   onClick={handleAccountDeletionRequest}
                 >
                   {deletionSubmitting === "loading" ? (
-                    <span className="loading loading-bars loading-spinner loading-sm" />
+                    <span className="loading loading-bars loading-sm text-info" />
                   ) : null}
                   {t("dashboardPage.billing.account.deleteCta")}
                 </button>
@@ -947,7 +963,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                         }
                       >
                         {planChangeSubmitting === "loading" ? (
-                          <span className="loading loading-bars loading-spinner loading-sm" />
+                          <span className="loading loading-bars loading-sm text-info" />
                         ) : null}
                         {t("dashboardPage.billing.subscription.confirm")}
                       </button>

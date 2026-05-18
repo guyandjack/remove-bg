@@ -204,7 +204,7 @@ const FormSignUp = () => {
             >
               {plan}
             </span>
-            <span className="ml-2 text-sm uppercase text-info">{currency}</span>
+            {/* <span className="ml-2 text-sm uppercase text-info">{currency}</span> */}
           </h1>
         </div>
 
@@ -404,7 +404,7 @@ const FormSignUp = () => {
               <div className="relative flex flex-col justify-center items-center">
                 <button
                   type="submit"
-                  className="btn btn-primary w-full mt-10"
+                  className="relative btn btn-primary w-full mt-10"
                   disabled={
                     pw !== cpw || //password differents
                     isSubmitting || //soumission du formulaire
@@ -417,13 +417,23 @@ const FormSignUp = () => {
                     status !== "idle" //si le status est en cours
                   }
                 >
+                  {isLoader && status === "idle" && !displayOtp ? (
+                    <div className="absolute top-[50%] left-[1rem] translate-y-[-50%]">
+                      <span
+                        className={`loading loading-bars loading-sm loading-info text-info`}
+                      ></span>
+                    </div>
+                  ) : null}
                   {t("formSignUp.btnSubmit")}
                 </button>
 
                 <div class="mt-5 h-[1px] w-full bg-gray-500 "></div>
-                {isLoader && !displayOtp ? (
-                  <Loader top="top-[90%]" text={t("formSignUp.loadingSubmit")} />
-                ) : null}
+               {/*  {isLoader && !displayOtp ? (
+                  <Loader
+                    top="top-[90%]"
+                    text={t("formSignUp.loadingSubmit")}
+                  />
+                ) : null} */}
 
                 {/* <div className="relative w-full flex flex-col justify-center items-center mt-4">
                   <BtnGoogleLogin

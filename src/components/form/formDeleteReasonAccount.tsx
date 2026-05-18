@@ -160,9 +160,16 @@ function FormDeleteReasonAccount({ content, token, onClose, onSubmitted }: Props
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-bold tracking-tight">{content.title}</h3>
-          <p className="mt-1 text-sm text-base-content/70">{content.subtitle}</p>
+          <p className="mt-1 text-sm text-base-content/70">
+            {content.subtitle}
+          </p>
         </div>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={onClose} disabled={status === "loading"}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={onClose}
+          disabled={status === "loading"}
+        >
           {content.button_close}
         </button>
       </div>
@@ -171,31 +178,59 @@ function FormDeleteReasonAccount({ content, token, onClose, onSubmitted }: Props
         <div className="rounded-xl border border-base-300 bg-base-100 p-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <label className="flex items-center gap-3">
-              <input type="checkbox" className="checkbox checkbox-sm" {...register("expensive")} />
+              <input
+                type="checkbox"
+                className="checkbox checkbox-sm"
+                {...register("expensive")}
+              />
               <span className="text-sm">{content.expensive}</span>
             </label>
             <label className="flex items-center gap-3">
-              <input type="checkbox" className="checkbox checkbox-sm" {...register("no_more_use")} />
+              <input
+                type="checkbox"
+                className="checkbox checkbox-sm"
+                {...register("no_more_use")}
+              />
               <span className="text-sm">{content.no_more_use}</span>
             </label>
             <label className="flex items-center gap-3">
-              <input type="checkbox" className="checkbox checkbox-sm" {...register("bad_quality_result")} />
+              <input
+                type="checkbox"
+                className="checkbox checkbox-sm"
+                {...register("bad_quality_result")}
+              />
               <span className="text-sm">{content.bad_quality_result}</span>
             </label>
             <label className="flex items-center gap-3">
-              <input type="checkbox" className="checkbox checkbox-sm" {...register("difficult")} />
+              <input
+                type="checkbox"
+                className="checkbox checkbox-sm"
+                {...register("difficult")}
+              />
               <span className="text-sm">{content.difficult}</span>
             </label>
             <label className="flex items-center gap-3">
-              <input type="checkbox" className="checkbox checkbox-sm" {...register("bad_UX")} />
+              <input
+                type="checkbox"
+                className="checkbox checkbox-sm"
+                {...register("bad_UX")}
+              />
               <span className="text-sm">{content.bad_UX}</span>
             </label>
             <label className="flex items-center gap-3">
-              <input type="checkbox" className="checkbox checkbox-sm" {...register("found_alternative")} />
+              <input
+                type="checkbox"
+                className="checkbox checkbox-sm"
+                {...register("found_alternative")}
+              />
               <span className="text-sm">{content.found_alternative}</span>
             </label>
             <label className="flex items-center gap-3 sm:col-span-2">
-              <input type="checkbox" className="checkbox checkbox-sm" {...register("other")} />
+              <input
+                type="checkbox"
+                className="checkbox checkbox-sm"
+                {...register("other")}
+              />
               <span className="text-sm">{content.other_reason}</span>
             </label>
 
@@ -208,7 +243,9 @@ function FormDeleteReasonAccount({ content, token, onClose, onSubmitted }: Props
                 })}
               />
               {errors.other_text ? (
-                <p className="mt-1 text-sm text-error">{String(errors.other_text.message)}</p>
+                <p className="mt-1 text-sm text-error">
+                  {String(errors.other_text.message)}
+                </p>
               ) : null}
             </div>
           </div>
@@ -218,7 +255,11 @@ function FormDeleteReasonAccount({ content, token, onClose, onSubmitted }: Props
           <div
             role="alert"
             className={`alert ${
-              status === "error" ? "alert-error" : status === "success" ? "alert-success" : "alert-info"
+              status === "error"
+                ? "alert-error"
+                : status === "success"
+                  ? "alert-success"
+                  : "alert-info"
             }`}
           >
             <span>{statusMessage}</span>
@@ -226,16 +267,31 @@ function FormDeleteReasonAccount({ content, token, onClose, onSubmitted }: Props
         ) : null}
 
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-          <button type="button" className="btn btn-ghost" onClick={onClose} disabled={status === "loading"}>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={onClose}
+            disabled={status === "loading"}
+          >
             {content.button_close}
           </button>
-          <button type="submit" className="btn btn-primary sm:min-w-[180px]" disabled={submitDisabled}>
-            {status === "loading" ? <span className="loading loading-bars loading-spinner loading-sm" /> : null}
+          <button
+            type="submit"
+            className="relative btn btn-primary sm:min-w-[180px]"
+            disabled={submitDisabled}
+          >
+            {status === "loading" ? (
+              <div className="absolute top-[50%] left-[1rem] translate-y-[-50%]">
+                <span
+                  className={`loading loading-bars loading-sm loading-info text-info`}
+                ></span>
+              </div>
+            ) : null}
             {content.button_submit}
           </button>
         </div>
 
-        {status === "loading" ? <Loader top="top-[100%]" /> : null}
+        {/* {status === "loading" ? <Loader top="top-[100%]" /> : null} */}
       </form>
     </div>
   );

@@ -143,7 +143,7 @@ const UploadImg = ({
             />
             <div className="label p-0">
               <span className="label-text text-base-content/70">
-                {`Formats: JPG, PNG, WEBP, GIF - Max ${maxMb} MB`}
+                {`Formats: JPG, PNG, WEBP - Max ${maxMb} MB`}
               </span>
             </div>
 

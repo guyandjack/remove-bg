@@ -378,11 +378,18 @@ function OtpInput({
           disabled={isLoader || status !== "idle"}
           id="resend"
           type="button"
-          className="btn btn-primary ml-5"
+          className="relative btn btn-primary ml-5"
           onClick={(e) => {
             resend(e);
           }}
         >
+          {isLoader && status === "idle" ? (
+            <div className="left-[1rem]">
+              <span
+                className={`loading loading-bars loading-sm loading-info text-info`}
+              ></span>
+            </div>
+          ) : null}
           {action}
         </button>
         <span
@@ -403,12 +410,14 @@ function OtpInput({
           {statusMessage}
         </span>
       </p>
-      {isLoader ? (
+      {/* {isLoader ? (
         <Loader
           top="top-[100%]"
-          text={loadingReason === "resend" ? loaderResendText : loaderVerifyText}
+          text={
+            loadingReason === "resend" ? loaderResendText : loaderVerifyText
+          }
         />
-      ) : null}
+      ) : null} */}
     </form>
   );
 }

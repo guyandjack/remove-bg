@@ -2,6 +2,10 @@ import type { RequestHandler } from "express";
 import { logger } from "../../logger.js";
 import { getStripeClient } from "../../function/stripe/stripeClient.js";
 import {
+  formatBillingLockMessage,
+  getStripeBillingLock,
+} from "../../function/stripe/stripeBillingGuards.js";
+import {
   getActiveSubscription,
   getActiveUsageBillingPeriod,
   getUserByEmail,
@@ -213,6 +217,17 @@ export const cancelSubscriptionController: RequestHandler = async (req, res) => 
 
   let updatedStripeSub;
   try {
+    const lock = await getStripeBillingLock({
+      stripe,
+      stripeSubscriptionId: subscription.stripe_subscription_id,
+    });
+    if (lock.locked) {
+      return res.status(409).json({
+        success: false,
+        message: formatBillingLockMessage({ locale, lock }),
+      });
+    }
+
     updatedStripeSub = await stripe.subscriptions.update(
       subscription.stripe_subscription_id,
       { cancel_at_period_end: true }

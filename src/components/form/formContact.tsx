@@ -376,11 +376,19 @@ function FormContact({content}:FormProps) {
           disabled={
             Object.keys(errors).length > 0 ||
             Object.keys(objectValueToStore.current).length < 5 ||
-            !agree
+            !agree ||
+            isSubmitting
           }
         >
-          {isLoader ? "" : content.button}
-          {isLoader ? <Loader direction="flex-col" top="top-20" /> : null}
+          {isLoader ? (
+              <div className="absolute top-[50%] left-[1rem] translate-y-[-50%]">
+                <span
+                  className={`loading loading-bars loading-sm loading-info text-info`}
+                ></span>
+              </div>
+            ) : null}
+         {content.button}
+          
         </button>
         <div
          

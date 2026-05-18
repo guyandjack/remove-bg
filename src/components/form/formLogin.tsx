@@ -299,7 +299,7 @@ const FormLogin = () => {
               <div className="relative flex flex-col justify-center items-center">
                 <button
                   type="submit"
-                  className="btn btn-primary w-full mt-10 "
+                  className="relative flex flex-row justify-evenly items-center btn btn-primary w-full mt-5 "
                   disabled={
                     isSubmitting || //soumission du formulaire
                     !email || //si formulaire pas rempli entierement
@@ -309,10 +309,18 @@ const FormLogin = () => {
                     status !== "idle" //si le status est en cours
                   }
                 >
-                  {t("formLogin.btnSubmit")}
+                  {isLoader ? (
+                    <div className="absolute top-[50%] left-[1rem] translate-y-[-50%]">
+                      {" "}
+                      <span
+                        className={`loading loading-bars loading-sm loading-info text-info`}
+                      ></span>
+                    </div>
+                  ) : null}
+                  <span>{t("formLogin.btnSubmit")}</span>
                 </button>
 
-                <div class="mt-5 h-[1px] w-full bg-gray-500 "></div>
+                <div class="relative mt-5 h-[1px] w-full bg-gray-500 "></div>
 
                 {/*  <div className="relative w-full flex flex-col justify-center items-center mt-4">
                   <BtnGoogleLogin
@@ -411,10 +419,17 @@ const FormLogin = () => {
                   {
                     <button
                       type="submit"
-                      className="btn btn-primary w-full"
-                      disabled={isForgotSubmitting }
+                      className="relative btn btn-primary w-full"
+                      disabled={isForgotSubmitting || statusForgot !== "idle"}
                     >
-                      {t("formForgot.btnSubmit")}
+                      {isLoader && statusForgot === "idle" ? (
+                        <div className="absolute top-[50%] left-[1rem] translate-y-[-50%]">
+                          <span
+                            className={`loading loading-bars loading-sm loading-info text-info`}
+                          ></span>
+                        </div>
+                      ) : null}
+                      <span>{t("formForgot.btnSubmit")}</span>
                     </button>
                   }
                   <button
@@ -424,9 +439,7 @@ const FormLogin = () => {
                   >
                     {t("formForgot.btnCancel")}
                   </button>
-                  {isLoader && statusForgot === "idle" ? (
-                    <Loader top="top-[100%]" />
-                  ) : null}
+                  
                   <div
                     className={`btn w-full transition-all duration-500 transform 
           ${statusForgot === "idle" ? "opacity-0 translate-y-0" : ""}
@@ -442,7 +455,9 @@ const FormLogin = () => {
           }
         `}
                   >
-                    {statusForgot === "success" ? t("formForgot.textSuccess") : ""}
+                    {statusForgot === "success"
+                      ? t("formForgot.textSuccess")
+                      : ""}
                     {statusForgot === "error" ? t("formForgot.textError") : ""}
                   </div>
                 </div>
