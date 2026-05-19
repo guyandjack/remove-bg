@@ -55,12 +55,18 @@
     "btnSubmit": "Create your account",
     "btnGoogle": "Continue with Google",
     "passwordError": "Password too weak",
+    "confirmError": "Passwords must match",
     "loadingSubmit": "Sending code…",
     "textSuccess": "A verification code has been sent.",
     "textError": "Unable to send the verification code. Please try again.",
     "question": "Already a member?",
     "link": "Log in",
-    "httpError": "An HTTP error has occurred. Please check your connection."
+    "httpError": "An HTTP error has occurred. Please check your connection.",
+    "errors": {
+      "cannotCreateAccount": "Unable to create the account. Check your details.",
+      "serviceUnavailable": "Service is temporarily unavailable. Please try again later.",
+      "tooManyRequests": "Too many attempts. Wait a few minutes and try again."
+    }
   },
 
   "otpInput": {
@@ -87,10 +93,16 @@
     "forgot": "Forgot password",
     "question": "Not a member yet?",
     "link": "Create your account",
+    "required": "Field required",
     "passwordError": "Invalid password",
     "textSuccess": "You are logged in",
     "textError": "An error occurred",
-    "pattern":"Invalid email"
+    "pattern":"Invalid email",
+    "httpError": "Unable to reach the server. Check your connection and try again.",
+    "errors": {
+      "invalidCredentials": "Incorrect email and/or password.",
+      "tooManyRequests": "Too many attempts. Wait a few minutes and try again."
+    }
   },
   "formForgot": {
     "title": "Recover your password",

@@ -5,6 +5,7 @@ import { useLocation } from "preact-iso";
 
 
 //import des librairies
+import axios from "axios";
 import { login } from "@/utils/axiosConfig";
 
 //import des instance
@@ -43,6 +44,7 @@ const FormLogin = () => {
   const location = useLocation();
   //state qui gere la validite de la reponse.
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [loginMessage, setLoginMessage] = useState<string | null>(null);
 
   //gere en partie l' affichage du loader
   const [isLoader, setIsLoader] = useState(false);
@@ -57,6 +59,18 @@ const FormLogin = () => {
   const [statusForgot, setStatusForgot] = useState<"idle" | "success" | "error">("idle");
 
   const language = i18n.resolvedLanguage || i18n.language;
+
+  const resolveLoginApiErrorMessage = (error: unknown): string => {
+    // Safety principle: never show backend-provided login errors (anti-enumeration + no debug leaks).
+    if (axios.isAxiosError(error)) {
+      const statusCode = error.response?.status;
+      if (!statusCode) return t("formLogin.httpError");
+      if (statusCode === 401) return t("formLogin.errors.invalidCredentials");
+      if (statusCode === 429) return t("formLogin.errors.tooManyRequests");
+    }
+
+    return t("formLogin.textError");
+  };
 
   const {
     register,
@@ -138,6 +152,7 @@ const FormLogin = () => {
   const onSubmit = async (data: FormValues) => {
     //afficha du loader
     setIsLoader(true);
+    setLoginMessage(null);
 
     try {
       const response = await login.post(`/api/login/`, data, {
@@ -166,12 +181,13 @@ const FormLogin = () => {
         setTimeout(() => {
           setStatus("idle");
           location.route("/services");
-        }, 2000);
+        }, 2500);
 
         
       } else {
         setIsLoader(false);
         setStatus("error");
+        setLoginMessage(t("formLogin.errors.invalidCredentials"));
         setTimeout(() => {
           setStatus("idle");
         }, 3000);
@@ -179,7 +195,7 @@ const FormLogin = () => {
     } catch (error) {
       setIsLoader(false);
       setStatus("error");
-      axiosError(setStatus, error);
+      setLoginMessage(resolveLoginApiErrorMessage(error));
       setTimeout(() => {
         setStatus("idle");
       }, 3000);
@@ -187,7 +203,7 @@ const FormLogin = () => {
       setTimeout(() => {
         
         setStatus("idle")
-      },2000)
+      },3000)
     }
   };
 
@@ -345,7 +361,9 @@ const FormLogin = () => {
         `}
                 >
                   {status === "success" ? t("formLogin.textSuccess") : ""}
-                  {status === "error" ? t("formLogin.textError") : ""}
+                  {status === "error"
+                    ? (loginMessage ?? t("formLogin.textError"))
+                    : ""}
                 </div>
               </div>
 

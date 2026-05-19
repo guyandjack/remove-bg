@@ -53,12 +53,18 @@
     "btnSubmit": "Créer votre compte",
     "btnGoogle": "Continuer avec Google",
     "passwordError": "Mot de passe trop faible",
+    "confirmError": "Les mots de passe doivent correspondre",
     "loadingSubmit": "Envoi du code…",
     "textSuccess": "Un code de vérification a été envoyé.",
     "textError": "Impossible d’envoyer le code de vérification. Réessayez.",
     "question": "Déjà membre",
     "link": "Connectez-vous",
-    "httpError": "Une erreur HTTP s'est produite. Vérifiez votre connexion."
+    "httpError": "Une erreur HTTP s'est produite. Vérifiez votre connexion.",
+    "errors": {
+      "cannotCreateAccount": "Impossible de créer le compte. Vérifiez vos informations.",
+      "serviceUnavailable": "Le service est temporairement indisponible. Réessayez plus tard.",
+      "tooManyRequests": "Trop de tentatives. Patientez quelques minutes puis réessayez."
+    }
   },
 
   "otpInput": {
@@ -84,10 +90,16 @@
     "forgot": "Mot de passe oublié",
     "question": "Pas encore membre",
     "link": "Créer votre compte",
+    "required": "Champs requis",
     "passwordError": "Mot de passe non valide",
     "textSuccess": "Vous êtes connecté",
     "textError": "Une erreur s'est produite",
-    "pattern": "Email non valide"
+    "pattern": "Email non valide",
+    "httpError": "Connexion impossible. Vérifiez votre connexion et réessayez.",
+    "errors": {
+      "invalidCredentials": "Identifiant et/ou mot de passe incorrect.",
+      "tooManyRequests": "Trop de tentatives. Patientez quelques minutes puis réessayez."
+    }
   },
   "formForgot": {
     "title": "Récupérer votre mot de passe",

@@ -7,9 +7,6 @@ const axiosError = (seteur:any, error:any) => {
     if (error.code === "ECONNABORTED" || !error.response) {
       console.warn("Erreur réseau ou serveur injoignable");
       seteur("error");
-      
-      // exemple : message spécifique
-      alert("Connexion error");
     }
 
     // 🧩 2️⃣ Cas : le serveur a répondu avec un code HTTP ≠ 2xx

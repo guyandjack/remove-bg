@@ -114,6 +114,40 @@ const FormSignUp = () => {
   const cpw = watch("confirm");
   const email = watch("email");
 
+  const resolveSignupApiErrorMessage = (
+    error: unknown,
+    kind: "initial" | "resend",
+  ): string => {
+    // Safety principle: never display backend-provided messages to the customer,
+    // because they may contain sensitive or user-enumeration information.
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      const payload = (error.response?.data || {}) as any;
+      const code = typeof payload?.code === "string" ? payload.code : "";
+
+      // Network / CORS / timeout => no response
+      if (!status) return t("formSignUp.httpError");
+
+      // Rate limiting
+      if (status === 429) return t("formSignUp.errors.tooManyRequests");
+
+      // Email service temporarily unavailable
+      if (status === 503 || code === "smtp_unavailable")
+        return t("formSignUp.errors.serviceUnavailable");
+
+      // Existing account / conflict: do not confirm existence; provide safe guidance.
+      if (status === 409 || code === "signup_email_exists") {
+        return kind === "resend"
+          ? t("formSignUp.textError")
+          : t("formSignUp.errors.cannotCreateAccount");
+      }
+    }
+
+    return kind === "resend"
+      ? t("formSignUp.textError")
+      : t("formSignUp.errors.cannotCreateAccount");
+  };
+
   //permet la soumission du formulaire
   const onSubmit = async (
     data: FormValues
@@ -161,27 +195,9 @@ const FormSignUp = () => {
         setStatus("error");
         setDisplayOtp(false);
       }
-      if (axios.isAxiosError(error)) {
-        const payload = error.response?.data;
-        console.log("signup error payload:", payload);
-        if (payload) {
-          const serverMessage =
-            typeof payload === "string"
-              ? payload
-              : payload.message || t("formSignUp.httpError");
-          if (kind === "initial") setErrorMessage(serverMessage);
-          return { ok: false, kind, error: serverMessage };
-        } else {
-          const message = t("formSignUp.httpError");
-          if (kind === "initial") setErrorMessage(message);
-          return { ok: false, kind, error: message };
-        }
-      } else {
-        console.error("signup unexpected error:", error);
-        const message = t("formSignUp.httpError");
-        if (kind === "initial") setErrorMessage(message);
-        return { ok: false, kind, error: message };
-      }
+      const message = resolveSignupApiErrorMessage(error, kind);
+      if (kind === "initial") setErrorMessage(message);
+      return { ok: false, kind, error: message };
     } finally {
       if (kind === "initial") {
         setIsLoader(false);
@@ -353,6 +369,8 @@ const FormSignUp = () => {
                     className="input-clean"
                     {...register("confirm", {
                       required: t("formContact.required"),
+                      validate: (value) =>
+                        value === pw || t("formSignUp.confirmError"),
                       pattern: {
                         value: REGEX.password,
                         message: t("formSignUp.passwordError"),
