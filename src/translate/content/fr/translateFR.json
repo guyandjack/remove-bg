@@ -832,6 +832,16 @@
       "error": "Erreur lors de la demande. Réessayez."
     }
   },
+  "sessionWarning": {
+    "title": "Votre session arrive à expiration",
+    "message": "Votre session expire dans {{time}}",
+    "keep": "Maintenir la session",
+    "refreshing": "Prolongation",
+    "logout": "Déconnexion",
+    "loggingOut": "Déconnexion en cours",
+    "success": "Session prolongée.",
+    "error": "Impossible de prolonger la session. Veuillez vous reconnecter."
+  },
   "billingSuccess": {
     "title": "Confirmation de paiement",
     "processing": "Confirmation du paiement en cours.",

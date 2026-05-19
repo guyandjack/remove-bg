@@ -829,8 +829,17 @@
       "success": "If an account exists, an email has been sent.",
       "error": "Error while requesting. Please try again."
     }
-  }
-  ,
+  },
+  "sessionWarning": {
+    "title": "Your session is about to expire",
+    "message": "Your session expires in {{time}}",
+    "keep": "Keep session",
+    "refreshing": "Extending",
+    "logout": "Logout",
+    "loggingOut": "Logging out...",
+    "success": "Session extended.",
+    "error": "Unable to extend your session. Please sign in again."
+  },
   "billingSuccess": {
     "title": "Payment confirmation",
     "processing": "Payment confirmation in progress.",

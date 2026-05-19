@@ -1,9 +1,9 @@
 //instance personnel d' axios pour tout le projet
 //import des librairies
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 
 //import des fonction
-import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
+import { sessionSignal } from "@/stores/session";
 import { localOrProd } from "@/utils/localOrProd";
 
 //const et variable globale
@@ -13,15 +13,63 @@ const { urlApi } = localOrProd();
 const normalizedBaseURL = urlApi.replace(/\/+$/, "");
 console.log("api url: ", normalizedBaseURL);
 
+function safeParseJson(input: string): any | null {
+  try {
+    return JSON.parse(input);
+  } catch {
+    return null;
+  }
+}
+
+function readAccessToken(): string | null {
+  const fromSignal = sessionSignal?.value?.token?.trim();
+  if (fromSignal) return fromSignal;
+
+  const raw = localStorage.getItem("session") || "";
+  const parsed = safeParseJson(raw);
+  const fromStorage = typeof parsed?.token === "string" ? parsed.token.trim() : "";
+  return fromStorage || null;
+}
+
+function clearFrontSession() {
+  try {
+    localStorage.removeItem("session");
+  } catch {
+    // ignore
+  }
+  sessionSignal.value = null;
+}
+
+function persistNewAccessToken(newAccessToken: string) {
+  const raw = localStorage.getItem("session") || "";
+  const parsed = safeParseJson(raw) ?? {};
+  const next = { ...parsed, token: newAccessToken };
+  localStorage.setItem("session", JSON.stringify(next));
+
+  const currentSession = sessionSignal.value;
+  if (currentSession) {
+    sessionSignal.value = { ...currentSession, token: newAccessToken };
+    return;
+  }
+
+  // Fallback minimal (ex: session cleared but refresh succeeded)
+  sessionSignal.value = {
+    user: { email: "" },
+    status: null,
+    authentified: false,
+    redirect: false,
+    redirectUrl: null,
+    plan: { code: "" },
+    token: newAccessToken,
+    credits: { used_last_24h: 0, remaining_last_24h: 0 },
+    subscriptionId: null,
+    hint: null,
+  };
+}
+
 function attachAuthAndNormalizeUrl(client: ReturnType<typeof axios.create>) {
   client.interceptors.request.use((config) => {
-    const stringSessionObject = localStorage.getItem("session") || "";
-    let token = null;
-    if (stringSessionObject) {
-      const parsedSessionObject = JSON.parse(stringSessionObject);
-      token =
-        sessionSignal?.value?.token?.trim() || parsedSessionObject.token || null;
-    }
+    const token = readAccessToken();
 
     // S'assure que les chemins relatifs commencent par '/'
     const url = config.url ?? "";
@@ -62,7 +110,6 @@ const login = axios.create({
   timeout: 20000,
 });
 
-
 // --- Interceptor pour ajouter le token ---
 attachAuthAndNormalizeUrl(api);
 attachAuthAndNormalizeUrl(apiBlob);
@@ -76,119 +123,98 @@ const onRefreshed = (token: string | null) => {
   pendingRequests = [];
 };
 
-/// ---- Instance sans interceptors pour appeler /auth/refresh ----
+// ---- Instance sans interceptors pour appeler /auth/refresh ----
 const refreshClient = axios.create({
   baseURL: normalizedBaseURL,
   timeout: 20000,
   withCredentials: true,
 });
 
-// ---- Interceptor de réponse : gère les 401 ----
-api.interceptors.response.use(
-  (response) => response,
-  async (error: AxiosError) => {
-    const status = error.response?.status;
-    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+async function refreshAccessToken(): Promise<string | null> {
+  try {
+    const refreshResponse = await refreshClient.post("/api/auth/refresh", {});
+    const data = refreshResponse?.data;
 
-    // Si ce n'est pas un 401, ou si on a déjà retenté, on laisse l'erreur passer
-    if (status !== 401 || originalRequest._retry) {
-      return Promise.reject(error);
+    if (!data || data.status !== "success") {
+      clearFrontSession();
+      return null;
     }
 
-    originalRequest._retry = true;
-
-    // Si un refresh est déjà en cours, on met cette requête en attente
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        pendingRequests.push((newToken) => {
-          if (!newToken) {
-            reject(error);
-            return;
-          }
-          originalRequest.headers = originalRequest.headers ?? {};
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          resolve(api(originalRequest));
-        });
-      });
+    const newAccessToken = String((data as any).token ?? "").trim();
+    if (!newAccessToken) {
+      clearFrontSession();
+      return null;
     }
 
-    // Sinon, on lance le refresh
-    isRefreshing = true;
-
-    try {
-      const refreshResponse = await refreshClient.post("/api/auth/refresh", {});
-
-      //si pas de reponse on log une erreur http ou autre
-      if (!refreshResponse) {
-        console.log("erreur http sur refresh request");
-      }
-
-      const data = refreshResponse.data;
-
-      //si refresh client echoue:
-      
-
-      if (data.status !== "success") {
-        // Cleanup côté front
-        localStorage.removeItem("session");
-        sessionSignal.value = null;
-
-        // Option : redirection vers la page de login
-       return //window.location.href = "/login";
-        
-      }
-
-      const newAccessToken = (data as any).token as string;
-
-      // 1) On stocke le nouveau token
-      const objectSession = localStorage.getItem("session") || "";
-      const objectSessionParsed = JSON.parse(objectSession);
-      objectSessionParsed.token = newAccessToken;
-      //mise a jour de la session dans le localstorage et signalSession
-      localStorage.setItem("session", JSON.stringify(objectSessionParsed));
-      const currentSession = sessionSignal.value;
-      if (currentSession) {
-        sessionSignal.value = { ...currentSession, token: newAccessToken };
-      } else {
-        // Fallback si la session a ete remise a null (ex: logout/refresh fail)
-        sessionSignal.value = {
-          user: { email: "" },
-          status: null,
-          authentified: false,
-          redirect: false,
-          redirectUrl: null,
-          plan: { code: "" },
-          token: newAccessToken,
-          credits: { used_last_24h: 0, remaining_last_24h: 0 },
-          subscriptionId: null,
-          hint: null,
-        };
-      }
-
-      // 2) On réveille toutes les requêtes en attente
-      onRefreshed(newAccessToken);
-      isRefreshing = false;
-
-      // 3) On rejoue la requête originale
-      originalRequest.headers = originalRequest.headers ?? {};
-      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-      return api(originalRequest);
-    } catch (refreshError) {
-      isRefreshing = false;
-
-      // On réveille les requêtes en échec (sans token)
-      onRefreshed(null);
-
-      // Cleanup côté front
-      localStorage.removeItem("session");
-      sessionSignal.value = null;
-
-      // Option : redirection vers la page de login
-       //window.location.href = "/login";
-
-      return Promise.reject(refreshError);
-    }
+    persistNewAccessToken(newAccessToken);
+    return newAccessToken;
+  } catch {
+    clearFrontSession();
+    return null;
   }
-);
+}
 
-export  {api, apiBlob, login};
+function installRefreshInterceptor(client: AxiosInstance) {
+  client.interceptors.response.use(
+    (response) => response,
+    async (error: AxiosError) => {
+      const status = error.response?.status;
+      const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+
+      // Si ce n'est pas un 401, ou si on a déjà retenté, on laisse l'erreur passer
+      if (status !== 401 || originalRequest._retry) {
+        return Promise.reject(error);
+      }
+
+      originalRequest._retry = true;
+
+      // Si un refresh est déjà en cours, on met cette requête en attente
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          pendingRequests.push((newToken) => {
+            if (!newToken) {
+              reject(error);
+              return;
+            }
+            originalRequest.headers = originalRequest.headers ?? {};
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            resolve(client(originalRequest));
+          });
+        });
+      }
+
+      // Sinon, on lance le refresh
+      isRefreshing = true;
+
+      try {
+        const newAccessToken = await refreshAccessToken();
+        if (!newAccessToken) {
+          onRefreshed(null);
+          isRefreshing = false;
+          return Promise.reject(error);
+        }
+
+        // Réveille toutes les requêtes en attente
+        onRefreshed(newAccessToken);
+        isRefreshing = false;
+
+        // Rejoue la requête originale
+        originalRequest.headers = originalRequest.headers ?? {};
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return client(originalRequest);
+      } catch (refreshError) {
+        isRefreshing = false;
+        onRefreshed(null);
+        clearFrontSession();
+        return Promise.reject(refreshError);
+      }
+    }
+  );
+}
+
+// ---- Interceptors de réponse : gère les 401 sur les appels auth ----
+installRefreshInterceptor(api);
+installRefreshInterceptor(apiBlob);
+
+export { api, apiBlob, login, refreshAccessToken };
+

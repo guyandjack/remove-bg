@@ -3,14 +3,14 @@ import { useState } from "preact/hooks";
 import { useLocation } from "preact-iso";
 
 //import des instances perso
-import { api } from "@/utils/axiosConfig";
-import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
+
 
 //import des composants enfants
 import { Loader } from "@/components/loader/Loader";
 
 //import des functions
 import { navigateWithLink } from "@/utils/navigateWithLink";
+import { logoutClient } from "@/utils/auth/logout";
 
 //constante et variable globale
 
@@ -44,38 +44,19 @@ const ProfileDropDown = ({ content }: ProfileDropDownType) => {
 
   //declaration des fonctions
   const logOut = async () => {
-    setIsLoader(true);
-    try {
-      const response = await api.post("/api/logout", {});
-      if (!response) {
-        console.log("error http");
-      }
-      const data = response.data;
-      if (data.status === "success") {
-        //supression des info de session
-        sessionSignal.value = null;
-        localStorage.removeItem("session");
-        localStorage.removeItem("wizpix:last_service");
-        localStorage.removeItem("wizpix:account_deletion_feedback");
-        
+    await logoutClient({
+      onStart: () => {
+        setIsLoader(true);
+      },
+      onFinished: () => {
         setIsLoader(false);
         setIsStatus("success");
-        
-      }
-    } catch {
-      sessionSignal.value = null;
-      localStorage.removeItem("session");
-      localStorage.removeItem("wizpix:last_service");
-      localStorage.removeItem("wizpix:account_deletion_feedback");
-      setIsLoader(false);
-      setIsStatus("success");
-      
-    }  finally {
-      setTimeout(() => {
-        setIsStatus("idle");
-        navigateWithLink("/");
-      }, 2000);
-    } 
+        setTimeout(() => {
+          setIsStatus("idle");
+          navigateWithLink("/");
+        }, 2000);
+      },
+    });
   };
 
   return (

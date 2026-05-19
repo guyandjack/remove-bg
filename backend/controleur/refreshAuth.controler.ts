@@ -12,11 +12,20 @@ const refreshAuth: RequestHandler = async (req, res) => {
     }
 
     // Issue new tokens
-    const accessToken = signAccessToken(data.email);
-    const newRefresh = await signRefreshToken(data.email, { ip: req.ip, userAgent: req.headers['user-agent'] as string | undefined });
-    // Decode new jti to mark rotation
+    const newRefresh = await signRefreshToken(data.email, {
+      ip: req.ip,
+      userAgent: req.headers["user-agent"] as string | undefined,
+    });
+
+    // Decode new jti to mark rotation + expose refresh expiry to the client through the access token
     const decoded: any = jwt.decode(newRefresh) || {};
     const newJti: string | undefined = decoded?.jti || decoded?.jwtid;
+    const rtExp: number | undefined =
+      typeof decoded?.exp === "number" ? decoded.exp : undefined;
+
+    const accessToken = signAccessToken(
+      rtExp ? { email: data.email, rtExp } : { email: data.email }
+    );
     if (newJti) {
       await revokeRefreshToken(data.jti, newJti);
     } else {

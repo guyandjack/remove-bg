@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import Stripe from "stripe";
+import jwt from "jsonwebtoken";
 import {
   getStripeCheckoutSessionState,
   markStripeCheckoutSessionConsumed,
@@ -126,11 +127,16 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
       });
     }
 
-    const accessToken = signAccessToken(user.email);
     const refreshToken = await signRefreshToken(user.email, {
       ip: req.ip,
       userAgent: req.headers["user-agent"] as string | undefined,
     });
+    const decodedRefresh: any = jwt.decode(refreshToken) || {};
+    const rtExp: number | undefined =
+      typeof decodedRefresh?.exp === "number" ? decodedRefresh.exp : undefined;
+    const accessToken = signAccessToken(
+      rtExp ? { email: user.email, rtExp } : { email: user.email }
+    );
     const cookieOptions = setCookieOptionsObject();
 
     const usage = await getActiveUsageBillingPeriod(user.id);

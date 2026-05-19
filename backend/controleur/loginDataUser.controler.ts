@@ -1,5 +1,6 @@
 //import des librairies nécessaires
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 //import des fonctions pour les token et cookies et bdd
 import {
@@ -93,11 +94,19 @@ const login: RequestHandler = async (req, res, next) => {
     let formatedObject: ObjectResponse = {};
 
     try {
-      const accessToken = signAccessToken(user.email);
       refreshToken = await signRefreshToken(user.email, {
         ip: req.ip,
         userAgent: req.headers["user-agent"] as string | undefined,
       });
+
+      const decodedRefresh: any = jwt.decode(refreshToken) || {};
+      const rtExp: number | undefined =
+        typeof decodedRefresh?.exp === "number" ? decodedRefresh.exp : undefined;
+
+      const accessToken = signAccessToken(
+        rtExp ? { email: user.email, rtExp } : { email: user.email }
+      );
+
       options = setCookieOptionsObject();
 
       //if ok get plan and credit of user, for send un formated object response

@@ -19,6 +19,7 @@ import { AnimatedLogoNormalWhite } from "./animation/AnimatedLogoNormalWhite";
 import { AnimatedLogoNormalBlack } from "./animation/AnimatedLogoNormalBlack";
 import { AnimatedLogoTinyWhite } from "./animation/AnimatedLogoTinyWhite";
 import { AnimatedLogoTinyBlack } from "./animation/AnimatedLogoTinyBlack";
+import { SessionExpiryWarning } from "./session/SessionExpiryWarning";
 
 //import des data
 import { navBarContent } from "@/data/content/components/nav/navBarContent";
@@ -258,6 +259,7 @@ const NavBar = () => {
           </p>
         </div>
       ) : null}
+      <SessionExpiryWarning />
       <nav className="navbar bg-navbar shadow-sm backdrop-blur-sm">
         <div className="navbar-start">
           <div className="drawer lg:hidden">

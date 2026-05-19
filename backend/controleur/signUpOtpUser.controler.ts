@@ -1,5 +1,6 @@
 //import des librairies
 import crypto from "node:crypto";
+import jwt from "jsonwebtoken";
 import { logger } from "../logger.js";
 import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.js";
 import { buildLogoUrl } from "../utils/publicAssetUrl.js";
@@ -315,11 +316,16 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
             });
         }
         try {
-          accessToken = signAccessToken(email);
           refreshToken = await signRefreshToken(email, {
             ip: req.ip,
             userAgent: req.headers["user-agent"] as string | undefined,
           });
+          const decodedRefresh: any = jwt.decode(refreshToken) || {};
+          const rtExp: number | undefined =
+            typeof decodedRefresh?.exp === "number" ? decodedRefresh.exp : undefined;
+          accessToken = signAccessToken(
+            rtExp ? { email, rtExp } : { email }
+          );
         } catch (err: any) {
           return res
             .status(500)

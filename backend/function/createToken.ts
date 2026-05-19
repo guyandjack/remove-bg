@@ -13,7 +13,7 @@ type Option = {
   httpOnly: boolean;
   secure: boolean;
   maxAge: number;
-  sameSite?: string;
+  sameSite?: boolean | "none" | "lax" | "strict";
 };
 
 export type PasswordResetPayload = {
@@ -24,6 +24,42 @@ export type PasswordResetPayload = {
 };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+function parseExpiresInToMs(input: unknown, fallbackMs: number): number {
+  if (typeof input === "number" && Number.isFinite(input)) {
+    // jsonwebtoken numeric expiresIn is in seconds
+    return Math.max(0, Math.floor(input * 1000));
+  }
+
+  const raw = String(input ?? "").trim();
+  if (!raw) return fallbackMs;
+
+  // If it's a plain number string, assume seconds (jsonwebtoken convention)
+  if (/^\d+$/.test(raw)) {
+    const seconds = Number(raw);
+    return Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds * 1000)) : fallbackMs;
+  }
+
+  const match = raw.match(/^(\d+(?:\.\d+)?)(ms|s|m|h|d)$/i);
+  if (!match) return fallbackMs;
+
+  const value = Number(match[1]);
+  const unit = match[2].toLowerCase();
+  if (!Number.isFinite(value)) return fallbackMs;
+
+  const multiplier =
+    unit === "ms"
+      ? 1
+      : unit === "s"
+        ? 1000
+        : unit === "m"
+          ? 60 * 1000
+          : unit === "h"
+            ? 60 * 60 * 1000
+            : 24 * 60 * 60 * 1000; // d
+
+  return Math.max(0, Math.floor(value * multiplier));
+}
 
 function normalizePem(input: string): string {
   const withRealNewlines = input.replace(/\r\n/g, "\n");
@@ -241,14 +277,17 @@ const verifyRefreshToken = async (token: string) => {
 
 //fonction pour définir les options de cookie
 const setCookieOptionsObject = () => {
-    const mode = process.env.NODE_ENV
+  const mode = process.env.NODE_ENV;
+  // Refresh cookie lifetime must match refresh token lifetime, otherwise users get logged out "randomly"
+  // when the cookie disappears before the token is actually expired.
+  const refreshMaxAgeMs = parseExpiresInToMs(process.env.JWT_REFRESH_EXPIRES_IN, 60 * 60 * 1000);
   switch (mode) {
     case "production":
       return {
         domain: "background.ch",
         httpOnly: true,
         secure: true,
-        maxAge: 15 * 60 * 1000,
+        maxAge: refreshMaxAgeMs,
         sameSite: "none",
       } as Option;
 
@@ -257,12 +296,16 @@ const setCookieOptionsObject = () => {
         //domain: "undefined",
         httpOnly: true,
         secure: false,
-        maxAge: 60 * 60 * 1000,
+        maxAge: refreshMaxAgeMs,
         //samesite: "none",
       } as Option;
 
     default:
-      return {};
+      return {
+        httpOnly: true,
+        secure: false,
+        maxAge: refreshMaxAgeMs,
+      } as Option;
   }
 };
 
