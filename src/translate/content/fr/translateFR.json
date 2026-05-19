@@ -394,7 +394,7 @@
     "paginationPageLabel": "Page {current}/{total}",
     "paginationPageEmpty": "Page -",
     "backgroundAlt": "Fond",
-    "previewTitle": "Prévisualisation du fond",
+    "previewTitle": "Aperçu",
     "previewDescription": "Seule cette fenêtre applique le fond choisi. Validez pour mettre à jour l'éditeur principal.",
     "previewAlt": "Aperçu du fond sélectionné",
     "previewError": "Impossible de générer un aperçu.",
@@ -703,6 +703,11 @@
   "dashboardPage": {
     "title": "Tableau de bord",
     "subtitle": "Gérez votre compte et votre abonnement.",
+    "errors": {
+      "network": "Connexion impossible. Vérifiez votre connexion et réessayez.",
+      "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+      "actionInProgress": "Une opération est déjà en cours. Réessayez dans quelques instants."
+    },
     "billing": {
       "title": "Compte & abonement",
       "description": "Gérez votre abonnement, vos préférences marketing et votre compte.",
@@ -732,6 +737,10 @@
         "changePlanSuccess": "Changement de plan demandé.",
         "changePlanError": "Impossible de changer de plan.",
         "checkoutRedirect": "Paiement requis. Redirection vers Stripe…",
+        "changePlanAlreadyPending": "Un changement d’abonnement est déjà en cours. Réessayez plus tard.",
+        "changePlanPendingUpgrade": "Upgrade demandé. Le nouveau plan sera activé après confirmation du paiement.",
+        "changePlanPendingDowngrade": "Downgrade programmé. Le nouveau plan sera actif à partir du {{date}}.",
+        "paymentFailed": "Paiement refusé ou non validable. Vérifiez votre moyen de paiement puis réessayez.",
         "creditsLabel": "Crédits",
         "cancelCta": "Annuler l'abonnement",
         "resumeCta": "Reprendre l'abonnement",
@@ -787,6 +796,8 @@
     "stats": {
       "creditsRemainingTitle": "Crédits restants",
       "creditsUsedTitle": "Crédits utilisés",
+      "creditsRemainingTitleConverter": "Crédits restants",
+      "creditsUsedTitleConverter": "Crédits utilisés",
       "planTitle": "Abonnement",
       "billingPeriod": "Période en cours",
       "user": "Utilisateur"
@@ -797,6 +808,7 @@
       "changeCta": "Changer d'abonnement",
       "cancelCta": "Annuler l'abonnement",
       "cancelSuccess": "Demande d'annulation enregistrée.",
+      "cancelSuccessWithDate": "Demande d'annulation enregistrée. Accès jusqu’au {{date}}.",
       "cancelError": "Impossible d’annuler l’abonnement. Veuillez réessayer."
     },
     "password": {

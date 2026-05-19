@@ -704,6 +704,11 @@
   "dashboardPage": {
     "title": "Dashboard",
     "subtitle": "Manage your account and subscriptions.",
+    "errors": {
+      "network": "Unable to reach the server. Check your connection and try again.",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "actionInProgress": "An operation is already in progress. Please try again in a moment."
+    },
     "billing": {
       "title": "Account & subscription",
       "description": "Manage your subscription, marketing preferences and account settings.",
@@ -732,6 +737,10 @@
         "changePlanSuccess": "Plan change requested.",
         "changePlanError": "Unable to change plan.",
         "checkoutRedirect": "Payment required. Redirecting to Stripe…",
+        "changePlanAlreadyPending": "A plan change is already in progress. Please try again later.",
+        "changePlanPendingUpgrade": "Upgrade requested. The new plan will be activated after payment confirmation.",
+        "changePlanPendingDowngrade": "Downgrade scheduled. The new plan will be active starting {{date}}.",
+        "paymentFailed": "Payment failed or could not be completed. Check your payment method and try again.",
         "creditsLabel": "Credits",
         "cancelCta": "Cancel subscription",
         "resumeCta": "Resume subscription",
@@ -797,6 +806,7 @@
       "changeCta": "Change subscription",
       "cancelCta": "Cancel subscription",
       "cancelSuccess": "Cancellation request recorded.",
+      "cancelSuccessWithDate": "Cancellation request recorded. Access until {{date}}.",
       "cancelError": "Unable to cancel your subscription. Please try again."
     },
     "password": {

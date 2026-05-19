@@ -965,9 +965,9 @@ const ImgEditor = ({
                     <h3 className="text-xl font-semibold">
                       {textContent.previewTitle}
                     </h3>
-                    <p className="text-sm text-base-content/70">
+                    {/* <p className="text-sm text-base-content/70">
                       {textContent.previewDescription}
-                    </p>
+                    </p> */}
                   </div>
                   <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-base-200 bg-base-200/60">
                     {previewImage ? (

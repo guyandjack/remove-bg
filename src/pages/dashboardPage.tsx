@@ -2,6 +2,7 @@
 import { useLocation } from "preact-iso";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
 
 //import des composant enfant
 import { PriceCard } from "@/components/card/priceCard";
@@ -91,7 +92,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
   }>({ status: "idle", message: null });
   const actionToastTimeoutRef = useRef<number | null>(null);
   const { t } = useTranslation();
-  const dashboardActionBtn = "btn btn-sm w-auto lg:min-w-[220px]";
+  const dashboardActionBtn = "btn btn-sm min-w-[180px]";
   const location = useLocation();
 
   const currency: CurrencyCode = "CHF";
@@ -196,6 +197,59 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
     }, 4500);
   };
 
+  type DashboardAction =
+    | "subscription_cancel"
+    | "subscription_resume"
+    | "plan_change"
+    | "account_deletion";
+
+  const normalizeIsoDate = (input: unknown): string | null => {
+    if (typeof input !== "string") return null;
+    const raw = input.trim();
+    if (!raw) return null;
+    // Accept both YYYY-MM-DD and full ISO (YYYY-MM-DDTHH:mm:ssZ) and return YYYY-MM-DD.
+    const ymd = raw.slice(0, 10);
+    return /^\d{4}-\d{2}-\d{2}$/.test(ymd) ? ymd : null;
+  };
+
+  const resolveDashboardApiErrorMessage = (
+    action: DashboardAction,
+    error: unknown,
+  ): string => {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      const data = (error.response?.data || {}) as any;
+      const errorCode = typeof data?.errorCode === "string" ? data.errorCode : "";
+
+      // Network / CORS / timeout (no HTTP response).
+      if (!status) return t("dashboardPage.errors.network");
+
+      // Auth (token missing/expired/invalid). Backends in this repo often use `errorCode: veri*`.
+      if (status === 401 || errorCode.startsWith("veri"))
+        return t("dashboardPage.errors.sessionExpired");
+
+      // Stripe/payment related
+      if (action === "plan_change" && status === 402)
+        return t("dashboardPage.billing.subscription.paymentFailed");
+
+      // Conflicts: concurrent billing actions / already pending plan change / Stripe lock.
+      if (status === 409) {
+        if (action === "plan_change")
+          return t("dashboardPage.billing.subscription.changePlanAlreadyPending");
+        return t("dashboardPage.errors.actionInProgress");
+      }
+    }
+
+    // Action-scoped fallback (avoid leaking backend `message` to the customer).
+    if (action === "subscription_cancel")
+      return t("dashboardPage.subscription.cancelError");
+    if (action === "subscription_resume")
+      return t("dashboardPage.billing.subscription.resumeError");
+    if (action === "plan_change")
+      return t("dashboardPage.billing.subscription.changePlanError");
+    return t("dashboardPage.billing.account.deletionError");
+  };
+
   const creditsRemaining =
     sessionSignal?.value?.credits?.remaining_last_24h ?? 0;
   const creditsUsed = sessionSignal?.value?.credits?.used_last_24h ?? 0;
@@ -230,10 +284,12 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
     setCancelMessage(null);
     try {
       const resp = await api.post("/api/subscription/cancel");
-      const msg =
-        resp?.data?.message && typeof resp.data.message === "string"
-          ? resp.data.message
-          : t("dashboardPage.subscription.cancelSuccess");
+      const accessUntil = normalizeIsoDate(resp?.data?.plan_access_until);
+      const msg = accessUntil
+        ? t("dashboardPage.subscription.cancelSuccessWithDate", {
+            date: accessUntil,
+          })
+        : t("dashboardPage.subscription.cancelSuccess");
       setCancelMessage(msg);
       setCancelSubmitting("success");
       pushActionToast({ status: "success", message: msg });
@@ -245,11 +301,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
       } catch {}
     } catch (e: any) {
       setCancelSubmitting("error");
-      const apiMsg =
-        typeof e?.response?.data?.message === "string"
-          ? (e.response.data.message as string)
-          : null;
-      const msg = apiMsg || t("dashboardPage.subscription.cancelError");
+      const msg = resolveDashboardApiErrorMessage("subscription_cancel", e);
       setCancelMessage(msg);
       pushActionToast({ status: "error", message: msg });
     } finally {
@@ -261,11 +313,8 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
     setCancelSubmitting("loading");
     setCancelMessage(null);
     try {
-      const resp = await api.post("/api/subscription/resume");
-      const msg =
-        resp?.data?.message && typeof resp.data.message === "string"
-          ? resp.data.message
-          : t("dashboardPage.billing.subscription.resumeSuccess");
+      await api.post("/api/subscription/resume");
+      const msg = t("dashboardPage.billing.subscription.resumeSuccess");
       setCancelMessage(msg);
       setCancelSubmitting("success");
       pushActionToast({ status: "success", message: msg });
@@ -276,11 +325,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
       } catch {}
     } catch (e: any) {
       setCancelSubmitting("error");
-      const apiMsg =
-        typeof e?.response?.data?.message === "string"
-          ? (e.response.data.message as string)
-          : null;
-      const msg = apiMsg || t("dashboardPage.billing.subscription.resumeError");
+      const msg = resolveDashboardApiErrorMessage("subscription_resume", e);
       setCancelMessage(msg);
       pushActionToast({ status: "error", message: msg });
     } finally {
@@ -373,11 +418,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
     } catch (e: any) {
       setDeletionSubmitting("error");
       {
-        const apiMsg =
-          typeof e?.response?.data?.message === "string"
-            ? (e.response.data.message as string)
-            : null;
-        const msg = apiMsg || t("dashboardPage.billing.account.deletionError");
+        const msg = resolveDashboardApiErrorMessage("account_deletion", e);
         setDeletionMessage(msg);
         pushActionToast({ status: "error", message: msg });
       }
@@ -494,20 +535,27 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         typeof resp.data.redirectUrl === "string"
       ) {
         setPlanChangeSubmitting("success");
-        setPlanChangeMessage(
-          resp?.data?.message ||
-            t("dashboardPage.billing.subscription.checkoutRedirect"),
-        );
+        setPlanChangeMessage(t("dashboardPage.billing.subscription.checkoutRedirect"));
         setTimeout(() => {
           window.location.assign(resp.data.redirectUrl);
-        }, 400);
+        }, 3000);
         return;
       }
       setPlanChangeSubmitting("success");
-      setPlanChangeMessage(
-        resp?.data?.message ||
-          t("dashboardPage.billing.subscription.changePlanSuccess"),
-      );
+      const pending = resp?.data?.pending === true;
+      const changeType = typeof resp?.data?.change_type === "string" ? resp.data.change_type : "";
+      const effectiveAt = normalizeIsoDate(resp?.data?.effective_at);
+
+      const msg =
+        pending && changeType === "upgrade"
+          ? t("dashboardPage.billing.subscription.changePlanPendingUpgrade")
+          : pending && changeType === "downgrade" && effectiveAt
+            ? t("dashboardPage.billing.subscription.changePlanPendingDowngrade", {
+                date: effectiveAt,
+              })
+            : t("dashboardPage.billing.subscription.changePlanSuccess");
+
+      setPlanChangeMessage(msg);
       try {
         const st = await api.get("/api/account/billing-account");
         if (st?.data?.success) setBillingState(st.data as any);
@@ -520,12 +568,8 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
       }, 800);
     } catch (e: any) {
       setPlanChangeSubmitting("error");
-      const apiMsg =
-        typeof e?.response?.data?.message === "string"
-          ? (e.response.data.message as string)
-          : null;
       setPlanChangeMessage(
-        apiMsg || t("dashboardPage.billing.subscription.changePlanError"),
+        resolveDashboardApiErrorMessage("plan_change", e),
       );
     } finally {
       setTimeout(() => setPlanChangeSubmitting("idle"), 2500);
@@ -552,7 +596,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         </div>
       ) : null}
       <div className="mb-8">
-        <h1 className="text-3xl lg:text-4xl font-bold">
+        <h1 className="text-3xl text-center lg:text-4xl font-bold">
           {t("dashboardPage.title")}
         </h1>
         <p className="text-base-content/70 mt-2">
@@ -560,7 +604,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         </p>
       </div>
 
-      <div className="flex flex-col md:flex-row md:flex-wrap md:justify-center  gap-4">
+      <div className="flex flex-col items-center md:flex-row md:flex-wrap md:justify-center  gap-4 max-w-[992px]">
         <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
           <div className="stat-title">{t("dashboardPage.stats.user")}</div>
           <div className="stat-value text-primary truncate text-base">
@@ -592,22 +636,55 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
             </p>
           </div>
         </div>
-        <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
-          <div className="stat-title">
-            {t("dashboardPage.stats.creditsRemainingTitle")}
-          </div>
-          <div className="stat-value text-primary">{creditsRemaining}</div>
-        </div>
+        <div className="p-2 border rounded-xl border-primary/70">
+          <p className={"text-sm py-2"}>Supression d'arriere plan</p>
+          <div
+            className={
+              "flex flex-col justify-start items-center gap-2 md: flex-row"
+            }
+          >
+            <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
+              <div className="stat-title">
+                {t("dashboardPage.stats.creditsRemainingTitle")}
+              </div>
+              <div className="stat-value text-primary">{creditsRemaining}</div>
+            </div>
 
-        <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
-          <div className="stat-title">
-            {t("dashboardPage.stats.creditsUsedTitle")}
+            <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
+              <div className="stat-title">
+                {t("dashboardPage.stats.creditsUsedTitle")}
+              </div>
+              <div className="stat-value text-info">{creditsUsed}</div>
+            </div>
           </div>
-          <div className="stat-value text-info">{creditsUsed}</div>
+        </div>
+        <div className="p-2 border rounded-xl border-secondary/70">
+          <p className={"text-sm py-2"}>Convertion de fichiers image</p>
+          <div
+            className={
+              "flex flex-col justify-start items-center gap-2 md: flex-row"
+            }
+          >
+            <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
+              <div className="stat-title">
+                {t("dashboardPage.stats.creditsRemainingTitleConverter")}
+              </div>
+              <div className="stat-value text-secondary">
+                {creditsRemaining}
+              </div>
+            </div>
+
+            <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
+              <div className="stat-title">
+                {t("dashboardPage.stats.creditsUsedTitleConverter")}
+              </div>
+              <div className="stat-value text-secondary">{creditsUsed}</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-[1300px]">
         <section className="lg:col-span-2 card bg-base-100 border border-base-300 shadow-sm">
           <div className="card-body">
             <h2 className="card-title">{t("dashboardPage.billing.title")}</h2>
