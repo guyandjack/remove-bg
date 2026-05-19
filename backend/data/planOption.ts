@@ -1,4 +1,6 @@
 //option des differents plans sur 24h
+import { logger } from "../logger.js";
+
 type CurrencyCode = "CHF" | "EUR" | "USD";
 type PlanOptionInput = {
   active: boolean;
@@ -24,6 +26,31 @@ type PlanOptionInput = {
   bundle_qt?: number;
   api?: boolean;
   api_external?: boolean;
+};
+
+// Stripe mode (keys) and deployment mode are distinct concerns:
+// - In preprod we often run with `NODE_ENV=production` but `STRIPE_MODE=test`.
+// - The server uses LIVE keys only when BOTH are set to "production".
+const stripeIsLive =
+  process.env.NODE_ENV === "production" &&
+  process.env.STRIPE_MODE === "production";
+
+const readEnv = (key: string): string => {
+  const v = process.env[key];
+  return typeof v === "string" ? v.trim() : "";
+};
+
+const isStripePriceId = (value: string): boolean =>
+  // Stripe Price IDs look like: price_...
+  /^price_[A-Za-z0-9_]+$/.test(value);
+
+const resolveStripePriceId = (keys: {
+  live: string;
+  test: string;
+}): string => {
+  const candidate = stripeIsLive ? readEnv(keys.live) : readEnv(keys.test);
+  if (!candidate) return "";
+  return isStripePriceId(candidate) ? candidate : "";
 };
 
 const planOption: PlanOptionInput[] = [
@@ -101,9 +128,13 @@ const planOption: PlanOptionInput[] = [
       USD: 4.99,
     },
     stripePriceIds: {
-      CHF: "price_1SeepuBaVLyPBDGsvlWmRxVS",
-      EUR: "price_1SeepuBaVLyPBDGstF3a5O0B",
-      USD: "price_1Sez7zBaVLyPBDGsMMgFL0D1",
+      // Legacy env vars (kept for backward-compatibility):
+      // - live: PRICE_ID_CH_PROD / PRICE_ID_EUR_PROD / PRICE_ID_USA_PROD
+      // - test: PRICE_ID_CH_DEV / PRICE_ID_EUR_DEV / PRICE_ID_USA_DEV
+      // Note: some setups use "USA" for USD in env names; we keep that convention here.
+      CHF: resolveStripePriceId({ live: "PRICE_ID_CH_PROD", test: "PRICE_ID_CH_DEV" }),
+      EUR: resolveStripePriceId({ live: "PRICE_ID_EUR_PROD", test: "PRICE_ID_EUR_DEV" }),
+      USD: resolveStripePriceId({ live: "PRICE_ID_USA_PROD", test: "PRICE_ID_USA_DEV" }),
     },
     model_IA_ressource: "improved",
     credit_IA: 150,
@@ -142,9 +173,13 @@ const planOption: PlanOptionInput[] = [
       USD: 10,
     },
     stripePriceIds: {
-      CHF: "price_1SeesUBaVLyPBDGsDf8RNfE7",
-      EUR: "price_1SefFxBaVLyPBDGsZ8puzEiW",
-      USD: "price_1Sez6YBaVLyPBDGsWE3ErOdv",
+      // Pro plan is currently inactive. Prefer wiring it via dedicated env vars before enabling it:
+      // - live: PRICE_ID_PRO_CH_PROD / PRICE_ID_PRO_EUR_PROD / PRICE_ID_PRO_USD_PROD
+      // - test: PRICE_ID_PRO_CH_DEV / PRICE_ID_PRO_EUR_DEV / PRICE_ID_PRO_USD_DEV
+      // If not set, it stays disabled (empty ids) to avoid TEST/LIVE mismatches.
+      CHF: resolveStripePriceId({ live: "PRICE_ID_PRO_CH_PROD", test: "PRICE_ID_PRO_CH_DEV" }),
+      EUR: resolveStripePriceId({ live: "PRICE_ID_PRO_EUR_PROD", test: "PRICE_ID_PRO_EUR_DEV" }),
+      USD: resolveStripePriceId({ live: "PRICE_ID_PRO_USD_PROD", test: "PRICE_ID_PRO_USD_DEV" }),
     },
     model_IA_ressource: "pro",
     credit_IA: 300,
@@ -173,5 +208,32 @@ const planOption: PlanOptionInput[] = [
     api_external: true,
   },
 ];
+
+// Fail fast in LIVE mode if a paid/active plan is missing Stripe IDs.
+// In TEST mode, keep the server booting but log a warning (DX).
+(() => {
+  const paidActivePlans = planOption.filter((p) => p.active && Number(p.price) > 0);
+  const missing = paidActivePlans.flatMap((p) => {
+    const missingCurrencies = (Object.keys(p.stripePriceIds) as CurrencyCode[]).filter(
+      (c) => !p.stripePriceIds[c]
+    );
+    return missingCurrencies.length ? [{ plan: p.name, missingCurrencies }] : [];
+  });
+
+  if (missing.length === 0) return;
+
+  const payload = {
+    nodeEnv: process.env.NODE_ENV,
+    stripeMode: process.env.STRIPE_MODE,
+    missing,
+  };
+
+  if (stripeIsLive) {
+    // Throwing here prevents a partially configured LIVE server from running and charging users incorrectly.
+    throw new Error(`Stripe Price IDs misconfigured for active paid plan(s): ${JSON.stringify(payload)}`);
+  }
+
+  logger.warn("planOption::stripe_price_ids_missing", payload);
+})();
 
 export { planOption };

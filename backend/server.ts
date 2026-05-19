@@ -13,9 +13,29 @@
 // -----------------------------------------------------------------------------
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import fs from "node:fs";
 import dotenv from "dotenv";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(__dirname, ".env") });
+// Resolve `.env` in both dev (tsx server.ts) and build output (node dist/server.js).
+// - dev: backend/.env (same folder as server.ts)
+// - build (standard): backend/.env (parent folder of dist/)
+// - build (flattened deploy): backend/.env (same folder as server.js)
+const resolveEnvPath = (): string | null => {
+  const candidates = [
+    path.join(__dirname, ".env"),
+    path.join(__dirname, "..", ".env"),
+    path.join(process.cwd(), ".env"),
+  ];
+  for (const p of candidates) {
+    try {
+      if (fs.existsSync(p)) return p;
+    } catch {}
+  }
+  return null;
+};
+
+const envPath = resolveEnvPath();
+dotenv.config(envPath ? { path: envPath } : undefined);
 
 // -----------------------------------------------------------------------------
 // 2) Imports applicatifs et cœur Node

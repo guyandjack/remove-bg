@@ -8,7 +8,9 @@ import {
 import {
   getActiveSubscription,
   getPlanByCode,
+  getPlanByName,
   getUserByEmail,
+  listPlans,
   updateSubscription,
   createStripeCheckoutSessionState,
 } from "../../DB/queriesSQL/queriesSQL.js";
@@ -22,6 +24,14 @@ function resolveLocale(input: unknown): "fr" | "en" | "de" | "it" {
 }
 
 type Body = { plan_code?: string; currency?: "CHF" | "EUR" | "USD" };
+
+function normalizePlanCodeInput(raw: string): string {
+  return String(raw || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/-+/g, "_");
+}
 
 export const changePlanController: RequestHandler = async (req, res) => {
   const stripe = getStripeClient();
@@ -42,8 +52,9 @@ export const changePlanController: RequestHandler = async (req, res) => {
   if (!user) return res.status(404).json({ success: false, message: "User not found." });
 
   const body = (req.body || {}) as Body;
-  const planCode = typeof body.plan_code === "string" ? body.plan_code.trim().toLowerCase() : "";
-  if (!planCode) {
+  const rawPlanInput = typeof body.plan_code === "string" ? body.plan_code.trim() : "";
+  const planCode = rawPlanInput ? normalizePlanCodeInput(rawPlanInput) : "";
+  if (!rawPlanInput || !planCode) {
     return res.status(400).json({ success: false, message: "Missing plan_code." });
   }
 
@@ -52,8 +63,38 @@ export const changePlanController: RequestHandler = async (req, res) => {
     return res.status(400).json({ success: false, message: "No active subscription found for this account." });
   }
 
-  const targetPlan = await getPlanByCode(planCode);
-  if (!targetPlan || targetPlan.is_archived === 1) {
+  let targetPlan = await getPlanByCode(planCode);
+  if (!targetPlan) {
+    targetPlan = await getPlanByName(rawPlanInput);
+  }
+
+  if (!targetPlan) {
+    try {
+      const plans = await listPlans(true);
+      logger.warn("subscription.change_plan::plan_not_found", {
+        userId: user.id,
+        requestedPlanInput: rawPlanInput,
+        normalizedPlanCode: planCode,
+        planCount: plans.length,
+        planCodesSample: plans.map((p) => p.code).slice(0, 10),
+      });
+    } catch (err: any) {
+      logger.warn("subscription.change_plan::plan_not_found_debug_failed", {
+        userId: user.id,
+        requestedPlanInput: rawPlanInput,
+        normalizedPlanCode: planCode,
+        message: err?.message || String(err),
+      });
+    }
+    return res.status(404).json({ success: false, message: "Plan not found." });
+  }
+
+  if (targetPlan.is_archived === 1) {
+    logger.warn("subscription.change_plan::plan_archived", {
+      userId: user.id,
+      planId: targetPlan.id,
+      planCode: targetPlan.code,
+    });
     return res.status(404).json({ success: false, message: "Plan not found." });
   }
 
