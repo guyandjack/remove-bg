@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import defaultOgImageUrl from "@/assets/images/logo/logo_9.svg";
 import { localOrProd } from "@/utils/localOrProd";
 
+import { seoRefPage } from "@/data/seoPageIndex/seoPageIndex";
+
 type SEOContent = {
   title: string;
   description: string;
@@ -19,24 +21,6 @@ type SEOContent = {
    */
   robots?: string;
 };
-
-type HreflangSpec = {
-  hrefLang: "fr-CH" | "en" | "de-CH" | "it-CH" | "x-default";
-  /**
-   * i18next language code used in URL. Keep it aligned with supported languages.
-   */
-  langParam: string;
-};
-
-const HREFLANGS: HreflangSpec[] = [
-  { hrefLang: "fr-CH", langParam: "fr" },
-  { hrefLang: "en", langParam: "en" },
-  // Ces deux variantes sont demandées côté SEO; tant que l'UI n'est pas traduite,
-  // elles serviront de cible "lang" pour une future extension i18n.
-  { hrefLang: "de-CH", langParam: "de" },
-  { hrefLang: "it-CH", langParam: "it" },
-  { hrefLang: "x-default", langParam: "en" },
-];
 
 function normalizeBaseUrl(url: string): string {
   return (url || "").trim().replace(/\/+$/, "");
@@ -57,14 +41,28 @@ function toAbsoluteUrl(baseUrl: string, inputUrl: string): string {
   }
 }
 
-function buildPageUrl(baseUrl: string, path: string, langParam: string): string {
-  const url = new URL(`${normalizeBaseUrl(baseUrl) || ""}${normalizePath(path)}`);
-  if (langParam) url.searchParams.set("lang", langParam);
-  return url.toString();
+function buildCanonicalUrl(baseUrl: string, path: string): string {
+  return toAbsoluteUrl(normalizeBaseUrl(baseUrl), normalizePath(path));
 }
 
 function sanitizeMetaText(value: string): string {
   return String(value ?? "").replace(/\s+/g, " ").trim();
+}
+
+const INDEXABLE_PATHS = new Set(seoRefPage.map((p) => normalizePath(p)));
+
+function isIndexablePath(path: string): boolean {
+  return INDEXABLE_PATHS.has(normalizePath(path));
+}
+
+function findNearestIndexablePath(path: string): string | null {
+  let current = normalizePath(path);
+  while (current && current !== "/") {
+    if (INDEXABLE_PATHS.has(current)) return current;
+    const lastSlash = current.lastIndexOf("/");
+    current = lastSlash > 0 ? current.slice(0, lastSlash) : "/";
+  }
+  return INDEXABLE_PATHS.has("/") ? "/" : null;
 }
 
 function SEO({ content }: { content: SEOContent }) {
@@ -76,9 +74,16 @@ function SEO({ content }: { content: SEOContent }) {
 
   const title = sanitizeMetaText(content.title);
   const description = sanitizeMetaText(content.description);
-  const robots = sanitizeMetaText(content.robots || "index,follow");
+  const normalizedPath = normalizePath(path);
+  const defaultRobots = isIndexablePath(normalizedPath)
+    ? "index,follow"
+    : "noindex,follow";
+  const robots = sanitizeMetaText(content.robots || defaultRobots);
 
-  const canonicalUrl = buildPageUrl(baseUrl, path, language);
+  const canonicalPath =
+    findNearestIndexablePath(normalizedPath) ?? normalizedPath;
+  const canonicalUrl = buildCanonicalUrl(baseUrl, canonicalPath);
+
   const ogImage = toAbsoluteUrl(baseUrl, content.imageUrl || defaultOgImageUrl);
 
   return (
@@ -90,6 +95,8 @@ function SEO({ content }: { content: SEOContent }) {
       <title>{title}</title>
       <meta name="description" content={description} />
       <meta name="robots" content={robots} />
+
+      {/* Canonical unique par page (pas de "alternate/hreflang") car les traductions sont dynamiques sans changer l'URL. */}
       <link rel="canonical" href={canonicalUrl} />
 
       {/* Open Graph */}
@@ -105,20 +112,9 @@ function SEO({ content }: { content: SEOContent }) {
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
-
-      {/* hreflang */}
-      {HREFLANGS.map(({ hrefLang, langParam }) => (
-        <link
-          key={hrefLang}
-          rel="alternate"
-          hrefLang={hrefLang}
-          href={buildPageUrl(baseUrl, path, langParam)}
-        />
-      ))}
     </Helmet>
   );
 }
 
 export type { SEOContent };
 export { SEO };
-
