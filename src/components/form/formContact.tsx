@@ -59,7 +59,8 @@ function FormContact({content}:FormProps) {
   const [isLoader, setIsLoader] = useState(false);
 
   //recuperation des valeurs du localstorage pour initialiser les valeurs du formulaire
-  const localSorageValue = localStorage.getItem("formContact");
+  const localSorageValue =
+    typeof window !== "undefined" ? localStorage.getItem("formContact") : null;
   let defaultValue = {
     firstname: "",
     lastname: "",
@@ -106,6 +107,7 @@ function FormContact({content}:FormProps) {
 
   //Permet l' enregistrement des valeurs des inputs dans le localstorage
   const storeValue = (e: any) => {
+    if (typeof window === "undefined") return;
     const key: string = e.target.id.toString();
     let value: string;
     if (key === "agree") {
@@ -148,7 +150,9 @@ function FormContact({content}:FormProps) {
       if (response.data.status === "success") {
         setIsLoader(false);
         setStatus("success");
-        localStorage.removeItem("formContact");
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("formContact");
+        }
         reset({
           firstname: "",
           lastname: "",

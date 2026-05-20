@@ -77,7 +77,9 @@ const isAuthentified = async () => {
     };
 
     sessionSignal.value = updatedSession;
-    localStorage.setItem("session", JSON.stringify(updatedSession));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("session", JSON.stringify(updatedSession));
+    }
   } catch (error) {
     throw Error("une erreur est survenu lors de la requete. code:2 :" + error);
   }

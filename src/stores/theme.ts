@@ -17,12 +17,16 @@ const privileges = computed(() => {
 // 3. Fonction pour mettre à jour la session : à appeler après click user
 // =========================
 function setThemeFromClickUser(data: string) {
-  const html = document.documentElement;
-
   if (data !== "winter" && data !== "night") {
     data = "winter";
   }
 
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    themeSignal.value = data as "winter" | "night";
+    return;
+  }
+
+  const html = document.documentElement;
   html.setAttribute("data-theme", data);
   localStorage.setItem("theme", data);
   themeSignal.value = data as "winter" | "night";
@@ -32,6 +36,10 @@ function setThemeFromClickUser(data: string) {
 // 4.  initialisation du theme a partir du locale storage au démarrage
 // =========================
 function initThemeFromLocalStorage() {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return themeSignal.value;
+  }
+
   const html = document.documentElement;
   const storedTheme = localStorage.getItem("theme");
   const attrTheme = html.getAttribute("data-theme");

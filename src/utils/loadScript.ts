@@ -1,6 +1,10 @@
 // utils/loadScript.ts
  function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
+    if (typeof document === "undefined") {
+      resolve();
+      return;
+    }
     // Si déjà chargé → OK
     if (document.querySelector(`script[src="${src}"]`)) {
       resolve();

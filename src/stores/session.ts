@@ -126,7 +126,9 @@ function setSessionFromApiResponse(data: SessionData) {
   };
   
   // Optionnel : persister dans localStorage
-  localStorage.setItem("session", JSON.stringify(sessionSignal.value));
+  if (typeof window !== "undefined") {
+    localStorage.setItem("session", JSON.stringify(sessionSignal.value));
+  }
 
   
 }
@@ -135,6 +137,7 @@ function setSessionFromApiResponse(data: SessionData) {
 // 4. Re-hydratation locale au démarrage
 // =========================
 function initSessionFromLocalStorage() {
+  if (typeof window === "undefined") return false;
   const raw = localStorage.getItem("session");
   if (!raw) return false;
 

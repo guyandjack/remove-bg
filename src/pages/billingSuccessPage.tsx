@@ -15,19 +15,16 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
   const finalizedRef = useRef<boolean>(false);
 
   const sessionId = (() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      return params.get("session_id") || "";
-    } catch {
-      return "";
-    }
+    if (typeof window === "undefined") return "";
+    const params = new URLSearchParams(window.location.search);
+    return params.get("session_id") || "";
   })();
 
   const stopPolling = () => {
-    if (pollingRef.current) {
-      window.clearInterval(pollingRef.current);
-      pollingRef.current = null;
-    }
+    if (typeof window === "undefined") return;
+    if (!pollingRef.current) return;
+    window.clearInterval(pollingRef.current);
+    pollingRef.current = null;
   };
 
   const finalizeIfPossible = async () => {
@@ -96,6 +93,7 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
   };
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
     poll();
     pollingRef.current = window.setInterval(poll, 2000) as any;
     return () => stopPolling();

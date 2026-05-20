@@ -72,11 +72,10 @@ const saveImageToDestination = async (
   textContent: DownloadLinkTextContent,
   fileName: string,
 ) => {
-  const blob = await buildBlobFromSource(source, textContent);
-  if (typeof window === "undefined") {
-    triggerFallbackDownload(blob, fileName);
+  if (typeof window === "undefined" || typeof document === "undefined") {
     return;
   }
+  const blob = await buildBlobFromSource(source, textContent);
   const maybePicker = (window as WindowWithFilePicker).showSaveFilePicker;
   if (typeof maybePicker === "function") {
     const handle = await maybePicker({

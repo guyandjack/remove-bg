@@ -1,24 +1,32 @@
 // lang-signal.ts
 import { signal, effect } from "@preact/signals";
-import i18n from "../translate/function/i18next"; // ton instance i18next initialisée ailleurs
+import i18n from "../translate/function/i18next";
 
-// Signal global
 export const langSignal = signal<string>(
-  localStorage.getItem("lang") ||
-    (navigator.languages?.[0] || navigator.language || "en").split("-")[0]
+  typeof window !== "undefined"
+    ? localStorage.getItem("lang") ||
+        (navigator.languages?.[0] || navigator.language || "en").split("-")[0]
+    : "fr",
 );
 
-// Quand le signal change → on informe i18next
 effect(() => {
   const lang = langSignal.value;
-  i18n.changeLanguage(lang); // 🔥 déclenche la traduction
-  try {
-    localStorage.setItem("lang", lang);
-  } catch {}
-  document.documentElement.lang = lang;
+
+  i18n.changeLanguage(lang);
+
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem("lang", lang);
+    } catch {}
+
+    document.documentElement.lang = lang;
+  }
 });
 
-// Quand i18next change (par ex. via useTranslation quelque part) → on met à jour le signal
-i18n.on("languageChanged", (lng) => {
-  if (langSignal.value !== lng) langSignal.value = lng;
-});
+if (typeof window !== "undefined") {
+  i18n.on("languageChanged", (lng) => {
+    if (langSignal.value !== lng) {
+      langSignal.value = lng;
+    }
+  });
+}

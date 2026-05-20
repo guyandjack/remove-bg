@@ -40,7 +40,7 @@ const { urlApi } = localOrProd();
 //recupere la valeur du parametre "plan"
 const getPlan = (): string | null => {
   // Récupérer la chaîne de requête
-  const queryString = window.location.search;
+  const queryString = typeof window !== "undefined" ? window.location.search : "";
 
   // Analyser la chaîne de requête
   const urlParams = new URLSearchParams(queryString);
@@ -51,7 +51,7 @@ const getPlan = (): string | null => {
   return plan;
 };
 const getCurrency = (): string => {
-  const queryString = window.location.search;
+  const queryString = typeof window !== "undefined" ? window.location.search : "";
   const urlParams = new URLSearchParams(queryString);
   const currency = urlParams.get("currency") || "CHF";
   const normalized = currency.toUpperCase();

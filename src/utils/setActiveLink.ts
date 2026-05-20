@@ -2,6 +2,9 @@ import { navBarContent } from "@/data/content/components/nav/navBarContent";
 import { footerContent } from "@/data/content/components/footer/footerContent";
 
 const setActiveLink = (e?: any) => {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return;
+  }
   const pageName = e?.currentTarget.dataset.id || window.location.pathname.split("/")[1];
   
   let element = navBarContent.filter((el) => el.href.includes(pageName));

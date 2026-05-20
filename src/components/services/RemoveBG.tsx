@@ -65,7 +65,8 @@ function createUuid(): string {
 }
 
 function readAuthToken(): string | null {
-  const raw = localStorage.getItem("session") || "";
+  const raw =
+    typeof window !== "undefined" ? localStorage.getItem("session") || "" : "";
   if (!raw) return sessionSignal?.value?.token ?? null;
   try {
     const parsed = JSON.parse(raw);
@@ -237,7 +238,8 @@ const RemoveBg = ({
   const userLoged = sessionSignal?.value?.authentified;
 
   const planChoiceEl = useRef<HTMLUListElement | null>(null);
-  const objectSession: string = localStorage.getItem("session") || "";
+  const objectSession: string =
+    typeof window !== "undefined" ? localStorage.getItem("session") || "" : "";
   const parsedSession =
     objectSession !== ""
       ? (() => {
@@ -740,7 +742,9 @@ const RemoveBg = ({
           credits: { used_last_24h: used, remaining_last_24h: remaining },
         };
         sessionSignal.value = updated;
-        localStorage.setItem("session", JSON.stringify(updated));
+        if (typeof window !== "undefined") {
+          localStorage.setItem("session", JSON.stringify(updated));
+        }
       }
 
       return blobToObjectUrl(blob);

@@ -6,6 +6,7 @@ const updateSessionUser = <K extends keyof Session>(
   key: K,
   newValue: Session[K]
 ): void => {
+  if (typeof window === "undefined") return;
   const raw = localStorage.getItem("session");
   if (!raw) return;
 

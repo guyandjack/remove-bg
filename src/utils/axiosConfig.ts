@@ -25,26 +25,31 @@ function readAccessToken(): string | null {
   const fromSignal = sessionSignal?.value?.token?.trim();
   if (fromSignal) return fromSignal;
 
-  const raw = localStorage.getItem("session") || "";
+  const raw =
+    typeof window !== "undefined" ? localStorage.getItem("session") || "" : "";
   const parsed = safeParseJson(raw);
   const fromStorage = typeof parsed?.token === "string" ? parsed.token.trim() : "";
   return fromStorage || null;
 }
 
 function clearFrontSession() {
-  try {
-    localStorage.removeItem("session");
-  } catch {
-    // ignore
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem("session");
+    } catch {
+      // ignore
+    }
   }
   sessionSignal.value = null;
 }
 
 function persistNewAccessToken(newAccessToken: string) {
-  const raw = localStorage.getItem("session") || "";
-  const parsed = safeParseJson(raw) ?? {};
-  const next = { ...parsed, token: newAccessToken };
-  localStorage.setItem("session", JSON.stringify(next));
+  if (typeof window !== "undefined") {
+    const raw = localStorage.getItem("session") || "";
+    const parsed = safeParseJson(raw) ?? {};
+    const next = { ...parsed, token: newAccessToken };
+    localStorage.setItem("session", JSON.stringify(next));
+  }
 
   const currentSession = sessionSignal.value;
   if (currentSession) {

@@ -7,6 +7,7 @@ type LogoutCallbacks = {
 };
 
 function clearClientSessionStorage() {
+  if (typeof window === "undefined") return;
   try {
     localStorage.removeItem("session");
     localStorage.removeItem("wizpix:last_service");

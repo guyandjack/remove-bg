@@ -136,7 +136,8 @@ const releaseObjectUrl = (url?: string | null) => {
 };
 
 function readAuthToken(): string | null {
-  const raw = localStorage.getItem("session") || "";
+  const raw =
+    typeof window !== "undefined" ? localStorage.getItem("session") || "" : "";
   if (!raw) return sessionSignal?.value?.token ?? null;
   try {
     const parsed = JSON.parse(raw);
