@@ -1,9 +1,9 @@
 //import de hooks
 import { useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
+import { SEO } from "@/components/SEO";
 
 ///import des fonctions
-import { setDocumentTitle } from "@/utils/setDocumentTitle";
 import { setActiveLink } from "@/utils/setActiveLink";
 
 
@@ -37,9 +37,9 @@ type PropsPage = {
 
 function ContactPage({routeKey}: PropsPage) {
   const { t } = useTranslation();
+  const { t: tSeo } = useTranslation("seo");
   useEffect(() => {
     setActiveLink();
-    setDocumentTitle();
   }, [routeKey]);
 
   const contentForm:Record<FormKey, string> = {
@@ -60,7 +60,14 @@ function ContactPage({routeKey}: PropsPage) {
     textError: t("formContact.textError"),
   };
   return (
-    <div className="page-container gap-[50px]">
+    <>
+      <SEO
+        content={{
+          title: tSeo("contact.title"),
+          description: tSeo("contact.description"),
+        }}
+      />
+      <div className="page-container gap-[50px]">
       
       <h1
         dangerouslySetInnerHTML={{
@@ -80,7 +87,8 @@ function ContactPage({routeKey}: PropsPage) {
         <DesignPaternPoint width={80} height={100} color={"info"} styled={"absolute top-[-40px] right-[-80px] hidden lg:block" } />
         <FormContact content={contentForm} />
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

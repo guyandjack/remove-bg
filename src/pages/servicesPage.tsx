@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { sessionSignal } from "@/stores/session";
 import { api } from "@/utils/axiosConfig";
 import { type PlanOption, setPlanOptions } from "@/stores/planOptions";
+import { SEO } from "@/components/SEO";
 
 //import des librairies
 import { AnimatePresence } from "motion/react";
@@ -24,7 +25,6 @@ import iconConvert from "@/assets/images/icon/icon-convertir-opt.svg";
 
 //import des fonctions
 import { setActiveLink } from "@/utils/setActiveLink";
-import { setDocumentTitle } from "@/utils/setDocumentTitle";
 
 //declaration des types
 type UploadImgType = {
@@ -55,6 +55,7 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
   type ServiceId = "remove" | "social" | "product" | "convert" | string;
   const [service, setService] = useState<ServiceId | null>(null);
   const { t } = useTranslation();
+  const { t: tSeo } = useTranslation("seo");
   const userLoged = sessionSignal?.value?.authentified || false;
   console.log("isLoged: ", userLoged);
 
@@ -62,7 +63,6 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
 
    useEffect(() => {
      setActiveLink();
-     setDocumentTitle();
    }, [routeKey]);
 
   // Plan options are used for frontend limits (max upload size, etc.).
@@ -323,7 +323,14 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
   }, [service]);
 
   return (
-    <div className="page-container gap-10">
+    <>
+      <SEO
+        content={{
+          title: tSeo("services.title"),
+          description: tSeo("services.description"),
+        }}
+      />
+      <div className="page-container gap-10">
       <div
         className={
           "relative w-full mx-auto max-w-[1300px] py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px]"
@@ -394,7 +401,8 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
           ) : null}
         </AnimatePresence>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

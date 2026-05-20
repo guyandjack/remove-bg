@@ -2,6 +2,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { useLocation } from "preact-iso";
 import { useTranslation } from "react-i18next";
+import { SEO } from "@/components/SEO";
 
 //import des instance
 import { api } from "@/utils/axiosConfig";
@@ -21,7 +22,6 @@ import {
   planOptionsSignal,
   setPlanOptions,
 } from "@/stores/planOptions";
-import { setDocumentTitle } from "@/utils/setDocumentTitle";
 import { setActiveLink } from "@/utils/setActiveLink";
 
 
@@ -58,6 +58,7 @@ const currencySymbols: Record<CurrencyCode, string> = {
 
 const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
   const { t } = useTranslation();
+  const { t: tSeo } = useTranslation("seo");
   const location = useLocation();
   const planOptions = planOptionsSignal.value;
   const activePlanOptions = planOptions.filter(
@@ -239,7 +240,6 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
 
   useEffect(() => {
     setActiveLink();
-    setDocumentTitle();
     const params = new URLSearchParams(window.location.search);
     const requestedCurrency = params.get("currency");
     if (
@@ -310,7 +310,14 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
   }, [routeKey, finalizeStatus]);
 
   return (
-    <div className={"page-container"}>
+    <>
+      <SEO
+        content={{
+          title: tSeo("pricing.title"),
+          description: tSeo("pricing.description"),
+        }}
+      />
+      <div className={"page-container"}>
       <div
         className={
           "relative w-full mx-auto max-w-[1300px] py-[20px] px-[10px] flex flex-col justify-start items-center gap-[30px] "
@@ -499,7 +506,8 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         </h2>
         <Faq text={textLangFaq} />
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

@@ -6,11 +6,12 @@ import { useEffect } from "preact/hooks";
 //import des librairies
 import { useTranslation } from "react-i18next";
 
-/* //import de compoants enfants
-import {
-  BackgroundRemovalAnimation,
-  type BackgroundRemovalFrame,
-} from "@/components/animation/BackgroundRemovalAnimation"; */
+import { SEO } from "@/components/SEO";
+
+
+
+//import de compoants enfants
+
 import { CtaStyled } from "@/components/cta/CtaStyled";
 import { FinalCTA } from "@/components/cta/ctaFinal";
 import { Hero } from "@/components/hero/hero";
@@ -21,18 +22,10 @@ import { ServiceCard } from "../components/card/ServiceCard";
 import { Faq } from "../components/faq/Faq";
 
 //import de fonctions
-import { setDocumentTitle } from "@/utils/setDocumentTitle";
 import { setActiveLink } from "@/utils/setActiveLink";
 
 //import des images
-import friendImg from "@/assets/images/friend.jpg";
-import friendImgBGRemove from "@/assets/images/friend-removebg-preview.png";
-import petImg from "@/assets/images/pet.jpg";
-import petImgBGRemove from "@/assets/images/pet-removebg-preview.png";
-import sportImg from "@/assets/images/sport.jpg";
-import sportImgBGRemove from "@/assets/images/sport-removebg-preview.png";
-import vehiculeImg from "@/assets/images/vehicule.jpg";
-import vehiculeImgBGRemove from "@/assets/images/vehicule-removebg-preview.png";
+
 import iconBackground from "@/assets/images/icon/icon-arriere-plan-opt.svg";
 import iconSocial from "@/assets/images/icon/icon-reseau-opt.svg";
 import iconProduct from "@/assets/images/icon/icon-projecteurs-opt.svg";
@@ -84,6 +77,7 @@ type PropsPage = {
 
 function HomePage({ routeKey = "" }: PropsPage) {
   const { t } = useTranslation();
+  const { t: tSeo } = useTranslation("seo");
 
   //hero content
   const heroContent: Record<HeroContentKey, string> = {
@@ -129,34 +123,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
     subtitle: t("animationSection.subtitle"),
   };
 
-  /* const animationSequence: BackgroundRemovalFrame[] = [
-    {
-      id: "friend",
-      originalSrc: friendImg,
-      cutoutSrc: friendImgBGRemove,
-      alt: t("diff.friend_label"),
-    },
-    {
-      id: "pet",
-      originalSrc: petImg,
-      cutoutSrc: petImgBGRemove,
-      alt: t("diff.pet_label"),
-    },
-    {
-      id: "sport",
-      originalSrc: sportImg,
-      cutoutSrc: sportImgBGRemove,
-      alt: t("diff.sport_label"),
-    },
-    {
-      id: "vehicule",
-      originalSrc: vehiculeImg,
-      cutoutSrc: vehiculeImgBGRemove,
-      alt: t("diff.vehicule_label"),
-    },
-  ]; */
-
-  
+    
 
   //buton label
   const labels: Labels = [
@@ -311,81 +278,65 @@ function HomePage({ routeKey = "" }: PropsPage) {
 
   useEffect(() => {
     setActiveLink();
-    setDocumentTitle();
   }, [routeKey]);
 
   
 
   return (
-    <div className={"page-container"}>
-      <div className={"w-full mb-[100px] lg:mb-0"}>
-        <div
-          className={
-            "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
-          }
-        >
-          <Hero content={heroContent} />
-        </div>
-      </div>
-      {/* <div className={"w-full bg-page py-[120px]"}>
-        <div
-          className={
-            "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center gap-10 lg:flex-row lg:items-center"
-          }
-        >
-          <div className="w-full max-w-[600px] text-center lg:w-[40%] lg:text-left">
-            <p className="mb-6 text-sm font-semibold uppercase tracking-[0.35em] text-secondary">
-              {animationContent.helper}
-            </p>
-            <h2 className="mb-6 text-3xl font-bold leading-tight text-base-content lg:text-5xl">
-              {animationContent.title}
-            </h2>
-            <p className="text-lg text-base-content/80">
-              {animationContent.subtitle}
-            </p>
-          </div>
-          {/* <div className="w-full lg:w-[60%]">
-            <BackgroundRemovalAnimation
-              sequence={animationSequence}
-              opacity={0.92}
-            />
-          </div> }
-        </div>
-      </div> */}
-      <div className={"w-full p-10 lg:p-15"}>
-        <div
-          className={
-            "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
-          }
-        >
-          <h2 className="mb-[50px] text-center text-3xl font-bold lg:w-[60%] lg:text-5xl">
-            {contentCardServiceTitle}
-          </h2>
-          <ul
+    <>
+      <SEO
+        content={{
+          title: tSeo("home.title"),
+          description: tSeo("home.description"),
+        }}
+      />
+      
+
+      <div className={"page-container"}>
+        <div className={"w-full mb-[100px] lg:mb-0"}>
+          <div
             className={
-              "my-16 w-full max-w-[1200px] flex flex-col justify-start items-center gap-y-5 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-5"
+              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
             }
           >
-            {contentCardService.map((cardContent) => {
-              return (
-                <li key={cardContent.id}>
-                  <ServiceCard content={cardContent} />
-                </li>
-              );
-            })}
-          </ul>
+            <Hero content={heroContent} />
+          </div>
         </div>
-      </div>
-      <div className={"w-full bg-component p-20"}>
-        <div
-          className={
-            "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
-          }
-        >
-          <StepAction content={stepsContent} />
+        
+        <div className={"w-full p-10 lg:p-15"}>
+          <div
+            className={
+              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
+            }
+          >
+            <h2 className="mb-[50px] text-center text-3xl font-bold lg:w-[60%] lg:text-5xl">
+              {contentCardServiceTitle}
+            </h2>
+            <ul
+              className={
+                "my-16 w-full max-w-[1200px] flex flex-col justify-start items-center gap-y-5 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-5"
+              }
+            >
+              {contentCardService.map((cardContent) => {
+                return (
+                  <li key={cardContent.id}>
+                    <ServiceCard content={cardContent} />
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
-      </div>
-      {/* <div className={"w-full bg-component py-[50px]"}>
+        <div className={"w-full bg-component p-20"}>
+          <div
+            className={
+              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
+            }
+          >
+            <StepAction content={stepsContent} />
+          </div>
+        </div>
+        {/* <div className={"w-full bg-component py-[50px]"}>
         <div
           className={
             "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
@@ -394,79 +345,80 @@ function HomePage({ routeKey = "" }: PropsPage) {
           <ProblemSection />
         </div>
       </div> */}
-      <div className={"w-full bg-component"}>
-        <div
-          className={
-            "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
-          }
-        >
-          <FinalCTA content={ctaFinalContent} />
-        </div>
-      </div>
-
-      <div className={"w-full pt-[100px] lg:pt[200px]"}>
-        <div
-          className={
-            "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
-          }
-        >
-          <h2 className="mb-[50px] self-center text-center text-3xl font-bold lg:w-[60%] lg:text-5xl lg:self-start lg:text-left">
-            {contentDiffTitle}
-          </h2>
-          <div className={"w-full max-w-[800px] lg:w-[50%]"}>
-            <Diff tag={labels} />
-          </div>
-        </div>
-      </div>
-      <div className={"w-full py-[100px] lg:[200px] bg-page"}>
-        <div
-          className={
-            "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
-          }
-        >
-          <h2 className="mb-[50px] self-center text-center text-3xl font-bold lg:w-[60%] lg:text-5xl lg:self-start lg:text-left">
-            A qui s'adresse notre service
-          </h2>
-          <ul
+        <div className={"w-full bg-component"}>
+          <div
             className={
-              "w-full flex flex-row flex-wrap justify-evenly items-center gap-8 "
+              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
             }
           >
-            {cardFeatureContent.map((cardContent) => {
-              return (
-                <li key={cardContent.title}>
-                  <FeatureCard content={cardContent} />
-                </li>
-              );
-            })}
-          </ul>
+            <FinalCTA content={ctaFinalContent} />
+          </div>
         </div>
-      </div>
-      <div className={"w-full bg-secondary/80"}>
-        <div
-          className={
-            "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
-          }
-        >
-          <CtaStyled content={ctaContent} />
-        </div>
-      </div>
 
-      <div className={"w-full pt-[100px] lg:pt[200px]"}>
-        <div
-          className={
-            "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
-          }
-        >
-          <h2 className="mb-[50px] text-center text-3xl font-bold lg:w-[60%] lg:text-5xl">
-            {faqTitle}
-          </h2>
-          <div className={"mb-[100px]"}>
-            <Faq text={faqContent} />
+        <div className={"w-full pt-[100px] lg:pt[200px]"}>
+          <div
+            className={
+              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
+            }
+          >
+            <h2 className="mb-[50px] self-center text-center text-3xl font-bold lg:w-[60%] lg:text-5xl lg:self-start lg:text-left">
+              {contentDiffTitle}
+            </h2>
+            <div className={"w-full max-w-[800px] lg:w-[50%]"}>
+              <Diff tag={labels} />
+            </div>
+          </div>
+        </div>
+        <div className={"w-full py-[100px] lg:[200px] bg-page"}>
+          <div
+            className={
+              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
+            }
+          >
+            <h2 className="mb-[50px] self-center text-center text-3xl font-bold lg:w-[60%] lg:text-5xl lg:self-start lg:text-left">
+              A qui s'adresse notre service
+            </h2>
+            <ul
+              className={
+                "w-full flex flex-row flex-wrap justify-evenly items-center gap-8 "
+              }
+            >
+              {cardFeatureContent.map((cardContent) => {
+                return (
+                  <li key={cardContent.title}>
+                    <FeatureCard content={cardContent} />
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+        <div className={"w-full bg-secondary/80"}>
+          <div
+            className={
+              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
+            }
+          >
+            <CtaStyled content={ctaContent} />
+          </div>
+        </div>
+
+        <div className={"w-full pt-[100px] lg:pt[200px]"}>
+          <div
+            className={
+              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
+            }
+          >
+            <h2 className="mb-[50px] text-center text-3xl font-bold lg:w-[60%] lg:text-5xl">
+              {faqTitle}
+            </h2>
+            <div className={"mb-[100px]"}>
+              <Faq text={faqContent} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

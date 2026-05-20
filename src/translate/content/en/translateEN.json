@@ -10,7 +10,8 @@
   },
 
   "dropDownProfile": {
-    "credits": "Credits",
+    "credits": "Credits AI",
+    "creditsConverter": "Credits conversion",
     "dashboard": "Dashboard",
     "logout": "Logout"
   },

@@ -1,0 +1,59 @@
+{
+  "home": {
+    "title": "AI Background Removal | WizPix Switzerland",
+    "description": "Automatically remove image backgrounds with AI. Add professional backgrounds, colors and visuals in seconds for clean, high‑impact results."
+  },
+  "services": {
+    "title": "AI Photo Tools | Background Removal & Conversion | WizPix",
+    "description": "Explore WizPix tools to remove backgrounds, convert images, and produce clean, professional visuals for web, marketing and e‑commerce."
+  },
+  "pricing": {
+    "title": "WizPix Pricing | Credits and Plans",
+    "description": "Pick a simple, flexible plan for AI background removal and image conversion. Secure checkout and professional usage — built for Switzerland."
+  },
+  "contact": {
+    "title": "Contact WizPix | Support and Help",
+    "description": "Need help with WizPix? Reach our support team for technical questions, billing, credits, or getting started with the tools."
+  },
+  "legal": {
+    "title": "Legal Notice | WizPix",
+    "description": "Read WizPix legal information: publisher details, hosting, contact, and mandatory legal disclosures for the wizpix.ch website."
+  },
+  "terms": {
+    "title": "Terms of Use | WizPix",
+    "description": "Review WizPix Terms of Use: access to the service, usage rules, responsibilities, and key information for using the platform."
+  },
+  "privacy": {
+    "title": "Privacy Policy | WizPix",
+    "description": "Learn how WizPix handles your data: collection, use, security, cookies, and your privacy rights."
+  },
+  "cgv": {
+    "title": "Terms of Sale (CGV) | WizPix",
+    "description": "Read WizPix Terms of Sale: pricing, payments, credits, subscriptions, service conditions, and commercial information."
+  },
+  "notFound": {
+    "title": "Page Not Found (404) | WizPix",
+    "description": "The page you’re looking for doesn’t exist or was moved. Return to the WizPix homepage to continue browsing."
+  },
+  "login": {
+    "title": "Log In | WizPix",
+    "description": "Log in to your WizPix account to access your dashboard, credits, and projects."
+  },
+  "signup": {
+    "title": "Create an Account | WizPix",
+    "description": "Create your WizPix account to start removing backgrounds, converting images, and using our AI photo tools."
+  },
+  "resetPassword": {
+    "title": "Reset Password | WizPix",
+    "description": "Securely reset your WizPix password to regain access to your account."
+  },
+  "dashboard": {
+    "title": "Dashboard | WizPix",
+    "description": "Manage your projects, credits, and WizPix settings from your dashboard."
+  },
+  "billingSuccess": {
+    "title": "Payment Confirmed | WizPix",
+    "description": "Your payment has been confirmed. Check your credits and plan details in your WizPix account."
+  }
+}
+
