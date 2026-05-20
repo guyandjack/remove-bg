@@ -581,6 +581,15 @@ const ImageConverter = ({
         message: converterTextContent.statusSuccess,
       });
       setVisitorBlocked(false);
+
+      // Credits are decremented server-side only on successful conversion.
+      // Refresh session (credits displayed in Dashboard) after success.
+      const sessionToken = sessionSignal?.value?.token ?? null;
+      if (sessionToken) {
+        isAuthentified().catch((err) => {
+          console.warn("Unable to refresh conversion credits after success", err);
+        });
+      }
     } catch (error) {
       const axiosError = error as AxiosError<any>;
       let backendMessage: string | null = null;

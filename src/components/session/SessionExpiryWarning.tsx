@@ -37,7 +37,7 @@ function formatSeconds(totalSeconds: number): string {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-const WARNING_LEAD_MS = 5 * 60 * 1000;
+const WARNING_LEAD_MS = 2 * 60 * 1000;
 
 const SessionExpiryWarning = () => {
   const { t } = useTranslation();

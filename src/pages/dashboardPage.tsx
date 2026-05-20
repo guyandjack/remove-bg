@@ -253,6 +253,12 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
   const creditsRemaining =
     sessionSignal?.value?.credits?.remaining_last_24h ?? 0;
   const creditsUsed = sessionSignal?.value?.credits?.used_last_24h ?? 0;
+  const creditRemainingConverter =
+    sessionSignal?.value?.creditRemainingConcerter ?? 0;
+  const creditUsedConverter = sessionSignal?.value?.creditUsedConverter ?? 0;
+
+  const creditRemainingConverterDisplay =
+    creditRemainingConverter === -1 ? textLangCard.unlimited : creditRemainingConverter;
   const planName =
     sessionSignal?.value?.plan?.name || sessionSignal?.value?.plan?.code || "-";
   const userDisplayName = (() => {
@@ -637,7 +643,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
           </div>
         </div>
         <div className="p-2 border rounded-xl border-primary/70">
-          <p className={"text-sm py-2"}>Supression d'arriere plan</p>
+          <p className={"text-sm py-2"}>{t("dashboardPage.stats.removeBgSectionTitle")}</p>
           <div
             className={
               "flex flex-col justify-start items-center gap-2 md: flex-row"
@@ -658,30 +664,30 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
             </div>
           </div>
         </div>
-        <div className="p-2 border rounded-xl border-secondary/70">
-          <p className={"text-sm py-2"}>Convertion de fichiers image</p>
-          <div
-            className={
-              "flex flex-col justify-start items-center gap-2 md: flex-row"
-            }
-          >
-            <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
-              <div className="stat-title">
-                {t("dashboardPage.stats.creditsRemainingTitleConverter")}
-              </div>
-              <div className="stat-value text-secondary">
-                {creditsRemaining}
-              </div>
-            </div>
+         <div className="stat-credit-converter p-2 border rounded-xl border-secondary/70">
+           <p className={"text-sm py-2"}>{t("dashboardPage.stats.converterSectionTitle")}</p>
+           <div
+             className={
+               "flex flex-col justify-start items-center gap-2 md: flex-row"
+             }
+           >
+             <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
+               <div className="stat-title">
+                 {t("dashboardPage.stats.creditsRemainingTitleConverter")}
+               </div>
+               <div className="stat-value text-secondary">
+                 {creditRemainingConverterDisplay}
+               </div>
+             </div>
 
-            <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
-              <div className="stat-title">
-                {t("dashboardPage.stats.creditsUsedTitleConverter")}
-              </div>
-              <div className="stat-value text-secondary">{creditsUsed}</div>
-            </div>
-          </div>
-        </div>
+             <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
+               <div className="stat-title">
+                 {t("dashboardPage.stats.creditsUsedTitleConverter")}
+               </div>
+               <div className="stat-value text-secondary">{creditUsedConverter}</div>
+             </div>
+           </div>
+         </div>
       </div>
 
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-[1300px]">

@@ -24,6 +24,8 @@ const createFallbackSession = (): SessionData => ({
     used_last_24h: 0,
     remaining_last_24h: 0,
   },
+  creditRemainingConcerter: 0,
+  creditUsedConverter: 0,
   subscriptionId: null,
   hint: null,
 });
@@ -63,6 +65,14 @@ const isAuthentified = async () => {
             remaining_last_24h: data.credits.remaining_last_24h ?? 0,
           }
         : baseSession.credits,
+      creditRemainingConcerter:
+        typeof (data as any)?.creditRemainingConcerter === "number"
+          ? (data as any).creditRemainingConcerter
+          : baseSession.creditRemainingConcerter ?? 0,
+      creditUsedConverter:
+        typeof (data as any)?.creditUsedConverter === "number"
+          ? (data as any).creditUsedConverter
+          : baseSession.creditUsedConverter ?? 0,
       subscriptionId: data?.subscriptionId ?? baseSession.subscriptionId,
     };
 

@@ -16,6 +16,7 @@ import {
   getActiveUsageBillingPeriod,
   getUserPlanAndCreditsBillingPeriod,
 } from "../DB/queriesSQL/queriesSQL.js";
+import { getConversionQuotaSnapshotForUser } from "../DB/queriesSQL/conversionQuota.queries.js";
 
 //import des types
 import type { RequestHandler } from "express";
@@ -41,6 +42,8 @@ type ObjectResponse = {
     used_last_24h: number;
     remaining_last_24h: number;
   };
+  creditRemainingConcerter: number;
+  creditUsedConverter: number;
 
   subscriptionId: string;
   hint: string;
@@ -133,6 +136,8 @@ const login: RequestHandler = async (req, res, next) => {
         planAndCredit?.remaining_credits_in_period ??
         planQuota;
 
+      const converter = await getConversionQuotaSnapshotForUser(String(userId));
+
       formatedObject = {
         user: {
           email: email,
@@ -155,6 +160,8 @@ const login: RequestHandler = async (req, res, next) => {
           used_last_24h: usedCredits,
           remaining_last_24h: remainingCredits,
         },
+        creditRemainingConcerter: converter?.remaining ?? 0,
+        creditUsedConverter: converter?.used ?? 0,
         subscriptionId: null,
         hint: "",
       };

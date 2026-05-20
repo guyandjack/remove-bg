@@ -11,7 +11,8 @@
   },
 
   "dropDownProfile": {
-    "credits": "Crédits",
+    "credits": "Crédits IA",
+    "creditsConverter":"Crédits conversion",
     "dashboard": "Tableau de board",
     "logout": "Déconnexion"
   },
@@ -810,6 +811,8 @@
       "creditsUsedTitle": "Crédits utilisés",
       "creditsRemainingTitleConverter": "Crédits restants",
       "creditsUsedTitleConverter": "Crédits utilisés",
+      "removeBgSectionTitle": "Suppression d'arrière-plan",
+      "converterSectionTitle": "Conversion de fichiers image",
       "planTitle": "Abonnement",
       "billingPeriod": "Période en cours",
       "user": "Utilisateur"

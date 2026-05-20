@@ -7,6 +7,11 @@ import type {
   NormalizedConverterOptions,
   SupportedFormat,
 } from "../../utils/imageConverterOptions.js";
+import { getUserByEmail } from "../../DB/queriesSQL/queriesSQL.js";
+import {
+  getConversionQuotaSnapshotForUser,
+  tryConsumeConversionCreditForUser,
+} from "../../DB/queriesSQL/conversionQuota.queries.js";
 
 const clampNumber = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
@@ -112,6 +117,7 @@ const convertWithSharp = async (
 
 const imageConverter: RequestHandler = async (req, res) => {
   try {
+    const requestId = (req as any).requestId;
     const imageData = (req as any).imageValidated as ValidatedImage | undefined;
     const options = (req as any).imageConverterOptions as
       | NormalizedConverterOptions
@@ -127,11 +133,83 @@ const imageConverter: RequestHandler = async (req, res) => {
       });
     }
 
+    const email =
+      ((req as any).payload as any)?.email ?? (req as any).payload ?? null;
+    if (!email || typeof email !== "string") {
+      return res.status(401).json({ message: "User unknown", requestId });
+    }
+
+    const user = await getUserByEmail(String(email).toLowerCase());
+    if (!user) {
+      return res.status(404).json({ message: "User not found", requestId });
+    }
+
+    // Credits check (monthly billing period)
+    const before = await getConversionQuotaSnapshotForUser(user.id);
+    if (!before) {
+      return res.status(403).json({
+        message: "No active subscription or plan",
+        requestId,
+      });
+    }
+    if (before.remaining !== -1 && before.remaining <= 0) {
+      return res.status(429).json({
+        error: true,
+        code: "NO_CONVERSION_CREDITS",
+        message: "No more conversion credits available for this billing period",
+        requestId,
+        creditsConverter: {
+          used: before.used,
+          remaining: before.remaining,
+          limit: before.limit,
+        },
+      });
+    }
+
     const { buffer, mimeType } = await convertWithSharp(imageData.buffer, options);
     const filename = buildFilename(imageData.originalName, options.format);
 
+    // Decrement conversion credits only on successful output.
+    const consumed = await tryConsumeConversionCreditForUser(user.id);
+    if (!consumed.allowed) {
+      return res.status(429).json({
+        error: true,
+        code: "NO_CONVERSION_CREDITS",
+        message: "No more conversion credits available for this billing period",
+        requestId,
+      });
+    }
+
     res.setHeader("Content-Type", mimeType);
     res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
+
+    // Expose updated conversion credits to the frontend (binary response)
+    try {
+      const refreshed = consumed.snapshot;
+      if (refreshed) {
+        res.setHeader(
+          "Access-Control-Expose-Headers",
+          "X-Wizpix-Converter-Credits-Remaining,X-Wizpix-Converter-Credits-Used,X-Wizpix-Converter-Credits-Limit",
+        );
+        res.setHeader(
+          "X-Wizpix-Converter-Credits-Remaining",
+          String(refreshed.remaining),
+        );
+        res.setHeader(
+          "X-Wizpix-Converter-Credits-Used",
+          String(refreshed.used),
+        );
+        res.setHeader(
+          "X-Wizpix-Converter-Credits-Limit",
+          String(refreshed.limit),
+        );
+      }
+    } catch (headerErr: any) {
+      logger.warn("imageConverter::credits_header_failed", {
+        requestId,
+        message: headerErr?.message ?? String(headerErr),
+      });
+    }
 
     return res.status(200).send(buffer);
   } catch (error) {

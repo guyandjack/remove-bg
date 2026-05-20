@@ -34,6 +34,8 @@ export type SessionData = {
   plan: PlanAPI ;
   token: string | null;
   credits: CreditsAPI;
+  creditRemainingConcerter: number;
+  creditUsedConverter: number;
   subscriptionId: string | null;
   hint: string | null;
 } | null;
@@ -57,6 +59,8 @@ const sessionSignal = signal<SessionData>({
     used_last_24h: 0,
     remaining_last_24h: 0,
   },
+  creditRemainingConcerter: 0,
+  creditUsedConverter: 0,
   subscriptionId: null,
   hint: null,
 } );
@@ -109,6 +113,14 @@ function setSessionFromApiResponse(data: SessionData) {
       used_last_24h: data?.credits.used_last_24h || 0,
       remaining_last_24h: data?.credits.remaining_last_24h || 0,
     },
+    creditRemainingConcerter:
+      typeof (data as any)?.creditRemainingConcerter === "number"
+        ? (data as any).creditRemainingConcerter
+        : 0,
+    creditUsedConverter:
+      typeof (data as any)?.creditUsedConverter === "number"
+        ? (data as any).creditUsedConverter
+        : 0,
     subscriptionId: data?.subscriptionId || "",
     hint: data?.hint || "",
   };

@@ -16,6 +16,7 @@ import {
 } from "../../function/createToken.js";
 import type { ObjectResponse } from "../loginDataUser.controler.js";
 import { planOption } from "../../data/planOption.js";
+import { getConversionQuotaSnapshotForUser } from "../../DB/queriesSQL/conversionQuota.queries.js";
 import {
   CheckoutSessionPendingError,
   finalizeCheckoutSessionFromStripeSession,
@@ -157,6 +158,7 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
     const planName = planRow?.name ?? record.plan_code;
     const usedCredits = usage?.used_in_period ?? 0;
     const remainingCredits = usage?.remaining_in_period ?? planQuota;
+    const converter = await getConversionQuotaSnapshotForUser(user.id);
 
     const payload: ObjectResponse = {
       user: {
@@ -180,6 +182,8 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
         used_last_24h: usedCredits,
         remaining_last_24h: remainingCredits,
       },
+      creditRemainingConcerter: converter?.remaining ?? 0,
+      creditUsedConverter: converter?.used ?? 0,
       subscriptionId: record.subscription_id ?? null,
       hint: "",
     };

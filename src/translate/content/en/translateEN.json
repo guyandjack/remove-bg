@@ -808,6 +808,10 @@
     "stats": {
       "creditsRemainingTitle": "Credits remaining",
       "creditsUsedTitle": "Credits used",
+      "creditsRemainingTitleConverter": "Credits remaining",
+      "creditsUsedTitleConverter": "Credits used",
+      "removeBgSectionTitle": "Background removal",
+      "converterSectionTitle": "Image file conversion",
       "planTitle": "Subscription",
       "billingPeriod": "Current billing period",
       "user": "User"

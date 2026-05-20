@@ -4,6 +4,7 @@ import {
   getPlanById,
   getUserByEmail,
 } from "../DB/queriesSQL/queriesSQL.js";
+import { getConversionQuotaSnapshotForUser } from "../DB/queriesSQL/conversionQuota.queries.js";
 
 const authMe = async (req: Request, res: Response) => {
   const email = ((req as any).payload as any)?.email ?? (req as any).payload ?? null;
@@ -27,6 +28,7 @@ const authMe = async (req: Request, res: Response) => {
 
   const usage = await getActiveUsageBillingPeriod(userRow.id);
   const plan = usage ? await getPlanById(usage.plan_id) : null;
+  const converter = await getConversionQuotaSnapshotForUser(userRow.id);
 
   return res.status(200).json({
     status: "success",
@@ -49,6 +51,8 @@ const authMe = async (req: Request, res: Response) => {
           remaining_last_24h: usage.remaining_in_period,
         }
       : null,
+    creditRemainingConcerter: converter?.remaining ?? 0,
+    creditUsedConverter: converter?.used ?? 0,
     subscriptionId: usage?.subscription_id ?? null,
   });
 };

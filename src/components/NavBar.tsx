@@ -41,7 +41,8 @@ type DisplayState = {
   authentified: boolean;
   credit: number | null;
   textCredit: string | null;
-  plan: string | null;
+  creditConverter: number | null;
+  textCreditConverter: string | null;
   textLogout: string | null;
   textDashboard: string | null;
 } | null;
@@ -55,7 +56,8 @@ const NavBar = () => {
     authentified: false,
     credit: 0,
     textCredit: t("dropDownProfile.credits"),
-    plan: null,
+    creditConverter: 0,
+    textCreditConverter: t("dropDownProfile.creditsConverter"),
     textLogout: t("dropDownProfile.logout"),
     textDashboard: t("dropDownProfile.dashboard"),
   });
@@ -236,7 +238,8 @@ const NavBar = () => {
       authentified: session?.authentified || false,
       credit: session?.credits?.remaining_last_24h || 0,
       textCredit: t("dropDownProfile.credits"),
-      plan: session?.plan?.name || session?.plan?.code || null,
+      creditConverter: session?.creditRemainingConcerter || 0,
+      textCreditConverter: t("dropDownProfile.creditsConverter"),
       textLogout: t("dropDownProfile.logout"),
       textDashboard: t("dropDownProfile.dashboard"),
     });

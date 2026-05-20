@@ -29,6 +29,7 @@ import {
   signRefreshToken,
   setCookieOptionsObject,
 } from "../function/createToken.js";
+import { getConversionQuotaSnapshotForUser } from "../DB/queriesSQL/conversionQuota.queries.js";
 
 //pour gerer stripe
 import { createCheckoutSession } from "../function/stripe/createCheckoutSession.js";
@@ -353,6 +354,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         const planName = planRow?.name ?? planDefinition?.name ?? planCode;
         const usedCredits = usage?.used_in_period ?? 0;
         const remainingCredits = usage?.remaining_in_period ?? planQuota;
+        const converter = await getConversionQuotaSnapshotForUser(user.id);
         res.cookie("tokenRefresh", refreshToken, options);
         const formatedObject: ObjectResponse = {
           user: {
@@ -376,6 +378,8 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
             used_last_24h: usedCredits,
             remaining_last_24h: remainingCredits,
           },
+          creditRemainingConcerter: converter?.remaining ?? 0,
+          creditUsedConverter: converter?.used ?? 0,
           subscriptionId: null,
           hint: "",
         };

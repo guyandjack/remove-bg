@@ -62,6 +62,8 @@ function persistNewAccessToken(newAccessToken: string) {
     plan: { code: "" },
     token: newAccessToken,
     credits: { used_last_24h: 0, remaining_last_24h: 0 },
+    creditRemainingConcerter: 0,
+    creditUsedConverter: 0,
     subscriptionId: null,
     hint: null,
   };
@@ -217,4 +219,3 @@ installRefreshInterceptor(api);
 installRefreshInterceptor(apiBlob);
 
 export { api, apiBlob, login, refreshAccessToken };
-
