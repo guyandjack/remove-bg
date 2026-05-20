@@ -2,10 +2,10 @@
 
 import { useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
+import { SEO } from "@/components/SEO";
 
 //import des fonctions
 import { setActiveLink } from "@/utils/setActiveLink";
-import { setDocumentTitle } from "@/utils/setDocumentTitle";
 
 type PropsPage = {
   routeKey: string;
@@ -13,13 +13,20 @@ type PropsPage = {
 
 const TermsPage = ({ routeKey }: PropsPage) => {
   const { t } = useTranslation();
+  const { t: tSeo } = useTranslation("seo");
   useEffect(() => {
     setActiveLink();
-    setDocumentTitle();
   }, [routeKey]);
   return (
-    <div className="page-container">
-      <div className={"max-w-4xl"}>
+    <>
+      <SEO
+        content={{
+          title: tSeo("terms.title"),
+          description: tSeo("terms.description"),
+        }}
+      />
+      <div className="page-container">
+        <div className={"max-w-4xl"}>
         <header className="text-center space-y-3 mb-8">
           <h1 className="text-3xl md:text-4xl font-semibold text-primary">
             {t("terms.title")}
@@ -172,7 +179,8 @@ const TermsPage = ({ routeKey }: PropsPage) => {
           {t("terms.conclusion")}
         </p> */}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

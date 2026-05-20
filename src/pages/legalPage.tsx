@@ -2,10 +2,10 @@
 
 import { useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
+import { SEO } from "@/components/SEO";
 
 //import des fonctions
 import { setActiveLink } from "@/utils/setActiveLink";
-import { setDocumentTitle } from "@/utils/setDocumentTitle";
 
 type PropsPage = {
   routeKey: string;
@@ -13,74 +13,81 @@ type PropsPage = {
 
 const LegalPage = ({routeKey}: PropsPage) => {
   const { t } = useTranslation();
+  const { t: tSeo } = useTranslation("seo");
 
    useEffect(() => {
      setActiveLink();
-     setDocumentTitle();
    }, [routeKey]);
   
   return (
-    <div className="page-container">
-      <div className={"max-w-4xl"}>
-        <header className="text-center space-y-3 mb-8">
-          <h1 className="text-3xl md:text-4xl font-semibold text-primary">
-            {t("legal.title")}
-          </h1>
-          <p className="legal-intro text-base-content/70"
-            dangerouslySetInnerHTML={{
-              __html: t("legal.intro")
-            }}
-          >{}</p>
-        </header>
-
-        <ul className="space-y-6">
-          <li className="rounded-box bg-base-100 border border-base-200 shadow-sm p-6">
-            <h2 className="text-secondary text-lg md:text-xl font-semibold mb-2">
-              {t("legal.article1_title")}
-            </h2>
-            <div
-              className="text-base-content/80 leading-relaxed"
+    <>
+      <SEO
+        content={{
+          title: tSeo("legal.title"),
+          description: tSeo("legal.description"),
+        }}
+      />
+      <div className="page-container">
+        <div className={"max-w-4xl"}>
+          <header className="text-center space-y-3 mb-8">
+            <h1 className="text-3xl md:text-4xl font-semibold text-primary">
+              {t("legal.title")}
+            </h1>
+            <p className="legal-intro text-base-content/70"
               dangerouslySetInnerHTML={{
-                __html: t("legal.article1_text").replace(/\n/g, "<br/>"),
+                __html: t("legal.intro")
               }}
-            />
-          </li>
+            >{}</p>
+          </header>
 
-          <li className="rounded-box bg-base-100 border border-base-200 shadow-sm p-6">
-            <h2 className="text-secondary text-lg md:text-xl font-semibold mb-2">
-              {t("legal.article2_title")}
-            </h2>
-            <div
-              className="text-base-content/80 leading-relaxed"
-              dangerouslySetInnerHTML={{
-                __html: t("legal.article2_text").replace(/\n/g, "<br/>"),
-              }}
-            />
-          </li>
+          <ul className="space-y-6">
+            <li className="rounded-box bg-base-100 border border-base-200 shadow-sm p-6">
+              <h2 className="text-secondary text-lg md:text-xl font-semibold mb-2">
+                {t("legal.article1_title")}
+              </h2>
+              <div
+                className="text-base-content/80 leading-relaxed"
+                dangerouslySetInnerHTML={{
+                  __html: t("legal.article1_text").replace(/\n/g, "<br/>"),
+                }}
+              />
+            </li>
 
-          <li className="rounded-box bg-base-100 border border-base-200 shadow-sm p-6">
-            <h2 className="text-secondary text-lg md:text-xl font-semibold mb-2">
-              {t("legal.article3_title")}
-            </h2>
-            <div
-              className="text-base-content/80 leading-relaxed"
-              dangerouslySetInnerHTML={{
-                __html: t("legal.article3_text").replace(/\n/g, "<br/>"),
-              }}
-            />
-          </li>
+            <li className="rounded-box bg-base-100 border border-base-200 shadow-sm p-6">
+              <h2 className="text-secondary text-lg md:text-xl font-semibold mb-2">
+                {t("legal.article2_title")}
+              </h2>
+              <div
+                className="text-base-content/80 leading-relaxed"
+                dangerouslySetInnerHTML={{
+                  __html: t("legal.article2_text").replace(/\n/g, "<br/>"),
+                }}
+              />
+            </li>
 
-          <li className="rounded-box bg-base-100 border border-base-200 shadow-sm p-6">
-            <h2 className="text-secondary text-lg md:text-xl font-semibold mb-2">
-              {t("legal.article4_title")}
-            </h2>
-            <div
-              className="text-base-content/80 leading-relaxed"
-              dangerouslySetInnerHTML={{
-                __html: t("legal.article4_text").replace(/\n/g, "<br/>"),
-              }}
-            />
-          </li>
+            <li className="rounded-box bg-base-100 border border-base-200 shadow-sm p-6">
+              <h2 className="text-secondary text-lg md:text-xl font-semibold mb-2">
+                {t("legal.article3_title")}
+              </h2>
+              <div
+                className="text-base-content/80 leading-relaxed"
+                dangerouslySetInnerHTML={{
+                  __html: t("legal.article3_text").replace(/\n/g, "<br/>"),
+                }}
+              />
+            </li>
+
+            <li className="rounded-box bg-base-100 border border-base-200 shadow-sm p-6">
+              <h2 className="text-secondary text-lg md:text-xl font-semibold mb-2">
+                {t("legal.article4_title")}
+              </h2>
+              <div
+                className="text-base-content/80 leading-relaxed"
+                dangerouslySetInnerHTML={{
+                  __html: t("legal.article4_text").replace(/\n/g, "<br/>"),
+                }}
+              />
+            </li>
 
           <li className="rounded-box bg-base-100 border border-base-200 shadow-sm p-6">
             <h2 className="text-secondary text-lg md:text-xl font-semibold mb-2">
@@ -147,9 +154,9 @@ const LegalPage = ({routeKey}: PropsPage) => {
           {t("legal.conclusion")}
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
 export { LegalPage };
-
