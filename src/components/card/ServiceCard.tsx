@@ -71,14 +71,18 @@ const ServiceCard = ({ content, selectService }: BannerProps) => {
       data-id={"/services"}
       href={content.active ? serviceHref : ""}
       onClick={content.active ? handleClick : undefined}
-      className={
-        `relative bg-component block w-[400px] h-[280px] border-service-card rounded-xl ${content.active?"group  transition hover:z-[1] hover:shadow-lg hover:shadow-primary/50":"cursor-default"}`
-      }
+      className={`relative bg-component block w-[400px] h-[280px] border-service-card rounded-xl ${content.active ? "group  transition hover:z-[1] hover:shadow-lg hover:shadow-primary/50" : "cursor-default"}`}
     >
-      {content.active? null :<div className={"soon-service"}>Prochainement service suplementaire</div>}
+      {content.active ? null : (
+        <div className={"soon-service"}>
+          Prochainement service suplementaire
+        </div>
+      )}
       <div
         className={
-          content.active ? "space-y-8 py-12 p-8" : "space-y-8 py-12 p-8 opacity-[0.4]"
+          content.active
+            ? "space-y-8 py-12 p-8"
+            : "space-y-8 py-12 p-8 opacity-[0.4]"
         }
       >
         <div className={"flex flex-row justify-end items-center"}>
@@ -88,7 +92,13 @@ const ServiceCard = ({ content, selectService }: BannerProps) => {
               "flex flex-row justify-center items-center p-[10px] w-[20%] bg-info rounded-full"
             }
           >
-            <img src={content.src} loading="lazy" className="w-12 h-12" />
+            <img
+              src={content.src}
+              loading="lazy"
+              className="w-12 h-12"
+              alt=""
+              aria-hidden="true"
+            />
           </div>
         </div>
         <div className="space-y-2">

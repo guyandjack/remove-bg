@@ -3,12 +3,16 @@
 //import des hooks
 import { useState } from "preact/hooks";
 
+// import image small
+import vehiculeImgBGRemoveSmall from "@/assets/images/vehicule-removebg-small-500px.png";
+import vehiculeImgSmall from "@/assets/images/vehicule-small-500px.webp";
+
 // import des images originales
-import friendImg from "@/assets/images/friend.jpg";
-import petImg from "@/assets/images/pet.jpg";
-import sportImg from "@/assets/images/sport.jpg";
-import vehiculeImg from "@/assets/images/vehicule.jpg";
-import logoImg from "@/assets/images/logo.jpg";
+import friendImg from "@/assets/images/friend-converted.webp";
+import petImg from "@/assets/images/pet-converted.webp";
+import sportImg from "@/assets/images/sport-converted.webp";
+import vehiculeImg from "@/assets/images/vehicule-converted.webp";
+import logoImg from "@/assets/images/logo-converted.webp";
 
 //import des images sans back ground
 import friendImgBGRemove from "@/assets/images/friend-removebg-preview.png";
@@ -17,18 +21,18 @@ import sportImgBGRemove from "@/assets/images/sport-removebg-preview.png";
 import vehiculeImgBGRemove from "@/assets/images/vehicule-removebg-preview.png";
 import logoImgBGRemove from "@/assets/images/logo-removebg-preview.png";
 
-//import image de fond
-import bgImg from "@/assets/images/dessert.jpg";
 
-//import des fonctions
-import { setActiveLink } from "@/utils/setActiveLink";
 
 
 type PictureKey = "friend" | "pet" | "sport" | "vehicule" | "logo";
 
+
+
 type Tags = {
-  tag: string[]
+  tag: string[];
+  
 };
+
 
 
 type Labels = string[];
@@ -65,12 +69,14 @@ const buttonConfig: { id: PictureKey; className: string }[] = [
   { id: "logo", className: "btn btn-dash btn-success" },
 ];
 
-const Diff = ({ tag }: Tags) => {
+const Diff = ({ tag, }: Tags) => {
   const [selectedKey, setSelectedKey] = useState<PictureKey>("vehicule");
 
   const pictureSrc = pictures[selectedKey];
   const pictureSrcBGRemove = picturesBgRemoved[selectedKey];
   const pictureAlt = pictureLabels[selectedKey];
+
+  const isTag = tag.length > 0;
 
   return (
     <div
@@ -78,32 +84,62 @@ const Diff = ({ tag }: Tags) => {
         "flex flex-col justify-start items-center gap-10 w-full max-w-[1300px] "
       }
     >
-      <figure className="diff aspect-16/9 mx-auto" tabIndex={0}>
-        <div className="diff-item-1" role="img" tabIndex={0}>
-          <img alt={pictureAlt} src={pictureSrc} />
-        </div>
+      {isTag ? (
+        <>
+          <figure className="diff aspect-16/9 mx-auto" tabIndex={0}>
+            <div className="diff-item-1" role="img" tabIndex={0}>
+              <img
+                alt={pictureAlt}
+                src={pictureSrc}
+                
+              />
+            </div>
 
-        <div className="diff-item-2 bg-white" role="img">
-          <img alt="Image de référence floutée" src={pictureSrcBGRemove} />
-        </div>
+            <div className="diff-item-2 bg-white" role="img">
+              <img
+                alt="Image de référence floutée"
+                src={pictureSrcBGRemove}
+               
+              />
+            </div>
 
-        <div className="diff-resizer" />
-      </figure>
+            <div className="diff-resizer" />
+          </figure>
+          <ul className="flex flex-row justify-evenly items-center w-full pt-[20px] pb-[20px]">
+            {buttonConfig.map(({ id, className }, index) => (
+              <li key={id}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedKey(id)}
+                  className={className}
+                >
+                  {tag[index]}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <figure className="diff aspect-16/9 mx-auto" tabIndex={0}>
+          <div className="diff-item-1" role="img" tabIndex={0}>
+            <img
+              alt={pictureAlt}
+              src={vehiculeImgSmall}
+              
+            />
+          </div>
 
-      {tag.length > 0 ?(
-        <ul className="flex flex-row justify-evenly items-center w-full pt-[20px] pb-[20px]">
-          {buttonConfig.map(({ id, className }, index) => (
-            <li key={id}>
-              <button
-                type="button"
-                onClick={() => setSelectedKey(id)}
-                className={className}
-              >
-                {tag[index]}
-              </button>
-            </li>
-          ))}
-        </ul>) : null }
+          <div className="diff-item-2 bg-white" role="img">
+            <img
+              alt="Image de référence floutée"
+              src={vehiculeImgBGRemoveSmall}
+              
+            />
+          </div>
+
+          <div className="diff-resizer" />
+        </figure>
+      )}
     </div>
   );
 };
