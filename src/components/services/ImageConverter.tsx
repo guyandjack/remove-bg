@@ -588,7 +588,10 @@ const ImageConverter = ({
       const sessionToken = sessionSignal?.value?.token ?? null;
       if (sessionToken) {
         isAuthentified().catch((err) => {
-          console.warn("Unable to refresh conversion credits after success", err);
+          console.warn(
+            "Unable to refresh conversion credits after success",
+            err,
+          );
         });
       }
     } catch (error) {
@@ -715,13 +718,16 @@ const ImageConverter = ({
         </p>
       </header>
 
-      <div className="grid gap-10 lg:grid-cols-2">
-        <form className="space-y-8" onSubmit={handleSubmit}>
+      <div className={"grid gap-10"}>
+        <form
+          className="flex flex-col justify-start items-center gap-4 lg:flex-row "
+          onSubmit={handleSubmit}
+        >
           <div
             onDrop={onDrop}
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
-            className={`border-2 border-dashed rounded-2xl p-6 text-center transition ${
+            className={`w-full border-2 border-dashed rounded-2xl p-6 text-center bg-component transition ${
               isDragActive ? "border-primary bg-primary/5" : "border-base-300"
             }`}
           >
@@ -744,7 +750,7 @@ const ImageConverter = ({
             </button>
           </div>
 
-          <section className="flex flex-col justify-start items-left gap-4 bg-base-200 rounded-2xl p-5  shadow-sm">
+          <section className="w-full flex flex-col justify-start items-left gap-4 bg-component rounded-2xl p-5  shadow-sm">
             <header className="flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-xl font-semibold">
@@ -819,219 +825,232 @@ const ImageConverter = ({
               ) : null}
             </div>
           </section>
+        </form>
+        <form className={"grid lg:grid-cols-2 lg:gap-4"}>
+          <div
+            className={
+              "w-full flex flex-col justify-start items-center gap-4 lg:h-[835px]"
+            }
+          >
+            <section className="w-full flex flex-col justify-start items-left gap-4 bg-component rounded-2xl p-5 shadow-sm">
+              <header className="flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-semibold">
+                    {converterTextContent.formatTitle}
+                  </h3>
+                  <p className="text-sm text-base-content/70">
+                    {converterTextContent.formatDescription}
+                  </p>
+                </div>
+              </header>
 
-          <section className="flex flex-col justify-start items-left gap-4 bg-base-200 rounded-2xl p-5 shadow-sm">
-            <header className="flex items-center justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-semibold">
-                  {converterTextContent.formatTitle}
-                </h3>
-                <p className="text-sm text-base-content/70">
-                  {converterTextContent.formatDescription}
-                </p>
-              </div>
-            </header>
+              <label className="form-control">
+                <span className="label-text font-semibold mr-[20px]">
+                  {converterTextContent.formatExtension}
+                </span>
+                <select
+                  className="select select-bordered select-sm"
+                  value={options.format}
+                  onChange={(event) =>
+                    setOptions((prev) => ({
+                      ...prev,
+                      format: event.currentTarget.value as SupportedFormat,
+                    }))
+                  }
+                >
+                  {formatChoices.map((format) => (
+                    <option key={format.value} value={format.value}>
+                      {format.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-            <label className="form-control">
-              <span className="label-text font-semibold mr-[20px]">
-                {converterTextContent.formatExtension}
-              </span>
-              <select
-                className="select select-bordered select-sm"
-                value={options.format}
-                onChange={(event) =>
-                  setOptions((prev) => ({
-                    ...prev,
-                    format: event.currentTarget.value as SupportedFormat,
-                  }))
-                }
-              >
-                {formatChoices.map((format) => (
-                  <option key={format.value} value={format.value}>
-                    {format.label}
-                  </option>
+              <label className="form-control w-full">
+                <div className="flex items-center justify-between">
+                  <span className="label-text font-semibold">
+                    {converterTextContent.qualityLabel}
+                  </span>
+                  <span className="text-sm text-base-content/70">
+                    {options.quality} %
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={10}
+                  max={100}
+                  step={1}
+                  className="range range-xs"
+                  value={options.quality}
+                  onInput={(event) =>
+                    setOptions((prev) => ({
+                      ...prev,
+                      quality: Number(event.currentTarget.value),
+                    }))
+                  }
+                />
+                <div className="flex justify-between text-xs text-base-content/60">
+                  <span>{converterTextContent.qualityPriorityWeight}</span>
+                  <span>{converterTextContent.qualityPriorityQuality}</span>
+                </div>
+              </label>
+            </section>
+
+            <section className="w-full flex flex-col justify-start items-left gap-4 bg-component rounded-2xl p-5 shadow-sm">
+              <header className="flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-semibold">
+                    {converterTextContent.filtersTitle}
+                  </h3>
+                  <p className="text-sm text-base-content/70">
+                    {converterTextContent.filtersDescription}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-outline btn-info btn-sm"
+                  onClick={resetFilters}
+                  disabled={!file && !previewDataUrl}
+                >
+                  {converterTextContent.filtersReset}
+                </button>
+              </header>
+
+              <div className="flex flex-col justify-start items-left gap-4">
+                {filterDescriptors.map((filter) => (
+                  <label key={filter.key} className="form-control">
+                    <div className="flex items-center justify-between">
+                      <span className="label-text font-semibold">
+                        {filter.label}
+                      </span>
+                      <span className="text-sm text-base-content/60">
+                        {options.filters[filter.key]}
+                        {filter.unit}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={filter.min}
+                      max={filter.max}
+                      step={filter.step ?? 1}
+                      className="range range-xs"
+                      value={options.filters[filter.key]}
+                      onInput={(event) =>
+                        updateFilter(
+                          filter.key,
+                          Number(event.currentTarget.value),
+                        )
+                      }
+                    />
+                    {filter.helper ? (
+                      <p className="text-xs text-base-content/60 mt-1">
+                        {filter.helper}
+                      </p>
+                    ) : null}
+                  </label>
                 ))}
-              </select>
-            </label>
-
-            <label className="form-control w-full">
-              <div className="flex items-center justify-between">
-                <span className="label-text font-semibold">
-                  {converterTextContent.qualityLabel}
-                </span>
-                <span className="text-sm text-base-content/70">
-                  {options.quality} %
-                </span>
               </div>
-              <input
-                type="range"
-                min={10}
-                max={100}
-                step={1}
-                className="range range-xs"
-                value={options.quality}
-                onInput={(event) =>
-                  setOptions((prev) => ({
-                    ...prev,
-                    quality: Number(event.currentTarget.value),
-                  }))
-                }
-              />
-              <div className="flex justify-between text-xs text-base-content/60">
-                <span>{converterTextContent.qualityPriorityWeight}</span>
-                <span>{converterTextContent.qualityPriorityQuality}</span>
-              </div>
-            </label>
-          </section>
+            </section>
 
-          <section className="flex flex-col justify-start items-left gap-4 bg-base-200 rounded-2xl p-5 shadow-sm">
-            <header className="flex items-center justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-semibold">
-                  {converterTextContent.filtersTitle}
-                </h3>
-                <p className="text-sm text-base-content/70">
-                  {converterTextContent.filtersDescription}
+            <footer className="w-full flex flex-col gap-3 justify-start lg:flex-row bg-component p-4 rounded-xl">
+                <p className={`text-sm break-words ${statusColor} lg:w-[calc(100%-220px)]`}>
+                  
+                {(status.message && status.message.length > 0) ||
+                  status.state !== "idle" ? (
+                  status.message) : ""}
+                  
                 </p>
-              </div>
+               
+              
               <button
                 type="button"
-                className="btn btn-outline btn-info btn-sm"
-                onClick={resetFilters}
+                className="btn btn-outline btn-info btn-md w-[100px]"
+                onClick={clearAll}
                 disabled={!file && !previewDataUrl}
               >
-                {converterTextContent.filtersReset}
+                {converterTextContent.actionClear}
               </button>
-            </header>
+              {status.state !== "loading" ? (
+                <button
+                  type="submit"
+                  className={"btn btn-outline btn-success btn-md w-[100px]"}
+                  disabled={!file || visitorBlocked}
+                >
+                  {converterTextContent.actionConvert}
+                </button>
+              ) : (
+                <div className={"w-[100px] flex justify-center items-center"}>
+                  <span className="loading loading-bars loading-md text-info"></span>
+                </div>
+              )}
+            </footer>
+          </div>
 
-            <div className="flex flex-col justify-start items-left gap-4">
-              {filterDescriptors.map((filter) => (
-                <label key={filter.key} className="form-control">
-                  <div className="flex items-center justify-between">
-                    <span className="label-text font-semibold">
-                      {filter.label}
-                    </span>
-                    <span className="text-sm text-base-content/60">
-                      {options.filters[filter.key]}
-                      {filter.unit}
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={filter.min}
-                    max={filter.max}
-                    step={filter.step ?? 1}
-                    className="range range-xs"
-                    value={options.filters[filter.key]}
-                    onInput={(event) =>
-                      updateFilter(
-                        filter.key,
-                        Number(event.currentTarget.value),
-                      )
-                    }
-                  />
-                  {filter.helper ? (
-                    <p className="text-xs text-base-content/60 mt-1">
-                      {filter.helper}
-                    </p>
-                  ) : null}
-                </label>
-              ))}
+          <div className="relative bg-base-200 rounded-2xl p-4 shadow-sm flex flex-col justify-end gap-5 lg:h-[835px]">
+            <h3 className="text-xl font-semibold">
+              {converterTextContent.previewTitle}
+            </h3>
+            <div className="relative w-full aspect-square bg-base-100 rounded-xl border border-base-300 flex items-center justify-center overflow-hidden">
+              {previewDataUrl ? (
+                <img
+                  src={previewDataUrl}
+                  alt={converterTextContent.previewAlt}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <p className="text-center text-base-content/60 px-6">
+                  {converterTextContent.previewEmpty}
+                </p>
+              )}
             </div>
-          </section>
-
-          <footer className="flex flex-wrap gap-3 justify-end">
-            <button
-              type="button"
-              className="btn btn-outline btn-info btn-md"
-              onClick={clearAll}
-              disabled={!file && !previewDataUrl}
-            >
-              {converterTextContent.actionClear}
-            </button>
-            {status.state !== "loading" ? (
-              <button
-                type="submit"
-                className={"btn btn-outline btn-success btn-md w-[100px]"}
-                disabled={!file || visitorBlocked}
-              >
-                {converterTextContent.actionConvert}
-              </button>
-            ) : (
-              <div className={"w-[100px] flex justify-center items-center"}>
-                <span className="loading loading-bars loading-md text-info"></span>
-              </div>
-            )}
-          </footer>
-          {(status.message && status.message.length > 0) ||
-          status.state !== "idle" ? (
-            <p className={`text-sm ${statusColor}`}>{status.message}</p>
-          ) : null}
-        </form>
-
-        <div className="relative bg-base-200 rounded-2xl p-6 shadow-sm flex flex-col gap-5">
-          <h3 className="text-xl font-semibold">
-            {converterTextContent.previewTitle}
-          </h3>
-          <div className="relative w-full aspect-square bg-base-100 rounded-xl border border-base-300 flex items-center justify-center overflow-hidden">
-            {previewDataUrl ? (
-              <img
-                src={previewDataUrl}
-                alt={converterTextContent.previewAlt}
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <p className="text-center text-base-content/60 px-6">
-                {converterTextContent.previewEmpty}
+            {previewDataUrl && (
+              <p className="text-sm text-base-content/70">
+                {converterTextContent.previewHint}
               </p>
             )}
-          </div>
-          {previewDataUrl && (
-            <p className="text-sm text-base-content/70">
-              {converterTextContent.previewHint}
-            </p>
-          )}
-          <div className="bg-base-100 rounded-xl p-4 border border-base-300 space-y-2 text-sm">
-            <div className="flex flex-wrap items-center justify-between">
-              <span className="text-base-content/70">
-                {converterTextContent.summaryDimensions}
-              </span>
-              <span className="font-semibold">
-                {options.width} x {options.height} px
-              </span>
+            <div className="bg-base-100 rounded-xl p-4 border border-base-300 space-y-2 text-sm">
+              <div className="flex flex-wrap items-center justify-between">
+                <span className="text-base-content/70">
+                  {converterTextContent.summaryDimensions}
+                </span>
+                <span className="font-semibold">
+                  {options.width} x {options.height} px
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center justify-between">
+                <span className="text-base-content/70">
+                  {converterTextContent.summaryFormat}
+                </span>
+                <span className="font-semibold uppercase">
+                  {options.format}
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center justify-between">
+                <span className="text-base-content/70">
+                  {converterTextContent.summaryQuality}
+                </span>
+                <span className="font-semibold">{options.quality}%</span>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center justify-between">
-              <span className="text-base-content/70">
-                {converterTextContent.summaryFormat}
-              </span>
-              <span className="font-semibold uppercase">{options.format}</span>
-            </div>
-            <div className="flex flex-wrap items-center justify-between">
-              <span className="text-base-content/70">
-                {converterTextContent.summaryQuality}
-              </span>
-              <span className="font-semibold">{options.quality}%</span>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-3 ">
-            <button
-              type="button"
-              className="btn btn-outline btn-info btn-md"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {converterTextContent.changeImage}
-            </button>
+            <div className="flex flex-wrap gap-3 ">
+              <button
+                type="button"
+                className="btn btn-outline btn-info btn-md"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {converterTextContent.changeImage}
+              </button>
 
-            <button
-              type="button"
-              className="btn btn-outline btn-success btn-md"
-              onClick={downloadConverted}
-              disabled={!convertedAsset}
-            >
-              {converterTextContent.downloadConverted}
-            </button>
+              <button
+                type="button"
+                className="btn btn-outline btn-success btn-md"
+                onClick={downloadConverted}
+                disabled={!convertedAsset}
+              >
+                {converterTextContent.downloadConverted}
+              </button>
 
-            {/* <button
+              {/* <button
               type="button"
               className="btn btn-outline btn-info btn-md"
               onClick={deleteConvertedAsset}
@@ -1039,9 +1058,9 @@ const ImageConverter = ({
             >
               {converterTextContent.deleteConverted}
             </button> */}
-          </div>
+            </div>
 
-          {/* {convertedAsset ? (
+            {/* {convertedAsset ? (
             <div className="space-y-3">
               <p className="text-xs text-base-content/70">
                 {converterTextContent.assetReadyPrefix}{" "}
@@ -1063,12 +1082,13 @@ const ImageConverter = ({
               {converterTextContent.emptyConversionHint}
             </p>
           )} */}
-          {/* {!userLoged ? (
+            {/* {!userLoged ? (
             <a href="/pricing" className="service-link-info">
               {converterTextContent.needPlanLink}
             </a>
           ) : null} */}
-        </div>
+          </div>
+        </form>
       </div>
     </section>
   );
