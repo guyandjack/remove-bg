@@ -44,6 +44,7 @@ import http from "node:http";
 import app from "./app.js"; // Instance Express déjà configurée (TS/ESM: sans extension)
 import { logger } from "./logger.js";
 import { startRemoveBgOutputCleanup } from "./services/cleanup/removeBgOutputCleanup.js";
+import { startFreePlanEmailGuardCleanup } from "./services/cleanup/freePlanEmailGuardCleanup.js";
 
 // -----------------------------------------------------------------------------
 // 3) Normalisation du port & lecture des variables
@@ -65,6 +66,13 @@ if (!PORT) {
   process.exit(1);
 }
 
+// Required env var for free-plan anti-abuse (HMAC key).
+// Fail fast at startup rather than during a signup request.
+if (!String(process.env.EMAIL_GUARD_SECRET || "").trim()) {
+  logger.error("âŒ Missing EMAIL_GUARD_SECRET env var (required for free plan anti-abuse).");
+  process.exit(1);
+}
+
 // Express garde cette info dans ses settings (facultatif mais pratique)
 app.set("port", PORT);
 
@@ -83,6 +91,20 @@ startRemoveBgOutputCleanup()
   })
   .catch((err: any) => {
     logger.warn("removeBgOutputCleanup::start_failed", {
+      message: err?.message ?? String(err),
+    });
+  });
+
+// -----------------------------------------------------------------------------
+// Free plan email guard cleanup (cron-like)
+// -----------------------------------------------------------------------------
+let stopEmailGuardCleanup: (() => void) | null = null;
+startFreePlanEmailGuardCleanup()
+  .then((stop) => {
+    stopEmailGuardCleanup = stop;
+  })
+  .catch((err: any) => {
+    logger.warn("freePlanEmailGuardCleanup::start_failed", {
       message: err?.message ?? String(err),
     });
   });
@@ -203,6 +225,9 @@ process.on("SIGUSR2", () => {
 function gracefulShutdown(code: number, onClosed?: () => void) {
   try {
     stopRemoveBgCleanup?.();
+  } catch {}
+  try {
+    stopEmailGuardCleanup?.();
   } catch {}
   // Empêche de nouvelles connexions et attend la fin des requêtes en cours
   server.close((err?: Error) => {

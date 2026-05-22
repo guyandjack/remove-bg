@@ -178,6 +178,15 @@ CREATE TABLE IF NOT EXISTS `EmailVerification` (
   UNIQUE KEY uniq_email_active (email, active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Free plan email guard (anti-abuse, no clear email stored)
+-- Stores HMAC(email_normalized) for 30 days to prevent "free credits reset" after account deletion.
+CREATE TABLE IF NOT EXISTS `free_plan_email_guard` (
+  email_hmac   CHAR(64)   NOT NULL PRIMARY KEY,
+  created_at   DATETIME   NOT NULL,
+  expires_at   DATETIME   NOT NULL,
+  INDEX idx_fpeg_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Stripe checkout session state: keeps link between Stripe session and local user/account activation
 CREATE TABLE IF NOT EXISTS `StripeCheckoutSession` (
   id               VARCHAR(36)   NOT NULL PRIMARY KEY,

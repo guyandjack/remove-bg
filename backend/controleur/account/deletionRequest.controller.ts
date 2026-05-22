@@ -4,12 +4,14 @@ import {
   anonymizeUserCredentials,
   createAccountDeletionFeedbackRequest,
   getActiveSubscription,
+  getPlanById,
   getUserByEmail,
   requestAccountDeletion,
   revokeAllRefreshTokensForUser,
   updateUserMarketingConsent,
   updateSubscription,
 } from "../../DB/queriesSQL/queriesSQL.js";
+import { storeFreePlanEmailGuard } from "../../DB/queriesSQL/freePlanEmailGuard.queries.js";
 import { getStripeClient } from "../../function/stripe/stripeClient.js";
 import {
   formatBillingLockMessage,
@@ -23,6 +25,7 @@ import {
   resolveMailSender,
 } from "../../utils/mailer.js";
 import crypto from "node:crypto";
+import { computeEmailHmacSha256Hex } from "../../utils/emailGuard.js";
 
 function resolveLocale(input: unknown): "fr" | "en" | "de" | "it" {
   const raw = String(input || "en").toLowerCase();
@@ -223,6 +226,24 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
     }
   } catch (err: any) {
     logger.warn("account.deletion_request::email_failed", {
+      userId: user.id,
+      message: err?.message || String(err),
+    });
+  }
+
+  // 4b) Free plan anti-abuse: keep only an HMAC fingerprint (no clear email) for 30 days.
+  // This also covers legacy accounts created before the guard existed.
+  try {
+    if (activeSub?.plan_id) {
+      const plan = await getPlanById(activeSub.plan_id);
+      const planCode = String((plan as any)?.code || "").trim().toLowerCase();
+      if (planCode === "free") {
+        const emailHmac = computeEmailHmacSha256Hex(user.email);
+        await storeFreePlanEmailGuard(emailHmac);
+      }
+    }
+  } catch (err: any) {
+    logger.warn("account.deletion_request::email_guard_failed", {
       userId: user.id,
       message: err?.message || String(err),
     });

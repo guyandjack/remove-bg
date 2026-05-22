@@ -2,6 +2,7 @@
 import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
 import { logger } from "../logger.js";
+import { computeEmailHmacSha256Hex } from "../utils/emailGuard.js";
 import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.js";
 import { buildLogoUrl } from "../utils/publicAssetUrl.js";
 import {
@@ -74,7 +75,7 @@ async function sendAccountCreatedEmail(params: {
     const transporter = createSmtpTransporter(isProd);
     if (!transporter) {
       logger.warn("signup.account_created::smtp_not_configured", {
-        email: params.toEmail,
+        // never log email
       });
       return;
     }
@@ -108,7 +109,6 @@ async function sendAccountCreatedEmail(params: {
     });
   } catch (mailErr: any) {
     logger.warn("signup.account_created::email_failed", {
-      email: params.toEmail,
       message: mailErr?.message || String(mailErr),
     });
   }
@@ -240,6 +240,37 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
               [record.id]
             );
 
+            // 1b) Free plan anti-abuse: prevent reusing the free plan multiple times within 30 days.
+            // Uses only HMAC(email_normalized) (no clear email stored) and never logs any identifier.
+            const emailHmac = computeEmailHmacSha256Hex(email);
+            const [grows] = await cx.execute<RowDataPacket[]>(
+              `SELECT expires_at
+               FROM \`free_plan_email_guard\`
+               WHERE email_hmac = ?
+               LIMIT 1
+               FOR UPDATE`,
+              [emailHmac],
+            );
+            const guardRow = grows[0] as any | undefined;
+            if (guardRow?.expires_at) {
+              const expiresAt = new Date(guardRow.expires_at);
+              if (Number.isFinite(expiresAt.getTime()) && expiresAt.getTime() > Date.now()) {
+                throw new Error("FREE_PLAN_ALREADY_USED_RECENTLY");
+              }
+              await cx.execute<ResultSetHeader>(
+                `UPDATE \`free_plan_email_guard\`
+                 SET created_at = NOW(), expires_at = DATE_ADD(NOW(), INTERVAL 30 DAY)
+                 WHERE email_hmac = ?`,
+                [emailHmac],
+              );
+            } else {
+              await cx.execute<ResultSetHeader>(
+                `INSERT INTO \`free_plan_email_guard\` (email_hmac, created_at, expires_at)
+                 VALUES (?, NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY))`,
+                [emailHmac],
+              );
+            }
+
             // 2) Find or create user
             const [urows] = await cx.execute<RowDataPacket[]>(
               `SELECT id FROM \`User\` WHERE email = ? LIMIT 1`,
@@ -298,6 +329,13 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
             // Tokens already created before starting the transaction to avoid partial DB updates on failure
           });
         } catch (err: any) {
+          if (String(err?.message || "") === "FREE_PLAN_ALREADY_USED_RECENTLY") {
+            return res.status(409).json({
+              status: "error",
+              message: "Free plan already used recently.",
+              errorCode: "FREE_PLAN_ALREADY_USED_RECENTLY",
+            });
+          }
           return res.status(500).json({
             status: "error",
             message: err?.message || String(err),

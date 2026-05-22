@@ -143,7 +143,8 @@ const sendMailVerification: RequestHandler = async (req, res) => {
     ) as string | undefined;
 
     if (!from || !pass) {
-      console.warn("SMTP credentials missing; logging OTP in dev:", { email: normalizedEmail, otp });
+      // Never log email nor OTP (even in dev). If SMTP is missing, we still return the OTP to the caller (dev-only behavior).
+      console.warn("SMTP credentials missing; OTP returned in response (dev).");
       return res.status(200).json({ ok: true, email: normalizedEmail, message: "OTP generated (no SMTP)", devOtp: otp });
     }
 

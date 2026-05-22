@@ -1,6 +1,8 @@
 import { z } from "zod";
 import type { NextFunction, Request, Response } from "express";
 import { validationLimits, validationRegex, toRegExp } from "../../shared/validationRegex.js";
+import { computeEmailHmacSha256Hex } from "../../utils/emailGuard.js";
+import { hasActiveFreePlanEmailGuard } from "../../DB/queriesSQL/freePlanEmailGuard.queries.js";
 
 export const authSchema = z.object({
   email: z.email("Email invalide").trim().toLowerCase(),
@@ -28,7 +30,7 @@ export const authSchema = z.object({
 
 export type AuthDTO = z.infer<typeof authSchema>;
 
-const checkSignUpDataUser = (req: Request, res: Response, next: NextFunction) => {
+const checkSignUpDataUser = async (req: Request, res: Response, next: NextFunction) => {
   const result = authSchema.safeParse(req.body);
   if (!result.success) {
     return res.status(400).json({
@@ -52,6 +54,31 @@ const checkSignUpDataUser = (req: Request, res: Response, next: NextFunction) =>
   }
 
   const data: AuthDTO = result.data;
+  // Free plan anti-abuse: prevent reusing "free credits" by deleting and recreating an account.
+  // - Never store the clear email in this guard table.
+  // - Never log email nor HMAC.
+  if (String(data.plan || "").toLowerCase() === "free") {
+    try {
+      const emailHmac = computeEmailHmacSha256Hex(data.email);
+      const blocked = await hasActiveFreePlanEmailGuard(emailHmac);
+      if (blocked) {
+        return res.status(409).json({
+          error: true,
+          message: "Free plan already used recently.",
+          code: "FREE_PLAN_ALREADY_USED_RECENTLY",
+          requestId: (req as any).requestId,
+        });
+      }
+    } catch {
+      return res.status(500).json({
+        error: true,
+        message: "Server error.",
+        code: "EMAIL_GUARD_ERROR",
+        requestId: (req as any).requestId,
+      });
+    }
+  }
+
   (req as any).userValidated = {
     email: data.email,
     password: data.password,
@@ -65,4 +92,3 @@ const checkSignUpDataUser = (req: Request, res: Response, next: NextFunction) =>
 };
 
 export { checkSignUpDataUser };
-

@@ -3,10 +3,12 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 // Import JSON resources
-import frTranslate from '../content/fr/translateFR.json';
-import enTranslate from '../content/en/translateEN.json';
-import frSeo from '../content/fr/seo.json';
-import enSeo from '../content/en/seo.json';
+import frTranslate from '@/translate/content/fr/translateFR.json';
+import enTranslate from '@/translate/content/en/translateEN.json';
+import deTranslate from '@/translate/content/de/translateDE.json';
+import itTranslate from '@/translate/content/it/translateIT.json';
+import frSeo from '@/translate/content/fr/seo.json';
+import enSeo from '@/translate/content/en/seo.json';
 
 // Normalize resources to a consistent shape
 
@@ -18,6 +20,14 @@ const resources = {
   en: {
     translation: enTranslate as Record<string, unknown>,
     seo: enSeo as Record<string, unknown>,
+  },
+  de: {
+    translation: deTranslate as Record<string, unknown>,
+    //seo: deSeo as Record<string, unknown>,
+  },
+  it: {
+    translation: itTranslate as Record<string, unknown>,
+    //seo: itSeo as Record<string, unknown>,
   },
 } as const;
 

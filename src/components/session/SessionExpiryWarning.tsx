@@ -49,29 +49,27 @@ const SessionExpiryWarning = () => {
   const warnTimeoutRef = useRef<number | null>(null);
   const tickIntervalRef = useRef<number | null>(null);
   const didAutoLogoutRef = useRef(false);
+  const didWarnMissingRtExpRef = useRef(false);
 
   const token = sessionSignal.value?.token || null;
   const isAuth = Boolean(sessionSignal.value?.authentified);
 
-  const sessionExpiresAtMs = useMemo(() => {
+  const refreshSessionExpiresAtMs = useMemo(() => {
     if (!token || typeof token !== "string") return null;
     const decoded = decodeJwtPayload(token);
     if (!decoded) return null;
 
-    const rtExp = decoded.rtExp;
-    const refreshExp = decoded.refreshExp;
-    const accessExp = decoded.exp;
+    const refreshExpSeconds =
+      typeof decoded.rtExp === "number"
+        ? decoded.rtExp
+        : typeof decoded.refreshExp === "number"
+          ? decoded.refreshExp
+          : null;
 
-    const expSeconds =
-      typeof rtExp === "number"
-        ? rtExp
-        : typeof refreshExp === "number"
-          ? refreshExp
-          : typeof accessExp === "number"
-            ? accessExp
-            : null;
+    const refreshExpiresAtMs = refreshExpSeconds ? refreshExpSeconds * 1000 : null;
 
-    return expSeconds ? expSeconds * 1000 : null;
+    // Mode unique: on se base sur l'expiration du refresh token (fin rÃ©elle de session).
+    return refreshExpiresAtMs;
   }, [token]);
 
   useEffect(() => {
@@ -88,11 +86,21 @@ const SessionExpiryWarning = () => {
     setSecondsLeft(null);
     setFeedback("idle");
     didAutoLogoutRef.current = false;
+    didWarnMissingRtExpRef.current = false;
 
-    if (!isAuth || !sessionExpiresAtMs) return;
+    if (!isAuth || !refreshSessionExpiresAtMs) {
+      if (isAuth && !refreshSessionExpiresAtMs && !didWarnMissingRtExpRef.current) {
+        didWarnMissingRtExpRef.current = true;
+        // Si `rtExp` n'est pas prÃ©sent, on ne peut pas faire un warning fiable sur la fin de session.
+        // Le backend est censÃ© injecter `rtExp` (expiry du refresh) dans l'access token.
+        // eslint-disable-next-line no-console
+        console.warn("[SessionExpiryWarning] Missing refresh expiry (rtExp/refreshExp) in JWT payload.");
+      }
+      return;
+    }
 
     const tick = () => {
-      const remainingMs = sessionExpiresAtMs - Date.now();
+      const remainingMs = refreshSessionExpiresAtMs - Date.now();
       if (remainingMs <= 0) {
         setSecondsLeft(0);
         if (tickIntervalRef.current) {
@@ -120,7 +128,7 @@ const SessionExpiryWarning = () => {
       tickIntervalRef.current = window.setInterval(tick, 1000);
     };
 
-    const warnStartMs = sessionExpiresAtMs - WARNING_LEAD_MS;
+    const warnStartMs = refreshSessionExpiresAtMs - WARNING_LEAD_MS;
     const delayMs = warnStartMs - Date.now();
     if (delayMs <= 0) {
       startCountdown();
@@ -135,7 +143,7 @@ const SessionExpiryWarning = () => {
       warnTimeoutRef.current = null;
       tickIntervalRef.current = null;
     };
-  }, [isAuth, sessionExpiresAtMs]);
+  }, [isAuth, refreshSessionExpiresAtMs]);
 
   const isVisible = secondsLeft !== null && secondsLeft <= Math.ceil(WARNING_LEAD_MS / 1000);
 
