@@ -35,6 +35,8 @@ const Footer = () => {
   const services = t(`footer.services`);
   const company = t(`footer.company`);
   const legal = t(`footer.legal`);
+  const slogan = t("footer.slogan");
+
 
   
   return (
@@ -50,7 +52,7 @@ const Footer = () => {
               <AnimatedLogoNormalWhite />
             )}
           </a>
-          <p>L’intelligence artificielle au service de vos visuels.</p>
+          <p>{slogan}</p>
           <ThemeControler />
         </aside>
         <div className={"relative z-10"}>

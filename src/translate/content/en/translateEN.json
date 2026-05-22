@@ -17,6 +17,7 @@
   },
 
   "footer": {
+    "slogan": "Artificial intelligence serving your visuals.",
     "cookie": "Cookies",
     "services": "Services",
     "company": "Entreprise",
@@ -326,7 +327,7 @@
   "removeBg": {
     "confirmLabelIdle": "Process",
     "confirmLabelProcessing": "Processing…",
-    "planSimulation": "Simulate a subscription and evaluate the editing tools you need",
+     "planSimulation": "Simulate a subscription and explore the editing tools you want to use",
     "planFree": "Free plan",
     "planHobby": "Hobby plan",
     "planPro": "Pro plan",

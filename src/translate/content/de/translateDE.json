@@ -16,6 +16,7 @@
     "logout": "Abmelden"
   },
   "footer": {
+    "slogan": "Künstliche Intelligenz im Dienste Ihrer visuellen Inhalte.",
     "cookie": "Cookies",
     "services": "Dienstleistungen",
     "company": "Unternehmen",
@@ -31,16 +32,16 @@
     "subject": "Betreff",
     "email": "E-Mail",
     "message": "Nachricht",
-    "privacy": "Mit der Bestätigung akzeptieren Sie ",
-    "link": "unsere Datenschutzerklärung",
+    "privacy": "Mit dem Absenden akzeptieren Sie ",
+    "link": "unsere Datenschutzrichtlinie",
     "required": "Dieses Feld ist erforderlich.",
     "minLength": "Zu wenige Zeichen.",
-    "maxLength": "Zu viele Zeichen",
-    "pattern": "Ungültiges Format",
+    "maxLength": "Zu viele Zeichen.",
+    "pattern": "Ungültiges Format.",
     "button": "Senden",
-    "submit": "Wird ausgeführt...",
+    "submit": "Wird gesendet...",
     "textSuccess": "Nachricht gesendet",
-    "textError": "Nachricht nicht gesendet!"
+    "textError": "Nachricht konnte nicht gesendet werden!"
   },
   "formSignUp": {
     "title": "Erstellen Sie Ihr Konto",
@@ -132,30 +133,30 @@
     "pet_label": "Tiere"
   },
   "priceTab": {
-    "title_h2": "Vergleich der Abonnements",
+    "title_h2": "Abonnementvergleich",
     "col_free": "Free",
     "col_hobby": "Hobby",
     "col_pro": "Pro",
-    "price": "Preise",
+    "price": "Preis",
     "credit": "Credits",
     "remove_bg": "Hintergrundentfernung",
     "conversion": "Bildkonvertierung",
-    "img_input": "Maximale Dateigröße zur Verarbeitung",
-    "img_output": "Maximale Abmessungen der verarbeiteten Datei",
+    "img_input": "Maximale Dateigröße",
+    "img_output": "Maximale Ausgabeabmessungen",
     "per_month": "/ Monat",
     "conversions_suffix": "Konvertierungen / Monat",
-    "change_bg_color": "Hintergrundwechsel mit Volltonfarbe",
-    "tools": "Retuschewerkzeuge \n (Größe ändern, Anpassen, Feintuning, Filter, Wasserzeichen, Annotieren)",
+    "change_bg_color": "Hintergrund mit einfarbiger Farbe ersetzen",
+    "tools": "Bildbearbeitungswerkzeuge \n (Resize, Adjust, Finetune, Filters, Watermark, Annotate)",
     "model_IA_ressource": "KI-Ressourcen",
     "gomme_magique": "Magischer Radierer",
-    "img_pexels": "Hintergrundwechsel mit lizenzfreien Bildern",
+    "img_pexels": "Hintergrund mit lizenzfreien Bildern ersetzen",
     "delay_improved": "Verbesserte Verarbeitungszeit",
     "bg_IA_generation": "KI-Hintergrundgenerierung",
     "bundle": "Stapelverarbeitung",
     "api": "API",
     "api_external": "Externe API",
     "ressourceIA_free": "Standard",
-    "ressourceIA_hobby": "Verbessert",
+    "ressourceIA_hobby": "Erweitert",
     "ressourceIA_pro": "Pro"
   },
   "priceCard": {
@@ -166,29 +167,30 @@
     "conversion": "Bildkonvertierung",
     "conversions_suffix": "Konvertierungen / Monat",
     "unlimited": "Unbegrenzt",
-    "img_input": "Maximale Größe",
-    "tools": "Retuschewerkzeuge",
+    "img_input": "Max. Größe",
+    "tools": "Bildbearbeitungswerkzeuge",
     "gomme_magique": "Magischer Radierer",
     "img_pexels": "Lizenzfreie Bilder",
     "api": "API",
     "bundle": "Stapelverarbeitung",
-    "subscribe": "Ich wähle diesen Plan"
+    "subscribe": "Diesen Plan wählen"
   },
+
   "pricePage": {
     "alert": "Wählen Sie einen Plan, um sich zu registrieren."
   },
   "heroHome": {
-    "title_h1": "Supprimez l'arrière&#8209;plan de&nbsp;Ihre&nbsp;Bilds grâce&nbsp;à&nbsp;l'IA",
-    "title_h2": "Que vous soyez professionnel ou amateur de retouche photo, wählen Sie la simplicité,<span class='text-secondary text-2xl'> pour&nbsp;un&nbsp;gain&nbsp;de&nbsp;temps&nbsp;maximum</span>.",
-    "info_1": "Sie können bénéficier de ce Dienst kostenlosement en sélectionnant le plan kostenlos (2&nbsp;Credits&nbsp;/&nbsp;jour).",
-    "info_2": "Dazu:",
-    "info_list_1": "1 – Sélectionnez un plan sur la page des ",
+    "title_h1": "Entfernen Sie den Hintergrund Ihrer&nbsp;Bilder mit&nbsp;KI",
+    "title_h2": "Ob Sie Profi oder Hobby-Fotobearbeiter sind – wählen Sie die Einfachheit,<span class='text-secondary text-2xl'> für&nbsp;maximale&nbsp;Zeitersparnis</span>.",
+    "info_1": "Sie können diesen Dienst kostenlos nutzen, indem Sie den kostenlosen Plan auswählen (2&nbsp;Credits&nbsp;/&nbsp;Tag).",
+    "info_2": "So geht's:",
+    "info_list_1": "1 – Wählen Sie einen Plan auf der Seite ",
     "info_list_1_link": "Abonnements",
-    "info_list_2": "2 – Créez Ihr Konto über le formulaire.",
-    "info_list_3": "3 – Une fois connecté, vous pouvez utiliser le Dienst.",
-    "privacy_1": "Keine donnée personnelle n’ist collectée ni partagée avec des tiers.</br>Sie können einsehen unser ",
-    "privacy_1_link": "politique&nbsp;de&nbsp;Datenschutz",
-    "privacy_2": "Für den kostenlosen Plan wird keine Kartennummer verlangt.",
+    "info_list_2": "2 – Erstellen Sie Ihr Konto über das Formular.",
+    "info_list_3": "3 – Sobald Sie angemeldet sind, können Sie den Dienst nutzen.",
+    "privacy_1": "Es werden keine personenbezogenen Daten erfasst oder an Dritte weitergegeben.</br>Sie können unsere ",
+    "privacy_1_link": "Datenschutzrichtlinie",
+    "privacy_2": "Für den kostenlosen Plan ist keine Kartennummer erforderlich.",
     "btn_test": "Ich möchte die Qualität testen",
     "btn_choice": "Ich wähle einen Plan"
   },
@@ -199,18 +201,18 @@
   },
   "stepsContent": {
     "title": "Wie nutzt man unsere Dienste&nbsp;?",
-    "intro": "Téléversez Ihr Bild et laissez l'IA travailler à Ihr place.",
+    "intro": "Laden Sie Ihr Bild hoch und lassen Sie die KI die Arbeit für Sie erledigen.",
     "step_1": {
       "title": "Wählen Sie einen Plan",
-      "description": "Le plan sélectionné vous permet de bénéficier d’un nombre de Credits begrenzt par mois."
+      "description": "Mit dem gewählten Plan profitieren Sie von einer begrenzten Anzahl an Credits pro Monat."
     },
     "step_2": {
       "title": "Erstellen Sie ein Konto",
-      "description": "Une adresse email valide, un mot de passe sécurisé et le tour ist joué. Keine carte de crédit n’ist demandée pour le plan kostenlos."
+      "description": "Eine gültige E-Mail-Adresse, ein sicheres Passwort – und schon kann es losgehen. Für den kostenlosen Plan ist keine Kreditkarte erforderlich."
     },
     "step_3": {
       "title": "Nutzen Sie unseren Dienst",
-      "description": "Téléversez Ihre Bilds, patientez quelques secondes et Ihr Bild ist détourée. Selon l’Abonnement choisi, vous disposez également d’outils de retouche photo."
+      "description": "Laden Sie Ihre Bilder hoch, warten Sie einige Sekunden und Ihr Bild wird automatisch freigestellt. Je nach gewähltem Abonnement stehen Ihnen zusätzlich Bildbearbeitungswerkzeuge zur Verfügung."
     }
   },
   "serviceCardContent": {
@@ -219,85 +221,85 @@
       "id": "remove",
       "src": "",
       "title": "Hintergrundentfernung",
-      "description": "Supprime automatiquement l’Hintergrund de Ihre Bilds pour obtenir des visuels propres et prêts à l’usage."
+      "description": "Entfernt automatisch den Hintergrund Ihrer Bilder, um saubere und sofort einsatzbereite Visuals zu erhalten."
     },
     "card_2": {
       "id": "social",
       "src": "",
       "title": "Bilder für soziale Netzwerke",
-      "description": "Formate et optimise Ihre Bilds pour les principaux réseaux sociaux afin de garantir un rendu professionnel."
+      "description": "Formatiert und optimiert Ihre Bilder für die wichtigsten sozialen Netzwerke, um ein professionelles Erscheinungsbild zu gewährleisten."
     },
     "card_3": {
       "id": "convert",
       "src": "",
       "title": "Bildkonvertierung",
-      "description": "Convertit et redimensionne Ihre Bilds au format et à la taille souhaités."
+      "description": "Konvertiert und skaliert Ihre Bilder auf das gewünschte Format und die gewünschte Größe."
     },
     "card_4": {
       "id": "product",
       "src": "",
       "title": "Produktinszenierung",
-      "description": "Met en valeur Ihre produits en les plaçant dans des mises en scène adaptées pour la vente ou la présentation."
+      "description": "Setzt Ihre Produkte wirkungsvoll in Szene, indem sie in passende Umgebungen für Verkauf oder Präsentation eingebettet werden."
     }
   },
   "cta": {
-    "title_home_1": "Beginnen Sie mit der Verarbeitung Ihrer Bilder.",
-    "label_choice": "Je choisis un plan",
+    "title_home_1": "Beginnen Sie jetzt mit der Bearbeitung Ihrer Bilder.",
+    "label_choice": "Ich wähle einen Plan",
     "label_test": "Ich möchte die Qualität testen"
   },
   "ctaFinal": {
     "title_home": "Bearbeiten Sie Ihre Bilder jetzt",
-    "intro_home": "Rejoignez des centaines d'Nutzers qui traitent leurs Bilds en quelques secondes avec une qualité professionnelle.",
-    "btn_pricing": "Je choisis un plan",
+    "intro_home": "Schließen Sie sich Hunderten von Nutzern an, die ihre Bilder in wenigen Sekunden mit professioneller Qualität bearbeiten.",
+    "btn_pricing": "Ich wähle einen Plan",
     "btn_service": "Ich möchte die Qualität testen",
-    "info_1": "Keine Kartennummer für den kostenlosen Plan erforderlich",
+    "info_1": "Für den kostenlosen Plan ist keine Kartennummer erforderlich",
     "info_2": "Kündigen Sie Ihr Abonnement jederzeit"
   },
   "featureCardContent": {
     "card_1": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5\" /></svg>",
       "title": "Webentwickler",
-      "description": "Automatisez le détourage et la retouche d’Bilds directement dans Ihre applications grâce à une API simple et rapide."
+      "description": "Automatisieren Sie das Freistellen und Bearbeiten von Bildern direkt in Ihren Anwendungen mit einer einfachen und schnellen API."
     },
     "card_2": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z\" /><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z\" /></svg>",
       "title": "Fotografen",
-      "description": "Gagnez un temps précieux en supprimant automatiquement les Hintergrunds et en améliorant Ihre clichés en quelques secondes."
+      "description": "Sparen Sie wertvolle Zeit, indem Hintergründe automatisch entfernt und Ihre Aufnahmen in wenigen Sekunden verbessert werden."
     },
     "card_3": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z\" /></svg>",
       "title": "E-Commerce-Shops",
-      "description": "Créez des visuels produits propres, homogènes et prêts à être publiés sur Ihr site ou Ihr marketplace."
+      "description": "Erstellen Sie saubere, einheitliche Produktbilder, die bereit sind, auf Ihrer Website oder Ihrem Marktplatz veröffentlicht zu werden."
     },
     "card_4": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42\" /></svg>",
       "title": "Designer und Grafiker",
-      "description": "Accélérez Ihr workflow en générant des détourages propres et des mises en scène réalistes sans travail manuel chronophage."
+      "description": "Beschleunigen Sie Ihren Workflow, indem Sie saubere Freistellungen und realistische Inszenierungen ohne zeitaufwändige manuelle Arbeit erstellen."
     },
     "card_5": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z\" /></svg>",
       "title": "Content Creator",
-      "description": "Préparez des vignettes, miniatures et visuels attractifs sans compétences avancées en retouche d’Bild."
+      "description": "Erstellen Sie Vorschaubilder, Miniaturen und attraktive Visuals – ganz ohne fortgeschrittene Bildbearbeitungskenntnisse."
     },
     "card_6": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46\" /></svg>",
       "title": "Marketingagenturen",
-      "description": "Produisez rapidement des Bilds optimisées pour Ihre campagnes publicitaires et Ihre réseaux sociaux."
+      "description": "Erstellen Sie schnell optimierte Bilder für Ihre Werbekampagnen und sozialen Netzwerke."
     },
     "card_7": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75\" /></svg>",
       "title": "Marketplace-Manager",
-      "description": "Uniformisez les Bilds des vendeurs en supprimant automatiquement les fonds pour respecter Ihre standards visuels."
+      "description": "Vereinheitlichen Sie die Bilder Ihrer Verkäufer, indem Hintergründe automatisch entfernt werden, um Ihre visuellen Standards einzuhalten."
     },
     "card_8": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z\" /></svg>",
       "title": "Immobilien",
-      "description": "Mettez en valeur Ihre biens avec des visuels épurés, sans Hintergrund distrayant, pour Ihre annonces et supports commerciaux."
+      "description": "Präsentieren Sie Ihre Immobilien mit klaren Visuals ohne störenden Hintergrund – ideal für Anzeigen und Marketingmaterialien."
     },
     "card_9": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z\" /></svg>",
       "title": "Handwerker und Kreative",
-      "description": "Valorisez Ihre produits avec des Bilds nettes et professionnelles, sans matériel coûteux."
+      "description": "Werten Sie Ihre Produkte mit klaren und professionellen Bildern auf – ganz ohne teure Ausrüstung."
     }
   },
   "uploadImg": {
@@ -310,7 +312,7 @@
   "removeBg": {
     "confirmLabelIdle": "Verarbeiten",
     "confirmLabelProcessing": "Verarbeitung…",
-    "planSimulation": "Simule un Abonnement et évalue les outils de retouche que tu souhaites",
+    "planSimulation": "Simulieren Sie ein Abonnement und entdecken Sie die Bildbearbeitungswerkzeuge, die Sie nutzen möchten",
     "planFree": "Free plan",
     "planHobby": "Hobby plan",
     "planPro": "Pro plan",
@@ -420,189 +422,262 @@
   },
   "faqHome": {
     "title": "Häufig gestellte Fragen",
-    "question_1": "Le site respecte-t-il le RGPD&nbsp;?",
-    "reponse_1": "Oui. Notre plateforme ist entièrement conforme au RGPD. Les personenbezogene Daten ne sind collectées que lorsqu’elles sind strictement nécessaires (inscription ou formulaire de contact). Sie disposez jederzeit d’un Recht d’accès, de rectification et de suppression de Ihre Daten. <a class='faq-link' href='/privacy'>Consultez unser politique de Datenschutz</a> pour en savoir plus sur l’utilisation des Bilds avec nos Diensts.",
-    "question_2": "À qui s’adresse ce Dienst de suppression d’Hintergrund&nbsp;?",
-    "reponse_2": "Notre outil s’adresse aux créateurs de contenu, e-commerçants, photographes, graphistes, étudiants, ainsi qu’à toute personne souhaitant obtenir rapidement des Bilds détourées, prêtes pour un usage professionnel ou personnel.",
-    "question_3": "Le site ist-il sécurisé&nbsp;?",
-    "reponse_3": "Oui. Keine donnée n’ist partagée avec des tiers, kein cookie de suivi n’ist utilisé sur unser site, et les Zahlungs sind traités par Stripe, un pristataire certifié PCI-DSS garantissant un haut niveau de Sicherheit.",
-    "question_4": "Comment utiliser le Dienst&nbsp;?",
-    "reponse_4": "Il vous suffit de choisir un plan (kostenlos ou kostenpflichtig), de créer un Konto, puis d’importer Ihre Bilds. Le Verarbeitung démarre automatiquement et vous pouvez télécharger le résultat en quelques secondes. <a class='faq-link' href='/privacy'>Consultez unser politique de Datenschutz</a> pour plus d’Informationen sur l’utilisation des Bilds.",
-    "question_5": "Le plan kostenlos ist-il vraiment kostenlos&nbsp;?",
-    "reponse_5": "Oui, totalement. Certaines Funktionen avancées sind begrenztes, mais keine carte bancaire n’ist requise et vous disposez de Credits monatlichs pour utiliser le Dienst sans frais.",
-    "question_6": "Mes Bilds servent-elles à entraîner les modèles d’IA&nbsp;?",
-    "reponse_6": "Non. Notre partenaire Replicate, qui stellt bereit et héberge les modèles d’IA de Verarbeitung d’Bilds, indique que les Bilds ne sind pas utilisées pour entraîner des modèles. <a class='faq-link' href='/privacy'>Consultez unser politique de Datenschutz</a> pour plus de détails.",
-    "question_7": "Quels risques existent pour mes personenbezogene Daten&nbsp;?",
-    "reponse_7": "Kein risque notable. Nous collectons uniquement Ihr adresse IP (pour la sécurisation de unser API) ainsi que les Informationen que vous fournissez volontairement (inscription ou formulaire de contact). Keine donnée sensible n’ist demandée ni stockée.",
-    "question_8": "Combien de temps mes Bilds sind-elles conservées&nbsp;?",
-    "reponse_8": "Notre Dienst speichert nicht pas Ihre Bilds. Nous agissons uniquement comme intermédiaire entre vous et les modèles d’IA de Verarbeitung.",
-    "question_9": "Puis-je annuler mon Abonnement jederzeit&nbsp;?",
-    "reponse_9": "Oui. Sie können annuler Ihr Abonnement jederzeit depuis Ihr espace personnel. L’annulation désactive le renouvellement automatique sans interrompre Ihr accès jusqu’à la fin de la période en cours.",
-    "question_10": "L’annulation donne-t-elle Recht à un remboursement&nbsp;?",
-    "reponse_10": "Non. Conformément à nos conditions d’Abonnement, les périodes déjà réglées ristent dues jusqu’à leur échéance, même en cas d’annulation anticipée.",
-    "question_11": "Quelle ist la qualité des résultats obtenus&nbsp;?",
-    "reponse_11": "Les modèles d’IA utilisés ont été entraînés pour produire un détourage propre, précis et professionnel, même sur des Bilds complexes. Les abonnés kostenpflichtigs bénéficient d’une qualité optimisée et d’options avancées.",
-    "question_12": "Y a-t-il une limite au nombre d’Bilds que je peux verarbeiten&nbsp;?",
-    "reponse_12": "Oui. Chaque plan inclut un quota monatlich de Credits correspondant au nombre d’utilisations des outils d’IA. Ihr solde ist consultable jederzeit dans Ihr tableau de bord.",
-    "question_13": "Le Dienst fonctionne-t-il sur mobile&nbsp;?",
-    "reponse_13": "Oui. Notre Dienst ist compatible avec smartphones, tablettes et ordinateurs. Toutefois, pour une meilleure expérience Nutzer, nous recommandons l’utilisation sur un écran suffisamment large pour exploiter pleinement les outils de retouche.",
-    "question_14": "Que faire si une Bild ist mal détourée&nbsp;?",
-    "reponse_14": "Sie können réessayer avec une Bild de meilleure qualité ou utiliser nos outils de retouche (selon Ihr plan). En cas de problème persistant, unser support ist disponible pour vous accompagner.",
-    "question_15": "Proposez-vous une API&nbsp;?",
-    "reponse_15": "Une API sera prochainement disponible pour les plans professionnels afin d’intégrer la suppression d’Hintergrund dans Ihre applications, workflows ou boutiques e-commerce.",
-    "question_16": "Mes Informationen de Zahlung sind-elles stockées&nbsp;?",
-    "reponse_16": "Non. Toutes les Daten de Zahlung sind traitées exclusivement par Stripe. Nous n’y avons jamais accès et ne les conservons pas."
+    "question_1": "Entspricht die Website der DSGVO&nbsp;?",
+    "reponse_1": "Ja. Unsere Plattform ist vollständig DSGVO-konform. Personenbezogene Daten werden nur erhoben, wenn sie unbedingt erforderlich sind (Registrierung oder Kontaktformular). Sie haben jederzeit das Recht auf Auskunft, Berichtigung und Löschung Ihrer Daten. <a class='faq-link' href='/privacy'>Lesen Sie unsere Datenschutzrichtlinie</a>, um mehr über die Nutzung von Bildern mit unseren Diensten zu erfahren.",
+
+    "question_2": "Für wen ist dieser Hintergrundentfernungsdienst geeignet&nbsp;?",
+    "reponse_2": "Unser Tool richtet sich an Content Creator, E-Commerce-Händler, Fotografen, Grafikdesigner, Studenten sowie an alle, die schnell freigestellte Bilder für berufliche oder private Zwecke erhalten möchten.",
+
+    "question_3": "Ist die Website sicher&nbsp;?",
+    "reponse_3": "Ja. Es werden keine Daten an Dritte weitergegeben, auf unserer Website werden keine Tracking-Cookies verwendet und die Zahlungen werden von Stripe verarbeitet – einem PCI-DSS-zertifizierten Anbieter mit hohen Sicherheitsstandards.",
+
+    "question_4": "Wie verwendet man den Dienst&nbsp;?",
+    "reponse_4": "Wählen Sie einfach einen Plan (kostenlos oder kostenpflichtig), erstellen Sie ein Konto und laden Sie Ihre Bilder hoch. Die Verarbeitung startet automatisch und Sie können das Ergebnis innerhalb weniger Sekunden herunterladen. <a class='faq-link' href='/privacy'>Lesen Sie unsere Datenschutzrichtlinie</a>, um mehr über die Nutzung von Bildern zu erfahren.",
+
+    "question_5": "Ist der kostenlose Plan wirklich kostenlos&nbsp;?",
+    "reponse_5": "Ja, vollständig. Einige erweiterte Funktionen sind eingeschränkt, jedoch ist keine Kreditkarte erforderlich und Sie erhalten monatliche Credits, um den Dienst kostenlos zu nutzen.",
+    "question_6": "Werden meine Bilder zum Trainieren von KI-Modellen verwendet&nbsp;?",
+    "reponse_6": "Nein. Unser Partner Replicate, der KI-Modelle zur Bildverarbeitung bereitstellt und hostet, gibt an, dass Bilder nicht zum Trainieren von Modellen verwendet werden. <a class='faq-link' href='/privacy'>Lesen Sie unsere Datenschutzrichtlinie</a> für weitere Informationen.",
+
+    "question_7": "Welche Risiken bestehen für meine personenbezogenen Daten&nbsp;?",
+    "reponse_7": "Kein nennenswertes Risiko. Wir erfassen lediglich Ihre IP-Adresse (zur Absicherung unserer API) sowie Informationen, die Sie freiwillig bereitstellen (Registrierung oder Kontaktformular). Es werden keine sensiblen Daten angefordert oder gespeichert.",
+
+    "question_8": "Wie lange werden meine Bilder gespeichert&nbsp;?",
+    "reponse_8": "Unser Dienst speichert Ihre Bilder nicht. Wir fungieren lediglich als Vermittler zwischen Ihnen und den KI-Verarbeitungsmodellen.",
+
+    "question_9": "Kann ich mein Abonnement jederzeit kündigen&nbsp;?",
+    "reponse_9": "Ja. Sie können Ihr Abonnement jederzeit in Ihrem persönlichen Bereich kündigen. Die Kündigung deaktiviert lediglich die automatische Verlängerung, ohne Ihren Zugriff bis zum Ende des aktuellen Zeitraums zu unterbrechen.",
+
+    "question_10": "Besteht bei einer Kündigung Anspruch auf eine Rückerstattung&nbsp;?",
+    "reponse_10": "Nein. Gemäß unseren Abonnementbedingungen bleiben bereits bezahlte Zeiträume bis zu ihrem Ablauf fällig, auch bei vorzeitiger Kündigung.",
+
+    "question_11": "Wie gut ist die Qualität der erzielten Ergebnisse&nbsp;?",
+    "reponse_11": "Die verwendeten KI-Modelle wurden darauf trainiert, auch bei komplexen Bildern saubere, präzise und professionelle Freistellungen zu erzeugen. Kostenpflichtige Abonnenten profitieren von optimierter Qualität und erweiterten Optionen.",
+
+    "question_12": "Gibt es eine Begrenzung für die Anzahl der Bilder, die ich verarbeiten kann&nbsp;?",
+    "reponse_12": "Ja. Jeder Plan enthält ein monatliches Credit-Kontingent entsprechend der Anzahl der Nutzungen der KI-Tools. Ihr Kontostand kann jederzeit in Ihrem Dashboard eingesehen werden.",
+    "question_13": "Funktioniert der Dienst auf Mobilgeräten&nbsp;?",
+    "reponse_13": "Ja. Unser Dienst ist mit Smartphones, Tablets und Computern kompatibel. Für eine optimale Benutzererfahrung empfehlen wir jedoch die Nutzung auf einem ausreichend großen Bildschirm, um die Bildbearbeitungswerkzeuge vollständig nutzen zu können.",
+
+    "question_14": "Was tun, wenn ein Bild nicht korrekt freigestellt wurde&nbsp;?",
+    "reponse_14": "Sie können es erneut mit einem Bild höherer Qualität versuchen oder unsere Bildbearbeitungswerkzeuge nutzen (je nach Ihrem Plan). Falls das Problem weiterhin besteht, steht Ihnen unser Support gerne zur Verfügung.",
+
+    "question_15": "Bieten Sie eine API an&nbsp;?",
+    "reponse_15": "Eine API wird in Kürze für professionelle Pläne verfügbar sein, um die Hintergrundentfernung in Ihre Anwendungen, Workflows oder E-Commerce-Shops zu integrieren.",
+
+    "question_16": "Werden meine Zahlungsinformationen gespeichert&nbsp;?",
+    "reponse_16": "Nein. Alle Zahlungsdaten werden ausschließlich von Stripe verarbeitet. Wir haben niemals Zugriff darauf und speichern sie nicht."
   },
   "faqPricing": {
-    "question_1": "Puis-je annuler mon Abonnement jederzeit&nbsp;?",
-    "reponse_1": "Oui. Sie können annuler Ihr Abonnement jederzeit depuis Ihr espace personnel. L’annulation désactive simplement le renouvellement automatique. Ihr accès riste actif jusqu’à la fin de la période déjà payée.",
-    "question_2": "L’annulation donne-t-elle Recht à un remboursement&nbsp;?",
-    "reponse_2": "Non. Conformément à unser politique et à la législation applicable, les Abonnements déjà commencés ne sind pas remboursables. Sie speichertz toutefois l’accès au Dienst jusqu’à l’échéance de Ihr Abonnement en cours.",
-    "question_3": "Puis-je changer de formule (upgrade ou downgrade)&nbsp;?",
-    "reponse_3": "Oui. Sie können ändern Ihr Abonnement jederzeit en choisissant une formule supérieure ou inférieure selon Ihre besoins.",
-    "question_4": "Que se passe-t-il si je passe à une formule supérieure&nbsp;?",
-    "reponse_4": "Si vous wählen Sie une formule supérieure, elle ist appliquée immédiatement. Sie bénéficiez alors des avantages du nouveau plan. La date de facturation ist ajustée à la date de souscription du nouvel Abonnement.",
-    "question_5": "Que se passe-t-il si je rétrograde vers une formule inférieure&nbsp;?",
-    "reponse_5": "Le passage à une formule inférieure prend effet au prochain cycle de facturation monatlich. Sie speichertz jusqu’à cette date les Funktionen de Ihr formule actuelle.",
-    "question_6": "Comment fonctionne le Zahlung de l’Abonnement&nbsp;?",
-    "reponse_6": "Le Zahlung ist monatlich et s’effectue par carte bancaire über Stripe, une plateforme sécurisée. Nous ne conservons keine donnée bancaire sensible.",
-    "question_7": "Puis-je tister le Dienst avant de m’abonner&nbsp;?",
-    "reponse_7": "Oui. Un plan kostenlos ist disponible et vous permet de tister la qualité du Dienst avec un nombre begrenzt de Credits monatlichs. Kein numéro de carte bancaire n’ist requis.",
-    "question_8": "Que se passe-t-il si mes Credits monatlichs sind épuisés&nbsp;?",
-    "reponse_8": "Lorsque Ihre Credits sind épuisés, vous ne pouvez plus utiliser le Dienst jusqu’à leur réinitialisation automatique le mois suivant. Sie können également passer à une formule supérieure jederzeit pour obtenir plus de Credits.",
-    "question_9": "L’Abonnement se renouvelle-t-il automatiquement&nbsp;?",
-    "reponse_9": "Oui. L’Abonnement se renouvelle automatiquement chaque mois afin d’assurer la continuité du Dienst. Sie können désactiver le renouvellement depuis Ihr espace personnel.",
-    "question_10": "Puis-je utiliser le Dienst sur plusieurs appareils&nbsp;?",
-    "reponse_10": "Oui. Ihr Abonnement ist lié à Ihr Konto. Sie können accéder au Dienst depuis n’importe quel appareil, à condition d’être connecté."
+    "question_1": "Kann ich mein Abonnement jederzeit kündigen&nbsp;?",
+    "reponse_1": "Ja. Sie können Ihr Abonnement jederzeit in Ihrem persönlichen Bereich kündigen. Die Kündigung deaktiviert lediglich die automatische Verlängerung. Ihr Zugriff bleibt bis zum Ende des bereits bezahlten Zeitraums aktiv.",
+
+    "question_2": "Besteht bei einer Kündigung Anspruch auf eine Rückerstattung&nbsp;?",
+    "reponse_2": "Nein. Gemäß unserer Richtlinie und der geltenden Gesetzgebung sind bereits begonnene Abonnements nicht erstattungsfähig. Sie behalten jedoch bis zum Ablauf Ihres aktuellen Abonnements weiterhin Zugriff auf den Dienst.",
+
+    "question_3": "Kann ich meinen Tarif ändern (Upgrade oder Downgrade)&nbsp;?",
+    "reponse_3": "Ja. Sie können Ihr Abonnement jederzeit ändern und je nach Bedarf einen höheren oder niedrigeren Tarif wählen.",
+
+    "question_4": "Was passiert, wenn ich zu einem höheren Tarif wechsle&nbsp;?",
+    "reponse_4": "Wenn Sie einen höheren Tarif wählen, wird dieser sofort aktiviert. Sie profitieren dann direkt von den Vorteilen des neuen Plans. Das Abrechnungsdatum wird auf das Datum des neuen Abonnements angepasst.",
+
+    "question_5": "Was passiert, wenn ich zu einem niedrigeren Tarif wechsle&nbsp;?",
+    "reponse_5": "Der Wechsel zu einem niedrigeren Tarif wird zum nächsten monatlichen Abrechnungszyklus wirksam. Bis dahin behalten Sie die Funktionen Ihres aktuellen Tarifs.",
+    "question_6": "Wie funktioniert die Zahlung des Abonnements&nbsp;?",
+    "reponse_6": "Die Zahlung erfolgt monatlich per Kreditkarte über Stripe, eine sichere Zahlungsplattform. Wir speichern keine sensiblen Bankdaten.",
+
+    "question_7": "Kann ich den Dienst testen, bevor ich ein Abonnement abschließe&nbsp;?",
+    "reponse_7": "Ja. Ein kostenloser Plan steht zur Verfügung, mit dem Sie die Qualität des Dienstes mit einer begrenzten Anzahl monatlicher Credits testen können. Es ist keine Kreditkartennummer erforderlich.",
+
+    "question_8": "Was passiert, wenn meine monatlichen Credits aufgebraucht sind&nbsp;?",
+    "reponse_8": "Sobald Ihre Credits aufgebraucht sind, können Sie den Dienst bis zur automatischen Zurücksetzung im folgenden Monat nicht mehr nutzen. Sie können außerdem jederzeit zu einem höheren Tarif wechseln, um mehr Credits zu erhalten.",
+
+    "question_9": "Wird das Abonnement automatisch verlängert&nbsp;?",
+    "reponse_9": "Ja. Das Abonnement verlängert sich automatisch jeden Monat, um die Kontinuität des Dienstes sicherzustellen. Sie können die automatische Verlängerung jederzeit in Ihrem persönlichen Bereich deaktivieren.",
+
+    "question_10": "Kann ich den Dienst auf mehreren Geräten nutzen&nbsp;?",
+    "reponse_10": "Ja. Ihr Abonnement ist mit Ihrem Konto verknüpft. Sie können von jedem Gerät aus auf den Dienst zugreifen, sofern Sie angemeldet sind."
   },
   "contact": {
-    "title": "Sie avez des quistions&nbsp;?\nNous vous répondons&nbsp;!",
-    "intro": "Utilisez le formulaire ci-dessous pour nous écrire. Notre équipe vous répondra dans les plus brefs délais, que ce soit pour une assistance technique, une quistion administrative ou toute autre demande liée à nos Diensts."
+    "title": "Haben Sie Fragen&nbsp;?\nWir antworten Ihnen&nbsp;!",
+    "intro": "Verwenden Sie das untenstehende Formular, um uns zu schreiben. Unser Team wird Ihnen schnellstmöglich antworten – sei es bei technischer Unterstützung, administrativen Fragen oder anderen Anliegen rund um unsere Dienstleistungen."
   },
   "pricing": {
-    "title_h1": "Des plans adaptés à&nbsp;chaque&nbsp;contexte&nbsp;de&nbsp;travail.",
-    "title_h2_card": "Changez d’Abonnement en fonction de Ihre&nbsp;attentes.",
-    "intro": "Choisissez un forfait abordable qui&nbsp;comprend les meilleures Funktionen pour&nbsp;Ihre&nbsp;besoins.",
-    "title_h2_tab": "Comparatif des Abonnements",
+    "title_h1": "Pläne, die an&nbsp;jeden&nbsp;Arbeitskontext&nbsp;angepasst&nbsp;sind.",
+    "title_h2_card": "Passen Sie Ihr Abonnement an&nbsp;Ihre&nbsp;Bedürfnisse&nbsp;an.",
+    "intro": "Wählen Sie einen erschwinglichen Tarif mit&nbsp;den besten Funktionen für&nbsp;Ihre&nbsp;Anforderungen.",
+    "title_h2_tab": "Abonnementvergleich",
     "title_h2_faq": "Häufig gestellte Fragen",
-    "currency": "Choix de la devise"
+    "currency": "Währung auswählen"
   },
   "terms": {
-    "title": "Allgemeinen Bedingungen d’Utilisation (CGU)",
-    "intro": "Diese Conditions Génales d’Utilisation (ci-après « CGU »)<br> régissent l’accès et l’utilisation du Dienst Wizpix (ci-après « der Dienst »).<br> En utilisant der Dienst, der Nutzer reconnaît avoir pris connaissance des présentes conditions <br>et les accepter sans réserve.",
-    "article1_title": "1. Objet du Service",
-    "article1_text": "Wizpix stellt bereit un Dienst en ligne mit dem verarbeiten des Bilds über des modèles d’künstliche Intelligenz afin de löschen ou ändern l’Hintergrund.\n\nDer Dienst agit comme un intermédiaire technique entre der Nutzer et des pristataires tiers fournissant des modèles d’IA.",
-    "article2_title": "2. Accès au Service",
-    "article2_text": "L’accès au Service ist réservé aux personnes majeures ou disposant d’une autorisation légale.\n\nLa création d’un Konto ist nécessaire pour accéder à certaines Funktionen. Der Nutzer s’engage à fournir des Informationen exactes et à assurer la Datenschutz de ses identifiants.\n\nToute activité effectuée über le Konto de der Nutzer ist réputée avoir été réalisée par celui-ci.",
-    "article3_title": "3. Contenu et responsabilité de der Nutzer",
-    "article3_text": "Der Nutzer ist seul responsable des contenus qu’il utilise über der Dienst.\n\nIl s’interdit strictement d’utiliser der Dienst pour verarbeiten des contenus :\n- illégaux, violents, haineux ou contraires à l’ordre public,\n- portant atteinte aux Rechte de tiers (Recht à l’Bild, Recht d’auteur, propriété intellectuelle),\n- non conformes aux lois applicables.\n\nWizpix kann suspendre ou löschen tout Konto en cas de violation des présentes conditions et signaler toute activité illégale aux autorités compétentes.",
-    "article4_title": "4. Traitement des Bilds",
-    "article4_text": "Les Bilds sind transmises à des pristataires tiers spécialisés (notamment Replicate, États-Unis) über une API sécurisée afin d’être traitées.\n\nWizpix ne stocke keine Bild et n’en speichert keine copie après Verarbeitung.\n\nKeine donnée permettant d’identifier der Nutzer n’ist transmise avec les Bilds.\n\nDer Nutzer reconnaît que le Verarbeitung ist automatisé et que les résultats können varier selon la qualité des Bilds et les modèles utilisés.",
-    "article5_title": "5. Droits sur les Bilds",
-    "article5_text": "Der Nutzer speichert l’intégralité des Rechte sur les Bilds qu’il soumet ainsi que sur les résultats générés.\n\nIl ist libre d’utiliser les Bilds traitées sans ristriction, y compris à des fins commerciales (site e-commerce, marketing, communication, etc.).\n\nWizpix ne revendique kein Recht de propriété sur les contenus traités.",
-    "article6_title": "6. Utilisation du Service",
-    "article6_text": "Der Dienst ist fourni pour un usage légal.\n\nToute utilisation abusive, notamment automatisée, frauduleuse ou visant à contourner les limitations du Service, ist interdite.\n\nWizpix se réserve le Recht de limiter, suspendre ou interrompre l’accès au Service en cas d’abus ou pour des raisons techniques.",
-    "article7_title": "7. Abonnements et Zahlung",
-    "article7_text": "Certaines Funktionen du Service sind accessibles über des Abonnements kostenpflichtigs.\n\nLes Zahlungs sind traités par un pristataire tiers (Stripe). Wizpix n’a kein accès aux Daten de Zahlung.\n\nLes Abonnements sind reconduits automatiquement sauf résiliation.\n\nSauf disposition légale contraire, les sommes versées ne sind pas remboursables.",
-    "article8_title": "8. Données personnelles",
-    "article8_text": "Wizpix erhebt uniquement les Daten nécessaires au fonctionnement du Service (email, mot de passe chiffré, Daten de contact).\n\nKeine Bild n’ist stockée.\n\nPour plus d’Informationen, der Nutzer ist invité à einsehen la <a class='faq-link' href='/privacy'>Politique de Datenschutz.</a>",
-    "article9_title": "9. Propriété intellectuelle",
-    "article9_text": "Der Dienst, son code, son interface et ses technologies sind protégés par les lois sur la propriété intellectuelle.\n\nToute reproduction, modification ou exploitation non autorisée ist interdite.\n\nDer Nutzer speichert ses Rechte sur ses contenus.",
-    "article10_title": "10. Responsabilité",
-    "article10_text": "Der Dienst ist fourni « tel quel ».\n\nWizpix ne garantit pas un fonctionnement ininterrompu ou exempt d’erreur.\n\nDans les limites autorisées par la loi, Wizpix ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service, y compris en cas de perte de Daten ou de résultats non conformes.",
-    "article11_title": "11. Suspension et résiliation",
-    "article11_text": "Wizpix kann suspendre ou résilier un Konto en cas de violation des présentes CGU ou d’utilisation abusive du Service.\n\nLa résiliation ne donne lieu à kein remboursement des périodes déjà payées.",
-    "article12_title": "12. Droit applicable",
-    "article12_text": "Diese CGU sind régies par le Recht Schweizer.\n\nEn cas de litige, les zuständige Gerichte du canton de Vaud sind seuls compétents, sauf disposition légale impérative contraire.",
-    "article13_title": "13. Modifications",
-    "article13_text": "Wizpix se réserve le Recht de ändern les présentes CGU jederzeit. La version applicable ist celle publiée sur le site.",
-    "conclusion": "En utilisant der Dienst, der Nutzer reconnaît accepter pleinement les présentes CGU."
+    "title": "Allgemeine Nutzungsbedingungen (AGB)",
+
+    "intro": "Diese Allgemeinen Nutzungsbedingungen (nachfolgend „AGB“)<br> regeln den Zugang und die Nutzung des Wizpix-Dienstes (nachfolgend „der Dienst“).<br> Durch die Nutzung des Dienstes bestätigt der Nutzer, die vorliegenden Bedingungen gelesen zu haben <br>und sie vorbehaltlos zu akzeptieren.",
+
+    "article1_title": "1. Zweck des Dienstes",
+    "article1_text": "Wizpix bietet einen Online-Dienst zur Verarbeitung von Bildern mithilfe von Modellen künstlicher Intelligenz an, um Hintergründe zu entfernen oder zu verändern.\n\nDer Dienst fungiert als technischer Vermittler zwischen dem Nutzer und Drittanbietern, die KI-Modelle bereitstellen.",
+
+    "article2_title": "2. Zugang zum Dienst",
+    "article2_text": "Der Zugang zum Dienst ist volljährigen Personen oder Personen mit entsprechender gesetzlicher Genehmigung vorbehalten.\n\nFür den Zugriff auf bestimmte Funktionen ist die Erstellung eines Kontos erforderlich. Der Nutzer verpflichtet sich, korrekte Angaben bereitzustellen und die Vertraulichkeit seiner Zugangsdaten sicherzustellen.\n\nAlle Aktivitäten, die über das Benutzerkonto durchgeführt werden, gelten als vom Nutzer selbst vorgenommen.",
+
+    "article3_title": "3. Inhalte und Verantwortung des Nutzers",
+    "article3_text": "Der Nutzer ist allein verantwortlich für die Inhalte, die er über den Dienst verwendet.\n\nEs ist strengstens untersagt, den Dienst zur Verarbeitung folgender Inhalte zu verwenden:\n- illegale, gewalttätige, hasserfüllte oder gegen die öffentliche Ordnung verstoßende Inhalte,\n- Inhalte, die Rechte Dritter verletzen (Recht am eigenen Bild, Urheberrecht, geistiges Eigentum),\n- Inhalte, die nicht den geltenden Gesetzen entsprechen.\n\nWizpix kann Konten bei Verstößen gegen diese Bedingungen sperren oder löschen und illegale Aktivitäten den zuständigen Behörden melden.",
+
+    "article4_title": "4. Bildverarbeitung",
+    "article4_text": "Die Bilder werden über eine sichere API an spezialisierte Drittanbieter (insbesondere Replicate, USA) übermittelt und verarbeitet.\n\nWizpix speichert keine Bilder und behält nach der Verarbeitung keine Kopien.\n\nEs werden keine Daten übertragen, die eine Identifizierung des Nutzers ermöglichen.\n\nDer Nutzer erkennt an, dass die Verarbeitung automatisiert erfolgt und die Ergebnisse je nach Bildqualität und verwendeten Modellen variieren können.",
+
+    "article5_title": "5. Rechte an Bildern",
+    "article5_text": "Der Nutzer behält sämtliche Rechte an den eingereichten Bildern sowie an den generierten Ergebnissen.\n\nEr kann die verarbeiteten Bilder uneingeschränkt verwenden, einschließlich kommerzieller Zwecke (E-Commerce, Marketing, Kommunikation usw.).\n\nWizpix erhebt keinerlei Eigentumsansprüche auf die verarbeiteten Inhalte.",
+
+    "article6_title": "6. Nutzung des Dienstes",
+    "article6_text": "Der Dienst wird ausschließlich für rechtmäßige Zwecke bereitgestellt.\n\nJegliche missbräuchliche Nutzung, insbesondere automatisierte, betrügerische oder auf die Umgehung der Dienstbeschränkungen gerichtete Nutzung, ist untersagt.\n\nWizpix behält sich das Recht vor, den Zugang zum Dienst bei Missbrauch oder aus technischen Gründen einzuschränken, auszusetzen oder zu unterbrechen.",
+    "article7_title": "7. Abonnements und Zahlungen",
+    "article7_text": "Bestimmte Funktionen des Dienstes sind über kostenpflichtige Abonnements zugänglich.\n\nDie Zahlungen werden über einen Drittanbieter (Stripe) abgewickelt. Wizpix hat keinen Zugriff auf Zahlungsdaten.\n\nAbonnements verlängern sich automatisch, sofern sie nicht gekündigt werden.\n\nSofern gesetzlich nichts anderes vorgeschrieben ist, sind geleistete Zahlungen nicht erstattungsfähig.",
+
+    "article8_title": "8. Personenbezogene Daten",
+    "article8_text": "Wizpix erhebt ausschließlich die für den Betrieb des Dienstes erforderlichen Daten (E-Mail-Adresse, verschlüsseltes Passwort, Kontaktdaten).\n\nEs werden keine Bilder gespeichert.\n\nWeitere Informationen finden Nutzer in der <a class='faq-link' href='/privacy'>Datenschutzrichtlinie.</a>",
+
+    "article9_title": "9. Geistiges Eigentum",
+    "article9_text": "Der Dienst, sein Quellcode, seine Benutzeroberfläche und seine Technologien sind durch Gesetze zum Schutz geistigen Eigentums geschützt.\n\nJegliche unbefugte Vervielfältigung, Änderung oder Nutzung ist untersagt.\n\nDer Nutzer behält seine Rechte an seinen Inhalten.",
+
+    "article10_title": "10. Haftung",
+    "article10_text": "Der Dienst wird „wie besehen“ bereitgestellt.\n\nWizpix garantiert keinen unterbrechungsfreien oder fehlerfreien Betrieb.\n\nIm gesetzlich zulässigen Umfang haftet Wizpix nicht für direkte oder indirekte Schäden, die aus der Nutzung des Dienstes entstehen, einschließlich Datenverlust oder nicht erwartungsgemäßer Ergebnisse.",
+
+    "article11_title": "11. Sperrung und Kündigung",
+    "article11_text": "Wizpix kann ein Konto bei Verstößen gegen diese AGB oder missbräuchlicher Nutzung des Dienstes sperren oder kündigen.\n\nEine Kündigung berechtigt nicht zur Rückerstattung bereits bezahlter Zeiträume.",
+
+    "article12_title": "12. Anwendbares Recht",
+    "article12_text": "Diese AGB unterliegen schweizerischem Recht.\n\nIm Streitfall sind ausschließlich die Gerichte des Kantons Waadt zuständig, sofern keine zwingenden gesetzlichen Bestimmungen etwas anderes vorsehen.",
+
+    "article13_title": "13. Änderungen",
+    "article13_text": "Wizpix behält sich das Recht vor, diese AGB jederzeit zu ändern. Maßgeblich ist die jeweils auf der Website veröffentlichte Version.",
+
+    "conclusion": "Durch die Nutzung des Dienstes bestätigt der Nutzer, diese AGB vollständig zu akzeptieren."
   },
   "privacy": {
-    "title": "Datenschutzerklärung",
-    "intro": "La présente politique de Datenschutz décrit la manière dont Wizpix erhebt, utilise et protège les personenbezogene Daten dans le cadre de l’utilisation de son Dienst de suppression d’Hintergrund d’Bilds. Wizpix adopte une approche de minimisation des Daten et de transparence (« privacy by design »).",
-    "article1_title": "1. Responsable du Verarbeitung",
-    "article1_text": "Wizpix agit en tant que responsable du Verarbeitung des personenbezogene Daten au sens du Règlement Général sur la Protection des Données (RGPD) et de la législation Schweizer applicable (LPD).\n\nCertains pristataires interviennent en tant que responsables de Verarbeitung indépendants ou sous-traitants, tels que décrits ci-dessous.",
-    "article2_title": "2. Données collectées",
-    "article2_text": "Wizpix erhebt uniquement les Daten strictement nécessaires à la stellt bereiture du Dienst :\n\n- Adresse e-mail (création de Konto)\n- Mot de passe (stocké sous forme chiffrée)\n- Données transmises volontairement über le formulaire de contact\n- Adresse IP (à des fins de Sicherheit)\n\nKeine donnée de Zahlung n’ist collectée ni stockée par Wizpix.\n\nKeine Bild n’ist stockée sur les serveurs de Wizpix.",
-    "article3_title": "3. Paiement (Stripe)",
-    "article3_text": "Les Zahlungs sind traités directement par Stripe, qui agit en tant que responsable de Verarbeitung indépendant.\n\nLes Informationen de Zahlung sind saisies directement par der Nutzer sur l’interface sécurisée de Stripe. Wizpix erhebt uniquement le prénom et le nom transmis über Stripe lors du Zahlung, exclusivement à des fins d’amélioration de l’expérience Nutzer (UX).\n\nPour plus d’Informationen : <a class='faq-link' href='https://stripe.com/privacy'>https://stripe.com.privacy</a>",
-    "article4_title": "4. Traitement des Bilds (Replicate)",
-    "article4_text": "Wizpix agit comme un intermédiaire technique entre der Nutzer et des modèles d’künstliche Intelligenz fournis par Replicate, Inc. (États-Unis).\n\nLes Bilds sind transmises über une API sécurisée exclusivement pour leur Verarbeitung, puis immédiatement renvoyées à der Nutzer.\n\nKeine donnée permettant d’identifier der Nutzer (telle que l’adresse e-mail ou les Informationen de Konto) n’ist transmise avec les Bilds.\n\nSelon la documentation publique de Replicate, les Daten traitées über leur API ne sind pas utilisées pour entraîner des modèles publics et sind conservées uniquement le temps nécessaire au Verarbeitung.\n\nWizpix ne contrôle pas les Verarbeitungs effectués par Replicate, qui agit en tant que sous-traitant ou pristataire technique.\n\nPour plus d’Informationen : <a class='faq-link' href='https://replicate.com/privacy'>https://replicate.com/privacy</a>",
-    "article5_title": "5. Finalités du Verarbeitung",
-    "article5_text": "Les Daten sind utilisées exclusivement pour :\n\n- Fournir et faire fonctionner le Dienst\n- Gérer les Kontos Nutzers\n- Répondre aux demandes über le support\n- Assurer la Sicherheit et l’intégrité du Dienst\n\nKeine donnée n’ist utilisée à des fins publicitaires, de profilage ou de suivi.",
-    "article6_title": "6. Base légale",
-    "article6_text": "Le Verarbeitung repose sur :\n\n- L’exécution du Dienst (contrat)\n- Le consentement de der Nutzer (création de Konto, contact)\n- L’intérêt légitime (Sicherheit du Dienst)",
+    "title": "Datenschutzrichtlinie",
+
+    "intro": "Diese Datenschutzrichtlinie beschreibt, wie Wizpix personenbezogene Daten im Rahmen der Nutzung seines Dienstes zur Entfernung von Bildhintergründen erhebt, verwendet und schützt. Wizpix verfolgt einen Ansatz der Datenminimierung und Transparenz („Privacy by Design“).",
+
+    "article1_title": "1. Verantwortlicher für die Datenverarbeitung",
+    "article1_text": "Wizpix handelt als Verantwortlicher für die Verarbeitung personenbezogener Daten im Sinne der Datenschutz-Grundverordnung (DSGVO) sowie des anwendbaren schweizerischen Datenschutzgesetzes (DSG).\n\nBestimmte Dienstleister agieren als eigenständige Verantwortliche oder Auftragsverarbeiter, wie unten beschrieben.",
+
+    "article2_title": "2. Erhobene Daten",
+    "article2_text": "Wizpix erhebt ausschließlich Daten, die für die Bereitstellung des Dienstes unbedingt erforderlich sind:\n\n- E-Mail-Adresse (Kontoerstellung)\n- Passwort (verschlüsselt gespeichert)\n- Freiwillig über das Kontaktformular übermittelte Daten\n- IP-Adresse (zu Sicherheitszwecken)\n\nEs werden keine Zahlungsdaten von Wizpix erhoben oder gespeichert.\n\nEs werden keine Bilder auf den Servern von Wizpix gespeichert.",
+
+    "article3_title": "3. Zahlung (Stripe)",
+    "article3_text": "Zahlungen werden direkt von Stripe verarbeitet, das als eigenständiger Verantwortlicher handelt.\n\nDie Zahlungsinformationen werden vom Nutzer direkt über die sichere Stripe-Oberfläche eingegeben. Wizpix erhebt ausschließlich Vor- und Nachname, die über Stripe beim Zahlungsvorgang übermittelt werden, und dies ausschließlich zur Verbesserung der Benutzererfahrung (UX).\n\nWeitere Informationen: <a class='faq-link' href='https://stripe.com/privacy'>https://stripe.com/privacy</a>",
+
+    "article4_title": "4. Bildverarbeitung (Replicate)",
+    "article4_text": "Wizpix fungiert als technischer Vermittler zwischen dem Nutzer und KI-Modellen von Replicate, Inc. (USA).\n\nDie Bilder werden ausschließlich über eine sichere API zur Verarbeitung übermittelt und anschließend sofort an den Nutzer zurückgesendet.\n\nEs werden keine Daten übertragen, die eine Identifizierung des Nutzers ermöglichen (wie E-Mail-Adresse oder Kontoinformationen).\n\nLaut der öffentlichen Dokumentation von Replicate werden über deren API verarbeitete Daten nicht zum Training öffentlicher Modelle verwendet und nur so lange gespeichert, wie es für die Verarbeitung erforderlich ist.\n\nWizpix kontrolliert die von Replicate durchgeführten Verarbeitungen nicht; Replicate handelt als Auftragsverarbeiter oder technischer Dienstleister.\n\nWeitere Informationen: <a class='faq-link' href='https://replicate.com/privacy'>https://replicate.com/privacy</a>",
+
+    "article5_title": "5. Zwecke der Verarbeitung",
+    "article5_text": "Die Daten werden ausschließlich verwendet für:\n\n- Bereitstellung und Betrieb des Dienstes\n- Verwaltung von Benutzerkonten\n- Beantwortung von Supportanfragen\n- Gewährleistung der Sicherheit und Integrität des Dienstes\n\nEs werden keine Daten für Werbung, Profiling oder Tracking verwendet.",
+
+    "article6_title": "6. Rechtsgrundlage",
+    "article6_text": "Die Verarbeitung basiert auf:\n\n- Der Erfüllung des Dienstes (Vertrag)\n- Der Einwilligung des Nutzers (Kontoerstellung, Kontakt)\n- Dem berechtigten Interesse (Sicherheit des Dienstes)",
     "article7_title": "7. Cookies",
-    "article7_text": "Wizpix utilise uniquement un cookie strictement nécessaire au fonctionnement du Dienst. Ce cookie permet de maintenir la session Nutzer.\n\nKein cookie de suivi, d’analyse ou publicitaire n’ist utilisé.",
-    "article8_title": "8. Conservation des Daten",
-    "article8_text": "Les Daten sind conservées uniquement pendant la durée nécessaire :\n\n- Données de Konto : jusqu’à suppression du Konto\n- Données de contact : durée begrenzte au Verarbeitung de la demande\n- Images : keine conservation par Wizpix",
-    "article9_title": "9. Partage des Daten",
-    "article9_text": "Les personenbezogene Daten ne sind jamais vendues.\n\nLes seules interactions avec des tiers sind :\n- Stripe : Verarbeitung des Zahlungs (directement über leur interface)\n- Replicate : Verarbeitung des Bilds uniquement\n\nKeine autre donnée personnelle n’ist transmise à des tiers.",
-    "article10_title": "10. Transferts internationaux",
-    "article10_text": "L’utilisation du Dienst kann impliquer un transfert de Daten vers des pristataires situés hors de l’Union européenne, notamment aux États-Unis (Replicate).\n\nCes transferts sind begrenzts aux Daten strictement nécessaires au Verarbeitung technique (Bilds uniquement) et s’effectuent über des connexions sécurisées.",
-    "article11_title": "11. Sécurité",
-    "article11_text": "Wizpix met en œuvre des mesures techniques et organisationnelles adaptées, notamment :\n\n- Chiffrement des communications (HTTPS)\n- Stockage sécurisé des mots de passe\n- Accès begrenzt aux Daten\n\nToutefois, kein système ne kann garantir une Sicherheit absolue.",
-    "article12_title": "12. Droits de der Nutzer",
-    "article12_text": "Conformément au RGPD, vous disposez des Rechte suivants :\n\n- Accès à Ihre Daten\n- Rectification ou suppression\n- Limitation ou opposition au Verarbeitung\n\nSie können exercer ces Rechte über le formulaire de contact.",
-    "article13_title": "13. Modifications",
-    "article13_text": "Wizpix kann ändern cette politique jederzeit. La version applicable ist celle publiée sur le site.",
-    "conclusion": "Wizpix s’engage à erhebtr le minimum de Daten, à être transparent sur leur utilisation et à protéger la vie privée de ses Nutzers."
+    "article7_text": "Wizpix verwendet ausschließlich ein Cookie, das für den Betrieb des Dienstes unbedingt erforderlich ist. Dieses Cookie dient der Aufrechterhaltung der Benutzersitzung.\n\nEs werden keine Tracking-, Analyse- oder Werbe-Cookies verwendet.",
+
+    "article8_title": "8. Datenspeicherung",
+    "article8_text": "Die Daten werden nur so lange gespeichert, wie es erforderlich ist:\n\n- Kontodaten: bis zur Löschung des Kontos\n- Kontaktdaten: begrenzte Dauer zur Bearbeitung der Anfrage\n- Bilder: keine Speicherung durch Wizpix",
+
+    "article9_title": "9. Datenweitergabe",
+    "article9_text": "Personenbezogene Daten werden niemals verkauft.\n\nDie einzigen Interaktionen mit Dritten sind:\n- Stripe: Zahlungsabwicklung (direkt über deren Oberfläche)\n- Replicate: ausschließlich Bildverarbeitung\n\nEs werden keine weiteren personenbezogenen Daten an Dritte weitergegeben.",
+
+    "article10_title": "10. Internationale Datenübertragungen",
+    "article10_text": "Die Nutzung des Dienstes kann die Übertragung von Daten an Dienstleister außerhalb der Europäischen Union beinhalten, insbesondere in die Vereinigten Staaten (Replicate).\n\nDiese Übertragungen beschränken sich auf die für die technische Verarbeitung unbedingt erforderlichen Daten (nur Bilder) und erfolgen über sichere Verbindungen.",
+
+    "article11_title": "11. Sicherheit",
+    "article11_text": "Wizpix setzt geeignete technische und organisatorische Maßnahmen um, insbesondere:\n\n- Verschlüsselung der Kommunikation (HTTPS)\n- Sichere Speicherung von Passwörtern\n- Eingeschränkter Datenzugriff\n\nDennoch kann kein System absolute Sicherheit garantieren.",
+
+    "article12_title": "12. Rechte des Nutzers",
+    "article12_text": "Gemäß DSGVO verfügen Sie über folgende Rechte:\n\n- Zugriff auf Ihre Daten\n- Berichtigung oder Löschung\n- Einschränkung oder Widerspruch gegen die Verarbeitung\n\nSie können diese Rechte über das Kontaktformular ausüben.",
+
+    "article13_title": "13. Änderungen",
+    "article13_text": "Wizpix kann diese Richtlinie jederzeit ändern. Maßgeblich ist die auf der Website veröffentlichte Version.",
+
+    "conclusion": "Wizpix verpflichtet sich, nur ein Minimum an Daten zu erheben, transparent über deren Nutzung zu informieren und die Privatsphäre seiner Nutzer zu schützen."
   },
   "legal": {
-    "title": "Mentions Légales",
-    "intro": "Diese mentions légales ont pour objet de définir les Informationen relatives à l’éditeur, à l’hébergeur et aux conditions générales d’utilisation du site 'wizpix' de suppression d’Hintergrund d’Bilds (ci-après « der Dienst »).",
-    "article1_title": "1. Éditeur du site",
-    "article1_text": "Le site et der Dienst sind édités par :\n\nRaison sociale : Helveclick \nAdresse du siège social : Helveclick Chemin du Mont Paisible 1 3963 Crans-Montana\nNuméro d’identification IDE : CHE-443.826.915\nAdresse e-mail de contact : <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a> \nResponsable de la publication : Helveclick \n\nL’éditeur ist responsable du contenu publié sur le site et de la gistion du Service.",
-    "article2_title": "2. Hébergeur du site",
-    "article2_text": "Nom de l’hébergeur : PlanetHoster \nSiège Social (Québec) : 4416 Louis-B.-Mayer, Laval, Québec, H7P 0G1, Canada  \nSite web : https://www.planethoster.ch/fr \n  Tel: (FR) +33 1 59 12 00 07 -- (CH) +41 22 51 80 559 -- (CA) +1 855 774-4678 \n\nL’hébergeur assure la disponibilité technique du Service conformément à ses conditions générales.",
-    "article3_title": "3. Propriété intellectuelle",
-    "article3_text": "L’ensemble du contenu du site et du Service, y compris, sans limitation, les textes, Bilds, graphismes, logos, icônes, sons, vidéos, codes sources et algorithmes, ist la propriété exclusive du Anbieter, sauf mention contraire.\n\nToute reproduction, représentation, modification, publication, transmission ou adaptation de tout ou partie du contenu du site, quel que soit le moyen ou le procédé utilisé, ist interdite sans autorisation écrite préalable du Anbieter.\n\nToute utilisation non autorisée constitue une violation des Rechte de propriété intellectuelle et kann entraîner des poursuites judiciaires conformément au Recht Schweizer et européen.",
-    "article4_title": "4. Responsabilité",
-    "article4_text": "Le Anbieter s’efforce d’assurer l’exactitude et la mise à jour des Informationen publiées sur le site. Toutefois, il ne saurait être tenu responsable des erreurs, omissions, interruptions ou indisponibilités temporaires du Service.\n\nDer Nutzer reconnaît utiliser der Dienst sous sa responsabilité exclusive. Le Anbieter ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service, y compris la perte de Daten ou la détérioration de Dateis.\n\nDer Nutzer ist seul responsable du contenu qu’il téléverse über der Dienst. Tout contenu illicite (notamment à caractère pédopornographique, violent, haineux ou contraire aux lois Schweizers et européennes) ist strictement interdit et pourra faire l’objet d’un signalement aux autorités compétentes.",
-    "article5_title": "5. Données personnelles",
-    "article5_text": "Le Verarbeitung des personenbezogene Daten ist régi par la <a class=\"faq-link\" href=\"/privacy\">Politique de Confidentialité</a>, consultable jederzeit sur le site. Celle-ci détaille la nature des Daten collectées, leur finalité, leur durée de conservation ainsi que les Rechte de der Nutzer conformément au RGPD et à la LPD.",
-    "article5_link": "Consultez unser politique de Datenschutz",
-    "article6_title": "6. Liens externes",
-    "article6_text": "Le site kann contenir des liens hypertextes vers d’autres sites web. Le Anbieter ne kann être tenu responsable du contenu, de la Sicherheit ou des pratiques de Datenschutz de ces sites tiers. L’accès à ces sites s’effectue sous la seule responsabilité de der Nutzer.",
-    "article7_title": "7. Sécurité du site",
-    "article7_text": "Le Anbieter met en œuvre toutes les mesures techniques nécessaires pour sécuriser l’accès et l’utilisation du Service. Cependant, der Nutzer ist informé que la Sicherheit absolue sur Internet n’existe pas. Il lui appartient de protéger ses équipements et ses Daten (mots de passe, Dateis, logiciels).",
-    "article8_title": "8. Droit applicable et juridiction compétente",
-    "article8_text": "Diese mentions légales sind régies par le Recht Schweizer. En cas de litige, et sauf disposition légale impérative contraire, les zuständige Gerichte du canton du Valais seront seuls compétents.",
-    "article9_title": "9. Contact",
-    "article9_text": "Pour toute quistion relative au site, à son contenu ou à ses conditions d’utilisation, vous pouvez contacter l’éditeur über le <a class=\"faq-link\" href=\"/contact\">formulaire de contact du site </a> ou par e-mail à <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\"> info@helveclick.ch </a>.",
-    "conclusion": "En accédant au site et en utilisant der Dienst, der Nutzer reconnaît avoir pris connaissance des présentes mentions légales et les accepte sans réserve."
-  },
+  "title": "Impressum",
+  "intro": "Dieses Impressum dient dazu, Informationen über den Herausgeber, den Hosting-Anbieter sowie die allgemeinen Nutzungsbedingungen der Website für die Hintergrundentfernung (nachfolgend „der Dienst“) bereitzustellen.",
+
+  "article1_title": "1. Herausgeber der Website",
+  "article1_text": "Die Website und der Dienst werden veröffentlicht von:\n\nFirmenname: Helveclick\nSitz: Helveclick, Chemin du Mont Paisible 1, 3963 Crans-Montana, Schweiz\nUnternehmens-ID IDE: CHE-443.826.915\nKontakt-E-Mail: <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>\nVerantwortlich für die Veröffentlichung: Helveclick\n\nDer Herausgeber ist für die auf der Website veröffentlichten Inhalte sowie die Verwaltung des Dienstes verantwortlich.",
+
+  "article2_title": "2. Hosting-Anbieter der Website",
+  "article2_text": "Hosting-Anbieter: PlanetHoster \nHauptsitz (Quebec): 4416 Louis-B.-Mayer, Laval, Quebec, H7P 0G1, Kanada \nWebsite: https://www.planethoster.ch/en \nTel: (FR) +33 1 59 12 00 07 -- (CH) +41 22 51 80 559 -- (CA) +1 855 774-4678 \n\nDer Hosting-Anbieter gewährleistet die technische Verfügbarkeit des Dienstes gemäß seinen allgemeinen Geschäftsbedingungen.",
+
+  "article3_title": "3. Geistiges Eigentum",
+  "article3_text": "Sämtliche Inhalte der Website und des Dienstes, einschließlich, aber nicht beschränkt auf Texte, Bilder, Grafiken, Logos, Symbole, Audioinhalte, Videos, Quellcode und Algorithmen, sind ausschließliches Eigentum des Anbieters, sofern nicht anders angegeben.\n\nJegliche Vervielfältigung, Darstellung, Änderung, Veröffentlichung, Übertragung oder Anpassung der Inhalte der Website, ganz oder teilweise und unabhängig vom Verfahren, ist ohne vorherige schriftliche Genehmigung des Anbieters untersagt.\n\nJede unbefugte Nutzung stellt eine Verletzung geistiger Eigentumsrechte dar und kann gemäß schweizerischem und europäischem Recht rechtliche Schritte nach sich ziehen.",
+
+  "article4_title": "4. Haftung",
+  "article4_text": "Der Anbieter bemüht sich um die Richtigkeit und regelmäßige Aktualisierung der auf der Website veröffentlichten Informationen. Dennoch kann der Anbieter nicht für Fehler, Auslassungen, Unterbrechungen oder vorübergehende Nichtverfügbarkeit des Dienstes haftbar gemacht werden.\n\nDer Nutzer erkennt an, dass die Nutzung des Dienstes auf eigenes Risiko erfolgt. Der Anbieter haftet nicht für direkte oder indirekte Schäden, die sich aus der Nutzung des Dienstes ergeben, einschließlich Datenverlust oder Dateibeschädigungen.\n\nDer Nutzer ist allein verantwortlich für die Inhalte, die er über den Dienst hochlädt. Jegliche rechtswidrigen Inhalte (einschließlich, aber nicht beschränkt auf pädokriminelle, gewalttätige, hasserfüllte oder gegen schweizerisches und europäisches Recht verstoßende Inhalte) sind streng untersagt und können den zuständigen Behörden gemeldet werden.",
+
+  "article5_title": "5. Personenbezogene Daten",
+  "article5_text": "Die Verarbeitung personenbezogener Daten wird durch die <a class=\"faq-link\" href=\"/privacy\">Datenschutzrichtlinie</a> geregelt, die jederzeit auf der Website eingesehen werden kann. Sie beschreibt die Art der erhobenen Daten, die Zwecke der Verarbeitung, die Aufbewahrungsfristen sowie die Rechte der Nutzer gemäß DSGVO und dem schweizerischen Datenschutzgesetz (DSG).",
+  "article5_link": "Unsere Datenschutzrichtlinie lesen",
+
+  "article6_title": "6. Externe Links",
+  "article6_text": "Die Website kann Hyperlinks zu anderen Websites enthalten. Der Anbieter übernimmt keine Verantwortung für Inhalte, Sicherheit oder Datenschutzpraktiken solcher Drittseiten. Der Zugriff auf diese Seiten erfolgt auf alleinige Verantwortung des Nutzers.",
+
+  "article7_title": "7. Sicherheit der Website",
+  "article7_text": "Der Anbieter setzt alle erforderlichen technischen Maßnahmen um, um den Zugang und die Nutzung des Dienstes zu sichern. Der Nutzer wird jedoch darauf hingewiesen, dass absolute Sicherheit im Internet nicht existiert. Es liegt in der Verantwortung des Nutzers, seine Geräte und Daten (Passwörter, Dateien, Software) zu schützen.",
+
+  "article8_title": "8. Anwendbares Recht und Gerichtsstand",
+  "article8_text": "Dieses Impressum unterliegt schweizerischem Recht. Im Streitfall und sofern keine zwingenden gesetzlichen Bestimmungen entgegenstehen, sind ausschließlich die Gerichte des Kantons Wallis zuständig.",
+
+  "article9_title": "9. Kontakt",
+  "article9_text": "Bei Fragen zur Website, ihren Inhalten oder Nutzungsbedingungen können Sie den Herausgeber über das <a class=\"faq-link\" href=\"/contact\">Kontaktformular der Website</a> oder per E-Mail unter <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a> kontaktieren.",
+
+  "conclusion": "Durch den Zugriff auf die Website und die Nutzung des Dienstes bestätigt der Nutzer, dieses Impressum gelesen und vorbehaltlos akzeptiert zu haben."
+},
   "cgv": {
-    "title": "Allgemeinen Bedingungen de Vente (CGV)",
-    "intro": "Diese Allgemeinen Bedingungen de Vente (ci-après « CGV »)<br> régissent les relations contractuelles entre Wizpix (ci-après « le Anbieter »)<br> et tout Nutzer souscrivant à une offre kostenpflichtige (ci-après « le Kunde »).<br> En souscrivant un Abonnement, le Kunde accepte les présentes CGV sans réserve.",
-    "article1_title": "1. Objet",
-    "article1_text": "Wizpix propose un Dienst en ligne de Verarbeitung d’Bilds über künstliche Intelligenz, accessible sous forme d’Abonnement (Software as a Service).",
+    "title": "Allgemeine Verkaufsbedingungen (AVB)",
+
+    "intro": "Diese Allgemeinen Verkaufsbedingungen (nachfolgend „AVB“)<br> regeln die Vertragsbeziehungen zwischen Wizpix (nachfolgend „der Anbieter“)<br> und jedem Nutzer, der ein kostenpflichtiges Angebot abonniert (nachfolgend „der Kunde“).<br> Mit Abschluss eines Abonnements akzeptiert der Kunde diese AVB vorbehaltlos.",
+
+    "article1_title": "1. Gegenstand",
+    "article1_text": "Wizpix bietet einen Online-Dienst zur Bildverarbeitung mittels künstlicher Intelligenz an, der als Abonnementmodell (Software as a Service) verfügbar ist.",
+
     "article2_title": "2. Abonnement",
-    "article2_text": "Der Dienst ist proposé sous forme d’Abonnements monatlichs.\n\nChaque Abonnement donne accès à un certain nombre de Credits monatlichs permettant d’utiliser les Funktionen du Service.\n\nLes Credits sind personnels, non transférables et non cumulables d’un mois sur l’autre.",
-    "article3_title": "3. Crédits et limitations",
-    "article3_text": "Chaque action de Verarbeitung consomme un crédit.\n\nUne fois le quota monatlich de Credits épuisé, les Funktionen kostenpflichtiges ne sind plus accessibles jusqu’à la réinitialisation monatlichle.\n\nLe Kunde kann toutefois continuer à utiliser les Funktionen kostenloses éventuellement disponibles.",
-    "article4_title": "4. Durée et renouvellement",
-    "article4_text": "L’Abonnement ist conclu pour une durée monatlichle et ist renouvelé automatiquement à chaque échéance, sauf résiliation par le Kunde.\n\nLe Kunde kann résilier jederzeit. La résiliation prend effet à la fin de la période en cours.\n\nDer Dienst riste accessible jusqu’à cette date.",
-    "article5_title": "5. Modification d’Abonnement",
-    "article5_text": "Le Kunde kann ändern son Abonnement jederzeit.\n\n- En cas de passage à une formule supérieure (upgrade) :\nLe nouvel Abonnement prend effet immédiatement. Une nouvelle période de facturation commence à la date du changement.\nLes Credits ristants de l’ancien Abonnement sind perdus.\n\n- En cas de passage à une formule inférieure (downgrade) :\nLe changement prend effet à la fin de la période de facturation en cours.\nLe Kunde speichert les Funktionen de son Abonnement actuel jusqu’à cette échéance.",
-    "article6_title": "6. Prix et Zahlung",
-    "article6_text": "Les prix sind indiqués au moment de la souscription.\n\nLes Zahlungs sind traités par un pristataire tiers (Stripe). Wizpix n’a kein accès aux Daten de Zahlung.\n\nLe Zahlung ist exigible à chaque période de facturation.",
-    "article7_title": "7. Absence de remboursement",
-    "article7_text": "Les Abonnements ne sind pas remboursables.\n\nKein remboursement total ou partiel ne sera effectué en cas de résiliation en cours de période.\n\nLe Kunde speichert l’accès au Service jusqu’à la fin de la période déjà payée.",
-    "article8_title": "8. Accès au Dienst",
-    "article8_text": "Wizpix met en œuvre des moyens raisonnables pour assurer l’accès au Service.\n\nDer Dienst kann être temporairement suspendu pour maintenance, mise à jour ou en cas de problème technique.\n\nKeine compensation ne sera due en cas d’interruption temporaire.",
-    "article9_title": "9. Responsabilité",
-    "article9_text": "Der Dienst ist fourni « tel quel ».\n\nWizpix ne garantit pas un fonctionnement ininterrompu ni des résultats parfaits.\n\nDans les limites autorisées par la loi, Wizpix ne pourra être tenu responsable des dommages directs ou indirects résultant de l’utilisation du Service.",
-    "article10_title": "10. Données personnelles",
-    "article10_text": "Le Verarbeitung des personenbezogene Daten ist régi par la <a href=\"/privacy\">Politique de Datenschutz</a>.",
-    "article11_title": "11. Suspension et résiliation",
-    "article11_text": "Wizpix kann suspendre ou résilier un Konto en cas de violation des CGV ou d’utilisation abusive.\n\nKein remboursement ne sera dû dans ce cas.",
-    "article12_title": "12. Droit applicable",
-    "article12_text": "Diese CGV sind régies par le Recht Schweizer.\n\nEn cas de litige, les zuständige Gerichte du canton de Vaud sind seuls compétents, sauf disposition légale contraire.",
-    "article13_title": "13. Modifications",
-    "article13_text": "Wizpix se réserve le Recht de ändern les présentes CGV jederzeit. La version applicable ist celle publiée sur le site.",
-    "conclusion": "En souscrivant un Abonnement, le Kunde reconnaît accepter les présentes CGV."
+    "article2_text": "Der Dienst wird in Form monatlicher Abonnements angeboten.\n\nJedes Abonnement gewährt Zugriff auf eine bestimmte Anzahl monatlicher Credits zur Nutzung der Funktionen des Dienstes.\n\nDie Credits sind persönlich, nicht übertragbar und können nicht auf den Folgemonat übertragen werden.",
+
+    "article3_title": "3. Credits und Einschränkungen",
+    "article3_text": "Jede Verarbeitung verbraucht einen Credit.\n\nSobald das monatliche Credit-Kontingent aufgebraucht ist, sind kostenpflichtige Funktionen bis zur monatlichen Zurücksetzung nicht mehr verfügbar.\n\nDer Kunde kann jedoch weiterhin eventuell verfügbare kostenlose Funktionen nutzen.",
+
+    "article4_title": "4. Laufzeit und Verlängerung",
+    "article4_text": "Das Abonnement wird für eine monatliche Laufzeit abgeschlossen und verlängert sich automatisch zu jedem Fälligkeitsdatum, sofern keine Kündigung durch den Kunden erfolgt.\n\nDer Kunde kann jederzeit kündigen. Die Kündigung wird zum Ende des laufenden Zeitraums wirksam.\n\nDer Dienst bleibt bis zu diesem Datum zugänglich.",
+
+    "article5_title": "5. Änderung des Abonnements",
+    "article5_text": "Der Kunde kann sein Abonnement jederzeit ändern.\n\n- Beim Wechsel zu einem höheren Tarif (Upgrade):\nDas neue Abonnement tritt sofort in Kraft. Ein neuer Abrechnungszeitraum beginnt ab dem Datum der Änderung.\nVerbleibende Credits des bisherigen Abonnements verfallen.\n\n- Beim Wechsel zu einem niedrigeren Tarif (Downgrade):\nDie Änderung tritt zum Ende des laufenden Abrechnungszeitraums in Kraft.\nDer Kunde behält bis dahin die Funktionen seines aktuellen Abonnements.",
+
+    "article6_title": "6. Preise und Zahlung",
+    "article6_text": "Die Preise werden zum Zeitpunkt des Abschlusses angezeigt.\n\nDie Zahlungen werden von einem Drittanbieter (Stripe) verarbeitet. Wizpix hat keinen Zugriff auf Zahlungsdaten.\n\nDie Zahlung ist zu jeder Abrechnungsperiode fällig.",
+    "article7_title": "7. Keine Rückerstattung",
+    "article7_text": "Abonnements sind nicht erstattungsfähig.\n\nIm Falle einer Kündigung während des laufenden Zeitraums erfolgt keine vollständige oder teilweise Rückerstattung.\n\nDer Kunde behält den Zugang zum Dienst bis zum Ende des bereits bezahlten Zeitraums.",
+
+    "article8_title": "8. Zugang zum Dienst",
+    "article8_text": "Wizpix setzt angemessene Mittel ein, um den Zugang zum Dienst sicherzustellen.\n\nDer Dienst kann vorübergehend für Wartungsarbeiten, Aktualisierungen oder bei technischen Problemen ausgesetzt werden.\n\nIm Falle einer vorübergehenden Unterbrechung besteht kein Anspruch auf Entschädigung.",
+
+    "article9_title": "9. Haftung",
+    "article9_text": "Der Dienst wird „wie besehen“ bereitgestellt.\n\nWizpix garantiert weder einen unterbrechungsfreien Betrieb noch perfekte Ergebnisse.\n\nIm gesetzlich zulässigen Rahmen haftet Wizpix nicht für direkte oder indirekte Schäden, die sich aus der Nutzung des Dienstes ergeben.",
+
+    "article10_title": "10. Personenbezogene Daten",
+    "article10_text": "Die Verarbeitung personenbezogener Daten wird durch die <a href=\"/privacy\">Datenschutzrichtlinie</a> geregelt.",
+
+    "article11_title": "11. Sperrung und Kündigung",
+    "article11_text": "Wizpix kann ein Konto bei Verstößen gegen die AVB oder missbräuchlicher Nutzung sperren oder kündigen.\n\nIn diesem Fall erfolgt keine Rückerstattung.",
+
+    "article12_title": "12. Anwendbares Recht",
+    "article12_text": "Diese AVB unterliegen schweizerischem Recht.\n\nIm Streitfall sind ausschließlich die Gerichte des Kantons Waadt zuständig, sofern keine anderslautenden gesetzlichen Bestimmungen gelten.",
+
+    "article13_title": "13. Änderungen",
+    "article13_text": "Wizpix behält sich das Recht vor, diese AVB jederzeit zu ändern. Maßgeblich ist die auf der Website veröffentlichte Version.",
+
+    "conclusion": "Mit Abschluss eines Abonnements bestätigt der Kunde die Annahme dieser AVB."
   },
   "servicePageTitle": {
     "title_h1": "Tistez la qualité des Diensts",
