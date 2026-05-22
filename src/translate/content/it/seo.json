@@ -1,0 +1,58 @@
+{
+  "home": {
+    "title": "Rimozione sfondo con IA | WizPix Svizzera",
+    "description": "Rimuovi automaticamente lo sfondo delle tue immagini con l'IA. Aggiungi sfondi, colori e visual professionali in pochi secondi."
+  },
+  "services": {
+    "title": "Strumenti foto IA | Rimozione sfondo e conversione | WizPix",
+    "description": "Scopri gli strumenti WizPix per rimuovere lo sfondo, convertire le immagini e ottenere visual puliti e professionali per web ed e-commerce."
+  },
+  "pricing": {
+    "title": "Prezzi WizPix | Crediti e piani",
+    "description": "Scegli un piano semplice e flessibile per la rimozione dello sfondo con IA e la conversione delle immagini. Pagamento sicuro e uso professionale - pensato per la Svizzera."
+  },
+  "contact": {
+    "title": "Contatto WizPix | Supporto e assistenza",
+    "description": "Hai bisogno di aiuto con WizPix? Contatta il nostro supporto per domande tecniche, fatturazione, crediti o utilizzo degli strumenti."
+  },
+  "legal": {
+    "title": "Note legali | WizPix",
+    "description": "Consulta le informazioni legali di WizPix: editore, hosting, contatti e indicazioni obbligatorie relative al sito wizpix.ch."
+  },
+  "terms": {
+    "title": "Condizioni d'uso | WizPix",
+    "description": "Leggi le condizioni d'uso di WizPix: accesso al servizio, regole di utilizzo, responsabilità e informazioni essenziali."
+  },
+  "privacy": {
+    "title": "Informativa sulla privacy | WizPix",
+    "description": "Scopri come WizPix tratta i tuoi dati: raccolta, utilizzo, sicurezza, cookie e i tuoi diritti sulla privacy."
+  },
+  "cgv": {
+    "title": "Condizioni di vendita (CGV) | WizPix",
+    "description": "Consulta le condizioni di vendita di WizPix: prezzi, pagamenti, crediti, abbonamenti, condizioni del servizio e informazioni commerciali."
+  },
+  "notFound": {
+    "title": "Pagina non trovata (404) | WizPix",
+    "description": "La pagina richiesta non esiste o è stata spostata. Torna alla home di WizPix per continuare la navigazione."
+  },
+  "login": {
+    "title": "Accedi | WizPix",
+    "description": "Accedi al tuo account WizPix per visualizzare la dashboard, i crediti e i progetti."
+  },
+  "signup": {
+    "title": "Crea un account | WizPix",
+    "description": "Crea il tuo account WizPix per iniziare a rimuovere sfondi, convertire immagini e usare i nostri strumenti foto IA."
+  },
+  "resetPassword": {
+    "title": "Reimposta la password | WizPix",
+    "description": "Reimposta in modo sicuro la password di WizPix per recuperare l'accesso al tuo account."
+  },
+  "dashboard": {
+    "title": "Dashboard | WizPix",
+    "description": "Gestisci progetti, crediti e impostazioni di WizPix dalla tua dashboard."
+  },
+  "billingSuccess": {
+    "title": "Pagamento confermato | WizPix",
+    "description": "Il tuo pagamento è stato confermato. Trovi crediti e dettagli del piano nel tuo account WizPix."
+  }
+}

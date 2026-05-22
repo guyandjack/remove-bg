@@ -1,0 +1,58 @@
+{
+  "home": {
+    "title": "KI-Hintergrundentfernung | WizPix Schweiz",
+    "description": "Entfernen Sie Bildhintergründe automatisch mit KI. Fügen Sie professionelle Hintergründe, Farben und Visuals in Sekunden hinzu."
+  },
+  "services": {
+    "title": "KI-Foto-Tools | Hintergrund entfernen & Konvertieren | WizPix",
+    "description": "Entdecken Sie die WizPix-Tools zum Entfernen von Hintergründen, zum Konvertieren von Bildern und für saubere, professionelle Visuals für Web und E-Commerce."
+  },
+  "pricing": {
+    "title": "WizPix Preise | Credits und Pläne",
+    "description": "Wählen Sie ein einfaches, flexibles Modell für KI-Hintergrundentfernung und Bildkonvertierung. Sicherer Checkout, professionelle Nutzung - für die Schweiz."
+  },
+  "contact": {
+    "title": "Kontakt WizPix | Support und Hilfe",
+    "description": "Benötigen Sie Hilfe zu WizPix? Kontaktieren Sie unser Support-Team für technische Fragen, Abrechnung, Credits oder die Nutzung der Tools."
+  },
+  "legal": {
+    "title": "Impressum | WizPix",
+    "description": "Hier finden Sie die rechtlichen Informationen von WizPix: Herausgeber, Hosting, Kontakt und gesetzlich erforderliche Angaben zur Website wizpix.ch."
+  },
+  "terms": {
+    "title": "Nutzungsbedingungen | WizPix",
+    "description": "Lesen Sie die Nutzungsbedingungen von WizPix: Zugriff auf den Service, Nutzungsregeln, Verantwortlichkeiten und wichtige Informationen."
+  },
+  "privacy": {
+    "title": "Datenschutzerklärung | WizPix",
+    "description": "Erfahren Sie, wie WizPix Ihre Daten verarbeitet: Erhebung, Nutzung, Sicherheit, Cookies und Ihre Datenschutzrechte."
+  },
+  "cgv": {
+    "title": "Allgemeine Geschäftsbedingungen (AGB) | WizPix",
+    "description": "Lesen Sie die AGB von WizPix: Preise, Zahlungen, Credits, Abonnements, Servicebedingungen und kommerzielle Informationen."
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden (404) | WizPix",
+    "description": "Die angeforderte Seite existiert nicht oder wurde verschoben. Kehren Sie zur WizPix-Startseite zurück, um weiter zu navigieren."
+  },
+  "login": {
+    "title": "Anmelden | WizPix",
+    "description": "Melden Sie sich bei Ihrem WizPix-Konto an, um auf Ihr Dashboard, Ihre Credits und Ihre Projekte zuzugreifen."
+  },
+  "signup": {
+    "title": "Konto erstellen | WizPix",
+    "description": "Erstellen Sie Ihr WizPix-Konto, um Hintergründe zu entfernen, Bilder zu konvertieren und unsere KI-Foto-Tools zu nutzen."
+  },
+  "resetPassword": {
+    "title": "Passwort zurücksetzen | WizPix",
+    "description": "Setzen Sie Ihr WizPix-Passwort sicher zurück, um wieder Zugriff auf Ihr Konto zu erhalten."
+  },
+  "dashboard": {
+    "title": "Dashboard | WizPix",
+    "description": "Verwalten Sie Ihre Projekte, Credits und WizPix-Einstellungen in Ihrem Dashboard."
+  },
+  "billingSuccess": {
+    "title": "Zahlung bestätigt | WizPix",
+    "description": "Ihre Zahlung wurde bestätigt. Prüfen Sie Ihre Credits und Ihren Plan in Ihrem WizPix-Konto."
+  }
+}

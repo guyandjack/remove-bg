@@ -1,27 +1,27 @@
 {
   "home": {
-    "title": "Suppression d’arrière-plan IA | WizPix Suisse",
-    "description": "Supprimez automatiquement l’arrière-plan de vos images avec l’IA. Ajoutez des fonds, couleurs et visuels professionnels en quelques secondes."
+    "title": "Suppression d'arrière-plan IA | WizPix Suisse",
+    "description": "Supprimez automatiquement l'arrière-plan de vos images avec l'IA. Ajoutez des fonds, couleurs et visuels professionnels en quelques secondes."
   },
   "services": {
     "title": "Outils photo IA | Suppression de fond et conversion | WizPix",
-    "description": "Découvrez les outils WizPix pour supprimer l’arrière-plan, convertir vos images et obtenir des visuels propres et professionnels pour le web et l’e‑commerce."
+    "description": "Découvrez les outils WizPix pour supprimer l'arrière-plan, convertir vos images et obtenir des visuels propres et professionnels pour le web et l'e-commerce."
   },
   "pricing": {
     "title": "Tarifs WizPix | Crédits et abonnements",
-    "description": "Choisissez un plan simple et flexible pour la suppression d’arrière-plan et la conversion d’images. Paiement sécurisé, usage pro, en Suisse."
+    "description": "Choisissez un plan simple et flexible pour la suppression d'arrière-plan et la conversion d'images. Paiement sécurisé, usage pro, en Suisse."
   },
   "contact": {
     "title": "Contact WizPix | Support et assistance",
-    "description": "Besoin d’aide sur WizPix ? Contactez notre support pour vos questions techniques, facturation, crédits, ou utilisation des outils."
+    "description": "Besoin d'aide sur WizPix ? Contactez notre support pour vos questions techniques, facturation, crédits, ou utilisation des outils."
   },
   "legal": {
     "title": "Mentions légales | WizPix",
     "description": "Consultez les mentions légales de WizPix : éditeur, hébergement, contact et informations obligatoires liées au site wizpix.ch."
   },
   "terms": {
-    "title": "Conditions d’utilisation | WizPix",
-    "description": "Retrouvez les conditions d’utilisation de WizPix : accès au service, règles d’usage, responsabilités et informations essentielles."
+    "title": "Conditions d'utilisation | WizPix",
+    "description": "Retrouvez les conditions d'utilisation de WizPix : accès au service, règles d'usage, responsabilités et informations essentielles."
   },
   "privacy": {
     "title": "Politique de confidentialité | WizPix",
@@ -33,7 +33,7 @@
   },
   "notFound": {
     "title": "Page introuvable (404) | WizPix",
-    "description": "La page demandée n’existe pas ou a été déplacée. Revenez à l’accueil WizPix pour continuer votre navigation."
+    "description": "La page demandée n'existe pas ou a été déplacée. Revenez à l'accueil WizPix pour continuer votre navigation."
   },
   "login": {
     "title": "Connexion | WizPix",
@@ -45,7 +45,7 @@
   },
   "resetPassword": {
     "title": "Réinitialiser le mot de passe | WizPix",
-    "description": "Réinitialisez votre mot de passe WizPix en toute sécurité pour récupérer l’accès à votre compte."
+    "description": "Réinitialisez votre mot de passe WizPix en toute sécurité pour récupérer l'accès à votre compte."
   },
   "dashboard": {
     "title": "Tableau de bord | WizPix",
@@ -56,4 +56,3 @@
     "description": "Votre paiement a été confirmé. Retrouvez vos crédits et votre plan dans votre compte WizPix."
   }
 }
-

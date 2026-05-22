@@ -1,15 +1,15 @@
 {
   "home": {
     "title": "AI Background Removal | WizPix Switzerland",
-    "description": "Automatically remove image backgrounds with AI. Add professional backgrounds, colors and visuals in seconds for clean, high‑impact results."
+    "description": "Automatically remove image backgrounds with AI. Add professional backgrounds, colors and visuals in seconds for clean, high-impact results."
   },
   "services": {
     "title": "AI Photo Tools | Background Removal & Conversion | WizPix",
-    "description": "Explore WizPix tools to remove backgrounds, convert images, and produce clean, professional visuals for web, marketing and e‑commerce."
+    "description": "Explore WizPix tools to remove backgrounds, convert images, and produce clean, professional visuals for web, marketing and e-commerce."
   },
   "pricing": {
     "title": "WizPix Pricing | Credits and Plans",
-    "description": "Pick a simple, flexible plan for AI background removal and image conversion. Secure checkout and professional usage — built for Switzerland."
+    "description": "Pick a simple, flexible plan for AI background removal and image conversion. Secure checkout and professional usage - built for Switzerland."
   },
   "contact": {
     "title": "Contact WizPix | Support and Help",
@@ -33,7 +33,7 @@
   },
   "notFound": {
     "title": "Page Not Found (404) | WizPix",
-    "description": "The page you’re looking for doesn’t exist or was moved. Return to the WizPix homepage to continue browsing."
+    "description": "The page you're looking for doesn't exist or was moved. Return to the WizPix homepage to continue browsing."
   },
   "login": {
     "title": "Log In | WizPix",
@@ -56,4 +56,3 @@
     "description": "Your payment has been confirmed. Check your credits and plan details in your WizPix account."
   }
 }
-
