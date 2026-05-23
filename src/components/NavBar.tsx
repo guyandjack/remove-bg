@@ -262,7 +262,10 @@ const NavBar = () => {
           </p>
         </div>
       ) : null}
-      <SessionExpiryWarning />
+      {sessionSignal.value?.authentified
+        ? <SessionExpiryWarning />
+        : null
+      }
       <nav className="navbar bg-navbar shadow-sm backdrop-blur-sm">
         <div className="navbar-start">
           <div className="drawer lg:hidden">

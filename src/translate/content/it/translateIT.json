@@ -809,8 +809,8 @@
     }
   },
   "sessionWarning": {
-    "title": "La tua sessione sta per scadere",
-    "message": "La tua sessione scade tra {{time}}",
+    "title": "La tua sessione scade tra",
+    "message": "{{time}}",
     "keep": "Mantieni la sessione",
     "refreshing": "Estensione",
     "logout": "Disconnessione",

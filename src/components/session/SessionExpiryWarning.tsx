@@ -1,9 +1,15 @@
+//import des hooks
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 import { sessionSignal } from "@/stores/session";
+
+//import des fonctions
 import { refreshAccessToken } from "@/utils/axiosConfig";
 import { logoutClient } from "@/utils/auth/logout";
 import { navigateWithLink } from "@/utils/navigateWithLink";
+
+//import librairie animation
+import * as m from "motion/react-m";
 
 type DecodedJwtPayload = {
   exp?: number;
@@ -12,6 +18,7 @@ type DecodedJwtPayload = {
   refreshExp?: number;
   [key: string]: unknown;
 };
+
 
 function decodeJwtPayload(token: string): DecodedJwtPayload | null {
   try {
@@ -45,6 +52,7 @@ const SessionExpiryWarning = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [feedback, setFeedback] = useState<"idle" | "success" | "error">("idle");
+  
 
   const warnTimeoutRef = useRef<number | null>(null);
   const tickIntervalRef = useRef<number | null>(null);
@@ -145,7 +153,7 @@ const SessionExpiryWarning = () => {
     };
   }, [isAuth, refreshSessionExpiresAtMs]);
 
-  const isVisible = secondsLeft !== null && secondsLeft <= Math.ceil(WARNING_LEAD_MS / 1000);
+  const isVisible = secondsLeft !== null && secondsLeft <= Math.ceil(WARNING_LEAD_MS / 1000) ;
 
   const keepAlive = async () => {
     if (isRefreshing) return;
@@ -178,40 +186,55 @@ const SessionExpiryWarning = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="toast toast-top toast-center z-50 mt-16">
-      <div className="alert alert-warning shadow-lg gap-3 flex items-center">
-        <div className="flex flex-col">
+    <m.div
+      initial={{ opacity: 0, y: -24 }}
+      animate={{ opacity: 1, y: 24 }}
+      transition={{
+        duration: 0.7,
+        ease: "easeOut",
+      }}
+      style={{ willChange: "transform, opacity" }}
+      className="toast toast-top toast-center z-50 mt-16 "
+    >
+      <div className="alert bg-component border border-warning p-6 shadow-lg gap-4 flex flex-col justify-center items-center">
+        <div className="flex flex-col justify-start items-center gap-2 w-[350px]">
           <span className="font-semibold">{t("sessionWarning.title")}</span>
-          <span className="text-sm">
-            {t("sessionWarning.message", { time: formatSeconds(secondsLeft ?? 0) })}
+          <span className="text-base">
+            {t("sessionWarning.message", {
+              time: formatSeconds(secondsLeft ?? 0),
+            })}
           </span>
           {feedback === "success" ? (
-            <span className="text-sm">{t("sessionWarning.success")}</span>
+            <span className="text-sm text-center">{t("sessionWarning.success")}</span>
           ) : feedback === "error" ? (
-            <span className="text-sm">{t("sessionWarning.error")}</span>
+            <span className="text-sm text-center text-error">{t("sessionWarning.error")}</span>
           ) : null}
         </div>
 
-        <div className="ml-auto flex gap-2">
+        <div className="flex flex-col gap-6 md:flex-row">
           <button
             type="button"
-            className="btn btn-sm btn-primary"
+            className="btn btn-sm btn-primary btn-outline w-[140px]"
             onClick={keepAlive}
             disabled={isRefreshing || isLoggingOut}
           >
-            {isRefreshing ? t("sessionWarning.refreshing") : t("sessionWarning.keep")}
+            {isRefreshing
+              ? t("sessionWarning.refreshing")
+              : t("sessionWarning.keep")}
           </button>
           <button
             type="button"
-            className="btn btn-sm btn-ghost"
+            className="btn btn-sm btn-warning btn-outline w-[140px]"
             onClick={logout}
             disabled={isRefreshing || isLoggingOut}
           >
-            {isLoggingOut ? t("sessionWarning.loggingOut") : t("sessionWarning.logout")}
+            {isLoggingOut
+              ? t("sessionWarning.loggingOut")
+              : t("sessionWarning.logout")}
           </button>
         </div>
       </div>
-    </div>
+    </m.div>
   );
 };
 

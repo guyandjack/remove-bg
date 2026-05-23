@@ -837,8 +837,8 @@
     }
   },
   "sessionWarning": {
-    "title": "Your session is about to expire",
-    "message": "Your session expires in {{time}}",
+    "title": "Your session expire in",
+    "message": "{{time}}",
     "keep": "Keep session",
     "refreshing": "Extending",
     "logout": "Logout",

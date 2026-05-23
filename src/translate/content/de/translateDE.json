@@ -806,8 +806,8 @@
     }
   },
   "sessionWarning": {
-    "title": "Ihre Sitzung läuft bald ab",
-    "message": "Ihre Sitzung läuft in {{time}} ab",
+    "title": "Ihre Sitzung läuft in ab",
+    "message": "{{time}}",
     "keep": "Sitzung beibehalten",
     "refreshing": "Verlängerung",
     "logout": "Abmelden",
