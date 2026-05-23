@@ -278,18 +278,25 @@ const verifyRefreshToken = async (token: string) => {
 //fonction pour définir les options de cookie
 const setCookieOptionsObject = () => {
   const mode = process.env.NODE_ENV;
+  const configuredDomain = String(process.env.COOKIE_DOMAIN ?? "").trim() || undefined;
   // Refresh cookie lifetime must match refresh token lifetime, otherwise users get logged out "randomly"
   // when the cookie disappears before the token is actually expired.
   const refreshMaxAgeMs = parseExpiresInToMs(process.env.JWT_REFRESH_EXPIRES_IN, 60 * 60 * 1000);
   switch (mode) {
-    case "production":
-      return {
-        domain: "background.ch",
+    case "production": {
+      // IMPORTANT:
+      // - Do not hardcode an incorrect Domain (browsers will block Set-Cookie -> refresh breaks).
+      // - Omitting Domain creates a host-only cookie (more secure, and works for api.<domain> setups).
+      // - If you explicitly need cross-subdomain cookies, set COOKIE_DOMAIN (ex: `.wizpix.ch`).
+      const options: Option = {
         httpOnly: true,
         secure: true,
         maxAge: refreshMaxAgeMs,
         sameSite: "none",
-      } as Option;
+      };
+      if (configuredDomain) options.domain = configuredDomain;
+      return options;
+    }
 
     case "development":
       return {
@@ -297,7 +304,8 @@ const setCookieOptionsObject = () => {
         httpOnly: true,
         secure: false,
         maxAge: refreshMaxAgeMs,
-        //samesite: "none",
+        // Explicit is better than implicit (Chrome defaults evolve). For localhost:5173 -> localhost:3000, Lax is fine.
+        sameSite: "lax",
       } as Option;
 
     default:
@@ -305,6 +313,7 @@ const setCookieOptionsObject = () => {
         httpOnly: true,
         secure: false,
         maxAge: refreshMaxAgeMs,
+        sameSite: "lax",
       } as Option;
   }
 };
