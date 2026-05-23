@@ -24,7 +24,6 @@ import {
 } from "@/stores/planOptions";
 import { setActiveLink } from "@/utils/setActiveLink";
 
-
 type PlanKey =
   | "remove_bg"
   | "conversion"
@@ -40,7 +39,7 @@ type PlanKey =
   | "Image_pexels"
   | "api"
   | "bundle"
-  | "subscribe" ;
+  | "subscribe";
 
 type PlanText = Record<PlanKey, string>;
 
@@ -56,23 +55,22 @@ const currencySymbols: Record<CurrencyCode, string> = {
   USD: "$",
 };
 
-const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
+const PricePage = ({ routeKey = "", isSignup = false }: PricePageProps) => {
   const { t } = useTranslation();
   const { t: tSeo } = useTranslation("seo");
   const location = useLocation();
   const planOptions = planOptionsSignal.value;
-  const activePlanOptions = planOptions.filter(
-    (plan) => plan.active !== false
-  );
-  
+  const activePlanOptions = planOptions.filter((plan) => plan.active !== false);
+
   const [currency, setCurrency] = useState<CurrencyCode>("CHF");
-  const [finalizeStatus, setFinalizeStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
+  const [finalizeStatus, setFinalizeStatus] = useState<
+    "idle" | "pending" | "success" | "error"
+  >("idle");
   const [finalizeMessage, setFinalizeMessage] = useState<string | null>(null);
 
   const [isCreateAccount, setIscreateAccount] = useState<boolean>(isSignup);
 
   const textAlert: string = t("pricePage.alert");
-  
 
   const textLangCard: PlanText = {
     tag: t("priceCard.tag"),
@@ -90,7 +88,6 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
     api: t("priceCard.api"),
     bundle: t("priceCard.bundle"),
     subscribe: t("priceCard.subscribe"),
-    
   };
 
   const textLangTab = {
@@ -169,15 +166,17 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
     console.log("use effect run");
     const hydrateFromCache = (): boolean => {
       const cache = localStorage.getItem("option");
-      if (!cache)  {
+      if (!cache) {
         console.log("Pas objet option dans le localstorage. code_price-1 ");
-        return false
-      } 
+        return false;
+      }
       try {
         const parsed = JSON.parse(cache);
         if (!Array.isArray(parsed) || parsed.length === 0) {
-         console.log("L' objet parsed n' est pas un tableau ou sa longeur est nulle code_price_2 ");
-         return false;
+          console.log(
+            "L' objet parsed n' est pas un tableau ou sa longeur est nulle code_price_2 ",
+          );
+          return false;
         }
         const isCompatible = parsed.every((plan) => {
           if (!plan || typeof plan !== "object") return false;
@@ -192,7 +191,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
 
         if (!isCompatible) {
           console.log(
-            "Cache plans incompatible (schema obsolète), suppression… code_price_2b"
+            "Cache plans incompatible (schema obsolète), suppression… code_price_2b",
           );
           localStorage.removeItem("option");
           return false;
@@ -204,11 +203,16 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         }));
 
         setPlanOptions(normalizedPlans);
-        console.log("Le tableau arrayOption a ete mis Ã  jour avec le localstorage! ");
-        
+        console.log(
+          "Le tableau arrayOption a ete mis Ã  jour avec le localstorage! ",
+        );
+
         return true;
       } catch (error) {
-        console.warn("Option cache invalide, suppressionâ€¦ code_price_3", error);
+        console.warn(
+          "Option cache invalide, suppressionâ€¦ code_price_3",
+          error,
+        );
         localStorage.removeItem("option");
         return false;
       }
@@ -220,13 +224,12 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         if (data?.status !== "success" || !Array.isArray(data?.plans)) {
           return;
         }
-                const normalizedPlans = (data.plans as PlanOption[]).map((plan) => ({
+        const normalizedPlans = (data.plans as PlanOption[]).map((plan) => ({
           ...plan,
           active: plan.active ?? true,
         }));
         localStorage.setItem("option", JSON.stringify(normalizedPlans));
         setPlanOptions(normalizedPlans);
-        
       } catch (error) {
         console.error("Erreur lors de la rÃ©cupÃ©ration des plans", error);
       }
@@ -257,7 +260,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
       const { data } = await api.post(
         "api/stripe/finalize",
         { sessionId },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (data?.status === "pending") {
@@ -266,7 +269,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         } else {
           setFinalizeStatus("error");
           setFinalizeMessage(
-            "La confirmation Stripe prend plus de temps que prÃ©vu. RÃ©essayez dans quelques secondes."
+            "La confirmation Stripe prend plus de temps que prÃ©vu. RÃ©essayez dans quelques secondes.",
           );
         }
         return;
@@ -276,7 +279,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         setFinalizeStatus("error");
         setFinalizeMessage(
           data?.message ||
-            "Impossible de valider votre paiement. Merci de rÃ©essayer."
+            "Impossible de valider votre paiement. Merci de rÃ©essayer.",
         );
         return;
       }
@@ -294,7 +297,7 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
     } catch (error) {
       setFinalizeStatus("error");
       setFinalizeMessage(
-        "Une erreur est survenue pendant la validation du paiement."
+        "Une erreur est survenue pendant la validation du paiement.",
       );
     }
   };
@@ -318,197 +321,199 @@ const  PricePage = ({ routeKey = "", isSignup = false }: PricePageProps)=> {
         }}
       />
       <div className={"page-container"}>
-      <div
-        className={
-          "relative w-full mx-auto max-w-[1300px] py-[20px] px-[10px] flex flex-col justify-start items-center gap-[30px] "
-        }
-      >
-        {finalizeStatus !== "idle" ? (
-          <div
-            className={
-              "absolute top-[-50px] left-0 right-0 mx-auto max-w-[600px]"
-            }
-          >
+        <div
+          className={
+            "relative w-full mx-auto max-w-[1300px] py-[20px] px-[10px] flex flex-col justify-start items-center lg:items-start gap-[30px] "
+          }
+        >
+          {finalizeStatus !== "idle" ? (
             <div
-              role="alert"
-              className={`alert ${
-                finalizeStatus === "success"
-                  ? "alert-success"
-                  : finalizeStatus === "error"
-                    ? "alert-error"
-                    : "alert-info"
-              }`}
-            >
-              <span>{finalizeMessage}</span>
-            </div>
-          </div>
-        ) : null}
-        <h1
-          className={
-            "text-center text-4xl font-bold lg:w-[40%] lg:text-6xl lg:text-left lg:self-start"
-          }
-          dangerouslySetInnerHTML={{
-            __html: t("pricing.title_h1").replace(/\n/g, "<br/>"),
-          }}
-        ></h1>
-        <h2
-          className={
-            "font-bold text-3xl text-center text-info lg:text-left lg:self-start"
-          }
-          dangerouslySetInnerHTML={{
-            __html: t("pricing.title_h2_card").replace(/\n/g, "<br/>"),
-          }}
-        ></h2>
-        <p
-          className={
-            "font-medium text-xl text-center text-success lg:text-left lg:self-start"
-          }
-          dangerouslySetInnerHTML={{
-            __html: t("pricing.intro").replace(/\n/g, "<br/>"),
-          }}
-        ></p>
-        <div className="flex flex-wrap items-center gap-4 lg:absolute right-0 bottom-[20px]">
-          <span className="text-base font-semibold">
-            {t("pricing.currency")}
-          </span>
-          <div className="join">
-            {(["CHF", "EUR", "USD"] as CurrencyCode[]).map((code) => (
-              <button
-                key={code}
-                type="button"
-                className={`btn btn-sm join-item ${
-                  currency === code ? "btn-primary" : "btn-outline"
-                }`}
-                onClick={() => {
-                  setCurrency(code);
-                  const url = new URL(window.location.href);
-                  url.searchParams.set("currency", code);
-                  window.history.replaceState({}, "", url.toString());
-                }}
-              >
-                {currencySymbols[code]}
-              </button>
-            ))}
-          </div>
-        </div>
-        {isCreateAccount ? (
-          <m.div
-            className={"absolute top-[-10px] right-[10px] z-100"}
-            initial={{
-              opacity: 0,
-              y: -12,
-            }}
-            animate={{
-              opacity: [0, 1, 0],
-              y: [-12, 0, 0],
-            }}
-            transition={{
-              duration: 8,
-              times: [0, 0.01, 1],
-              ease: "easeInOut",
-            }}
-            style={{
-              willChange: "transform, opacity",
-            }}
-          >
-            <div
-              role="alert"
-              className="alert alert-horizontal alert-outline alert-warning"
-            >
-              {
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  className="stroke-warning h-6 w-6 shrink-0"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  ></path>
-                </svg>
+              className={
+                "absolute top-[-50px] left-0 right-0 mx-auto max-w-[600px]"
               }
-              <span className={"text-sm text-base-content"}>{textAlert}</span>
+            >
+              <div
+                role="alert"
+                className={`alert ${
+                  finalizeStatus === "success"
+                    ? "alert-success"
+                    : finalizeStatus === "error"
+                      ? "alert-error"
+                      : "alert-info"
+                }`}
+              >
+                <span>{finalizeMessage}</span>
+              </div>
             </div>
-          </m.div>
-        ) : null}
-      </div>
-      {/*card price*/}
+          ) : null}
+          <h1
+            className={
+              "text-center text-4xl font-bold lg:w-[40%] lg:text-6xl lg:text-left lg:self-start"
+            }
+            dangerouslySetInnerHTML={{
+              __html: t("pricing.title_h1").replace(/\n/g, "<br/>"),
+            }}
+          ></h1>
+          <h2
+            className={
+              "font-bold text-3xl text-center text-info lg:text-left lg:self-start"
+            }
+            dangerouslySetInnerHTML={{
+              __html: t("pricing.title_h2_card").replace(/\n/g, "<br/>"),
+            }}
+          ></h2>
 
-      <ul
-        className={
-          "relative w-full max-w-[1300px] mx-auto my-[50px]  flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-evenly lg:gap-[0px]"
-        }
-      >
-        {activePlanOptions.map((items, index) => {
-          return (
-            <m.li
-              key={items.name}
-              className={"max-w-[350px] min-w-[300px]"}
+          <p
+            className={
+              "font-medium text-xl text-center text-success lg:text-left lg:self-start"
+            }
+            dangerouslySetInnerHTML={{
+              __html: t("pricing.intro").replace(/\n/g, "<br/>"),
+            }}
+          ></p>
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="text-base font-semibold">
+              {t("pricing.currency")}
+            </span>
+            <div className="join">
+              {(["CHF", "EUR", "USD"] as CurrencyCode[]).map((code) => (
+                <button
+                  key={code}
+                  type="button"
+                  className={`btn btn-sm join-item ${
+                    currency === code ? "btn-primary" : "btn-outline"
+                  }`}
+                  onClick={() => {
+                    setCurrency(code);
+                    const url = new URL(window.location.href);
+                    url.searchParams.set("currency", code);
+                    window.history.replaceState({}, "", url.toString());
+                  }}
+                >
+                  {currencySymbols[code]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {isCreateAccount ? (
+            <m.div
+              className={"absolute top-[-10px] right-[10px] z-100"}
               initial={{
                 opacity: 0,
-                rotateY: -12,
+                y: -12,
               }}
               animate={{
-                opacity: 1,
-                rotateY: 0,
+                opacity: [0, 1, 0],
+                y: [-12, 0, 0],
               }}
               transition={{
-                delay: index * 0.2,
-                duration: 1,
-                ease: [0.22, 1, 0.36, 1],
+                duration: 8,
+                times: [0, 0.01, 1],
+                ease: "easeInOut",
               }}
               style={{
-                transformPerspective: 1000,
                 willChange: "transform, opacity",
               }}
             >
-              <PriceCard
-                lang={textLangCard}
-                option={items}
-                currency={currency}
-              />
-            </m.li>
-          );
-        })}
-      </ul>
+              <div
+                role="alert"
+                className="alert alert-horizontal alert-outline alert-warning"
+              >
+                {
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className="stroke-warning h-6 w-6 shrink-0"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                }
+                <span className={"text-sm text-base-content"}>{textAlert}</span>
+              </div>
+            </m.div>
+          ) : null}
+        </div>
+        {/*card price*/}
 
-      {/* tableau de comparaison*/}
-      <div className={"w-full max-w-[1300px] mx-auto py-[50px] "}>
-        <h2
+        <ul
           className={
-            "font-bold text-3xl text-center text-info lg:text-left lg:self-start"
+            "relative w-full max-w-[1300px] mx-auto my-[50px]  flex flex-col justify-start items-center gap-[100px] lg:flex-row lg:justify-evenly lg:gap-[0px]"
           }
         >
-          {t("pricing.title_h2_tab")}
-        </h2>
-        <PricingComparisonTable
-          lang={textLangTab}
-          option={activePlanOptions}
-          currency={currency}
-        />
-      </div>
+          {activePlanOptions.map((items, index) => {
+            return (
+              <m.li
+                key={items.name}
+                className={"max-w-[350px] min-w-[300px]"}
+                initial={{
+                  opacity: 0,
+                  rotateY: -12,
+                }}
+                animate={{
+                  opacity: 1,
+                  rotateY: 0,
+                }}
+                transition={{
+                  delay: index * 0.2,
+                  duration: 1,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                style={{
+                  transformPerspective: 1000,
+                  willChange: "transform, opacity",
+                }}
+              >
+                <PriceCard
+                  lang={textLangCard}
+                  option={items}
+                  currency={currency}
+                />
+              </m.li>
+            );
+          })}
+        </ul>
 
-      {/* FAQ*/}
-      <div
-        className={
-          "w-full max-w-[1300px] mx-auto py-[50px] flex flex-col justify-start items-center"
-        }
-      >
-        <h2
+        {/* tableau de comparaison*/}
+        <div className={"w-full max-w-[1300px] mx-auto py-[50px] "}>
+          <h2
+            className={
+              "font-bold text-3xl text-center text-info lg:text-left lg:self-start"
+            }
+          >
+            {t("pricing.title_h2_tab")}
+          </h2>
+          <PricingComparisonTable
+            lang={textLangTab}
+            option={activePlanOptions}
+            currency={currency}
+          />
+        </div>
+
+        {/* FAQ*/}
+        <div
           className={
-            "font-bold text-3xl text-center text-info lg:text-left lg:self-start"
+            "w-full max-w-[1300px] mx-auto py-[50px] flex flex-col justify-start items-center"
           }
         >
-          {t("pricing.title_h2_faq")}
-        </h2>
-        <Faq text={textLangFaq} />
-      </div>
+          <h2
+            className={
+              "font-bold text-3xl text-center text-info lg:text-left lg:self-start"
+            }
+          >
+            {t("pricing.title_h2_faq")}
+          </h2>
+          <Faq text={textLangFaq} />
+        </div>
       </div>
     </>
   );
-}
+};
 
 export { PricePage };
