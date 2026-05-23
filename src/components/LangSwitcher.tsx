@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "preact/hooks";
-import { langSignal } from "../utils/langSignal";
+import { setUserLang } from "../utils/langSignal";
 import { languageRef } from "@/data/content/components/languageNumber/languageRef";
 
 const SelectLanguage = () => {
@@ -12,7 +12,7 @@ const SelectLanguage = () => {
   };
 
   const selectLang = (ref: string) => {
-    langSignal.value = ref;
+    setUserLang(ref);
     closeDetail();
   };
 

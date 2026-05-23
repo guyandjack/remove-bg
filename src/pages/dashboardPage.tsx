@@ -17,6 +17,7 @@ import { initSessionFromLocalStorage, sessionSignal } from "@/stores/session";
 import { isAuthentified } from "@/utils/request/isAuthentified";
 import { setActiveLink } from "@/utils/setActiveLink";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
+//import { langSignal } from '@/utils/langSignal';
 
 type SubmitState = "idle" | "loading" | "success" | "error";
 type CurrencyCode = "CHF" | "EUR" | "USD";
@@ -91,9 +92,19 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
     message: string | null;
   }>({ status: "idle", message: null });
   const actionToastTimeoutRef = useRef<number | null>(null);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dashboardActionBtn = "btn btn-sm min-w-[180px]";
   const location = useLocation();
+
+  const inputPlaceHolderList = {
+  fr:"SUPPRIMER MON COMPTE",
+    en:"DELETE MY ACCOUNT",
+    de:"MEIN KONTO LÖSCHEN",
+    it:"ELIMINA IL MIO ACCOUNT",
+  };
+  
+  const lang = i18n.language[0];
+  console.log("language from i18n: ", lang);
 
   const currency: CurrencyCode = "CHF";
   const textLangCard = {

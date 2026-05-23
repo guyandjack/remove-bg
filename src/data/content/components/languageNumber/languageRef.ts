@@ -1,12 +1,12 @@
+const SUPPORTED_LANGS = ["fr", "en", "de", "it"] as const;
 
-type language = [string, string][]
+export type AppLang = (typeof SUPPORTED_LANGS)[number];
 
+type LanguageItem = readonly [code: AppLang, label: string];
 
-const languageRef:language = [
-    ["fr", "Français"],
-    ["en","English"],
-    ["de","Deutch"],
-    ["it","Italiano"] 
-]
-
-export {languageRef}
+export const languageRef: readonly LanguageItem[] = [
+  ["fr", "Français"],
+  ["en", "English"],
+  ["de", "Deutsch"],
+  ["it", "Italiano"],
+] as const;
