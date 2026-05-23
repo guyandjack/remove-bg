@@ -718,11 +718,8 @@ const ImageConverter = ({
         </p>
       </header>
 
-      <div className={"grid gap-10"}>
-        <form
-          className="flex flex-col justify-start items-center gap-4 lg:flex-row "
-          onSubmit={handleSubmit}
-        >
+      <form className={"grid gap-10"} onSubmit={handleSubmit}>
+        <div className="flex flex-col justify-start items-center gap-4 lg:flex-row ">
           <div
             onDrop={onDrop}
             onDragOver={onDragOver}
@@ -825,8 +822,9 @@ const ImageConverter = ({
               ) : null}
             </div>
           </section>
-        </form>
-        <form className={"grid lg:grid-cols-2 lg:gap-4"}>
+        </div>
+
+        <div className={"grid lg:grid-cols-2 lg:gap-4"}>
           <div
             className={
               "w-full flex flex-col justify-start items-center gap-4 lg:h-[835px]"
@@ -1077,10 +1075,10 @@ const ImageConverter = ({
                 {converterTextContent.finalDescription}
               </p>
             </div>
-          ) : (
-            <p className="text-xs text-base-content/60">
-              {converterTextContent.emptyConversionHint}
-            </p>
+              ) : (
+                <p className="text-xs text-base-content/60">
+                  {converterTextContent.emptyConversionHint}
+                </p>
           )} */}
             {/* {!userLoged ? (
             <a href="/pricing" className="service-link-info">
@@ -1088,8 +1086,8 @@ const ImageConverter = ({
             </a>
           ) : null} */}
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </section>
   );
 };
