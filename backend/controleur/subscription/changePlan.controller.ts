@@ -7,6 +7,7 @@ import {
 } from "../../function/stripe/stripeBillingGuards.js";
 import {
   getActiveSubscription,
+  getPlanById,
   getPlanByCode,
   getPlanByName,
   getUserByEmail,
@@ -14,7 +15,6 @@ import {
   updateSubscription,
   createStripeCheckoutSessionState,
 } from "../../DB/queriesSQL/queriesSQL.js";
-import { resolvePlanChangeType } from "../../services/subscription/planChange.js";
 import { createCheckoutSession } from "../../function/stripe/createCheckoutSession.js";
 import { planOption } from "../../data/planOption.js";
 
@@ -23,7 +23,8 @@ function resolveLocale(input: unknown): "fr" | "en" | "de" | "it" {
   return (["fr", "en", "de", "it"].includes(raw) ? raw : "en") as any;
 }
 
-type Body = { plan_code?: string; currency?: "CHF" | "EUR" | "USD" };
+type CurrencyCode = "CHF" | "EUR" | "USD";
+type Body = { plan_code?: string; currency?: CurrencyCode | string };
 
 function normalizePlanCodeInput(raw: string): string {
   return String(raw || "")
@@ -31,6 +32,48 @@ function normalizePlanCodeInput(raw: string): string {
     .toLowerCase()
     .replace(/\s+/g, "_")
     .replace(/-+/g, "_");
+}
+
+function normalizePlanCodeAlias(raw: string): string {
+  const normalized = normalizePlanCodeInput(raw);
+  // Backward-compatibility: some clients historically sent "hoby" (missing a 'b').
+  if (normalized === "hoby") return "hobby";
+  return normalized;
+}
+
+function getPlanOptionByCode(code: string) {
+  const normalized = normalizePlanCodeAlias(code);
+  return planOption.find((p) => p.name === normalized) ?? null;
+}
+
+function normalizeCurrencyCode(input: unknown, fallback: CurrencyCode): CurrencyCode {
+  const raw = String(input || "").trim().toUpperCase();
+  return (["CHF", "EUR", "USD"].includes(raw) ? raw : fallback) as CurrencyCode;
+}
+
+function isStripePriceId(value: string): boolean {
+  return /^price_[A-Za-z0-9_]+$/.test(String(value || ""));
+}
+
+function resolveStripePriceIdForPlan(params: {
+  targetPlan: { code: string; currency_code: string; stripe_price_id: string | null };
+  currency: CurrencyCode;
+}): { priceId: string; source: "db" | "planOption" } | null {
+  // Source of truth: planOption (Stripe Price IDs are wired there via env vars).
+  const cfg = getPlanOptionByCode(params.targetPlan.code);
+  const priceId = cfg?.stripePriceIds?.[params.currency] || "";
+  if (!priceId || !isStripePriceId(priceId)) return null;
+  return { priceId, source: "planOption" };
+}
+
+function getPlanPriceFromPlanOption(params: {
+  planCode: string;
+  currency: CurrencyCode;
+}): number | null {
+  const cfg = getPlanOptionByCode(params.planCode);
+  if (!cfg) return null;
+  const v = cfg.prices?.[params.currency];
+  return typeof v === "number" && Number.isFinite(v) ? v : null;
 }
 
 export const changePlanController: RequestHandler = async (req, res) => {
@@ -53,7 +96,7 @@ export const changePlanController: RequestHandler = async (req, res) => {
 
   const body = (req.body || {}) as Body;
   const rawPlanInput = typeof body.plan_code === "string" ? body.plan_code.trim() : "";
-  const planCode = rawPlanInput ? normalizePlanCodeInput(rawPlanInput) : "";
+  const planCode = rawPlanInput ? normalizePlanCodeAlias(rawPlanInput) : "";
   if (!rawPlanInput || !planCode) {
     return res.status(400).json({ success: false, message: "Missing plan_code." });
   }
@@ -98,24 +141,85 @@ export const changePlanController: RequestHandler = async (req, res) => {
     return res.status(404).json({ success: false, message: "Plan not found." });
   }
 
+  // Source of truth: planOption. Only allow switching to active plans defined there.
+  const targetPlanCode = normalizePlanCodeAlias(targetPlan.code);
+  const targetPlanConfig = getPlanOptionByCode(targetPlanCode);
+  if (!targetPlanConfig || !targetPlanConfig.active || targetPlanCode === "visitor") {
+    logger.warn("subscription.change_plan::plan_not_allowed", {
+      userId: user.id,
+      targetPlanId: targetPlan.id,
+      targetPlanCode: targetPlan.code,
+      normalizedTargetPlanCode: targetPlanCode,
+      hasPlanOptionConfig: Boolean(targetPlanConfig),
+      planOptionActive: targetPlanConfig?.active ?? null,
+    });
+    return res.status(404).json({ success: false, message: "Plan not found." });
+  }
+
   if (String(targetPlan.id) === String(subscription.plan_id)) {
     return res.status(200).json({ success: true, message: locale === "fr" ? "Vous êtes déjà sur ce plan." : "You are already on this plan." });
   }
 
+  // Current plan (DB + planOption) is needed to decide upgrade/downgrade reliably.
+  const currentPlanRow = await getPlanById(subscription.plan_id);
+  const currentPlanCode = currentPlanRow ? normalizePlanCodeAlias(currentPlanRow.code) : "";
+  const currentPlanConfig = currentPlanRow ? getPlanOptionByCode(currentPlanCode) : null;
+  if (!currentPlanRow || !currentPlanConfig) {
+    logger.error("subscription.change_plan::current_plan_unmapped", {
+      userId: user.id,
+      subscriptionId: subscription.id,
+      currentPlanId: subscription.plan_id,
+      currentPlanCode: currentPlanRow?.code ?? null,
+      normalizedCurrentPlanCode: currentPlanCode || null,
+    });
+    return res.status(500).json({ success: false, message: "Unable to resolve current plan configuration." });
+  }
+
   // FREE -> paid (no Stripe subscription yet): start a new Stripe subscription via Checkout.
   if (!subscription.stripe_subscription_id) {
-    const currency: "CHF" | "EUR" | "USD" =
-      body.currency && ["CHF", "EUR", "USD"].includes(body.currency) ? body.currency : "CHF";
-    const planCfg = planOption.find((p) => p.name === planCode);
-    const priceId = planCfg?.stripePriceIds?.[currency] || "";
-    if (!priceId) {
+    if (currentPlanCode !== "free") {
+      logger.error("subscription.change_plan::inconsistent_free_flow_state", {
+        userId: user.id,
+        subscriptionId: subscription.id,
+        currentPlanCode,
+        targetPlanCode,
+      });
+      return res.status(409).json({
+        success: false,
+        message: "Subscription state is inconsistent. Please contact support.",
+      });
+    }
+
+    const requestedCurrency = normalizeCurrencyCode(body.currency, "CHF");
+    const currency = requestedCurrency;
+
+    const resolved = resolveStripePriceIdForPlan({ targetPlan, currency });
+    if (!resolved) {
+      const planCfg = getPlanOptionByCode(targetPlan.code);
+      const planOptionPriceId = planCfg?.stripePriceIds?.[requestedCurrency] || "";
+      const hasPlanOptionCurrencyPrice = isStripePriceId(planOptionPriceId);
+
+      logger.warn("subscription.change_plan::missing_stripe_price_for_checkout", {
+        userId: user.id,
+        targetPlanId: targetPlan.id,
+        targetPlanCode: targetPlan.code,
+        requestedPlanInput: rawPlanInput,
+        normalizedPlanCode: planCode,
+        requestedCurrency,
+        nodeEnv: process.env.NODE_ENV,
+        stripeMode: process.env.STRIPE_MODE,
+        hasDbStripePriceId: Boolean(targetPlan.stripe_price_id),
+        hasPlanOptionConfig: Boolean(planCfg),
+        hasPlanOptionCurrencyPrice,
+      });
+
       return res.status(400).json({ success: false, message: "Plan price missing for checkout." });
     }
 
     const response = await createCheckoutSession({
-      priceId,
+      priceId: resolved.priceId,
       email: user.email,
-      planCode,
+      planCode: targetPlanCode,
       currency,
     });
     if (response.status !== "success" || !response.redirect || !response.sessionId) {
@@ -125,7 +229,7 @@ export const changePlanController: RequestHandler = async (req, res) => {
     await createStripeCheckoutSessionState({
       sessionId: response.sessionId,
       email: user.email,
-      planCode,
+      planCode: targetPlanCode,
       planId: targetPlan.id,
       currencyCode: currency,
     });
@@ -142,7 +246,7 @@ export const changePlanController: RequestHandler = async (req, res) => {
   }
 
   // Paid -> FREE: cancel Stripe subscription at period end and switch to free when it ends.
-  if (planCode === "free") {
+  if (normalizePlanCodeAlias(targetPlan.code) === "free") {
     // Prevent overlapping pending changes
     if (subscription.pending_plan_id) {
       return res.status(409).json({
@@ -223,20 +327,57 @@ export const changePlanController: RequestHandler = async (req, res) => {
     });
   }
 
-  // Determine upgrade/downgrade based on Plan.price (cents)
-  const changeType = resolvePlanChangeType({
-    currentPlanPrice: Number((subscription as any).plan_price ?? 0),
-    targetPlanPrice: Number(targetPlan.price),
+  // Determine upgrade/downgrade based on planOption (source of truth).
+  const comparisonCurrency = normalizeCurrencyCode(body.currency, "CHF");
+  const currentPlanPrice = getPlanPriceFromPlanOption({
+    planCode: currentPlanCode,
+    currency: comparisonCurrency,
   });
+  const targetPlanPrice = getPlanPriceFromPlanOption({
+    planCode: targetPlanCode,
+    currency: comparisonCurrency,
+  });
+  if (currentPlanPrice == null || targetPlanPrice == null) {
+    logger.error("subscription.change_plan::price_missing_in_plan_option", {
+      userId: user.id,
+      currentPlanCode,
+      targetPlanCode,
+      currency: comparisonCurrency,
+    });
+    return res.status(500).json({
+      success: false,
+      message: "Plan configuration error.",
+    });
+  }
+  const changeType = targetPlanPrice > currentPlanPrice ? "upgrade" : "downgrade";
 
   // Resolve Stripe price id for this plan & currency (multi-currency support)
-  const currency: "CHF" | "EUR" | "USD" =
-    body.currency && ["CHF", "EUR", "USD"].includes(body.currency) ? body.currency : "CHF";
-  const planCfg = planOption.find((p) => p.name === planCode);
-  const targetStripePriceId = planCfg?.stripePriceIds?.[currency] || "";
-  if (!targetStripePriceId) {
+  const requestedCurrency = normalizeCurrencyCode(body.currency, "CHF");
+  const currency = requestedCurrency;
+
+  const resolved = resolveStripePriceIdForPlan({ targetPlan, currency });
+  if (!resolved) {
+    const planCfg = getPlanOptionByCode(targetPlan.code);
+    const planOptionPriceId = planCfg?.stripePriceIds?.[requestedCurrency] || "";
+    const hasPlanOptionCurrencyPrice = isStripePriceId(planOptionPriceId);
+
+    logger.warn("subscription.change_plan::missing_stripe_price_for_change", {
+      userId: user.id,
+      targetPlanId: targetPlan.id,
+      targetPlanCode: targetPlan.code,
+      requestedPlanInput: rawPlanInput,
+      normalizedPlanCode: planCode,
+      requestedCurrency,
+      nodeEnv: process.env.NODE_ENV,
+      stripeMode: process.env.STRIPE_MODE,
+      hasDbStripePriceId: Boolean(targetPlan.stripe_price_id),
+      hasPlanOptionConfig: Boolean(planCfg),
+      hasPlanOptionCurrencyPrice,
+    });
+
     return res.status(400).json({ success: false, message: "Target plan is not linked to Stripe for this currency." });
   }
+  const targetStripePriceId = resolved.priceId;
 
   // Prevent overlapping pending changes
   if (subscription.pending_plan_id) {
@@ -280,6 +421,8 @@ export const changePlanController: RequestHandler = async (req, res) => {
     try {
       await stripe.subscriptions.update(subscription.stripe_subscription_id, {
         items: [{ id: subscriptionItemId, price: targetStripePriceId }],
+        // Start a fresh billing period from the successful upgrade time.
+        billing_cycle_anchor: "now",
         // Force immediate invoice + payment attempt for the proration delta.
         proration_behavior: "always_invoice",
         // Hard-fail if payment cannot be completed immediately (prevents pending payments).
