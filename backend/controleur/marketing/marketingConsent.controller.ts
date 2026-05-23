@@ -11,11 +11,7 @@ import {
   resolveMailAppName,
   resolveMailSender,
 } from "../../utils/mailer.js";
-
-function resolveLocale(input: unknown): "fr" | "en" | "de" | "it" {
-  const raw = String(input || "en").toLowerCase();
-  return (["fr", "en", "de", "it"].includes(raw) ? raw : "en") as any;
-}
+import { resolveRequestLocale } from "../../utils/locale.js";
 
 async function sendMarketingConsentConfirmationEmail(params: {
   req: any;
@@ -27,30 +23,35 @@ async function sendMarketingConsentConfirmationEmail(params: {
   const transporter = createSmtpTransporter(isProd);
   if (!transporter) return;
 
-  // Templates exist for fr/en; fallback to en for other locales
-  const templateLocale = (params.locale === "fr" || params.locale === "en") ? params.locale : "en";
   const appName = resolveMailAppName();
   const sender = resolveMailSender(isProd);
   const logoUrl = buildLogoUrl({ req: params.req, isProd });
 
+  const marketingStatusLabelByLocale: Record<
+    "fr" | "en" | "de" | "it",
+    { enabled: string; disabled: string }
+  > = {
+    fr: { enabled: "Offres activées", disabled: "Offres désactivées" },
+    en: { enabled: "Offers enabled", disabled: "Offers disabled" },
+    de: { enabled: "Angebote aktiviert", disabled: "Angebote deaktiviert" },
+    it: { enabled: "Offerte attivate", disabled: "Offerte disattivate" },
+  };
   const marketingStatusLabel =
-    templateLocale === "fr"
-      ? params.marketingConsent
-        ? "Offres activées"
-        : "Offres désactivées"
-      : params.marketingConsent
-      ? "Offers enabled"
-      : "Offers disabled";
+    marketingStatusLabelByLocale[params.locale]?.[params.marketingConsent ? "enabled" : "disabled"] ??
+    marketingStatusLabelByLocale.en[params.marketingConsent ? "enabled" : "disabled"];
 
-  const subject =
-    templateLocale === "fr"
-      ? "Préférence marketing mise à jour"
-      : "Marketing preference updated";
+  const subjectByLocale: Record<"fr" | "en" | "de" | "it", string> = {
+    fr: "Préférence marketing mise à jour",
+    en: "Marketing preference updated",
+    de: "Marketing-Einstellung aktualisiert",
+    it: "Preferenza marketing aggiornata",
+  };
+  const subject = subjectByLocale[params.locale] || subjectByLocale.en;
 
   const { html: mjmlHtml } = await renderMjmlTemplate(
-    `marketing.consent.updated.${templateLocale}.mjml`,
+    `marketing.consent.updated.${params.locale}.mjml`,
     { appName, logoUrl, marketingStatusLabel },
-    templateLocale
+    params.locale
   );
 
   const html = mjmlHtml && mjmlHtml.trim().length > 0 ? mjmlHtml : undefined;
@@ -87,8 +88,7 @@ export const updateMarketingConsentController: RequestHandler = async (req, res)
   logger.info("marketing.consent::updated", { userId: user.id, marketingConsent: raw });
 
   if (previous !== raw) {
-    const langHeader = req.headers["accept-language"];
-    const locale = resolveLocale(Array.isArray(langHeader) ? langHeader[0] : langHeader);
+    const locale = resolveRequestLocale(req);
     sendMarketingConsentConfirmationEmail({
       req,
       userEmail: user.email,

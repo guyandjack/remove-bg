@@ -11,7 +11,7 @@ import { BtnGoogleLogin } from "@/components/button/loginGoogle";
 import { OtpInput } from "@/components/form/OtpInput";
 import { Loader } from "@/components/loader/Loader";
 
-import { localOrProd } from "@/utils/localOrProd";
+import { login } from "@/utils/axiosConfig";
 import { REGEX } from "@/shared/validationRegex";
 
 
@@ -33,8 +33,6 @@ type BgColor = {
 };
 
 //constante et variable globales
-const { urlApi } = localOrProd();
-
 //declarations des fonctions
 
 //recupere la valeur du parametre "plan"
@@ -164,8 +162,8 @@ const FormSignUp = () => {
     dataUser.current = data;
 
     try {
-      const response = await axios.post(
-        `${urlApi}/api/signup/check/user`,
+      const response = await login.post(
+        "/api/signup/check/user",
         data,
         {
           withCredentials: true,

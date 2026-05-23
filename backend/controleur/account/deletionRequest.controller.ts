@@ -26,11 +26,7 @@ import {
 } from "../../utils/mailer.js";
 import crypto from "node:crypto";
 import { computeEmailHmacSha256Hex } from "../../utils/emailGuard.js";
-
-function resolveLocale(input: unknown): "fr" | "en" | "de" | "it" {
-  const raw = String(input || "en").toLowerCase();
-  return (["fr", "en", "de", "it"].includes(raw) ? raw : "en") as any;
-}
+import { resolveRequestLocale } from "../../utils/locale.js";
 
 export const accountDeletionRequestController: RequestHandler = async (req, res) => {
   const email =
@@ -44,8 +40,7 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
     return res.status(404).json({ success: false, message: "User not found." });
   }
 
-  const langHeader = req.headers["accept-language"];
-  const locale = resolveLocale(Array.isArray(langHeader) ? langHeader[0] : langHeader);
+  const locale = resolveRequestLocale(req);
 
   const now = new Date();
   const stripe = getStripeClient();
@@ -201,20 +196,22 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
   try {
     const transporter = createSmtpTransporter(process.env.NODE_ENV === "production");
     if (transporter) {
-      const templateLocale = locale === "fr" || locale === "en" ? locale : "en";
       const appName = resolveMailAppName();
       const sender = resolveMailSender(process.env.NODE_ENV === "production");
       const logoUrl = buildLogoUrl({ req, isProd: process.env.NODE_ENV === "production" });
 
-      const subject =
-        templateLocale === "fr"
-          ? "Confirmation de demande de suppression"
-          : "Account deletion request confirmation";
+      const subjectByLocale: Record<"fr" | "en" | "de" | "it", string> = {
+        fr: "Confirmation de demande de suppression",
+        en: "Account deletion request confirmation",
+        de: "Bestätigung der Kontolöschungsanfrage",
+        it: "Conferma della richiesta di eliminazione dell’account",
+      };
+      const subject = subjectByLocale[locale] || subjectByLocale.en;
 
       const { html: mjmlHtml } = await renderMjmlTemplate(
-        `account.deletion.requested.${templateLocale}.mjml`,
+        `account.deletion.requested.${locale}.mjml`,
         { appName, logoUrl },
-        templateLocale
+        locale
       );
       const html = mjmlHtml && mjmlHtml.trim().length > 0 ? mjmlHtml : undefined;
       await transporter.sendMail({

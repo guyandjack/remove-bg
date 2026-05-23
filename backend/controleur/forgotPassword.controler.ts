@@ -6,16 +6,12 @@ import { logger } from "../logger.js";
 import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.js";
 import { signPasswordResetToken } from "../function/createToken.js";
 import { buildLogoUrl } from "../utils/publicAssetUrl.js";
+import { resolveRequestLocale } from "../utils/locale.js";
 
 function normalizeEmail(email: unknown): string | null {
   if (!email) return null;
   const str = String(email).trim().toLowerCase();
   return str.length ? str : null;
-}
-
-function resolveLocale(lang: unknown): string {
-  const l = String(lang || "en").toLowerCase();
-  return ["fr", "de", "en", "it"].includes(l) ? l : "en";
 }
 
 function parseExpiryMinutes(raw: string | undefined): number {
@@ -40,7 +36,7 @@ export const forgotPassword: RequestHandler = async (req, res) => {
     }
 
     const normalizedEmail = normalizeEmail(email);
-    const locale = resolveLocale(lang);
+    const locale = resolveRequestLocale(req);
     if (!normalizedEmail || !locale) {
       return res.status(400).json({ status: "error", message: "normalise payload code_forgot_2" });
     }
@@ -90,7 +86,14 @@ export const forgotPassword: RequestHandler = async (req, res) => {
           : process.env.MAILBOX_DEV_ADDRESS || process.env.MAILBOX_DEV_ADRESS) ?? "";
 
       const appName = process.env.MAIL_SENDER_NAME || "Wizard Pixel";
-      const subject = isProd ? "Réinitialisation de votre mot de passe" : "[DEV] Réinitialisation de votre mot de passe";
+      const baseSubjectByLocale: Record<"fr" | "en" | "de" | "it", string> = {
+        fr: "Réinitialisation de votre mot de passe",
+        en: "Password reset",
+        de: "Passwort zurücksetzen",
+        it: "Reimpostazione della password",
+      };
+      const baseSubject = baseSubjectByLocale[locale] || baseSubjectByLocale.en;
+      const subject = isProd ? baseSubject : `[DEV] ${baseSubject}`;
 
       const expiryMinutes = parseExpiryMinutes(process.env.JWT_PASSWORD_RESET_EXPIRES_IN);
       const { html: mjmlHtml } = await renderMjmlTemplate(

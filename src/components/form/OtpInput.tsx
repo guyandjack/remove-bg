@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 //import des composnta enfants
 import { Loader } from "@/components/loader/Loader";
 
-import { localOrProd } from "@/utils/localOrProd";
+import { login } from "@/utils/axiosConfig";
 import { setSessionFromApiResponse } from "@/stores/session";
 import { REGEX } from "@/shared/validationRegex";
 
@@ -45,8 +45,6 @@ type OtpFormValues = {
   email?: string;
   id?: string;
 };
-
-const { urlApi } = localOrProd();
 
 function OtpInput({
   length = 6,
@@ -275,8 +273,8 @@ function OtpInput({
       const mailUser: any = emailUser || dataUser?.email;
       const payload = { ...data, email: mailUser };
 
-      const response = await axios.post(
-        `${urlApi}/api/signup/check/otp`,
+      const response = await login.post(
+        "/api/signup/check/otp",
         payload,
         {
           withCredentials: true,

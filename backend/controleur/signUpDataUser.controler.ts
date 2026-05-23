@@ -7,6 +7,7 @@ import type { ResultSetHeader } from "mysql2/promise";
 import { connectDb } from "../DB/poolConnexion/poolConnexion.js";
 import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.js";
 import { getUserByEmail } from "../DB/queriesSQL/queriesSQL.js";
+import { resolveRequestLocale } from "../utils/locale.js";
 /* import { planOption } from "../data/planOption.js";
 import { buildLogoUrl } from "../utils/publicAssetUrl.js"; */
 
@@ -22,11 +23,6 @@ function normalizeEmail(email: unknown): string | null {
   if (!email) return null;
   const str = String(email).trim().toLowerCase();
   return str.length ? str : null;
-}
-
-function resolveLocale(lang: unknown): string {
-  const l = String(lang || "en").toLowerCase();
-  return ["fr", "de", "en", "it"].includes(l) ? l : "en";
 }
 
 const sendMailVerification: RequestHandler = async (req, res) => {
@@ -57,7 +53,7 @@ const sendMailVerification: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: true, message: "Invalid email", code: "signup_invalid_email" });
     }
 
-    const locale = resolveLocale(lang);
+    const locale = resolveRequestLocale(req);
     const isResend = String(id || "").toLowerCase() === "resend";
     
     const planCode = String(plan).toLowerCase();

@@ -10,6 +10,7 @@ import {
   resolveMailAppName,
   resolveMailSender,
 } from "../utils/mailer.js";
+import { resolveRequestLocale } from "../utils/locale.js";
 
 //import des fonctions
 
@@ -58,17 +59,10 @@ const normalizeCurrency = (code?: string | null): CurrencyCode => {
 
 const OTP_MAX_ATTEMPTS = 5;
 
-function resolveTemplateLocaleFromRequest(req: any): "fr" | "en" {
-  const header = req?.headers?.["accept-language"];
-  const raw = Array.isArray(header) ? header[0] : header;
-  const first = String(raw || "").split(",")[0].trim().toLowerCase();
-  return first.startsWith("fr") ? "fr" : "en";
-}
-
 async function sendAccountCreatedEmail(params: {
   req: any;
   toEmail: string;
-  locale: "fr" | "en";
+  locale: "fr" | "en" | "de" | "it";
 }) {
   const isProd = process.env.NODE_ENV === "production";
   try {
@@ -85,14 +79,14 @@ async function sendAccountCreatedEmail(params: {
     const urlLogo = buildLogoUrl({ req: params.req, isProd });
     const name = String(params.toEmail).split("@")[0] || "";
 
-    const subject =
-      params.locale === "fr"
-        ? isProd
-          ? "Confirmation de création de compte"
-          : "[DEV] Confirmation de création de compte"
-        : isProd
-        ? "Account creation confirmation"
-        : "[DEV] Account creation confirmation";
+    const baseSubjectByLocale: Record<"fr" | "en" | "de" | "it", string> = {
+      fr: "Confirmation de création de compte",
+      en: "Account creation confirmation",
+      de: "Bestätigung der Kontoerstellung",
+      it: "Conferma di creazione dell’account",
+    };
+    const baseSubject = baseSubjectByLocale[params.locale] || baseSubjectByLocale.en;
+    const subject = isProd ? baseSubject : `[DEV] ${baseSubject}`;
 
     const { html: mjmlHtml } = await renderMjmlTemplate(
       `account.created.${params.locale}.mjml`,
@@ -426,7 +420,7 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         void sendAccountCreatedEmail({
           req,
           toEmail: email,
-          locale: resolveTemplateLocaleFromRequest(req),
+          locale: resolveRequestLocale(req),
         });
 
         return res.status(200).json(formatedObject);

@@ -95,6 +95,9 @@ const corsOptions: CorsOptions = {
     "Authorization",
     "Accept",
     "X-Requested-With",
+    // Frontend i18next language (used for MJML template selection)
+    "X-App-Locale",
+    "x-app-locale",
     // Async job creation uses an idempotency key header (preflight must allow it)
     "Idempotency-Key",
     "X-Idempotency-Key",

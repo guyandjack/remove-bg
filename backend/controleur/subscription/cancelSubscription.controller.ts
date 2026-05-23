@@ -18,11 +18,7 @@ import {
   resolveMailSender, 
   createSmtpTransporter, 
 } from "../../utils/mailer.js"; 
-
-function resolveLocale(input: unknown): "fr" | "en" | "de" | "it" {
-  const raw = String(input || "en").toLowerCase();
-  return (["fr", "en", "de", "it"].includes(raw) ? raw : "en") as any;
-}
+import { resolveRequestLocale } from "../../utils/locale.js";
 
 function formatIsoDate(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -90,20 +86,20 @@ async function sendCancellationConfirmationEmail(params: {
     const dashboardUrl = `${buildPublicBaseUrl(isProd)}/dashboard`;
 
     const planAccessUntil = formatIsoDate(params.currentPeriodEnd);
-    const subject =
-      params.locale === "fr"
-        ? isProd
-          ? "Confirmation d’annulation d’abonnement"
-          : "[DEV] Confirmation d’annulation d’abonnement"
-        : isProd
-        ? "Subscription cancellation confirmation"
-        : "[DEV] Subscription cancellation confirmation";
-
-    const templateLocale =
-      params.locale === "fr" || params.locale === "en" ? params.locale : "en";
+    const baseSubjectByLocale: Record<
+      "fr" | "en" | "de" | "it",
+      string
+    > = {
+      fr: "Confirmation d’annulation d’abonnement",
+      en: "Subscription cancellation confirmation",
+      de: "Bestätigung der Abonnementkündigung",
+      it: "Conferma di annullamento dell’abbonamento",
+    };
+    const baseSubject = baseSubjectByLocale[params.locale] || baseSubjectByLocale.en;
+    const subject = isProd ? baseSubject : `[DEV] ${baseSubject}`;
 
     const { html: mjmlHtml } = await renderMjmlTemplate(
-      `subscription.canceling.${templateLocale}.mjml`,
+      `subscription.canceling.${params.locale}.mjml`,
       {
         appName,
         logoUrl,
@@ -111,7 +107,7 @@ async function sendCancellationConfirmationEmail(params: {
         creditsRemaining: params.creditsRemaining ?? "—",
         dashboardUrl,
       },
-      templateLocale
+      params.locale
     );
 
     const html = mjmlHtml && mjmlHtml.trim().length > 0 ? mjmlHtml : undefined;
@@ -132,8 +128,7 @@ async function sendCancellationConfirmationEmail(params: {
 export const cancelSubscriptionController: RequestHandler = async (req, res) => {
   const isProd = process.env.NODE_ENV === "production";
   const stripe = getStripeClient();
-  const langHeader = req.headers["accept-language"];
-  const locale = resolveLocale(Array.isArray(langHeader) ? langHeader[0] : langHeader);
+  const locale = resolveRequestLocale(req);
 
   if (!stripe) {
     return res.status(500).json({

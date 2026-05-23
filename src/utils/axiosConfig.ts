@@ -5,6 +5,7 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 //import des fonction
 import { sessionSignal } from "@/stores/session";
 import { localOrProd } from "@/utils/localOrProd";
+import { langSignal } from "@/utils/langSignal";
 
 //const et variable globale
 const { urlApi } = localOrProd();
@@ -90,6 +91,17 @@ function attachAuthAndNormalizeUrl(client: ReturnType<typeof axios.create>) {
       (config.headers as any).Authorization = `Bearer ${token}`;
     }
 
+    // Langue applicative (i18next) : utilisée côté backend pour sélectionner les templates MJML.
+    // On envoie uniquement la base ("en", "fr", "de", "it").
+    try {
+      const raw = String(langSignal.value || "").trim().toLowerCase();
+      const base = raw.split("-")[0] || "en";
+      if (!config.headers) config.headers = {} as any;
+      (config.headers as any)["x-app-locale"] = base;
+    } catch {
+      // ignore
+    }
+
     return config;
   });
 }
@@ -120,6 +132,7 @@ const login = axios.create({
 // --- Interceptor pour ajouter le token ---
 attachAuthAndNormalizeUrl(api);
 attachAuthAndNormalizeUrl(apiBlob);
+attachAuthAndNormalizeUrl(login);
 
 // ---- Gestion du refresh en cours (pour éviter plusieurs refresh en parallèle) ----
 let isRefreshing = false;
