@@ -784,7 +784,7 @@
         "deletionRequested": "Suppression demandée.",
         "deletionNotRequested": "Aucune suppression demandée.",
         "deletionWarning": "La suppression désactive l’accès immédiatement. Cette action est irréversible.",
-        "typeToConfirm": "Tapez SUPPRIMER pour confirmer",
+        "typeToConfirm": "Tapez {{placeholder}} pour confirmer",
         "deleteCta": "Supprimer mon compte",
         "deletionSuccess": "Demande de suppression enregistrée. Déconnexion en cours.",
         "deletionError": "Impossible de demander la suppression du compte.",

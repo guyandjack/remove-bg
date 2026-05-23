@@ -17,6 +17,7 @@ import { initSessionFromLocalStorage, sessionSignal } from "@/stores/session";
 import { isAuthentified } from "@/utils/request/isAuthentified";
 import { setActiveLink } from "@/utils/setActiveLink";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
+import { langSignal } from "@/utils/langSignal";
 //import { langSignal } from '@/utils/langSignal';
 
 type SubmitState = "idle" | "loading" | "success" | "error";
@@ -91,6 +92,9 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
     status: "idle" | "success" | "error" | "info";
     message: string | null;
   }>({ status: "idle", message: null });
+
+  
+
   const actionToastTimeoutRef = useRef<number | null>(null);
   const { t, i18n } = useTranslation();
   const dashboardActionBtn = "btn btn-sm min-w-[180px]";
@@ -103,8 +107,16 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
     it:"ELIMINA IL MIO ACCOUNT",
   };
   
-  const lang = i18n.language[0];
+  const lang = langSignal.value;
   console.log("language from i18n: ", lang);
+
+  function selectPlaceHolder():string | "" {
+    if (!inputPlaceHolderList || !lang) return "";
+    let placeHolderTable = Object.entries(inputPlaceHolderList).filter((items) => items[0] === lang);
+    return placeHolderTable[0][1]
+  
+  }
+
 
   const currency: CurrencyCode = "CHF";
   const textLangCard = {
@@ -858,7 +870,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                     <label className="form-control w-full max-w-xs">
                       <div className="label">
                         <span className="label-text">
-                          {t("dashboardPage.billing.account.typeToConfirm")}
+                          {t("dashboardPage.billing.account.typeToConfirm",{placeholder: selectPlaceHolder()})}
                         </span>
                       </div>
                       <input
@@ -867,7 +879,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                         onInput={(e: any) =>
                           setDeleteConfirmText(e.currentTarget.value)
                         }
-                        placeholder="SUPPRIMER"
+                        placeholder={selectPlaceHolder()}
                       />
                     </label>
                   </div>
@@ -877,7 +889,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
                   disabled={
                     deletionSubmitting === "loading" ||
                     billingState?.account?.account_deletion_requested ||
-                    deleteConfirmText !== "SUPPRIMER"
+                    deleteConfirmText !== selectPlaceHolder()
                   }
                   onClick={handleAccountDeletionRequest}
                 >

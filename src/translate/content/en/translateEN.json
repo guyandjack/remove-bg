@@ -784,7 +784,7 @@
         "deletionRequested": "Deletion requested.",
         "deletionNotRequested": "No deletion requested.",
         "deletionWarning": "Deleting your account disables access immediately. This action cannot be undone.",
-        "typeToConfirm": "Type SUPPRIMER to confirm",
+        "typeToConfirm": "Type {{placeholder}} to confirm",
         "deleteCta": "Delete my account",
         "deletionSuccess": "Deletion request recorded. You are being signed out.",
         "deletionError": "Unable to request account deletion.",
