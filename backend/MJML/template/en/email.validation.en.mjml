@@ -4,7 +4,7 @@
       <mj-column vertical-align="top" width="100%">
         <mj-image
           src="{{urlLogo}}"
-          alt=""
+          alt="Logo"
           align="center"
           border="none"
           width="200px"
@@ -13,11 +13,15 @@
           padding-right="0px"
           padding-bottom="0px"
           padding-top="0"
-        />
+        ></mj-image>
       </mj-column>
     </mj-section>
-
-    <mj-section padding-bottom="20px" padding-top="20px">
+    
+    <mj-section
+      
+      padding-bottom="20px"
+      padding-top="20px"
+    >
       <mj-column vertical-align="middle" width="100%">
         <mj-text
           align="left"
@@ -26,11 +30,9 @@
           font-family="open Sans Helvetica, Arial, sans-serif"
           padding-left="25px"
           padding-right="25px"
+          >Hello<span style="color: #f4bf51"> {{email}}</span><br /><br />
+          Welcome to Wiz Pix</mj-text
         >
-          Hello<span style="color: #f4bf51"> {{email}}</span><br /><br />
-          Welcome to Wiz Pix
-        </mj-text>
-
         <mj-text
           align="left"
           color="#ffffff"
@@ -39,25 +41,25 @@
           padding-left="25px"
           padding-right="25px"
           line-height="1.2"
-        >
-          To complete the creation of your account
-        </mj-text>
-
-        <mj-button padding="5px" background-color="#2fd4bf">
-          {{plan}}
-        </mj-button>
-
-        <mj-text
+          >To finish creating your account
+          </mj-text>
+          <mj-button
+            padding="5px"
+            background-color="#2fd4bf"
+          >
+            {{plan}}
+          </mj-button>
+          <mj-text
           align="left"
           color="#ffffff"
           font-size="16px"
           font-family="open Sans Helvetica, Arial, sans-serif"
           padding-left="25px"
           padding-right="25px"
-          line-height="1.2"
+          line-height="1.2">
+          please confirm your email address by copying the code below into the website window.(valid for 
+10 minutes)</mj-text
         >
-          please confirm your email address by copying the code below into the website window (valid for 10 minutes).
-        </mj-text>
 
         <mj-button
           align="center"
@@ -69,9 +71,8 @@
           letter-spacing="5px"
           padding-left="25px"
           padding-right="25px"
+          >{{code}}</mj-button
         >
-          {{code}}
-        </mj-button>
 
         <mj-text
           align="left"
@@ -80,10 +81,9 @@
           font-family="open Sans Helvetica, Arial, sans-serif"
           padding-left="25px"
           padding-right="25px"
+          >Thank you, <br />
+          The Wizard of Pixels Team</mj-text
         >
-          Thank you, <br />
-          The Wizard of Pixels Team
-        </mj-text>
       </mj-column>
     </mj-section>
   </mj-body>

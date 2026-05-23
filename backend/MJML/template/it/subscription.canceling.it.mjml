@@ -27,7 +27,7 @@
           padding-left="25px"
           padding-right="25px"
         >
-          Passwort zurücksetzen
+          Annullamento programmato
         </mj-text>
 
         <mj-text
@@ -39,12 +39,24 @@
           padding-right="25px"
           line-height="1.4"
         >
-          Hallo <span style="color: #f4bf51">{{email}}</span>,<br /><br />
-          Sie haben das Zurücksetzen Ihres Passworts angefordert. Wenn Sie diese Anfrage gestellt haben, klicken Sie auf die Schaltfläche unten (gültig {{expiryMinutes}} Minuten).
+          Confermiamo che la sua richiesta di annullamento è stata registrata.
         </mj-text>
 
-        <mj-button
-          href="{{resetUrl}}"
+        <mj-text
+          align="left"
+          color="#ffffff"
+          font-size="16px"
+          font-family="open Sans Helvetica, Arial, sans-serif"
+          padding-left="25px"
+          padding-right="25px"
+          line-height="1.4"
+        >
+          Data di fine accesso: <span style="color: #f4bf51">{{planAccessUntil}}</span><br />
+          Crediti rimanenti: <span style="color: #f4bf51">{{creditsRemaining}}</span>
+        </mj-text>
+
+        <!-- <mj-button
+          href="{{dashboardUrl}}"
           align="left"
           color="#1e293b"
           background-color="#f4bf51"
@@ -55,8 +67,8 @@
           padding-right="25px"
           inner-padding="10px 16px"
         >
-          Passwort zurücksetzen
-        </mj-button>
+          Apri il pannello di controllo
+        </mj-button> -->
 
         <mj-text
           align="left"
@@ -67,20 +79,7 @@
           padding-right="25px"
           line-height="1.4"
         >
-          Oder kopieren Sie diesen Link in Ihren Browser:<br />
-          <a href="{{resetUrl}}" style="color:#2fd4bf; word-break:break-all">{{resetUrl}}</a>
-        </mj-text>
-
-        <mj-text
-          align="left"
-          color="#ffffff"
-          font-size="13px"
-          font-family="open Sans Helvetica, Arial, sans-serif"
-          padding-left="25px"
-          padding-right="25px"
-          line-height="1.4"
-        >
-          Wenn Sie diese Anfrage nicht gestellt haben, können Sie diese E-Mail ignorieren.
+          Può gestire il suo abbonamento, le sue preferenze marketing e il suo account dal suo pannello di controllo.
         </mj-text>
 
         <mj-text
@@ -91,10 +90,11 @@
           padding-left="25px"
           padding-right="25px"
         >
-          Danke, <br />
-          Das {{appName}}-Team
+          Grazie, <br />
+          Il team {{appName}}
         </mj-text>
       </mj-column>
     </mj-section>
   </mj-body>
 </mjml>
+

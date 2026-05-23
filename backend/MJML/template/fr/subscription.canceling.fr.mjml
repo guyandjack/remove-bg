@@ -55,7 +55,7 @@
           Crédits restants : <span style="color: #f4bf51">{{creditsRemaining}}</span>
         </mj-text>
 
-        <mj-button
+        <!-- <mj-button
           href="{{dashboardUrl}}"
           align="left"
           color="#1e293b"
@@ -68,7 +68,7 @@
           inner-padding="10px 16px"
         >
           Ouvrir le tableau de bord
-        </mj-button>
+        </mj-button> -->
 
         <mj-text
           align="left"

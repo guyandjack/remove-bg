@@ -3,8 +3,8 @@
     <mj-section padding-bottom="20px" padding-top="20px">
       <mj-column vertical-align="top" width="100%">
         <mj-image
-          src="{{logoUrl}}"
-          alt="{{appName}}"
+          src="{{urlLogo}}"
+          alt="Logo"
           align="center"
           border="none"
           width="200px"
@@ -13,7 +13,7 @@
           padding-right="0px"
           padding-bottom="0px"
           padding-top="0"
-        />
+        ></mj-image>
       </mj-column>
     </mj-section>
 
@@ -27,7 +27,8 @@
           padding-left="25px"
           padding-right="25px"
         >
-          Passwort zurücksetzen
+          Ciao<span style="color: #f4bf51"> {{email}}</span><br /><br />
+          Il tuo account Wiz Pix è stato creato
         </mj-text>
 
         <mj-text
@@ -39,48 +40,19 @@
           padding-right="25px"
           line-height="1.4"
         >
-          Hallo <span style="color: #f4bf51">{{email}}</span>,<br /><br />
-          Sie haben das Zurücksetzen Ihres Passworts angefordert. Wenn Sie diese Anfrage gestellt haben, klicken Sie auf die Schaltfläche unten (gültig {{expiryMinutes}} Minuten).
-        </mj-text>
-
-        <mj-button
-          href="{{resetUrl}}"
-          align="left"
-          color="#1e293b"
-          background-color="#f4bf51"
-          font-size="15px"
-          font-family="open Sans Helvetica, Arial, sans-serif"
-          border-radius="6px"
-          padding-left="25px"
-          padding-right="25px"
-          inner-padding="10px 16px"
-        >
-          Passwort zurücksetzen
-        </mj-button>
-
-        <mj-text
-          align="left"
-          color="#ffffff"
-          font-size="13px"
-          font-family="open Sans Helvetica, Arial, sans-serif"
-          padding-left="25px"
-          padding-right="25px"
-          line-height="1.4"
-        >
-          Oder kopieren Sie diesen Link in Ihren Browser:<br />
-          <a href="{{resetUrl}}" style="color:#2fd4bf; word-break:break-all">{{resetUrl}}</a>
+          La creazione del tuo account è stata confermata.
         </mj-text>
 
         <mj-text
           align="left"
           color="#ffffff"
-          font-size="13px"
+          font-size="16px"
           font-family="open Sans Helvetica, Arial, sans-serif"
           padding-left="25px"
           padding-right="25px"
           line-height="1.4"
         >
-          Wenn Sie diese Anfrage nicht gestellt haben, können Sie diese E-Mail ignorieren.
+          Ora puoi accedere con il tuo indirizzo email.
         </mj-text>
 
         <mj-text
@@ -91,10 +63,11 @@
           padding-left="25px"
           padding-right="25px"
         >
-          Danke, <br />
-          Das {{appName}}-Team
+          Grazie, <br />
+          Il team Wizard of Pixels
         </mj-text>
       </mj-column>
     </mj-section>
   </mj-body>
 </mjml>
+
