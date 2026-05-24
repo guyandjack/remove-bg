@@ -153,6 +153,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
     },
   };
 
+  const cardFeatureContentTitle = t("featureCardContent.title");
   const cardFeatureContent = [
     {
       url: t("featureCardContent.card_1.url"),
@@ -290,7 +291,6 @@ function HomePage({ routeKey = "" }: PropsPage) {
           description: tSeo("home.description"),
         }}
       />
-      
 
       <div className={"page-container"}>
         <div className={"w-full mb-[100px] lg:mb-0"}>
@@ -302,7 +302,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
             <Hero content={heroContent} />
           </div>
         </div>
-        
+
         <div className={"w-full p-10 lg:p-15"}>
           <div
             className={
@@ -376,7 +376,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
             }
           >
             <h2 className="mb-[50px] self-center text-center text-3xl font-bold lg:w-[60%] lg:text-5xl lg:self-start lg:text-left">
-              A qui s'adresse notre service
+              {cardFeatureContentTitle}
             </h2>
             <ul
               className={

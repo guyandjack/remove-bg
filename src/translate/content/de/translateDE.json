@@ -256,6 +256,7 @@
     "info_2": "Kündigen Sie Ihr Abonnement jederzeit"
   },
   "featureCardContent": {
+    "title":"An wen richtet sich unser Service?",
     "card_1": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5\" /></svg>",
       "title": "Webentwickler",
@@ -321,50 +322,60 @@
   },
   "imageConverter": {
     "headerTagline": "Bildkonvertierung",
-    "headerTitle": "Bereite dein Bild vor, passe es an und konvertiere es",
-    "headerDescription": "Téléverse un Datei, choisis les dimensions, l’extension finale et applique quelques filtres avant d’envoyer la conversion.",
-    "dropzonePrompt": "Dépose ton Bild ici ou utilise le bouton.",
+    "headerTitle": "Bereiten Sie Ihr Bild vor, passen Sie es an und konvertieren Sie es",
+    "headerDescription": "Laden Sie eine Datei hoch, wählen Sie die Abmessungen und das Zielformat und wenden Sie vor der Konvertierung einige Filter an.",
+    "dropzonePrompt": "Legen Sie Ihr Bild hier ab oder verwenden Sie die Schaltfläche.",
     "dropzoneButton": "Bild auswählen",
+
     "dimensionsTitle": "Abmessungen",
-    "dimensionsDescription": "Ajuste la largeur et la hauteur désirées.",
+    "dimensionsDescription": "Passen Sie die gewünschte Breite und Höhe an.",
     "dimensionsReset": "Zurücksetzen",
     "dimensionsWidth": "Breite (px)",
     "dimensionsHeight": "Höhe (px)",
-    "dimensionsLockAspect": "Proportionen sperren",
+    "dimensionsLockAspect": "Seitenverhältnis sperren",
     "dimensionsOriginalPrefix": "Original:",
-    "formatTitle": "Format und Qualität",
-    "formatDescription": "Choisis l’extension finale et ajuste la compression.",
+
+    "formatTitle": "Format & Qualität",
+    "formatDescription": "Wählen Sie das Zielformat und passen Sie die Komprimierung an.",
     "formatExtension": "Erweiterung",
     "qualityLabel": "Qualität",
-    "qualityPriorityWeight": "Priorität Dateigröße",
-    "qualityPriorityQuality": "Priorität Qualität",
+    "qualityPriorityWeight": "Dateigröße priorisieren",
+    "qualityPriorityQuality": "Qualität priorisieren",
+
     "filtersTitle": "Schnellfilter",
-    "filtersDescription": "Ajuste l’Bild avant de lancer la conversion de Datei.",
+    "filtersDescription": "Passen Sie das Bild vor der Dateikonvertierung an.",
     "filtersReset": "Standard",
     "actionClear": "Löschen",
     "actionConvert": "Konvertieren",
+
     "previewTitle": "Vorschau",
     "previewAlt": "Konvertierte Vorschau",
-    "previewEmpty": "Kein aperçu disponible.",
+    "previewEmpty": "Keine Vorschau verfügbar.",
     "previewHint": " ",
+
     "summaryDimensions": "Zielabmessungen",
     "summaryFormat": "Format",
     "summaryQuality": "Qualität",
+
     "changeImage": "Bild ändern",
     "downloadConverted": "Konvertiertes Bild herunterladen",
     "deleteConverted": "Konvertiertes Bild löschen",
+
     "assetReadyPrefix": "Datei bereit:",
     "finalAlt": "Endergebnis",
-    "finalDescription": "Visualise ci-dessus l’Bild calculée par le serveur. Tu peux la télécharger ou la löschen si le rendu ne correspond pas à tes attentes.",
-    "emptyConversionHint": "La conversion côté serveur générera un lien de téléchargement sécurisé.",
-    "needPlanLink": "Wähle einen Plan, um den Dienst zu nutzen",
+    "finalDescription": "Sehen Sie oben das vom Server berechnete Bild. Sie können es herunterladen oder löschen, wenn das Ergebnis nicht Ihren Erwartungen entspricht.",
+    "emptyConversionHint": "Die serverseitige Konvertierung erzeugt einen sicheren Download-Link.",
+
+    "needPlanLink": "Wählen Sie einen Plan, um den Dienst zu nutzen",
+
     "statusDeleted": "Das konvertierte Bild wurde gelöscht.",
-    "statusNoFile": "Füge ein Bild hinzu, um zu starten.",
+    "statusNoFile": "Fügen Sie ein Bild hinzu, um zu starten.",
     "statusLoading": "Konvertierung läuft…",
-    "statusSuccess": "Bild konvertiert. Lade die Datei herunter, um das Ergebnis zu erhalten.",
-    "statusError": "Das Bild kann derzeit nicht konvertiert werden. Prüfe deine Verbindung oder versuche es später erneut.",
-    "statusParamsModified": "Parameter geändert. Starte die Konvertierung erneut, um die Datei zu aktualisieren.",
-    "previewError": "Impossible de générer l’aperçu :",
+    "statusSuccess": "Bild konvertiert. Laden Sie die Datei herunter, um das Ergebnis zu erhalten.",
+    "statusError": "Das Bild kann derzeit nicht konvertiert werden. Überprüfen Sie Ihre Verbindung oder versuchen Sie es später erneut.",
+    "statusParamsModified": "Parameter geändert. Starten Sie die Konvertierung erneut, um die Datei zu aktualisieren.",
+    "previewError": "Vorschau konnte nicht erstellt werden:",
+
     "filters": {
       "brightness": "Helligkeit",
       "contrast": "Kontrast",
@@ -372,7 +383,7 @@
       "hue": "Farbton",
       "grayscale": "Graustufen",
       "blur": "Unschärfe",
-      "blurHelper": "Appliquer un léger flou pour adoucir les bords."
+      "blurHelper": "Leichte Unschärfe anwenden, um Kanten weicher zu machen."
     }
   },
   "imgEditor": {
@@ -680,8 +691,8 @@
     "conclusion": "Mit Abschluss eines Abonnements bestätigt der Kunde die Annahme dieser AVB."
   },
   "servicePageTitle": {
-    "title_h1": "Tistez la qualité des Diensts",
-    "title_h1_loged": "Utilisez nos Diensts"
+    "title_h1": "Testen Sie die Qualität unserer Dienstleistungen",
+    "title_h1_loged": "Nutzen Sie unsere Dienstleistungen"
   },
   "dashboardPage": {
     "title": "Dashboard",

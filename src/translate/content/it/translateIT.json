@@ -159,7 +159,7 @@
     "ressourceIA_hobby": "Avanzato",
     "ressourceIA_pro": "Pro"
   },
-  
+
   "priceCard": {
     "tag": "Il più popolare",
     "remove_bg": "Rimozione dello sfondo",
@@ -243,9 +243,9 @@
     }
   },
   "cta": {
-    "title_home_1": "Beginnen Sie jetzt mit der Bearbeitung Ihrer Bilder.",
-    "label_choice": "Ich wähle einen Plan",
-    "label_test": "Ich möchte die Qualität testen"
+    "title_home_1": "Inizia a elaborare le tue immagini.",
+    "label_choice": "Scelgo un piano",
+    "label_test": "Voglio testare la qualità"
   },
   "ctaFinal": {
     "title_home": "Modifica subito le tue immagini",
@@ -256,6 +256,7 @@
     "info_2": "Annulla il tuo abbonamento in qualsiasi momento"
   },
   "featureCardContent": {
+    "title": "A chi è rivolto il nostro servizio",
     "card_1": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5\" /></svg>",
       "title": "Webentwickler",
@@ -288,18 +289,20 @@
     },
     "card_7": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75\" /></svg>",
-      "title": "Marketplace-Manager",
-      "description": "Vereinheitlichen Sie die Bilder Ihrer Verkäufer, indem Hintergründe automatisch entfernt werden, um Ihre visuellen Standards einzuhalten."
+      "title": "Responsabili marketplace",
+      "description": "Uniforma le immagini dei venditori rimuovendo automaticamente gli sfondi per rispettare i tuoi standard visivi."
     },
+
     "card_8": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z\" /></svg>",
-      "title": "Immobilien",
-      "description": "Präsentieren Sie Ihre Immobilien mit klaren Visuals ohne störenden Hintergrund – ideal für Anzeigen und Marketingmaterialien."
+      "title": "Immobiliare",
+      "description": "Valorizza i tuoi immobili con immagini pulite, senza sfondi che distraggono, per annunci e materiali promozionali."
     },
+
     "card_9": {
       "url": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-10 stroke-primary\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z\" /></svg>",
-      "title": "Handwerker und Kreative",
-      "description": "Werten Sie Ihre Produkte mit klaren und professionellen Bildern auf – ganz ohne teure Ausrüstung."
+      "title": "Artigiani e creatori",
+      "description": "Valorizza i tuoi prodotti con immagini nitide e professionali, senza attrezzature costose."
     }
   },
   "uploadImg": {
@@ -321,50 +324,60 @@
   },
   "imageConverter": {
     "headerTagline": "Conversione immagini",
-    "headerTitle": "Prepara la tua immagine, regola e converti",
-    "headerDescription": "Téléverse un file, choisis les dimensions, l’extension finale et applique quelques filtres avant d’envoyer la conversion.",
-    "dropzonePrompt": "Dépose ton immagine ici ou utilise le bouton.",
-    "dropzoneButton": "Seleziona un’immagine",
+    "headerTitle": "Prepara la tua immagine, modificala e convertila",
+    "headerDescription": "Carica un file, scegli le dimensioni, il formato finale e applica alcuni filtri prima di avviare la conversione.",
+    "dropzonePrompt": "Trascina qui la tua immagine oppure usa il pulsante.",
+    "dropzoneButton": "Seleziona un'immagine",
+
     "dimensionsTitle": "Dimensioni",
-    "dimensionsDescription": "Ajuste la largeur et la hauteur désirées.",
+    "dimensionsDescription": "Regola larghezza e altezza desiderate.",
     "dimensionsReset": "Reimposta",
     "dimensionsWidth": "Larghezza (px)",
     "dimensionsHeight": "Altezza (px)",
-    "dimensionsLockAspect": "Blocca le proporzioni",
+    "dimensionsLockAspect": "Blocca proporzioni",
     "dimensionsOriginalPrefix": "Originale:",
+
     "formatTitle": "Formato e qualità",
-    "formatDescription": "Choisis l’extension finale et ajuste la compression.",
+    "formatDescription": "Scegli il formato finale e regola la compressione.",
     "formatExtension": "Estensione",
     "qualityLabel": "Qualità",
     "qualityPriorityWeight": "Priorità al peso",
     "qualityPriorityQuality": "Priorità alla qualità",
+
     "filtersTitle": "Filtri rapidi",
-    "filtersDescription": "Ajuste l’immagine avant de lancer la conversion de file.",
+    "filtersDescription": "Modifica l'immagine prima di avviare la conversione del file.",
     "filtersReset": "Predefinito",
     "actionClear": "Cancella",
     "actionConvert": "Converti",
+
     "previewTitle": "Anteprima",
     "previewAlt": "Anteprima convertita",
-    "previewEmpty": "Nessun aperçu disponible.",
+    "previewEmpty": "Nessuna anteprima disponibile.",
     "previewHint": " ",
+
     "summaryDimensions": "Dimensioni target",
     "summaryFormat": "Formato",
     "summaryQuality": "Qualità",
+
     "changeImage": "Cambia immagine",
-    "downloadConverted": "Scarica l’immagine convertita",
-    "deleteConverted": "Elimina l’immagine convertita",
+    "downloadConverted": "Scarica immagine convertita",
+    "deleteConverted": "Elimina immagine convertita",
+
     "assetReadyPrefix": "File pronto:",
     "finalAlt": "Risultato finale",
-    "finalDescription": "Visualise ci-dessus l’immagine calculée par le serveur. Tu peux la télécharger ou la eliminare si le rendu ne correspond pas à tes attentes.",
-    "emptyConversionHint": "La conversion côté serveur générera un lien de téléchargement sécurisé.",
-    "needPlanLink": "Scegli un piano per usare il servizio",
-    "statusDeleted": "L’immagine convertita è stata eliminata.",
-    "statusNoFile": "Aggiungi un’immagine per iniziare.",
+    "finalDescription": "Visualizza sopra l’immagine elaborata dal server. Puoi scaricarla o eliminarla se il risultato non corrisponde alle tue aspettative.",
+    "emptyConversionHint": "La conversione lato server genererà un link di download sicuro.",
+
+    "needPlanLink": "Scegli un piano per utilizzare il servizio",
+
+    "statusDeleted": "L'immagine convertita è stata eliminata.",
+    "statusNoFile": "Aggiungi un'immagine per iniziare.",
     "statusLoading": "Conversione in corso…",
-    "statusSuccess": "Immagine convertita. Scarica il file per recuperare il risultato.",
-    "statusError": "Impossibile convertire l’immagine al momento. Controlla la connessione o riprova più tardi.",
-    "statusParamsModified": "Parametri modificati. Rilancia la conversione per aggiornare il file.",
-    "previewError": "Impossible de générer l’aperçu :",
+    "statusSuccess": "Immagine convertita. Scarica il file per ottenere il risultato.",
+    "statusError": "Impossibile convertire l'immagine al momento. Controlla la connessione o riprova più tardi.",
+    "statusParamsModified": "Parametri modificati. Riavvia la conversione per aggiornare il file.",
+    "previewError": "Impossibile generare l'anteprima:",
+
     "filters": {
       "brightness": "Luminosità",
       "contrast": "Contrasto",
@@ -372,7 +385,7 @@
       "hue": "Tonalità",
       "grayscale": "Scala di grigi",
       "blur": "Sfocatura",
-      "blurHelper": "Appliquer un léger flou pour adoucir les bords."
+      "blurHelper": "Applica una leggera sfocatura per ammorbidire i bordi."
     }
   },
   "imgEditor": {
@@ -560,26 +573,25 @@
   "privacy": {
     "title": "Informativa sulla privacy",
 
-  "intro": "La presente informativa sulla privacy descrive il modo in cui Wizpix raccoglie, utilizza e protegge i dati personali nell'ambito dell'utilizzo del servizio di rimozione dello sfondo delle immagini. Wizpix adotta un approccio basato sulla minimizzazione dei dati e sulla trasparenza («privacy by design»).",
+    "intro": "La presente informativa sulla privacy descrive il modo in cui Wizpix raccoglie, utilizza e protegge i dati personali nell'ambito dell'utilizzo del servizio di rimozione dello sfondo delle immagini. Wizpix adotta un approccio basato sulla minimizzazione dei dati e sulla trasparenza («privacy by design»).",
 
-  "article1_title": "1. Titolare del trattamento",
-  "article1_text": "Wizpix agisce in qualità di titolare del trattamento dei dati personali ai sensi del Regolamento Generale sulla Protezione dei Dati (GDPR) e della normativa svizzera applicabile (LPD).\n\nAlcuni fornitori intervengono in qualità di titolari autonomi o responsabili del trattamento, come descritto di seguito.",
+    "article1_title": "1. Titolare del trattamento",
+    "article1_text": "Wizpix agisce in qualità di titolare del trattamento dei dati personali ai sensi del Regolamento Generale sulla Protezione dei Dati (GDPR) e della normativa svizzera applicabile (LPD).\n\nAlcuni fornitori intervengono in qualità di titolari autonomi o responsabili del trattamento, come descritto di seguito.",
 
-  "article2_title": "2. Dati raccolti",
-  "article2_text": "Wizpix raccoglie esclusivamente i dati strettamente necessari alla fornitura del servizio:\n\n- Indirizzo email (creazione account)\n- Password (memorizzata in forma crittografata)\n- Dati trasmessi volontariamente tramite il modulo di contatto\n- Indirizzo IP (per finalità di sicurezza)\n\nNessun dato di pagamento viene raccolto o archiviato da Wizpix.\n\nNessuna immagine viene archiviata sui server di Wizpix.",
+    "article2_title": "2. Dati raccolti",
+    "article2_text": "Wizpix raccoglie esclusivamente i dati strettamente necessari alla fornitura del servizio:\n\n- Indirizzo email (creazione account)\n- Password (memorizzata in forma crittografata)\n- Dati trasmessi volontariamente tramite il modulo di contatto\n- Indirizzo IP (per finalità di sicurezza)\n\nNessun dato di pagamento viene raccolto o archiviato da Wizpix.\n\nNessuna immagine viene archiviata sui server di Wizpix.",
 
-  "article3_title": "3. Pagamento (Stripe)",
-  "article3_text": "I pagamenti sono elaborati direttamente da Stripe, che agisce in qualità di titolare autonomo del trattamento.\n\nLe informazioni di pagamento vengono inserite direttamente dall’utente tramite l’interfaccia sicura di Stripe. Wizpix raccoglie esclusivamente nome e cognome trasmessi tramite Stripe durante il pagamento, unicamente per migliorare l’esperienza utente (UX).\n\nPer maggiori informazioni: <a class='faq-link' href='https://stripe.com/privacy'>https://stripe.com/privacy</a>",
+    "article3_title": "3. Pagamento (Stripe)",
+    "article3_text": "I pagamenti sono elaborati direttamente da Stripe, che agisce in qualità di titolare autonomo del trattamento.\n\nLe informazioni di pagamento vengono inserite direttamente dall’utente tramite l’interfaccia sicura di Stripe. Wizpix raccoglie esclusivamente nome e cognome trasmessi tramite Stripe durante il pagamento, unicamente per migliorare l’esperienza utente (UX).\n\nPer maggiori informazioni: <a class='faq-link' href='https://stripe.com/privacy'>https://stripe.com/privacy</a>",
 
-  "article4_title": "4. Elaborazione delle immagini (Replicate)",
-  "article4_text": "Wizpix agisce come intermediario tecnico tra l’utente e i modelli di intelligenza artificiale forniti da Replicate, Inc. (Stati Uniti).\n\nLe immagini vengono trasmesse tramite API sicura esclusivamente per la loro elaborazione e successivamente restituite immediatamente all’utente.\n\nNessun dato che consenta di identificare l’utente (come email o informazioni dell’account) viene trasmesso insieme alle immagini.\n\nSecondo la documentazione pubblica di Replicate, i dati elaborati tramite la loro API non vengono utilizzati per addestrare modelli pubblici e vengono conservati solo per il tempo necessario all’elaborazione.\n\nWizpix non controlla i trattamenti effettuati da Replicate, che agisce come responsabile del trattamento o fornitore tecnico.\n\nPer maggiori informazioni: <a class='faq-link' href='https://replicate.com/privacy'>https://replicate.com/privacy</a>",
+    "article4_title": "4. Elaborazione delle immagini (Replicate)",
+    "article4_text": "Wizpix agisce come intermediario tecnico tra l’utente e i modelli di intelligenza artificiale forniti da Replicate, Inc. (Stati Uniti).\n\nLe immagini vengono trasmesse tramite API sicura esclusivamente per la loro elaborazione e successivamente restituite immediatamente all’utente.\n\nNessun dato che consenta di identificare l’utente (come email o informazioni dell’account) viene trasmesso insieme alle immagini.\n\nSecondo la documentazione pubblica di Replicate, i dati elaborati tramite la loro API non vengono utilizzati per addestrare modelli pubblici e vengono conservati solo per il tempo necessario all’elaborazione.\n\nWizpix non controlla i trattamenti effettuati da Replicate, che agisce come responsabile del trattamento o fornitore tecnico.\n\nPer maggiori informazioni: <a class='faq-link' href='https://replicate.com/privacy'>https://replicate.com/privacy</a>",
 
-  "article5_title": "5. Finalità del trattamento",
-  "article5_text": "I dati vengono utilizzati esclusivamente per:\n\n- Fornire e gestire il servizio\n- Gestire gli account utente\n- Rispondere alle richieste tramite supporto\n- Garantire la sicurezza e l’integrità del servizio\n\nNessun dato viene utilizzato per finalità pubblicitarie, profilazione o tracciamento.",
+    "article5_title": "5. Finalità del trattamento",
+    "article5_text": "I dati vengono utilizzati esclusivamente per:\n\n- Fornire e gestire il servizio\n- Gestire gli account utente\n- Rispondere alle richieste tramite supporto\n- Garantire la sicurezza e l’integrità del servizio\n\nNessun dato viene utilizzato per finalità pubblicitarie, profilazione o tracciamento.",
 
-  "article6_title": "6. Base giuridica",
-  "article6_text": "Il trattamento si basa su:\n\n- Esecuzione del servizio (contratto)\n- Consenso dell’utente (creazione account, contatto)\n- Interesse legittimo (sicurezza del servizio)"
-,
+    "article6_title": "6. Base giuridica",
+    "article6_text": "Il trattamento si basa su:\n\n- Esecuzione del servizio (contratto)\n- Consenso dell’utente (creazione account, contatto)\n- Interesse legittimo (sicurezza del servizio)",
     "article7_title": "7. Cookie",
     "article7_text": "Wizpix utilizza esclusivamente un cookie strettamente necessario al funzionamento del Servizio. Questo cookie consente di mantenere attiva la sessione utente.\n\nNon vengono utilizzati cookie di tracciamento, analisi o pubblicitari.",
 
@@ -604,39 +616,39 @@
     "conclusion": "Wizpix si impegna a raccogliere il minimo indispensabile di dati, a essere trasparente sul loro utilizzo e a proteggere la privacy dei propri utenti."
   },
   "legal": {
-  "title": "Note legali",
-  "intro": "Le presenti note legali hanno lo scopo di definire le informazioni relative all’editore, al fornitore di hosting e alle condizioni generali di utilizzo del sito web per la rimozione dello sfondo (di seguito denominato il «Servizio»).",
+    "title": "Note legali",
+    "intro": "Le presenti note legali hanno lo scopo di definire le informazioni relative all’editore, al fornitore di hosting e alle condizioni generali di utilizzo del sito web per la rimozione dello sfondo (di seguito denominato il «Servizio»).",
 
-  "article1_title": "1. Editore del sito web",
-  "article1_text": "Il sito web e il Servizio sono pubblicati da:\n\nRagione sociale: Helveclick\nIndirizzo della sede legale: Helveclick, Chemin du Mont Paisible 1, 3963 Crans-Montana, Svizzera\nNumero di identificazione aziendale IDE: CHE-443.826.915\nIndirizzo email di contatto: <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>\nResponsabile della pubblicazione: Helveclick\n\nL’editore è responsabile dei contenuti pubblicati sul sito e della gestione del Servizio.",
+    "article1_title": "1. Editore del sito web",
+    "article1_text": "Il sito web e il Servizio sono pubblicati da:\n\nRagione sociale: Helveclick\nIndirizzo della sede legale: Helveclick, Chemin du Mont Paisible 1, 3963 Crans-Montana, Svizzera\nNumero di identificazione aziendale IDE: CHE-443.826.915\nIndirizzo email di contatto: <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>\nResponsabile della pubblicazione: Helveclick\n\nL’editore è responsabile dei contenuti pubblicati sul sito e della gestione del Servizio.",
 
-  "article2_title": "2. Hosting del sito web",
-  "article2_text": "Provider di hosting: PlanetHoster \nSede principale (Quebec): 4416 Louis-B.-Mayer, Laval, Quebec, H7P 0G1, Canada \nSito web: https://www.planethoster.ch/en \nTel: (FR) +33 1 59 12 00 07 -- (CH) +41 22 51 80 559 -- (CA) +1 855 774-4678 \n\nIl provider di hosting garantisce la disponibilità tecnica del Servizio in conformità alle proprie condizioni generali.",
+    "article2_title": "2. Hosting del sito web",
+    "article2_text": "Provider di hosting: PlanetHoster \nSede principale (Quebec): 4416 Louis-B.-Mayer, Laval, Quebec, H7P 0G1, Canada \nSito web: https://www.planethoster.ch/en \nTel: (FR) +33 1 59 12 00 07 -- (CH) +41 22 51 80 559 -- (CA) +1 855 774-4678 \n\nIl provider di hosting garantisce la disponibilità tecnica del Servizio in conformità alle proprie condizioni generali.",
 
-  "article3_title": "3. Proprietà intellettuale",
-  "article3_text": "Tutti i contenuti presenti sul sito web e all’interno del Servizio, inclusi ma non limitati a testi, immagini, grafica, loghi, icone, suoni, video, codice sorgente e algoritmi, sono di proprietà esclusiva del Fornitore, salvo diversa indicazione.\n\nQualsiasi riproduzione, rappresentazione, modifica, pubblicazione, trasmissione o adattamento, totale o parziale, dei contenuti del sito, con qualsiasi mezzo o procedimento, è vietata senza la preventiva autorizzazione scritta del Fornitore.\n\nQualsiasi utilizzo non autorizzato costituisce una violazione dei diritti di proprietà intellettuale e può comportare azioni legali ai sensi della normativa svizzera ed europea.",
+    "article3_title": "3. Proprietà intellettuale",
+    "article3_text": "Tutti i contenuti presenti sul sito web e all’interno del Servizio, inclusi ma non limitati a testi, immagini, grafica, loghi, icone, suoni, video, codice sorgente e algoritmi, sono di proprietà esclusiva del Fornitore, salvo diversa indicazione.\n\nQualsiasi riproduzione, rappresentazione, modifica, pubblicazione, trasmissione o adattamento, totale o parziale, dei contenuti del sito, con qualsiasi mezzo o procedimento, è vietata senza la preventiva autorizzazione scritta del Fornitore.\n\nQualsiasi utilizzo non autorizzato costituisce una violazione dei diritti di proprietà intellettuale e può comportare azioni legali ai sensi della normativa svizzera ed europea.",
 
-  "article4_title": "4. Responsabilità",
-  "article4_text": "Il Fornitore si impegna a garantire l’accuratezza e il costante aggiornamento delle informazioni pubblicate sul sito. Tuttavia, non potrà essere ritenuto responsabile per eventuali errori, omissioni, interruzioni o indisponibilità temporanee del Servizio.\n\nL’Utente riconosce di utilizzare il Servizio a proprio rischio. Il Fornitore non potrà essere ritenuto responsabile per danni diretti o indiretti derivanti dall’utilizzo del Servizio, inclusa la perdita di dati o la corruzione di file.\n\nL’Utente è l’unico responsabile dei contenuti caricati tramite il Servizio. Qualsiasi contenuto illegale (inclusi, a titolo esemplificativo ma non esaustivo, contenuti pedopornografici, violenti, di odio o contrari alla normativa svizzera ed europea) è severamente vietato e potrà essere segnalato alle autorità competenti.",
+    "article4_title": "4. Responsabilità",
+    "article4_text": "Il Fornitore si impegna a garantire l’accuratezza e il costante aggiornamento delle informazioni pubblicate sul sito. Tuttavia, non potrà essere ritenuto responsabile per eventuali errori, omissioni, interruzioni o indisponibilità temporanee del Servizio.\n\nL’Utente riconosce di utilizzare il Servizio a proprio rischio. Il Fornitore non potrà essere ritenuto responsabile per danni diretti o indiretti derivanti dall’utilizzo del Servizio, inclusa la perdita di dati o la corruzione di file.\n\nL’Utente è l’unico responsabile dei contenuti caricati tramite il Servizio. Qualsiasi contenuto illegale (inclusi, a titolo esemplificativo ma non esaustivo, contenuti pedopornografici, violenti, di odio o contrari alla normativa svizzera ed europea) è severamente vietato e potrà essere segnalato alle autorità competenti.",
 
-  "article5_title": "5. Dati personali",
-  "article5_text": "Il trattamento dei dati personali è disciplinato dalla <a class=\"faq-link\" href=\"/privacy\">Informativa sulla privacy</a>, consultabile in qualsiasi momento sul sito web. Essa descrive la natura dei dati raccolti, le finalità del trattamento, i periodi di conservazione e i diritti dell’Utente in conformità al GDPR e alla Legge federale svizzera sulla protezione dei dati (LPD).",
-  "article5_link": "Leggi la nostra Informativa sulla privacy",
+    "article5_title": "5. Dati personali",
+    "article5_text": "Il trattamento dei dati personali è disciplinato dalla <a class=\"faq-link\" href=\"/privacy\">Informativa sulla privacy</a>, consultabile in qualsiasi momento sul sito web. Essa descrive la natura dei dati raccolti, le finalità del trattamento, i periodi di conservazione e i diritti dell’Utente in conformità al GDPR e alla Legge federale svizzera sulla protezione dei dati (LPD).",
+    "article5_link": "Leggi la nostra Informativa sulla privacy",
 
-  "article6_title": "6. Link esterni",
-  "article6_text": "Il sito può contenere collegamenti ipertestuali ad altri siti web. Il Fornitore non può essere ritenuto responsabile per il contenuto, la sicurezza o le pratiche sulla privacy di tali siti di terze parti. L’accesso a tali siti è sotto l’esclusiva responsabilità dell’Utente.",
+    "article6_title": "6. Link esterni",
+    "article6_text": "Il sito può contenere collegamenti ipertestuali ad altri siti web. Il Fornitore non può essere ritenuto responsabile per il contenuto, la sicurezza o le pratiche sulla privacy di tali siti di terze parti. L’accesso a tali siti è sotto l’esclusiva responsabilità dell’Utente.",
 
-  "article7_title": "7. Sicurezza del sito web",
-  "article7_text": "Il Fornitore adotta tutte le misure tecniche necessarie per garantire la sicurezza dell’accesso e dell’utilizzo del Servizio. Tuttavia, l’Utente è informato che la sicurezza assoluta su Internet non esiste. È responsabilità dell’Utente proteggere i propri dispositivi e dati (password, file, software).",
+    "article7_title": "7. Sicurezza del sito web",
+    "article7_text": "Il Fornitore adotta tutte le misure tecniche necessarie per garantire la sicurezza dell’accesso e dell’utilizzo del Servizio. Tuttavia, l’Utente è informato che la sicurezza assoluta su Internet non esiste. È responsabilità dell’Utente proteggere i propri dispositivi e dati (password, file, software).",
 
-  "article8_title": "8. Legge applicabile e foro competente",
-  "article8_text": "Le presenti note legali sono disciplinate dal diritto svizzero. In caso di controversia, salvo diversa previsione di norme imperative, i tribunali competenti del Cantone Vallese avranno competenza esclusiva.",
+    "article8_title": "8. Legge applicabile e foro competente",
+    "article8_text": "Le presenti note legali sono disciplinate dal diritto svizzero. In caso di controversia, salvo diversa previsione di norme imperative, i tribunali competenti del Cantone Vallese avranno competenza esclusiva.",
 
-  "article9_title": "9. Contatti",
-  "article9_text": "Per qualsiasi domanda relativa al sito, ai suoi contenuti o alle condizioni di utilizzo, è possibile contattare l’editore tramite il <a class=\"faq-link\" href=\"/contact\">modulo di contatto del sito</a> oppure via email all’indirizzo <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>.",
+    "article9_title": "9. Contatti",
+    "article9_text": "Per qualsiasi domanda relativa al sito, ai suoi contenuti o alle condizioni di utilizzo, è possibile contattare l’editore tramite il <a class=\"faq-link\" href=\"/contact\">modulo di contatto del sito</a> oppure via email all’indirizzo <a class=\"faq-link\" href=\"mailto:info@helveclick.ch\">info@helveclick.ch</a>.",
 
-  "conclusion": "Accedendo al sito e utilizzando il Servizio, l’Utente dichiara di aver letto e accettato senza riserve le presenti note legali."
-},
+    "conclusion": "Accedendo al sito e utilizzando il Servizio, l’Utente dichiara di aver letto e accettato senza riserve le presenti note legali."
+  },
   "cgv": {
     "title": "Condizioni Generali di Vendita (CGV)",
 
@@ -683,8 +695,8 @@
     "conclusion": "Sottoscrivendo un abbonamento, il Cliente riconosce di accettare le presenti CGV."
   },
   "servicePageTitle": {
-    "title_h1": "Tèez la qualité des servizios",
-    "title_h1_loged": "Utilisez nos servizios"
+    "title_h1": "Testa la qualità dei nostri servizi",
+    "title_h1_loged": "Utilizza i nostri servizi"
   },
   "dashboardPage": {
     "title": "Dashboard",
