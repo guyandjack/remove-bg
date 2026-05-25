@@ -19,12 +19,13 @@ const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
       method: req.method,
       path: req.originalUrl || req.url,
       hasAuthHeader: Boolean(rawAuth),
-      errorCode: "veri1",
+      code: "mw_verifyAuth_err1",
     });
-    return res
-      .status(401)
-      .set("Cache-Control", "no-store")
-      .json({ status: "error", message: "No token", errorCode: "veri1" });
+    return res.status(401).set("Cache-Control", "no-store").json({
+      status: "error",
+      message: "Unauthorized",
+      code: "mw_verifyAuth_err1",
+    });
   }
 
   try {
@@ -41,12 +42,13 @@ const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
         requestId: (req as any).requestId,
         method: req.method,
         path: req.originalUrl || req.url,
-        errorCode: "veri2",
+        code: "mw_verifyAuth_err2",
       });
-      return res
-      .status(401)
-      .set("Cache-Control", "no-store")
-      .json({ status: "error", message: "Invalid token", errorCode: "veri2" });
+      return res.status(401).set("Cache-Control", "no-store").json({
+        status: "error",
+        message: "Unauthorized",
+        code: "mw_verifyAuth_err2",
+      });
     }
     
     (req as any).payload = { ...(req as any).payload, email: email };
@@ -56,13 +58,14 @@ const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
       requestId: (req as any).requestId,
       method: req.method,
       path: req.originalUrl || req.url,
-      errorCode: "veri3",
+      code: "mw_verifyAuth_err3",
       message: err?.message ?? String(err),
     });
-    return res
-      .status(401)
-      .set("Cache-Control", "no-store")
-      .json({ status: "error", message: err?.message || String(err), errorCode: "veri3" });
+    return res.status(401).set("Cache-Control", "no-store").json({
+      status: "error",
+      message: "Unauthorized",
+      code: "mw_verifyAuth_err3",
+    });
   }
 };
 
