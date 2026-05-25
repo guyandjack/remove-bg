@@ -349,6 +349,7 @@
     "headerDescription": "Upload a file, choose target dimensions and output format, then apply a few filters before sending the conversion. The final output is produced server-side with Sharp.",
     "dropzonePrompt": "Drop your image here or use the button.",
     "dropzoneButton": "Select an image",
+    "validFile":"Accepted file formats :",
     "dimensionsTitle": "Dimensions",
     "dimensionsDescription": "Adjust the desired width and height.",
     "dimensionsReset": "Reset",

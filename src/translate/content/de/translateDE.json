@@ -333,6 +333,7 @@
     "headerDescription": "Laden Sie eine Datei hoch, wählen Sie die Abmessungen und das Zielformat und wenden Sie vor der Konvertierung einige Filter an.",
     "dropzonePrompt": "Legen Sie Ihr Bild hier ab oder verwenden Sie die Schaltfläche.",
     "dropzoneButton": "Bild auswählen",
+    "validFile":"Akzeptierte Dateiformate :",
 
     "dimensionsTitle": "Abmessungen",
     "dimensionsDescription": "Passen Sie die gewünschte Breite und Höhe an.",

@@ -15,6 +15,11 @@ import type { AxiosError } from "axios";
 import { getMaxUploadForUser } from "@/utils/planOptionLimits";
 import { isAuthentified } from "@/utils/request/isAuthentified";
 import { setFileNameDownload } from "@/utils/setFileNameDownload";
+//import { validateFile } from '@/utils/check/validateFileImg';
+import {
+  validateFile,
+  type FileValidationTextContent,
+} from "@/utils/check/validateFileImg";
 
 type FilterOptions = {
   brightness: number;
@@ -48,6 +53,7 @@ type ConverterTextContent = {
   headerDescription: string;
   dropzonePrompt: string;
   dropzoneButton: string;
+  validFile: string;
   dimensionsTitle: string;
   dimensionsDescription: string;
   dimensionsReset: string;
@@ -100,6 +106,24 @@ type ConverterTextContent = {
 const MIN_SIZE = 32;
 const MAX_SIZE = 6000;
 
+const ACCEPTED_INPUT_MIME = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+] as const;
+
+const ACCEPTED_INPUT_EXT = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+  ".gif",
+] as const;
+
+const interpolateMaxMb = (template: string, maxMb: number) =>
+  template.replace(/\{\{\s*maxMb\s*\}\}/g, String(maxMb));
+
 const formatChoices: { label: string; value: SupportedFormat }[] = [
   { label: "PNG", value: "png" },
   { label: "JPEG", value: "jpeg" },
@@ -149,8 +173,10 @@ function readAuthToken(): string | null {
 
 const ImageConverter = ({
   converterTextContent,
+  fileValidationTextContent,
 }: {
   converterTextContent: ConverterTextContent;
+  fileValidationTextContent: FileValidationTextContent;
 }) => {
   const userLoged = sessionSignal?.value?.authentified;
   const [visitorBlocked, setVisitorBlocked] = useState(false);
@@ -308,7 +334,33 @@ const ImageConverter = ({
     });
   }, [options.width, options.height]);
 
+  const getUploadLimits = () =>
+    getMaxUploadForUser({
+      plans: planOptionsSignal.value,
+      isAuthenticated: Boolean(userLoged),
+      planCode: sessionSignal.value?.plan?.code || null,
+    });
+
+  const getFileValidationContent = (maxMb: number): FileValidationTextContent => ({
+    ...fileValidationTextContent,
+    tooLarge: interpolateMaxMb(fileValidationTextContent.tooLarge, maxMb),
+  });
+
   const applyFile = (selected: File) => {
+    const { maxBytes, maxMb } = getUploadLimits();
+    const validationContent = getFileValidationContent(maxMb);
+    const error = validateFile(
+      selected,
+      validationContent,
+      ACCEPTED_INPUT_MIME,
+      ACCEPTED_INPUT_EXT,
+      maxBytes,
+    );
+    if (error) {
+      setStatus({ state: "error", message: error });
+      return;
+    }
+
     releaseObjectUrl(previewUrl);
     releaseObjectUrl(convertedAsset?.url);
     setConvertedAsset(null);
@@ -508,10 +560,20 @@ const ImageConverter = ({
 
   const handleSubmit = async (event: Event) => {
     event.preventDefault();
-    if (!file) {
-      setStatus({ state: "error", message: converterTextContent.statusNoFile });
+    const { maxBytes, maxMb } = getUploadLimits();
+    const validationContent = getFileValidationContent(maxMb);
+    const fileError = validateFile(
+      file,
+      validationContent,
+      ACCEPTED_INPUT_MIME,
+      ACCEPTED_INPUT_EXT,
+      maxBytes,
+    );
+    if (fileError) {
+      setStatus({ state: "error", message: fileError });
       return;
     }
+    if (!file) return;
 
     // If a token exists, verify auth before starting the conversion request.
     // This avoids starting a long request that will be rejected by the backend (expired token).
@@ -530,20 +592,6 @@ const ImageConverter = ({
         });
         return;
       }
-    }
-
-    // Align UX with backend upload limits (visitor/free/hobby...).
-    const { maxBytes, maxMb } = getMaxUploadForUser({
-      plans: planOptionsSignal.value,
-      isAuthenticated: Boolean(userLoged),
-      planCode: sessionSignal.value?.plan?.code || null,
-    });
-    if (file.size > maxBytes) {
-      setStatus({
-        state: "error",
-        message: `Image trop volumineuse. Taille max: ${maxMb} MB.`,
-      });
-      return;
     }
 
     const formData = new FormData();
@@ -724,17 +772,18 @@ const ImageConverter = ({
             onDrop={onDrop}
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
-            className={`w-full border-2 border-dashed rounded-2xl p-6 text-center bg-component transition ${
-              isDragActive ? "border-primary bg-primary/5" : "border-base-300"
+            className={`relative mb-5 w-full border-2 border-dashed rounded-2xl p-6 text-center bg-component transition ${
+              isDragActive ? "border-info" : "border"
             }`}
           >
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept={ACCEPTED_INPUT_MIME.join(",")}
               className="hidden"
               onChange={onFileChange}
             />
+
             <p className="mb-3 font-medium">
               {file ? file.name : converterTextContent.dropzonePrompt}
             </p>
@@ -745,6 +794,9 @@ const ImageConverter = ({
             >
               {converterTextContent.dropzoneButton}
             </button>
+            <p className={"absolute bottom-[-1.8rem] left-0 text-sm"}>
+              Formats: JPG, PNG, WEBP, GIF
+            </p>
           </div>
 
           <section className="w-full flex flex-col justify-start items-left gap-4 bg-component rounded-2xl p-5  shadow-sm">
@@ -951,15 +1003,15 @@ const ImageConverter = ({
             </section>
 
             <footer className="w-full flex flex-col gap-3 justify-start lg:flex-row bg-component p-4 rounded-xl">
-                <p className={`text-sm break-words ${statusColor} lg:w-[calc(100%-220px)]`}>
-                  
+              <p
+                className={`text-sm break-words ${statusColor} lg:w-[calc(100%-220px)]`}
+              >
                 {(status.message && status.message.length > 0) ||
-                  status.state !== "idle" ? (
-                  status.message) : ""}
-                  
-                </p>
-               
-              
+                status.state !== "idle"
+                  ? status.message
+                  : ""}
+              </p>
+
               <button
                 type="button"
                 className="btn btn-outline btn-info btn-md w-[100px]"

@@ -347,6 +347,7 @@
     "headerDescription": "Téléverse un fichier, choisis les dimensions, l’extension finale et applique quelques filtres avant d’envoyer la conversion.",
     "dropzonePrompt": "Dépose ton image ici ou utilise le bouton.",
     "dropzoneButton": "Sélectionner une image",
+    "validFile":"Fichiers acceptés :",
     "dimensionsTitle": "Dimensions",
     "dimensionsDescription": "Ajuste la largeur et la hauteur désirées.",
     "dimensionsReset": "Réinitialiser",

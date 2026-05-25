@@ -33,6 +33,11 @@ type UploadImgType = {
   filename: string;
   preview: string;
   erase: string;
+  nofile: string;
+  tooLarge:string;
+  mustBeImage:string;
+  unsupportedFormat:string;
+  invalidExtension: string;
 };
 
 type CtaKey =
@@ -130,6 +135,12 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
     filename: t("uploadImg.fileName"),
     preview: t("uploadImg.preview"),
     erase: t("uploadImg.erase"),
+    nofile: t("uploadImg.errors.noFile"),
+    tooLarge: t("uploadImg.errors.tooLarge"),
+    mustBeImage: t("uploadImg.errors.mustBeImage"),
+    unsupportedFormat: t("uploadImg.errors.unsupportedFormat"),
+    invalidExtension: t("uploadImg.errors.invalidExtension"),
+  
   };
   const removeBgContent = {
     confirmLabelIdle: t("removeBg.confirmLabelIdle"),
@@ -195,6 +206,7 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
     headerDescription: t("imageConverter.headerDescription"),
     dropzonePrompt: t("imageConverter.dropzonePrompt"),
     dropzoneButton: t("imageConverter.dropzoneButton"),
+    validFile: t("imageConverter.validFile"),
     dimensionsTitle: t("imageConverter.dimensionsTitle"),
     dimensionsDescription: t("imageConverter.dimensionsDescription"),
     dimensionsReset: t("imageConverter.dimensionsReset"),
@@ -396,7 +408,10 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <ImageConverter converterTextContent={converterContent} />
+              <ImageConverter
+                converterTextContent={converterContent}
+                fileValidationTextContent={textUploadImgComponent}
+              />
             </m.div>
           ) : null}
         </AnimatePresence>

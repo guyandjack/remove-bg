@@ -335,6 +335,7 @@
     "headerDescription": "Carica un file, scegli le dimensioni, il formato finale e applica alcuni filtri prima di avviare la conversione.",
     "dropzonePrompt": "Trascina qui la tua immagine oppure usa il pulsante.",
     "dropzoneButton": "Seleziona un'immagine",
+    "validFile":"Formati accettati :",
 
     "dimensionsTitle": "Dimensioni",
     "dimensionsDescription": "Regola larghezza e altezza desiderate.",

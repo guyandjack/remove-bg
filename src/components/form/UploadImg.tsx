@@ -2,23 +2,17 @@
 
 //import des hooks
 import { useEffect, useRef, useState } from "preact/hooks";
-import { useTranslation } from "react-i18next";
 import { sessionSignal } from "@/stores/session";
 import { planOptionsSignal } from "@/stores/planOptions";
 import { getMaxUploadForUser } from "@/utils/planOptionLimits";
+import { validateFile } from "@/utils/check/validateFileImg";
 
 //import des composants enfant
 import { InputFile } from "../input/InputFile";
 
 //import des data
 
-const ACCEPTED_MIME = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-]);
-const ACCEPTED_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
+
 
 
 
@@ -28,6 +22,11 @@ export type UploadImgType = {
   filename: string;
   preview: string;
   erase: string;
+  nofile: string;
+  tooLarge: string;
+  mustBeImage: string;
+  unsupportedFormat: string;
+  invalidExtension: string;
 };
 
 export type UploadImgProps = {
@@ -40,6 +39,18 @@ export type UploadImgProps = {
   confirmLabel?: string;
   actionsDisabled?: boolean;
 };
+
+const ACCEPTED_MIME = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+] as const;
+
+const ACCEPTED_EXT = [".jpg", ".jpeg", ".png", ".webp", ".gif"] as const;
+
+const interpolateMaxMb = (template: string, maxMb: number) =>
+  template.replace(/\{\{\s*maxMb\s*\}\}/g, String(maxMb));
 
 const UploadImg = ({
   setPreviewUrl,
@@ -54,7 +65,6 @@ const UploadImg = ({
   const [error, setError] = useState<string>("");
   const [clearSignal, setClearSignal] = useState<number>(0);
   const errorTimerRef = useRef<number | null>(null);
-  const { t } = useTranslation();
   const isLoged = sessionSignal.value?.authentified === true;
   const planUser = sessionSignal.value?.plan?.code || null;
   const { maxBytes, maxMb } = getMaxUploadForUser({
@@ -103,24 +113,7 @@ const UploadImg = ({
 
   const clearInput = () => setClearSignal((previous) => previous + 1);
 
-  const validateFile = (file: File): string | null => {
-    if (!file) return t("uploadImg.errors.noFile");
-    if (file.size > maxBytes) return t("uploadImg.errors.tooLarge", { maxMb });
-
-    const isImageMime = file.type.startsWith("image/");
-    if (!isImageMime) return t("uploadImg.errors.mustBeImage");
-    if (!ACCEPTED_MIME.has(file.type))
-      return t("uploadImg.errors.unsupportedFormat");
-
-    const lower = file.name.toLowerCase();
-    const hasValidExt = Array.from(ACCEPTED_EXT).some((ext) =>
-      lower.endsWith(ext)
-    );
-    if (!hasValidExt)
-      return t("uploadImg.errors.invalidExtension");
-
-    return null;
-  };
+  
 
   const onChangeFile = (file: File | null) => {
     if (!file) {
@@ -130,7 +123,17 @@ const UploadImg = ({
 
     clearPendingErrorTimer();
 
-    const err = validateFile(file);
+    const validationContent = {
+      ...content,
+      tooLarge: interpolateMaxMb(content.tooLarge, maxMb),
+    };
+    const err = validateFile(
+      file,
+      validationContent,
+      ACCEPTED_MIME,
+      ACCEPTED_EXT,
+      maxBytes,
+    );
     if (err) {
       revokePreviewUrl(previewUrl);
       setPreviewUrl(null);
@@ -164,7 +167,7 @@ const UploadImg = ({
           <div className="space-y-3">
             <InputFile
               id="imageUpload"
-              accept="image/jpeg,image/png,image/webp,image/gif"
+              accept={ACCEPTED_MIME.join(",")}
               onChange={onChangeFile}
               className="w-full bg-base-200 file-input-info"
               placeholder={content.placeholder}
@@ -173,7 +176,7 @@ const UploadImg = ({
             />
             <div className="label p-0">
               <span className="label-text text-base-content/70">
-                {`Formats: JPG, PNG, WEBP - Max ${maxMb} MB`}
+                {`Formats: JPG, PNG, WEBP, GIF - Max ${maxMb} MB`}
               </span>
             </div>
 
