@@ -1,4 +1,5 @@
 import type { RequestHandler } from "express";
+import { logger } from "../../logger.js";
 
 const pexelsCheckReqParams: RequestHandler = (req, res, next) => {
   const allowedKeys = ["theme", "id", "lang", "page"] as const;
@@ -15,7 +16,15 @@ const pexelsCheckReqParams: RequestHandler = (req, res, next) => {
   // - /image  : id (lang optionnel)
   if (queryKeys.length < 1) {
     tabError.push("nombre de parametre incorrect code 8");
-    return res.status(400).json({ tabError });
+    logger.warn("pexelsCheckReqParams::missing_query_params", {
+      code: "mw_pexelsCheckReqParams_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      queryKeys,
+      tabError,
+    });
+    return res.status(400).json({ tabError, code: "mw_pexelsCheckReqParams_err1" });
   }
 
   // 2)test le nom des params
@@ -78,7 +87,15 @@ const pexelsCheckReqParams: RequestHandler = (req, res, next) => {
   }
 
   if (tabError.length > 0) {
-    return res.status(400).json({ tabError });
+    logger.warn("pexelsCheckReqParams::invalid_query_params", {
+      code: "mw_pexelsCheckReqParams_err2",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      query: req.query,
+      tabError,
+    });
+    return res.status(400).json({ tabError, code: "mw_pexelsCheckReqParams_err2" });
   }
 
   // 5) Tout est ok, on passe au middleware suivant

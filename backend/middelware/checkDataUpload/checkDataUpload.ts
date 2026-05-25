@@ -166,6 +166,7 @@ export function validateImageUpload(
       }
     } catch (err: any) {
       logger.error("validateImageUpload::max_size_resolver_failed", {
+        code: "mw_checkDataUpload_err1",
         ...requestMeta,
         status: 500,
         message: err?.message ?? String(err),
@@ -173,6 +174,7 @@ export function validateImageUpload(
       return res.status(500).json({
         error: true,
         message: "Erreur interne lors de la validation du fichier.",
+        code: "mw_checkDataUpload_err1",
         requestId: (req as any).requestId,
       });
     }
@@ -184,6 +186,7 @@ export function validateImageUpload(
     if (!files || !files[fieldName]) {
       const availableFields = files ? Object.keys(files) : [];
       logger.warn("validateImageUpload::missing_file", {
+        code: "mw_checkDataUpload_err2",
         ...requestMeta,
         availableFields,
         status: 400,
@@ -193,6 +196,7 @@ export function validateImageUpload(
         message: `Aucun fichier reÃ§u dans le champ "${fieldName}".`,
         availableFields,
         contentType: req.headers["content-type"] || null,
+        code: "mw_checkDataUpload_err2",
         requestId: (req as any).requestId,
       });
     }
@@ -201,12 +205,14 @@ export function validateImageUpload(
     const file = files[fieldName];
     if (Array.isArray(file)) {
       logger.warn("validateImageUpload::multiple_files", {
+        code: "mw_checkDataUpload_err3",
         ...requestMeta,
         status: 400,
       });
       return res.status(400).json({
         error: true,
         message: `Plusieurs fichiers reÃ§us pour "${fieldName}", un seul attendu.`,
+        code: "mw_checkDataUpload_err3",
         requestId: (req as any).requestId,
       });
     }
@@ -218,6 +224,7 @@ export function validateImageUpload(
     // VÃ©rif MIME dÃ©clarÃ© dans la liste autorisÃ©e
     if (!allowed.has(declaredMime)) {
       logger.warn("validateImageUpload::unsupported_mime", {
+        code: "mw_checkDataUpload_err4",
         ...requestMeta,
         declaredMime: declaredMime || null,
         status: 415,
@@ -227,6 +234,7 @@ export function validateImageUpload(
         message: `Type de fichier non supportÃ© (${
           declaredMime || "inconnu"
         }). AutorisÃ©s: jpeg, png, webp.`,
+        code: "mw_checkDataUpload_err4",
         requestId: (req as any).requestId,
       });
     }
@@ -234,6 +242,7 @@ export function validateImageUpload(
     // Taille max
     if (typeof f.size !== "number" || f.size <= 0) {
       logger.warn("validateImageUpload::invalid_size", {
+        code: "mw_checkDataUpload_err5",
         ...requestMeta,
         declaredMime: declaredMime || null,
         size: typeof f.size === "number" ? f.size : null,
@@ -242,11 +251,13 @@ export function validateImageUpload(
       return res.status(400).json({
         error: true,
         message: "Fichier vide ou taille invalide.",
+        code: "mw_checkDataUpload_err5",
         requestId: (req as any).requestId,
       });
     }
     if (f.size > maxSize) {
       logger.warn("validateImageUpload::too_large", {
+        code: "mw_checkDataUpload_err6",
         ...requestMeta,
         declaredMime: declaredMime || null,
         size: f.size,
@@ -258,6 +269,7 @@ export function validateImageUpload(
         message: `Fichier trop volumineux. Taille max: ${Math.floor(
           maxSize / (1024 * 1024)
         )} MB.`,
+        code: "mw_checkDataUpload_err6",
         requestId: (req as any).requestId,
       });
     }
@@ -266,6 +278,7 @@ export function validateImageUpload(
     const buffer: Buffer = (f as any).data as Buffer;
     if (!Buffer.isBuffer(buffer) || buffer.length !== f.size) {
       logger.warn("validateImageUpload::corrupted_buffer", {
+        code: "mw_checkDataUpload_err7",
         ...requestMeta,
         declaredMime: declaredMime || null,
         size: f.size,
@@ -274,6 +287,7 @@ export function validateImageUpload(
       return res.status(400).json({
         error: true,
         message: "Fichier non lisible ou corrompu.",
+        code: "mw_checkDataUpload_err7",
         requestId: (req as any).requestId,
       });
     }
@@ -282,6 +296,7 @@ export function validateImageUpload(
     const sniffed = sniffMimeFromBuffer(buffer);
     if (!sniffed) {
       logger.warn("validateImageUpload::unknown_signature", {
+        code: "mw_checkDataUpload_err8",
         ...requestMeta,
         declaredMime: declaredMime || null,
         size: f.size,
@@ -290,6 +305,7 @@ export function validateImageUpload(
       return res.status(415).json({
         error: true,
         message: "Signature de fichier inconnue ou non supportÃ©e.",
+        code: "mw_checkDataUpload_err8",
         requestId: (req as any).requestId,
       });
     }
@@ -304,6 +320,7 @@ export function validateImageUpload(
     ) {
       // Si le sniff contredit le MIME dÃ©clarÃ© (hors alias jpg/jpeg) â†’ refuse
       logger.warn("validateImageUpload::mime_mismatch", {
+        code: "mw_checkDataUpload_err9",
         ...requestMeta,
         declaredMime: declaredMime || null,
         sniffedMime: sniffed,
@@ -313,6 +330,7 @@ export function validateImageUpload(
       return res.status(415).json({
         error: true,
         message: `Le contenu du fichier ne correspond pas au type dÃ©clarÃ© (${declaredMime}).`,
+        code: "mw_checkDataUpload_err9",
         requestId: (req as any).requestId,
       });
     }
@@ -320,6 +338,7 @@ export function validateImageUpload(
     // ContrÃ´les additionnels simples sur le nom
     if (originalName.length > 200) {
       logger.warn("validateImageUpload::filename_too_long", {
+        code: "mw_checkDataUpload_err10",
         ...requestMeta,
         declaredMime: declaredMime || null,
         size: f.size,
@@ -329,6 +348,7 @@ export function validateImageUpload(
       return res.status(400).json({
         error: true,
         message: "Nom de fichier trop long.",
+        code: "mw_checkDataUpload_err10",
         requestId: (req as any).requestId,
       });
     }

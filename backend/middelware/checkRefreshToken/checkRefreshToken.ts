@@ -1,11 +1,23 @@
 import type { Request, Response, NextFunction } from "express";
 import { verifyRefreshToken } from "../../function/createToken.js";
+import { logger } from "../../logger.js";
 
 const checkRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.cookies?.tokenRefresh;
     if (!token || token === "undefined" || token === "null") {
-      return res.status(401).json({ status: "error", message: "Missing refresh token", codeErr: "refresh_0", authentified:false });
+      logger.warn("checkRefreshToken::missing_token", {
+        code: "mw_checkRefreshToken_err1",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(401).json({
+        status: "error",
+        message: "Unauthorized",
+        code: "mw_checkRefreshToken_err1",
+        authentified: false,
+      });
     }
 
     try {
@@ -15,15 +27,50 @@ const checkRefreshToken = async (req: Request, res: Response, next: NextFunction
       const userId: string | undefined = payload?.userId;
       const email: string | undefined = payload?.email;
       if (!jti || !userId || !email) {
-        return res.status(401).json({ status: "error", message: "Invalid refresh token payload", codeErr: "refresh_1", authentified:false });
+        logger.warn("checkRefreshToken::invalid_payload", {
+          code: "mw_checkRefreshToken_err2",
+          requestId: (req as any).requestId,
+          method: req.method,
+          path: req.originalUrl || req.url,
+        });
+        return res.status(401).json({
+          status: "error",
+          message: "Unauthorized",
+          code: "mw_checkRefreshToken_err2",
+          authentified: false,
+        });
       }
       (req as any).refresh = { jti, userId, email, token };
       return next();
     } catch (err: any) {
-      return res.status(401).json({ status: "error", message: err?.message || "Invalid or expired refresh token", codeErr: "refresh_2", authentified:false });
+      logger.warn("checkRefreshToken::verify_failed", {
+        code: "mw_checkRefreshToken_err3",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        message: err?.message ?? String(err),
+      });
+      return res.status(401).json({
+        status: "error",
+        message: "Unauthorized",
+        code: "mw_checkRefreshToken_err3",
+        authentified: false,
+      });
     }
   } catch (err: any) {
-    return res.status(500).json({ status: "error", message: err?.message || String(err), codeErr: "refresh_3", authentified:false });
+    logger.error("checkRefreshToken::unhandled_error", {
+      code: "mw_checkRefreshToken_err4",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      message: err?.message ?? String(err),
+    });
+    return res.status(500).json({
+      status: "error",
+      message: "Server error",
+      code: "mw_checkRefreshToken_err4",
+      authentified: false,
+    });
   }
 };
 

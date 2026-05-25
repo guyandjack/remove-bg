@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Request, Response, NextFunction } from "express";
 import { validationRegex, toRegExp } from "../../shared/validationRegex.js";
+import { logger } from "../../logger.js";
 
 /**
  * Constantes ajustables selon ton besoin
@@ -101,6 +102,16 @@ const  checkDataFormContact = (
 )=> {
   const parsed = contactSchema.safeParse(req.body);
   if (!parsed.success) {
+    logger.warn("checkDataFormContact::invalid_body", {
+      code: "mw_checkDataFormContact_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      issues: parsed.error.issues.map((i) => ({
+        field: i.path.join("."),
+        message: i.message,
+      })),
+    });
     return res.status(400).json({
       error: true,
       message: "Données invalides.",
@@ -108,6 +119,7 @@ const  checkDataFormContact = (
         field: i.path.join("."),
         message: i.message,
       })),
+      code: "mw_checkDataFormContact_err1",
       requestId: (req as any).requestId,
     });
   }

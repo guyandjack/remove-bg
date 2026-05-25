@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { NextFunction, Request, Response } from "express";
+import { logger } from "../../logger.js";
 
 const TOKEN_HEX_64 = /^[a-f0-9]{64}$/;
 
@@ -57,6 +58,16 @@ export type AccountDeletionFeedbackDTO = z.infer<typeof accountDeletionFeedbackS
 const checkDataAccountDeletionFeedback = (req: Request, res: Response, next: NextFunction) => {
   const parsed = accountDeletionFeedbackSchema.safeParse(req.body);
   if (!parsed.success) {
+    logger.warn("checkDataAccountDeletionFeedback::invalid_body", {
+      code: "mw_checkDataAccountDeletionFeedback_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      issues: parsed.error.issues.map((i) => ({
+        field: i.path.join("."),
+        message: i.message,
+      })),
+    });
     return res.status(400).json({
       error: true,
       message: "Données invalides.",
@@ -64,6 +75,7 @@ const checkDataAccountDeletionFeedback = (req: Request, res: Response, next: Nex
         field: i.path.join("."),
         message: i.message,
       })),
+      code: "mw_checkDataAccountDeletionFeedback_err1",
       requestId: (req as any).requestId,
     });
   }
@@ -73,4 +85,3 @@ const checkDataAccountDeletionFeedback = (req: Request, res: Response, next: Nex
 };
 
 export { checkDataAccountDeletionFeedback };
-

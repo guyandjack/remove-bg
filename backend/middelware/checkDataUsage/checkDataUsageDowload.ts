@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Request, Response, NextFunction } from "express";
+import { logger } from "../../logger.js";
 
 /**
  * Schéma Zod du formulaire de contact
@@ -21,6 +22,16 @@ const checkDataUsageDownload = (
 ) => {
   const parsed = contactSchema.safeParse(req.body);
   if (!parsed.success) {
+    logger.warn("checkDataUsageDownload::invalid_body", {
+      code: "mw_checkDataUsageDowload_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      issues: parsed.error.issues.map((i) => ({
+        field: i.path.join("."),
+        message: i.message,
+      })),
+    });
     return res.status(400).json({
       error: true,
       message: "Données invalides.",
@@ -28,6 +39,7 @@ const checkDataUsageDownload = (
         field: i.path.join("."),
         message: i.message,
       })),
+      code: "mw_checkDataUsageDowload_err1",
       requestId: (req as any).requestId,
     });
   }
