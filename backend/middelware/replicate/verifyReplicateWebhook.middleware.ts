@@ -95,6 +95,7 @@ export function verifyReplicateWebhook(
 
       if (!webhookId || !webhookTimestamp || !webhookSignature) {
         logger.warn("verifyReplicateWebhook::missing_headers", {
+          code: "mw_verifyReplicateWebhook_err1",
           requestId: (req as any).requestId,
           hasId: Boolean(webhookId),
           hasTimestamp: Boolean(webhookTimestamp),
@@ -107,6 +108,7 @@ export function verifyReplicateWebhook(
       const rawBody = (req as any).body;
       if (!Buffer.isBuffer(rawBody) || rawBody.length === 0) {
         logger.warn("verifyReplicateWebhook::missing_raw_body", {
+          code: "mw_verifyReplicateWebhook_err2",
           requestId: (req as any).requestId,
           webhookId,
         });
@@ -116,6 +118,7 @@ export function verifyReplicateWebhook(
       const timestampSeconds = parseTimestampSeconds(webhookTimestamp);
       if (!timestampSeconds) {
         logger.warn("verifyReplicateWebhook::invalid_timestamp", {
+          code: "mw_verifyReplicateWebhook_err3",
           requestId: (req as any).requestId,
           webhookId,
           webhookTimestamp,
@@ -127,6 +130,7 @@ export function verifyReplicateWebhook(
       const ageSeconds = Math.abs(nowSeconds - timestampSeconds);
       if (ageSeconds > toleranceSeconds) {
         logger.warn("verifyReplicateWebhook::timestamp_out_of_tolerance", {
+          code: "mw_verifyReplicateWebhook_err4",
           requestId: (req as any).requestId,
           webhookId,
           ageSeconds,
@@ -141,6 +145,7 @@ export function verifyReplicateWebhook(
         key = extractBase64KeyFromSecret(secret);
       } catch (err: any) {
         logger.error("verifyReplicateWebhook::missing_or_invalid_secret", {
+          code: "mw_verifyReplicateWebhook_err5",
           requestId: (req as any).requestId,
           webhookId,
           message: err?.message ?? String(err),
@@ -157,6 +162,7 @@ export function verifyReplicateWebhook(
       const candidates = parseSignatureHeader(webhookSignature);
       if (!candidates.length) {
         logger.warn("verifyReplicateWebhook::unsupported_signature_format", {
+          code: "mw_verifyReplicateWebhook_err6",
           requestId: (req as any).requestId,
           webhookId,
         });
@@ -166,6 +172,7 @@ export function verifyReplicateWebhook(
       const ok = candidates.some((sig) => safeEqualBase64(expectedSignature, sig));
       if (!ok) {
         logger.warn("verifyReplicateWebhook::signature_mismatch", {
+          code: "mw_verifyReplicateWebhook_err7",
           requestId: (req as any).requestId,
           webhookId,
         });
@@ -175,6 +182,7 @@ export function verifyReplicateWebhook(
       return next();
     } catch {
       logger.warn("verifyReplicateWebhook::unhandled_error", {
+        code: "mw_verifyReplicateWebhook_err8",
         requestId: (req as any).requestId,
       });
       return res.status(401).send("Unauthorized");
