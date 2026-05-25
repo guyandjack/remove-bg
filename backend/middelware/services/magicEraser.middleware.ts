@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import type { UploadedFile } from "express-fileupload";
 
 import type { ValidatedImage } from "../checkDataUpload/checkDataUpload.js";
+import { logger } from "../../logger.js";
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB
 
@@ -135,9 +136,18 @@ const validateMagicEraserPayload = (req: Request, res: Response, next: NextFunct
       initUpload.name
     );
     if (!initValidated) {
+      logger.warn("validateMagicEraserPayload::invalid_init_image", {
+        code: "mw_magicEraser_err1",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        mime: initUpload.mimetype,
+        size: initUpload.size,
+      });
       return res.status(415).json({
         error: true,
         message: 'Fichier "init_image" invalide ou non supporte.',
+        code: "mw_magicEraser_err1",
         requestId: (req as any).requestId,
       });
     }
@@ -148,9 +158,18 @@ const validateMagicEraserPayload = (req: Request, res: Response, next: NextFunct
       maskUpload.name
     );
     if (!maskValidated) {
+      logger.warn("validateMagicEraserPayload::invalid_mask_image", {
+        code: "mw_magicEraser_err2",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        mime: maskUpload.mimetype,
+        size: maskUpload.size,
+      });
       return res.status(415).json({
         error: true,
         message: 'Fichier "mask_image" invalide ou non supporte.',
+        code: "mw_magicEraser_err2",
         requestId: (req as any).requestId,
       });
     }
@@ -170,9 +189,16 @@ const validateMagicEraserPayload = (req: Request, res: Response, next: NextFunct
     null;
 
   if (!initDataUrl || !maskDataUrl) {
+    logger.warn("validateMagicEraserPayload::missing_payload", {
+      code: "mw_magicEraser_err3",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(400).json({
       error: true,
       message: 'Aucun fichier recu (init_image/mask_image) et aucun dataURL (image/mask).',
+      code: "mw_magicEraser_err3",
       requestId: (req as any).requestId,
     });
   }
@@ -180,9 +206,16 @@ const validateMagicEraserPayload = (req: Request, res: Response, next: NextFunct
   const initParsed = parseDataUrl(initDataUrl);
   const maskParsed = parseDataUrl(maskDataUrl);
   if (!initParsed || !maskParsed) {
+    logger.warn("validateMagicEraserPayload::invalid_data_url", {
+      code: "mw_magicEraser_err4",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(400).json({
       error: true,
       message: "Payload invalide: dataURL attendu (base64).",
+      code: "mw_magicEraser_err4",
       requestId: (req as any).requestId,
     });
   }
@@ -199,9 +232,18 @@ const validateMagicEraserPayload = (req: Request, res: Response, next: NextFunct
   );
 
   if (!initValidated || !maskValidated) {
+    logger.warn("validateMagicEraserPayload::unsupported_format", {
+      code: "mw_magicEraser_err5",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      initMime: initParsed.mime || null,
+      maskMime: maskParsed.mime || null,
+    });
     return res.status(415).json({
       error: true,
       message: "Image/mask non supporte (formats: jpeg, png, webp).",
+      code: "mw_magicEraser_err5",
       requestId: (req as any).requestId,
     });
   }

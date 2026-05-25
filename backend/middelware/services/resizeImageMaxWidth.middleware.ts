@@ -232,6 +232,7 @@ export function limitRemoveBgInputMaxWidth(
     } catch (err: any) {
       // Don't fail the request if resizing fails; fall back to original.
       logger.warn("limitRemoveBgInputMaxWidth::failed", {
+        code: "mw_resizeImageMaxWidth_err1",
         requestId,
         clientRequestId,
         message: err?.message ?? String(err),

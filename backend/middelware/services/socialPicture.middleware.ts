@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import type { FileArray, UploadedFile } from "express-fileupload";
+import { logger } from "../../logger.js";
 
 const KEY_PATTERN = /^assets\[(\d+)\]\[(.+)\]$/;
 const SUPPORTED_FORMATS = new Set(["jpg", "jpeg", "png", "webp", "avif"]);
@@ -151,11 +152,19 @@ const parseSocialPicturePayload = (
     (req as any).socialAssets = sanitized;
     next();
   } catch (error) {
+    logger.warn("parseSocialPicturePayload::invalid_payload", {
+      code: "mw_socialPicture_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      message: (error as Error)?.message ?? String(error),
+    });
     res.status(400).json({
       error: true,
       message:
         (error as Error).message ||
         "Les donnees envoyees ne permettent pas de traiter les images sociales.",
+      code: "mw_socialPicture_err1",
       requestId: (req as any).requestId,
     });
   }
