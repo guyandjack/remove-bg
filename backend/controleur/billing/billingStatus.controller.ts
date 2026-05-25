@@ -7,8 +7,8 @@ import {
   finalizeCheckoutSessionFromStripeSession,
 } from "../../services/stripe/finalizeCheckoutSession.js";
 
-function jsonError(res: any, status: number, message: string) {
-  return res.status(status).json({ success: false, message });
+function jsonError(res: any, status: number, message: string, code: string) {
+  return res.status(status).json({ success: false, message, code });
 }
 
 type BillingStatus =
@@ -19,10 +19,26 @@ type BillingStatus =
 
 export const billingStatusController: RequestHandler = async (req, res) => {
   const sessionId = String((req.query as any)?.session_id || "").trim();
-  if (!sessionId) return jsonError(res, 400, "Missing session_id.");
+  if (!sessionId) {
+    logger.warn("billingStatus::missing_session_id", {
+      code: "ctrl_billingStatus_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
+    return jsonError(res, 400, "Missing session_id.", "ctrl_billingStatus_err1");
+  }
 
   const stripe = getStripeClient();
-  if (!stripe) return jsonError(res, 500, "Stripe is not configured on this server.");
+  if (!stripe) {
+    logger.error("billingStatus::stripe_not_configured", {
+      code: "ctrl_billingStatus_err2",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
+    return jsonError(res, 500, "Stripe is not configured on this server.", "ctrl_billingStatus_err2");
+  }
 
   // DB state (source of truth for local activation)
   let dbState = await getStripeCheckoutSessionState(sessionId);
@@ -34,6 +50,8 @@ export const billingStatusController: RequestHandler = async (req, res) => {
     } as any);
   } catch (err: any) {
     logger.warn("billing.status::stripe_session_retrieve_failed", {
+      code: "ctrl_billingStatus_err3",
+      requestId: (req as any).requestId,
       sessionId,
       message: err?.message || String(err),
     });
@@ -83,6 +101,8 @@ export const billingStatusController: RequestHandler = async (req, res) => {
       // Pending means Stripe session metadata/subscription isn't fully ready yet; keep polling.
       if (!(err instanceof CheckoutSessionPendingError)) {
         logger.warn("billing.status::finalize_direct_failed", {
+          code: "ctrl_billingStatus_err4",
+          requestId: (req as any).requestId,
           sessionId,
           message: err?.message || String(err),
         });

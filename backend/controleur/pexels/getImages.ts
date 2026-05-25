@@ -1,6 +1,7 @@
 //import des fonctions
 import { pexelsConnect } from "../../function/pexelsConnect.js";
 import { buildPexelsCroppedImageUrl } from "../../function/pexelsImageUrl.js";
+import { logger } from "../../logger.js";
 
 //import des types
 import type { RequestHandler } from "express";
@@ -54,7 +55,17 @@ const getImages: RequestHandler = async (req, res) => {
             page: pageNumber,
         });
         if (!response) {
-            return res.status(500).json("error HTTP code: pex-1")
+            logger.error("pexels.getImages::empty_response", {
+                code: "ctrl_getImages_err1",
+                requestId: (req as any).requestId,
+                method: req.method,
+                path: req.originalUrl || req.url,
+            });
+            return res.status(500).json({
+                success: false,
+                message: "error HTTP code: pex-1",
+                code: "ctrl_getImages_err1",
+            })
         }
 
         // Ajoute une URL custom 2000x2000 (crop) pour chaque photo.
@@ -74,8 +85,18 @@ const getImages: RequestHandler = async (req, res) => {
             photos: photosWithCustom,
         });
     } catch (error:any) {
-        console.log("error: ", error || error.message);
-        res.status(500).json("error server code: pex-2" + error)
+        logger.error("pexels.getImages::search_failed", {
+            code: "ctrl_getImages_err2",
+            requestId: (req as any).requestId,
+            method: req.method,
+            path: req.originalUrl || req.url,
+            message: error?.message ?? String(error),
+        });
+        return res.status(500).json({
+            success: false,
+            message: "error server code: pex-2",
+            code: "ctrl_getImages_err2",
+        });
     }
     
 };

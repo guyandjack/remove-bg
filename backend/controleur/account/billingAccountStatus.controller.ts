@@ -5,6 +5,7 @@ import {
   getPlanById,
   getUserByEmail,
 } from "../../DB/queriesSQL/queriesSQL.js";
+import { logger } from "../../logger.js";
 
 function formatIsoDateTime(d: Date | null): string | null {
   if (!d) return null;
@@ -24,12 +25,32 @@ export const billingAccountStatusController: RequestHandler = async (req, res) =
   const email =
     ((req as any).payload as any)?.email ?? (req as any).payload ?? null;
   if (!email || typeof email !== "string") {
-    return res.status(401).json({ success: false, message: "Unauthenticated." });
+    logger.warn("billingAccountStatus::unauthenticated", {
+      code: "ctrl_billingAccountStatus_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized",
+      code: "ctrl_billingAccountStatus_err1",
+    });
   }
 
   const user = await getUserByEmail(String(email).trim().toLowerCase());
   if (!user) {
-    return res.status(404).json({ success: false, message: "User not found." });
+    logger.warn("billingAccountStatus::user_not_found", {
+      code: "ctrl_billingAccountStatus_err2",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
+    return res.status(404).json({
+      success: false,
+      message: "Unauthorized",
+      code: "ctrl_billingAccountStatus_err2",
+    });
   }
 
   const sub = await getActiveSubscription(user.id);

@@ -14,7 +14,17 @@ export const accountDeletionFeedbackController: RequestHandler = async (req, res
     | undefined;
 
   if (!validated) {
-    return res.status(400).json({ success: false, message: "Missing payload." });
+    logger.warn("account.deletion_feedback::missing_payload", {
+      code: "ctrl_deletionFeedback_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
+    return res.status(400).json({
+      success: false,
+      message: "Missing payload.",
+      code: "ctrl_deletionFeedback_err1",
+    });
   }
 
   const tokenHash = crypto.createHash("sha256").update(validated.token).digest("hex");
@@ -51,18 +61,29 @@ export const accountDeletionFeedbackController: RequestHandler = async (req, res
       submittedIpHash,
     });
     if (!ok) {
+      logger.warn("account.deletion_feedback::token_expired_or_used", {
+        code: "ctrl_deletionFeedback_err2",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(404).json({
         success: false,
         message: "Lien expiré ou déjà utilisé.",
+        code: "ctrl_deletionFeedback_err2",
       });
     }
     return res.status(200).json({ success: true });
   } catch (err: any) {
     logger.warn("account.deletion_feedback::db_failed", {
+      code: "ctrl_deletionFeedback_err3",
       requestId: (req as any).requestId,
       message: err?.message ?? String(err),
     });
-    return res.status(500).json({ success: false, message: "Server error." });
+    return res.status(500).json({
+      success: false,
+      message: "Server error.",
+      code: "ctrl_deletionFeedback_err3",
+    });
   }
 };
-

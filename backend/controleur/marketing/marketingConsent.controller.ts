@@ -67,19 +67,47 @@ export const updateMarketingConsentController: RequestHandler = async (req, res)
   const email =
     ((req as any).payload as any)?.email ?? (req as any).payload ?? null;
   if (!email || typeof email !== "string") {
-    return res.status(401).json({ success: false, message: "Unauthenticated." });
+    logger.warn("marketingConsent::unauthenticated", {
+      code: "ctrl_marketingConsent_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
+    return res.status(401).json({
+      success: false,
+      message: "Unauthenticated.",
+      code: "ctrl_marketingConsent_err1",
+    });
   }
 
   const user = await getUserByEmail(String(email).trim().toLowerCase());
   if (!user) {
-    return res.status(404).json({ success: false, message: "User not found." });
+    logger.warn("marketingConsent::user_not_found", {
+      code: "ctrl_marketingConsent_err2",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
+    return res.status(404).json({
+      success: false,
+      message: "User not found.",
+      code: "ctrl_marketingConsent_err2",
+    });
   }
 
   const raw = (req as any).body?.marketing_consent;
   if (typeof raw !== "boolean") {
+    logger.warn("marketingConsent::invalid_body", {
+      code: "ctrl_marketingConsent_err3",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      userId: user.id,
+    });
     return res.status(400).json({
       success: false,
       message: "Body must be: { marketing_consent: true|false }",
+      code: "ctrl_marketingConsent_err3",
     });
   }
 
@@ -96,6 +124,8 @@ export const updateMarketingConsentController: RequestHandler = async (req, res)
       locale,
     }).catch((err: any) => {
       logger.warn("marketing.consent::email_failed", {
+        code: "ctrl_marketingConsent_err4",
+        requestId: (req as any).requestId,
         userId: user.id,
         message: err?.message || String(err),
       });

@@ -15,20 +15,61 @@ export const changePasswordController: RequestHandler = async (req, res) => {
     const { current_password, password } = (req as any).userValidated as ChangePasswordValidatedPayload;
 
     if (!email) {
-      return res.status(401).json({ status: "error", message: "unauthorized" });
+      logger.warn("changePassword::unauthorized", {
+        code: "ctrl_changePassword_err1",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(401).json({
+        status: "error",
+        message: "unauthorized",
+        code: "ctrl_changePassword_err1",
+      });
     }
     if (!current_password || !password) {
-      return res.status(400).json({ status: "error", message: "missing payload change_password_1" });
+      logger.warn("changePassword::missing_payload", {
+        code: "ctrl_changePassword_err2",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(400).json({
+        status: "error",
+        message: "missing payload change_password_1",
+        code: "ctrl_changePassword_err2",
+      });
     }
 
     const user = await getUserByEmail(email);
     if (!user) {
-      return res.status(401).json({ status: "error", message: "unauthorized" });
+      logger.warn("changePassword::user_not_found", {
+        code: "ctrl_changePassword_err3",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(401).json({
+        status: "error",
+        message: "unauthorized",
+        code: "ctrl_changePassword_err3",
+      });
     }
 
     const ok = await bcrypt.compare(current_password, user.password_hash);
     if (!ok) {
-      return res.status(400).json({ status: "error", message: "incorrect current password" });
+      logger.warn("changePassword::incorrect_current_password", {
+        code: "ctrl_changePassword_err4",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        userId: user.id,
+      });
+      return res.status(400).json({
+        status: "error",
+        message: "incorrect current password",
+        code: "ctrl_changePassword_err4",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -53,6 +94,8 @@ export const changePasswordController: RequestHandler = async (req, res) => {
       }
     } catch (error) {
       logger.warn("Unable to revoke refresh tokens after password change", {
+        code: "ctrl_changePassword_err5",
+        requestId: (req as any).requestId,
         userId: user.id,
         msg: (error as Error)?.message ?? String(error),
       });
@@ -60,7 +103,17 @@ export const changePasswordController: RequestHandler = async (req, res) => {
 
     return res.status(200).json({ status: "success" });
   } catch (error) {
-    logger.error("Change password error", { msg: (error as Error)?.message ?? String(error) });
-    return res.status(500).json({ status: "error", message: "server error change_password_2" });
+    logger.error("Change password error", {
+      code: "ctrl_changePassword_err6",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      msg: (error as Error)?.message ?? String(error),
+    });
+    return res.status(500).json({
+      status: "error",
+      message: "server error change_password_2",
+      code: "ctrl_changePassword_err6",
+    });
   }
 };

@@ -32,12 +32,32 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
   const email =
     ((req as any).payload as any)?.email ?? (req as any).payload ?? null;
   if (!email || typeof email !== "string") {
-    return res.status(401).json({ success: false, message: "Unauthenticated." });
+    logger.warn("account.deletion_request::unauthenticated", {
+      code: "ctrl_deletionRequest_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
+    return res.status(401).json({
+      success: false,
+      message: "Unauthenticated.",
+      code: "ctrl_deletionRequest_err1",
+    });
   }
 
   const user = await getUserByEmail(String(email).trim().toLowerCase());
   if (!user) {
-    return res.status(404).json({ success: false, message: "User not found." });
+    logger.warn("account.deletion_request::user_not_found", {
+      code: "ctrl_deletionRequest_err2",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
+    return res.status(404).json({
+      success: false,
+      message: "Unauthorized",
+      code: "ctrl_deletionRequest_err2",
+    });
   }
 
   const locale = resolveRequestLocale(req);
@@ -52,12 +72,20 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
   const activeSub = await getActiveSubscription(user.id);
   if (activeSub?.stripe_subscription_id) {
     if (!stripe) {
+      logger.warn("account.deletion_request::stripe_not_configured", {
+        code: "ctrl_deletionRequest_err3",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        userId: user.id,
+      });
       return res.status(503).json({
         success: false,
         message:
           locale === "fr"
             ? "Suppression impossible: Stripe nâ€™est pas configurÃ© sur ce serveur."
             : "Deletion not allowed: Stripe is not configured on this server.",
+        code: "ctrl_deletionRequest_err3",
       });
     }
 
@@ -66,9 +94,18 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
       stripeSubscriptionId: activeSub.stripe_subscription_id,
     });
     if (lock.locked) {
+      logger.warn("account.deletion_request::billing_locked", {
+        code: "ctrl_deletionRequest_err4",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        userId: user.id,
+        lock,
+      });
       return res.status(409).json({
         success: false,
         message: formatBillingLockMessage({ locale, lock }),
+        code: "ctrl_deletionRequest_err4",
       });
     }
 
@@ -97,12 +134,22 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
       // Validation: ensure Stripe reports the subscription as canceled.
       const canceled: any = await stripe.subscriptions.retrieve(activeSub.stripe_subscription_id);
       if (String(canceled?.status || "") !== "canceled") {
+        logger.warn("account.deletion_request::stripe_cancellation_not_confirmed", {
+          code: "ctrl_deletionRequest_err5",
+          requestId: (req as any).requestId,
+          method: req.method,
+          path: req.originalUrl || req.url,
+          userId: user.id,
+          stripeSubscriptionId: activeSub.stripe_subscription_id,
+          stripeStatus: String(canceled?.status || ""),
+        });
         return res.status(502).json({
           success: false,
           message:
             locale === "fr"
               ? "Suppression impossible: Ã©tat Stripe non confirmÃ© (abonnement pas encore annulÃ©)."
               : "Deletion not allowed: Stripe cancellation not confirmed.",
+          code: "ctrl_deletionRequest_err5",
         });
       }
 
@@ -123,6 +170,10 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
       } catch {}
     } catch (err: any) {
       logger.warn("account.deletion_request::stripe_cancel_failed", {
+        code: "ctrl_deletionRequest_err6",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
         userId: user.id,
         message: err?.message || String(err),
       });
@@ -132,6 +183,7 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
           locale === "fr"
             ? "Suppression impossible: Ã©chec lors de lâ€™annulation Stripe."
             : "Deletion not allowed: Stripe cancellation failed.",
+        code: "ctrl_deletionRequest_err6",
       });
     }
   }
@@ -159,6 +211,10 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
     feedbackTokenStored = Boolean(created);
   } catch (err: any) {
     logger.warn("account.deletion_request::feedback_token_failed", {
+      code: "ctrl_deletionRequest_err7",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
       userId: user.id,
       message: err?.message || String(err),
     });
@@ -187,6 +243,10 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
     await revokeAllRefreshTokensForUser(user.id);
   } catch (err: any) {
     logger.warn("account.deletion_request::revoke_tokens_failed", {
+      code: "ctrl_deletionRequest_err8",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
       userId: user.id,
       message: err?.message || String(err),
     });
@@ -223,6 +283,10 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
     }
   } catch (err: any) {
     logger.warn("account.deletion_request::email_failed", {
+      code: "ctrl_deletionRequest_err9",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
       userId: user.id,
       message: err?.message || String(err),
     });
@@ -241,6 +305,10 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
     }
   } catch (err: any) {
     logger.warn("account.deletion_request::email_guard_failed", {
+      code: "ctrl_deletionRequest_err10",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
       userId: user.id,
       message: err?.message || String(err),
     });
@@ -257,6 +325,10 @@ export const accountDeletionRequestController: RequestHandler = async (req, res)
     });
   } catch (err: any) {
     logger.warn("account.deletion_request::anonymize_failed", {
+      code: "ctrl_deletionRequest_err11",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
       userId: user.id,
       message: err?.message || String(err),
     });
