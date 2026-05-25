@@ -310,7 +310,14 @@
     "placeHolder": "Nessun file scelto",
     "fileName": "Nessun file selezionato",
     "preview": "Nessuna anteprima disponibile",
-    "erase": "Cancella"
+    "erase": "Cancella",
+    "errors": {
+      "noFile": "Nessun file selezionato.",
+      "tooLarge": "Immagine troppo grande. Dimensione massima: {{maxMb}} MB.",
+      "mustBeImage": "Il file deve essere un'immagine.",
+      "unsupportedFormat": "Formato non supportato (JPEG, PNG, WEBP, GIF).",
+      "invalidExtension": "Estensione non valida (jpg, jpeg, png, webp, gif)."
+    }
   },
   "removeBg": {
     "confirmLabelIdle": "Elabora",

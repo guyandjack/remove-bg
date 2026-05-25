@@ -320,7 +320,14 @@
     "placeHolder": "Aucun fichier choisi",
     "fileName": "Aucun fichier sélectionné",
     "preview": "Aucun aperçu disponible",
-    "erase": "Effacer"
+    "erase": "Effacer",
+    "errors": {
+      "noFile": "Aucun fichier sélectionné.",
+      "tooLarge": "Image trop volumineuse. Taille max : {{maxMb}} MB.",
+      "mustBeImage": "Le fichier doit être une image.",
+      "unsupportedFormat": "Format non supporté (JPEG, PNG, WEBP, GIF).",
+      "invalidExtension": "Extension non valide (jpg, jpeg, png, webp, gif)."
+    }
   },
 
   "removeBg": {
