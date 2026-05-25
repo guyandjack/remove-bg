@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import { resolveClientIp } from "../../utils/telegramNotification.js";
+import { logger } from "../../logger.js";
 
 type RateEntry = { count: number; expiresAt: number };
 
@@ -18,10 +19,21 @@ const contactRateLimiter: RequestHandler = (req, res, next) => {
   }
 
   if (entry.count >= MAX_REQUESTS_PER_WINDOW) {
+    logger.warn("contactRateLimiter::rate_limited", {
+      code: "mw_contactRateLimiter_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      maxRequests: MAX_REQUESTS_PER_WINDOW,
+      windowMs: WINDOW_DURATION_MS,
+      currentCount: entry.count,
+      expiresAt: entry.expiresAt,
+    });
     return res.status(429).json({
       status: "error",
       message:
         "Trop de requêtes sur le formulaire de contact. Réessayez dans quelques minutes.",
+      code: "mw_contactRateLimiter_err1",
     });
   }
 
