@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 import { validationLimits, validationRegex, toRegExp } from "../../shared/validationRegex.js";
 import { computeEmailHmacSha256Hex } from "../../utils/emailGuard.js";
 import { hasActiveFreePlanEmailGuard } from "../../DB/queriesSQL/freePlanEmailGuard.queries.js";
+import { logger } from "../../logger.js";
 
 export const authSchema = z.object({
   email: z.email("Email invalide").trim().toLowerCase(),
@@ -33,6 +34,16 @@ export type AuthDTO = z.infer<typeof authSchema>;
 const checkSignUpDataUser = async (req: Request, res: Response, next: NextFunction) => {
   const result = authSchema.safeParse(req.body);
   if (!result.success) {
+    logger.warn("checkSignUpDataUser::invalid_body", {
+      code: "mw_checkSignUpDataUser_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      issues: result.error.issues.map((i) => ({
+        field: i.path.join("."),
+        message: i.message,
+      })),
+    });
     return res.status(400).json({
       error: true,
       message: "Données invalides.",
@@ -40,15 +51,23 @@ const checkSignUpDataUser = async (req: Request, res: Response, next: NextFuncti
         field: i.path.join("."),
         message: i.message,
       })),
+      code: "mw_checkSignUpDataUser_err1",
       requestId: (req as any).requestId,
     });
   }
 
   const { password, confirm } = result.data;
   if (password !== confirm) {
+    logger.warn("checkSignUpDataUser::password_mismatch", {
+      code: "mw_checkSignUpDataUser_err2",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(400).json({
       error: true,
       message: "Password error.",
+      code: "mw_checkSignUpDataUser_err2",
       requestId: (req as any).requestId,
     });
   }
@@ -62,18 +81,31 @@ const checkSignUpDataUser = async (req: Request, res: Response, next: NextFuncti
       const emailHmac = computeEmailHmacSha256Hex(data.email);
       const blocked = await hasActiveFreePlanEmailGuard(emailHmac);
       if (blocked) {
+        logger.warn("checkSignUpDataUser::free_plan_already_used", {
+          code: "mw_checkSignUpDataUser_err3",
+          requestId: (req as any).requestId,
+          method: req.method,
+          path: req.originalUrl || req.url,
+        });
         return res.status(409).json({
           error: true,
           message: "Free plan already used recently.",
-          code: "FREE_PLAN_ALREADY_USED_RECENTLY",
+          code: "mw_checkSignUpDataUser_err3",
           requestId: (req as any).requestId,
         });
       }
-    } catch {
+    } catch (error: any) {
+      logger.error("checkSignUpDataUser::email_guard_failed", {
+        code: "mw_checkSignUpDataUser_err4",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        message: error?.message ?? String(error),
+      });
       return res.status(500).json({
         error: true,
         message: "Server error.",
-        code: "EMAIL_GUARD_ERROR",
+        code: "mw_checkSignUpDataUser_err4",
         requestId: (req as any).requestId,
       });
     }

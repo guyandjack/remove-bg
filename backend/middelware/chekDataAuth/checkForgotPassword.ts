@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Request, Response, NextFunction } from "express";
+import { logger } from "../../logger.js";
 
 export const authSchema = z.object({
   email: z.email("email invalide").trim().toLowerCase(),
@@ -11,6 +12,16 @@ export type AuthDTO = z.infer<typeof authSchema>;
 const checkForgotPassword = (req: Request, res: Response, next: NextFunction) => {
   const result = authSchema.safeParse(req.body);
   if (!result.success) {
+    logger.warn("checkForgotPassword::invalid_body", {
+      code: "mw_checkForgotPassword_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      issues: result.error.issues.map((i) => ({
+        field: i.path.join("."),
+        message: i.message,
+      })),
+    });
     return res.status(400).json({
       error: true,
       message: "Données invalides.",
@@ -18,6 +29,7 @@ const checkForgotPassword = (req: Request, res: Response, next: NextFunction) =>
         field: i.path.join("."),
         message: i.message,
       })),
+      code: "mw_checkForgotPassword_err1",
       requestId: (req as any).requestId,
     });
   }

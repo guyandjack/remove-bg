@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { NextFunction, Request, Response } from "express";
 import { validationLimits, validationRegex, toRegExp } from "../../shared/validationRegex.js";
+import { logger } from "../../logger.js";
 
 export const resetPasswordSchema = z
   .object({
@@ -29,6 +30,16 @@ const checkResetPassword = (req: Request, res: Response, next: NextFunction) => 
   const result = resetPasswordSchema.safeParse(req.body);
 
   if (!result.success) {
+    logger.warn("checkResetPassword::invalid_body", {
+      code: "mw_checkResetPassword_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      issues: result.error.issues.map((i) => ({
+        field: i.path.join("."),
+        message: i.message,
+      })),
+    });
     return res.status(400).json({
       error: true,
       message: "Donnees invalides.",
@@ -36,6 +47,7 @@ const checkResetPassword = (req: Request, res: Response, next: NextFunction) => 
         field: i.path.join("."),
         message: i.message,
       })),
+      code: "mw_checkResetPassword_err1",
       requestId: (req as any).requestId,
     });
   }
@@ -50,4 +62,3 @@ const checkResetPassword = (req: Request, res: Response, next: NextFunction) => 
 };
 
 export { checkResetPassword };
-
