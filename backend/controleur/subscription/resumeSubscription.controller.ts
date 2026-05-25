@@ -23,9 +23,17 @@ function formatIsoDate(d: Date): string {
 export const resumeSubscriptionController: RequestHandler = async (req, res) => {
   const stripe = getStripeClient();
   if (!stripe) {
+    logger.error("subscription.resume::stripe_not_configured", {
+      code: "ctrl_resumeSubscription_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(500).json({
       success: false,
       message: "Stripe is not configured on this server.",
+      code: "ctrl_resumeSubscription_err1",
+      requestId: (req as any).requestId,
     });
   }
 
@@ -35,19 +43,51 @@ export const resumeSubscriptionController: RequestHandler = async (req, res) => 
   const email =
     ((req as any).payload as any)?.email ?? (req as any).payload ?? null;
   if (!email || typeof email !== "string") {
-    return res.status(401).json({ success: false, message: "Unauthenticated." });
+    logger.warn("subscription.resume::unauthenticated_missing_payload", {
+      code: "ctrl_resumeSubscription_err2",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
+    return res.status(401).json({
+      success: false,
+      message: "Unauthenticated.",
+      code: "ctrl_resumeSubscription_err2",
+      requestId: (req as any).requestId,
+    });
   }
 
   const user = await getUserByEmail(String(email).trim().toLowerCase());
   if (!user) {
-    return res.status(404).json({ success: false, message: "User not found." });
+    logger.warn("subscription.resume::user_not_found", {
+      code: "ctrl_resumeSubscription_err3",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      email: String(email),
+    });
+    return res.status(404).json({
+      success: false,
+      message: "User not found.",
+      code: "ctrl_resumeSubscription_err3",
+      requestId: (req as any).requestId,
+    });
   }
 
   const subscription = await getActiveSubscription(user.id);
   if (!subscription || !subscription.stripe_subscription_id) {
+    logger.warn("subscription.resume::no_active_stripe_subscription", {
+      code: "ctrl_resumeSubscription_err4",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      userId: user.id,
+    });
     return res.status(400).json({
       success: false,
       message: "No active Stripe subscription found for this account.",
+      code: "ctrl_resumeSubscription_err4",
+      requestId: (req as any).requestId,
     });
   }
 
@@ -74,9 +114,19 @@ export const resumeSubscriptionController: RequestHandler = async (req, res) => 
       stripeSubscriptionId: subscription.stripe_subscription_id,
     });
     if (lock.locked) {
+      logger.warn("subscription.resume::billing_locked", {
+        code: "ctrl_resumeSubscription_err5",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        userId: user.id,
+        stripeSubscriptionId: subscription.stripe_subscription_id,
+      });
       return res.status(409).json({
         success: false,
         message: formatBillingLockMessage({ locale, lock }),
+        code: "ctrl_resumeSubscription_err5",
+        requestId: (req as any).requestId,
       });
     }
 
@@ -85,11 +135,17 @@ export const resumeSubscriptionController: RequestHandler = async (req, res) => 
     });
   } catch (err: any) {
     logger.error("subscription.resume::stripe_update_failed", {
+      code: "ctrl_resumeSubscription_err6",
       userId: user.id,
       subscriptionId: subscription.id,
       message: err?.message || String(err),
     });
-    return res.status(502).json({ success: false, message: "Stripe update failed." });
+    return res.status(502).json({
+      success: false,
+      message: "Stripe update failed.",
+      code: "ctrl_resumeSubscription_err6",
+      requestId: (req as any).requestId,
+    });
   }
 
   let stripeSub: any = null;
@@ -97,6 +153,7 @@ export const resumeSubscriptionController: RequestHandler = async (req, res) => 
     stripeSub = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id);
   } catch (err: any) {
     logger.error("subscription.resume::stripe_retrieve_failed", {
+      code: "ctrl_resumeSubscription_err7",
       userId: user.id,
       subscriptionId: subscription.id,
       message: err?.message || String(err),
@@ -110,6 +167,7 @@ export const resumeSubscriptionController: RequestHandler = async (req, res) => 
 
   if (cancelAtPeriodEnd || !currentPeriodEnd) {
     logger.error("subscription.resume::stripe_response_invalid", {
+      code: "ctrl_resumeSubscription_err8",
       userId: user.id,
       stripeSubscriptionId: subscription.stripe_subscription_id,
       cancelAtPeriodEndRaw: (stripeSub as any)?.cancel_at_period_end,
@@ -118,6 +176,8 @@ export const resumeSubscriptionController: RequestHandler = async (req, res) => 
     return res.status(502).json({
       success: false,
       message: "Stripe response is missing cancel_at_period_end/current_period_end.",
+      code: "ctrl_resumeSubscription_err8",
+      requestId: (req as any).requestId,
     });
   }
 

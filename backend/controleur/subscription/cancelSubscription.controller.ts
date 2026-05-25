@@ -75,7 +75,10 @@ async function sendCancellationConfirmationEmail(params: {
   try {
     const transporter = createSmtpTransporter(isProd);
     if (!transporter) {
-      logger.warn("subscription.cancel::smtp_not_configured", { userId: params.userId });
+      logger.warn("subscription.cancel::smtp_not_configured", {
+        code: "ctrl_cancelSubscription_err1",
+        userId: params.userId,
+      });
       return;
     }
 
@@ -119,6 +122,7 @@ async function sendCancellationConfirmationEmail(params: {
     });
   } catch (mailErr: any) {
     logger.warn("subscription.cancel::email_failed", {
+      code: "ctrl_cancelSubscription_err2",
       userId: params.userId,
       message: mailErr?.message || String(mailErr),
     });
@@ -131,41 +135,85 @@ export const cancelSubscriptionController: RequestHandler = async (req, res) => 
   const locale = resolveRequestLocale(req);
 
   if (!stripe) {
+    logger.error("subscription.cancel::stripe_not_configured", {
+      code: "ctrl_cancelSubscription_err3",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(500).json({
       success: false,
       message: "Stripe is not configured on this server.",
+      code: "ctrl_cancelSubscription_err3",
+      requestId: (req as any).requestId,
     });
   }
 
   const email =
     ((req as any).payload as any)?.email ?? (req as any).payload ?? null;
   if (!email || typeof email !== "string") {
+    logger.warn("subscription.cancel::unauthenticated_missing_payload", {
+      code: "ctrl_cancelSubscription_err4",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(401).json({
       success: false,
       message: "Unauthenticated.",
+      code: "ctrl_cancelSubscription_err4",
+      requestId: (req as any).requestId,
     });
   }
 
   const user = await getUserByEmail(String(email).trim().toLowerCase());
   if (!user) {
+    logger.warn("subscription.cancel::user_not_found", {
+      code: "ctrl_cancelSubscription_err5",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      email: String(email),
+    });
     return res.status(404).json({
       success: false,
       message: "User not found.",
+      code: "ctrl_cancelSubscription_err5",
+      requestId: (req as any).requestId,
     });
   }
 
   const subscription = await getActiveSubscription(user.id);
   if (!subscription) {
+    logger.warn("subscription.cancel::no_active_subscription", {
+      code: "ctrl_cancelSubscription_err6",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      userId: user.id,
+    });
     return res.status(400).json({
       success: false,
       message: "No active subscription found.",
+      code: "ctrl_cancelSubscription_err6",
+      requestId: (req as any).requestId,
     });
   }
 
   if (!subscription.stripe_subscription_id) {
+    logger.warn("subscription.cancel::no_active_stripe_subscription", {
+      code: "ctrl_cancelSubscription_err7",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      userId: user.id,
+      subscriptionId: subscription.id,
+    });
     return res.status(400).json({
       success: false,
       message: "No active Stripe subscription found for this account.",
+      code: "ctrl_cancelSubscription_err7",
+      requestId: (req as any).requestId,
     });
   }
 
@@ -217,9 +265,20 @@ export const cancelSubscriptionController: RequestHandler = async (req, res) => 
       stripeSubscriptionId: subscription.stripe_subscription_id,
     });
     if (lock.locked) {
+      logger.warn("subscription.cancel::billing_locked", {
+        code: "ctrl_cancelSubscription_err8",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        userId: user.id,
+        subscriptionId: subscription.id,
+        stripeSubscriptionId: subscription.stripe_subscription_id,
+      });
       return res.status(409).json({
         success: false,
         message: formatBillingLockMessage({ locale, lock }),
+        code: "ctrl_cancelSubscription_err8",
+        requestId: (req as any).requestId,
       });
     }
 
@@ -229,6 +288,7 @@ export const cancelSubscriptionController: RequestHandler = async (req, res) => 
     );
   } catch (err: any) {
     logger.error("subscription.cancel::stripe_update_failed", {
+      code: "ctrl_cancelSubscription_err9",
       userId: user.id,
       subscriptionId: subscription.id,
       message: err?.message || String(err),
@@ -236,6 +296,8 @@ export const cancelSubscriptionController: RequestHandler = async (req, res) => 
     return res.status(502).json({
       success: false,
       message: "Stripe update failed.",
+      code: "ctrl_cancelSubscription_err9",
+      requestId: (req as any).requestId,
     });
   }
 
@@ -248,6 +310,7 @@ export const cancelSubscriptionController: RequestHandler = async (req, res) => 
     );
   } catch (err: any) {
     logger.error("subscription.cancel::stripe_retrieve_failed", {
+      code: "ctrl_cancelSubscription_err10",
       userId: user.id,
       subscriptionId: subscription.id,
       stripeSubscriptionId: subscription.stripe_subscription_id,
@@ -266,6 +329,7 @@ export const cancelSubscriptionController: RequestHandler = async (req, res) => 
 
   if (!cancelAtPeriodEnd || !currentPeriodEnd) {
     logger.error("subscription.cancel::stripe_response_invalid", {
+      code: "ctrl_cancelSubscription_err11",
       userId: user.id,
       stripeSubscriptionId: subscription.stripe_subscription_id,
       stripeObjectType: String((stripeSub as any)?.object || ""),
@@ -276,6 +340,8 @@ export const cancelSubscriptionController: RequestHandler = async (req, res) => 
     return res.status(502).json({
       success: false,
       message: "Stripe response is missing cancel_at_period_end/current_period_end.",
+      code: "ctrl_cancelSubscription_err11",
+      requestId: (req as any).requestId,
     });
   }
 

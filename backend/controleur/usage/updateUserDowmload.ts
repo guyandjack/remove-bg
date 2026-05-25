@@ -18,37 +18,69 @@ const updateUserDownload: RequestHandler = async (req, res) => {
     
 
     if (!email || !reason) {
+      logger.warn("updateUserDownload::unauthorized_missing_payload", {
+        code: "ctrl_updateUserDowmload_err1",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(401).json({
         status: "error",
         message: "Unauthorized: missing user payload",
-        codeErr: "usage:unauth",
+        code: "ctrl_updateUserDowmload_err1",
+        requestId: (req as any).requestId,
       });
     }
 
     // Récupère l'utilisateur et son usage 24h courant
     const user = await getUserByEmail(email);
     if (!user) {
+      logger.warn("updateUserDownload::user_not_found", {
+        code: "ctrl_updateUserDowmload_err2",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        email,
+      });
       return res.status(404).json({
         status: "error",
         message: "User not found",
-        codeErr: "usage:user_not_found",
+        code: "ctrl_updateUserDowmload_err2",
+        requestId: (req as any).requestId,
       });
     }
 
     const usage = await getActiveUsageBillingPeriod(user.id);
     if (!usage) {
+      logger.warn("updateUserDownload::no_active_subscription", {
+        code: "ctrl_updateUserDowmload_err3",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        userId: user.id,
+      });
       return res.status(403).json({
         status: "error",
         message: "No active subscription or plan",
-        codeErr: "usage:no_active_subscription",
+        code: "ctrl_updateUserDowmload_err3",
+        requestId: (req as any).requestId,
       });
     }
 
     if (usage.remaining_in_period <= 0) {
+      logger.warn("updateUserDownload::no_credit_left", {
+        code: "ctrl_updateUserDowmload_err4",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        userId: user.id,
+        subscriptionId: usage.subscription_id,
+      });
       return res.status(429).json({
         status: "error",
         message: "No more credits available for this billing period",
-        codeErr: "usage:no_credit_left",
+        code: "ctrl_updateUserDowmload_err4",
+        requestId: (req as any).requestId,
         credits: {
           used_last_24h: usage.used_in_period,
           remaining_last_24h: usage.remaining_in_period,
@@ -61,6 +93,8 @@ const updateUserDownload: RequestHandler = async (req, res) => {
       await recordCreditUsage(usage.subscription_id, 1, reason);
     } catch (err: any) {
       logger.error("Failed to record credit usage", {
+        code: "ctrl_updateUserDowmload_err5",
+        requestId: (req as any).requestId,
         err: err?.message || String(err),
         email,
         subscriptionId: usage.subscription_id,
@@ -68,7 +102,8 @@ const updateUserDownload: RequestHandler = async (req, res) => {
       return res.status(500).json({
         status: "error",
         message: "Failed to record credit usage",
-        codeErr: "usage:record_failed",
+        code: "ctrl_updateUserDowmload_err5",
+        requestId: (req as any).requestId,
       });
     }
 
@@ -93,11 +128,18 @@ const updateUserDownload: RequestHandler = async (req, res) => {
       },
     });
   } catch (error: any) {
-    logger.error("updateUserDownload controller crashed", { error: error?.message || String(error) });
+    logger.error("updateUserDownload::unhandled_error", {
+      code: "ctrl_updateUserDowmload_err6",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      error: error?.message || String(error),
+    });
     return res.status(500).json({
       status: "error",
-      message: error?.message || String(error),
-      codeErr: "usage:unexpected",
+      message: "internal_error",
+      code: "ctrl_updateUserDowmload_err6",
+      requestId: (req as any).requestId,
     });
   }
 };
