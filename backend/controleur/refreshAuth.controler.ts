@@ -2,13 +2,25 @@ import type { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { setCookieOptionsObject, signAccessToken, signRefreshToken } from "../function/createToken.js";
 import { revokeRefreshToken } from "../DB/queriesSQL/queriesSQL.js";
+import { logger } from "../logger.js";
 
 // Controller: issue new access/refresh tokens after middleware validation
 const refreshAuth: RequestHandler = async (req, res) => {
   try {
     const data = (req as any).refresh as { jti: string; userId: string; email: string; token: string } | undefined;
     if (!data) {
-      return res.status(401).json({ status: "error", message: "Missing validated refresh", codeErr: "refresh_ctrl_0" });
+      logger.warn("refreshAuth::missing_validated_refresh", {
+        code: "ctrl_refreshAuth_err1",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(401).json({
+        status: "error",
+        message: "Missing validated refresh",
+        code: "ctrl_refreshAuth_err1",
+        requestId: (req as any).requestId,
+      });
     }
 
     // Issue new tokens
@@ -36,7 +48,19 @@ const refreshAuth: RequestHandler = async (req, res) => {
     res.cookie("tokenRefresh", newRefresh, options);
     return res.status(200).json({ status: "success", token: accessToken });
   } catch (err: any) {
-    return res.status(500).json({ status: "error", message: err?.message || String(err), codeErr: "refresh_ctrl_1" });
+    logger.error("refreshAuth::unhandled_error", {
+      code: "ctrl_refreshAuth_err2",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      message: err?.message || String(err),
+    });
+    return res.status(500).json({
+      status: "error",
+      message: "internal_error",
+      code: "ctrl_refreshAuth_err2",
+      requestId: (req as any).requestId,
+    });
   }
 };
 

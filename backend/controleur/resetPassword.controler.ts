@@ -20,7 +20,18 @@ const resetPassword: RequestHandler = async (req, res) => {
     const { token, password } = (req as any).userValidated as ResetValidatedPayload;
 
     if (!token || !password) {
-      return res.status(400).json({ status: "error", message: "missing payload reset_1" });
+      logger.warn("resetPassword::missing_payload", {
+        code: "ctrl_resetPassword_err1",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(400).json({
+        status: "error",
+        message: "Missing required payload.",
+        code: "ctrl_resetPassword_err1",
+        requestId: (req as any).requestId,
+      });
     }
 
     let decoded: PasswordResetPayload;
@@ -30,8 +41,19 @@ const resetPassword: RequestHandler = async (req, res) => {
       if ((verified as any).typ !== "password_reset") throw new Error("Token type invalid");
       decoded = verified as any;
     } catch (error) {
-      logger.warn("Reset password token invalid", { msg: (error as Error)?.message ?? String(error) });
-      return res.status(400).json({ status: "error", message: "invalid or expired token reset_2" });
+      logger.warn("resetPassword::token_invalid", {
+        code: "ctrl_resetPassword_err2",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        msg: (error as Error)?.message ?? String(error),
+      });
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid or expired token.",
+        code: "ctrl_resetPassword_err2",
+        requestId: (req as any).requestId,
+      });
     }
 
     const user =
@@ -39,8 +61,19 @@ const resetPassword: RequestHandler = async (req, res) => {
       (decoded.email && (await getUserByEmail(String(decoded.email))));
 
     if (!user) {
-      logger.warn("Reset password user not found", { sub: decoded.sub, email: decoded.email });
-      return res.status(400).json({ status: "error", message: "invalid token reset_3" });
+      logger.warn("resetPassword::user_not_found", {
+        code: "ctrl_resetPassword_err3",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        sub: decoded.sub,
+      });
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid token.",
+        code: "ctrl_resetPassword_err3",
+        requestId: (req as any).requestId,
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -51,6 +84,8 @@ const resetPassword: RequestHandler = async (req, res) => {
       await revokeAllRefreshTokensForUser(user.id);
     } catch (error) {
       logger.warn("Unable to revoke refresh tokens after password reset", {
+        code: "ctrl_resetPassword_err4",
+        requestId: (req as any).requestId,
         userId: user.id,
         msg: (error as Error)?.message ?? String(error),
       });
@@ -59,8 +94,19 @@ const resetPassword: RequestHandler = async (req, res) => {
     // UX: no redirect instruction. Front decides what to do.
     return res.status(200).json({ status: "success" });
   } catch (error) {
-    logger.error("Reset password error", { msg: (error as Error)?.message ?? String(error) });
-    return res.status(500).json({ status: "error", message: "server error reset_4" });
+    logger.error("resetPassword::unhandled_error", {
+      code: "ctrl_resetPassword_err5",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      msg: (error as Error)?.message ?? String(error),
+    });
+    return res.status(500).json({
+      status: "error",
+      message: "internal_error",
+      code: "ctrl_resetPassword_err5",
+      requestId: (req as any).requestId,
+    });
   }
 };
 

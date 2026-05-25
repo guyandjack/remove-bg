@@ -32,13 +32,35 @@ export const forgotPassword: RequestHandler = async (req, res) => {
   try {
     const { email, lang } = (req as any).userValidated as { email: string; lang: string };
     if (!email || !lang) {
-      return res.status(400).json({ status: "error", message: "missing payload code_forgot_1" });
+      logger.warn("forgotPassword::missing_payload", {
+        code: "ctrl_forgotPassword_err1",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(400).json({
+        status: "error",
+        message: "Missing required payload.",
+        code: "ctrl_forgotPassword_err1",
+        requestId: (req as any).requestId,
+      });
     }
 
     const normalizedEmail = normalizeEmail(email);
     const locale = resolveRequestLocale(req);
     if (!normalizedEmail || !locale) {
-      return res.status(400).json({ status: "error", message: "normalise payload code_forgot_2" });
+      logger.warn("forgotPassword::invalid_payload", {
+        code: "ctrl_forgotPassword_err2",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid payload.",
+        code: "ctrl_forgotPassword_err2",
+        requestId: (req as any).requestId,
+      });
     }
 
     const user = await getUserByEmail(normalizedEmail);
@@ -68,7 +90,10 @@ export const forgotPassword: RequestHandler = async (req, res) => {
         | undefined;
 
       if (!from || !pass) {
-        logger.warn("SMTP credentials missing for forgot password", { userId: user.id });
+        logger.warn("forgotPassword::smtp_not_configured", {
+          code: "ctrl_forgotPassword_err3",
+          userId: user.id,
+        });
         return res.status(200).json({ status: "success", message: "If an account exists, a reset email has been sent." });
       }
 
@@ -111,7 +136,13 @@ export const forgotPassword: RequestHandler = async (req, res) => {
 
     return res.status(200).json({ status: "success", message: "If an account exists, a reset email has been sent." });
   } catch (err: any) {
-    logger.error("Forgot password error", { message: err?.message || String(err) });
+    logger.error("forgotPassword::unhandled_error", {
+      code: "ctrl_forgotPassword_err4",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      message: err?.message || String(err),
+    });
     return res.status(200).json({ status: "success", message: "If an account exists, a reset email has been sent." });
   }
 };

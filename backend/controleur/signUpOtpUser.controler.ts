@@ -70,6 +70,8 @@ async function sendAccountCreatedEmail(params: {
     if (!transporter) {
       logger.warn("signup.account_created::smtp_not_configured", {
         // never log email
+        code: "ctrl_signUpOtpUser_err1",
+        requestId: (params.req as any)?.requestId,
       });
       return;
     }
@@ -103,6 +105,8 @@ async function sendAccountCreatedEmail(params: {
     });
   } catch (mailErr: any) {
     logger.warn("signup.account_created::email_failed", {
+      code: "ctrl_signUpOtpUser_err2",
+      requestId: (params.req as any)?.requestId,
       message: mailErr?.message || String(mailErr),
     });
   }
@@ -118,12 +122,19 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
     const code = String(otp || "").trim();
 
     if (!email || !code) {
+      logger.warn("createNewAccountUser::missing_email_or_code", {
+        code: "ctrl_signUpOtpUser_err3",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res
         .status(400)
         .json({
           status: "error",
           message: "Missing email or code",
-          errorCode: "otp1",
+          code: "ctrl_signUpOtpUser_err3",
+          requestId: (req as any).requestId,
         });
     }
 
@@ -138,12 +149,19 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
     );
     const record = rows[0] as RowDataPacket | undefined;
     if (!record) {
+      logger.warn("createNewAccountUser::no_active_code", {
+        code: "ctrl_signUpOtpUser_err4",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res
         .status(400)
         .json({
           status: "error",
           message: "No active code",
-          errorCode: "otp2",
+          code: "ctrl_signUpOtpUser_err4",
+          requestId: (req as any).requestId,
         });
     }
 
@@ -165,10 +183,17 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         `UPDATE \`EmailVerification\` SET active = NULL WHERE id = ?`,
         [record.id]
       );
+      logger.warn("createNewAccountUser::too_many_attempts", {
+        code: "ctrl_signUpOtpUser_err5",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(400).json({
         status: "error",
         message: "Too many attempts. Please request a new code.",
-        errorCode: "otp_too_many_attempts",
+        code: "ctrl_signUpOtpUser_err5",
+        requestId: (req as any).requestId,
       });
     }
 
@@ -178,9 +203,20 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         `UPDATE \`EmailVerification\` SET active = NULL WHERE id = ?`,
         [record.id]
       );
+      logger.warn("createNewAccountUser::code_expired_after_match", {
+        code: "ctrl_signUpOtpUser_err6",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res
         .status(400)
-        .json({ status: "error", message: "Code expired", errorCode: "otp3" });
+        .json({
+          status: "error",
+          message: "Code expired",
+          code: "ctrl_signUpOtpUser_err6",
+          requestId: (req as any).requestId,
+        });
     }
 
     if (expired) {
@@ -188,9 +224,20 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         `UPDATE \`EmailVerification\` SET active = NULL WHERE id = ?`,
         [record.id]
       );
+      logger.warn("createNewAccountUser::code_expired", {
+        code: "ctrl_signUpOtpUser_err7",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res
         .status(400)
-        .json({ status: "error", message: "Code expired", errorCode: "otp4" });
+        .json({
+          status: "error",
+          message: "Code expired",
+          code: "ctrl_signUpOtpUser_err7",
+          requestId: (req as any).requestId,
+        });
     }
 
     if (!match) {
@@ -198,9 +245,20 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         `UPDATE \`EmailVerification\` SET attempts = attempts + 1 WHERE id = ?`,
         [record.id]
       );
+      logger.warn("createNewAccountUser::invalid_code", {
+        code: "ctrl_signUpOtpUser_err8",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res
         .status(400)
-        .json({ status: "error", message: "Invalid code", errorCode: "otp5" });
+        .json({
+          status: "error",
+          message: "Invalid code",
+          code: "ctrl_signUpOtpUser_err8",
+          requestId: (req as any).requestId,
+        });
     }
 
     // Use plan directly from EmailVerification (plan_type)
@@ -324,28 +382,50 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
           });
         } catch (err: any) {
           if (String(err?.message || "") === "FREE_PLAN_ALREADY_USED_RECENTLY") {
+            logger.warn("createNewAccountUser::free_plan_already_used_recently", {
+              code: "ctrl_signUpOtpUser_err9",
+              requestId: (req as any).requestId,
+              method: req.method,
+              path: req.originalUrl || req.url,
+            });
             return res.status(409).json({
               status: "error",
               message: "Free plan already used recently.",
-              errorCode: "FREE_PLAN_ALREADY_USED_RECENTLY",
+              code: "ctrl_signUpOtpUser_err9",
+              requestId: (req as any).requestId,
             });
           }
+          logger.error("createNewAccountUser::transaction_failed", {
+            code: "ctrl_signUpOtpUser_err10",
+            requestId: (req as any).requestId,
+            method: req.method,
+            path: req.originalUrl || req.url,
+            message: err?.message ?? String(err),
+          });
           return res.status(500).json({
             status: "error",
-            message: err?.message || String(err),
-            errorCode: "otp7",
+            message: "internal_error",
+            code: "ctrl_signUpOtpUser_err10",
+            requestId: (req as any).requestId,
           });
         }
 
         // 2) After commit: create tokens, set cookie, get usage and respond
         const user = await getUserByEmail(email);
         if (!user) {
+          logger.error("createNewAccountUser::user_missing_after_signup", {
+            code: "ctrl_signUpOtpUser_err11",
+            requestId: (req as any).requestId,
+            method: req.method,
+            path: req.originalUrl || req.url,
+          });
           return res
             .status(500)
             .json({
               status: "error",
               message: "User missing after signup",
-              errorCode: "otp6a",
+              code: "ctrl_signUpOtpUser_err11",
+              requestId: (req as any).requestId,
             });
         }
         try {
@@ -360,12 +440,20 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
             rtExp ? { email, rtExp } : { email }
           );
         } catch (err: any) {
+          logger.error("createNewAccountUser::token_generation_failed", {
+            code: "ctrl_signUpOtpUser_err12",
+            requestId: (req as any).requestId,
+            method: req.method,
+            path: req.originalUrl || req.url,
+            message: err?.message ?? String(err),
+          });
           return res
             .status(500)
             .json({
               status: "error",
-              message: err?.message || String(err),
-              errorCode: "otp6b",
+              message: "internal_error",
+              code: "ctrl_signUpOtpUser_err12",
+              requestId: (req as any).requestId,
             });
         }
         const usage = await getActiveUsageBillingPeriod(user.id);
@@ -437,10 +525,17 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
       priceId = priceIds?.[currencyCode] || "";
 
       if (!priceId) {
+        logger.warn("createNewAccountUser::plan_price_missing_for_checkout", {
+          code: "ctrl_signUpOtpUser_err13",
+          requestId: (req as any).requestId,
+          method: req.method,
+          path: req.originalUrl || req.url,
+        });
         return res.status(400).json({
           status: "error",
           message: "Plan price missing for checkout",
-          errorCode: "otp_plan_price_missing",
+          code: "ctrl_signUpOtpUser_err13",
+          requestId: (req as any).requestId,
         });
       }
 
@@ -457,10 +552,19 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
       });
 
       if (response.status !== "success" || !response.redirect || !response.sessionId) {
+        logger.error("createNewAccountUser::checkout_session_create_failed", {
+          code: "ctrl_signUpOtpUser_err14",
+          requestId: (req as any).requestId,
+          method: req.method,
+          path: req.originalUrl || req.url,
+          message: response.message,
+        });
         return res.status(500).json({
           user: { email: email },
           status: response.status,
-          message: response.message,
+          message: "internal_error",
+          code: "ctrl_signUpOtpUser_err14",
+          requestId: (req as any).requestId,
           authentified: false,
           redirect: false,
           redirectUrl: "",
@@ -493,13 +597,20 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
       });
     }
   } catch (err: any) {
-    console.error("createNewAccountUser error:", err?.message || err);
+    logger.error("createNewAccountUser::unhandled_error", {
+      code: "ctrl_signUpOtpUser_err15",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      message: err?.message ?? String(err),
+    });
     return res
       .status(500)
       .json({
         status: "error",
-        message: err?.message || String(err),
-        errorCode: "otp8",
+        message: "internal_error",
+        code: "ctrl_signUpOtpUser_err15",
+        requestId: (req as any).requestId,
       });
   }
 };

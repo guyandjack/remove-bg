@@ -8,6 +8,7 @@ import { connectDb } from "../DB/poolConnexion/poolConnexion.js";
 import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.js";
 import { getUserByEmail } from "../DB/queriesSQL/queriesSQL.js";
 import { resolveRequestLocale } from "../utils/locale.js";
+import { logger } from "../logger.js";
 /* import { planOption } from "../data/planOption.js";
 import { buildLogoUrl } from "../utils/publicAssetUrl.js"; */
 
@@ -26,15 +27,24 @@ function normalizeEmail(email: unknown): string | null {
 }
 
 const sendMailVerification: RequestHandler = async (req, res) => {
+  const httpRequestId = (req as any).requestId;
   const nodEnv = process.env.NODE_ENV || null;
   const baseUrlProd = process.env.BASE_URL_PROD || null;
   const baseUrlDev = process.env.BASE_URL_DEV || null;
   if (!baseUrlDev || !baseUrlProd || !nodEnv) {
+    logger.error("sendMailVerification::missing_env", {
+      code: "ctrl_signUpDataUser_err1",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(500).json({
       error: true,
       message: "Missing env values",
-      code: "signup_missing_env",})
-    }
+      code: "ctrl_signUpDataUser_err1",
+      requestId: httpRequestId,
+    });
+  }
   const isProd = nodEnv === "production";
   const baseUrlUsed = isProd ? baseUrlProd : baseUrlDev;
   try {
@@ -42,15 +52,33 @@ const sendMailVerification: RequestHandler = async (req, res) => {
 
     // Basic required fields
     if (!email || !lang || !password || !plan || !currency) {
+      logger.warn("sendMailVerification::missing_required_fields", {
+        code: "ctrl_signUpDataUser_err2",
+        requestId: httpRequestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(400).json({
         error: true,
         message: "Missing required fields (email, password, lang, plan, currency)",
-        code: "signup_missing_fields",
+        code: "ctrl_signUpDataUser_err2",
+        requestId: httpRequestId,
       });
     }
     const normalizedEmail = normalizeEmail(email);
     if (!normalizedEmail) {
-      return res.status(400).json({ error: true, message: "Invalid email", code: "signup_invalid_email" });
+      logger.warn("sendMailVerification::invalid_email", {
+        code: "ctrl_signUpDataUser_err3",
+        requestId: httpRequestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(400).json({
+        error: true,
+        message: "Invalid email",
+        code: "ctrl_signUpDataUser_err3",
+        requestId: httpRequestId,
+      });
     }
 
     const locale = resolveRequestLocale(req);
@@ -81,7 +109,18 @@ const sendMailVerification: RequestHandler = async (req, res) => {
       if (!isResend) {
         const user = await getUserByEmail(normalizedEmail);
         if (user) {
-          return res.status(409).json({ error: true, message: "Email already registered", code: "signup_email_exists" });
+          logger.warn("sendMailVerification::email_already_registered", {
+            code: "ctrl_signUpDataUser_err4",
+            requestId: httpRequestId,
+            method: req.method,
+            path: req.originalUrl || req.url,
+          });
+          return res.status(409).json({
+            error: true,
+            message: "Email already registered",
+            code: "ctrl_signUpDataUser_err4",
+            requestId: httpRequestId,
+          });
         }
       }
 
@@ -140,8 +179,18 @@ const sendMailVerification: RequestHandler = async (req, res) => {
 
     if (!from || !pass) {
       // Never log email nor OTP (even in dev). If SMTP is missing, we still return the OTP to the caller (dev-only behavior).
-      console.warn("SMTP credentials missing; OTP returned in response (dev).");
-      return res.status(200).json({ ok: true, email: normalizedEmail, message: "OTP generated (no SMTP)", devOtp: otp });
+      logger.warn("sendMailVerification::smtp_not_configured", {
+        code: "ctrl_signUpDataUser_err5",
+        requestId: httpRequestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(200).json({
+        ok: true,
+        email: normalizedEmail,
+        message: "OTP generated (no SMTP)",
+        devOtp: otp,
+      });
     }
 
     const transporter = nodemailer.createTransport({
@@ -171,11 +220,34 @@ const sendMailVerification: RequestHandler = async (req, res) => {
           conn.release();
         }
       } catch {}
-      return res.status(503).json({ error: true, message: "Email service unavailable. Please retry.", code: "smtp_unavailable" });
+      logger.error("sendMailVerification::smtp_send_failed", {
+        code: "ctrl_signUpDataUser_err6",
+        requestId: httpRequestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        message: (mailErr as any)?.message ?? String(mailErr),
+      });
+      return res.status(503).json({
+        error: true,
+        message: "Email service unavailable. Please retry.",
+        code: "ctrl_signUpDataUser_err6",
+        requestId: httpRequestId,
+      });
     }
   } catch (err: any) {
-    console.error("sendMailVerification error:", err?.message || err);
-    return res.status(500).json({ error: true, message: "Server error", code: "signup_server_error" });
+    logger.error("sendMailVerification::unhandled_error", {
+      code: "ctrl_signUpDataUser_err7",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      message: err?.message ?? String(err),
+    });
+    return res.status(500).json({
+      error: true,
+      message: "Server error",
+      code: "ctrl_signUpDataUser_err7",
+      requestId: httpRequestId,
+    });
   }
 };
 

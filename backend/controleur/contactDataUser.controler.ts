@@ -2,6 +2,7 @@
 import type { RequestHandler } from "express";
 import nodemailer, { TransportOptions } from "nodemailer";
 import "dotenv/config";
+import { logger } from "../logger.js";
 import {
   notifyContactSubmission,
   safeNotify,
@@ -144,16 +145,20 @@ const sendContactEmail: RequestHandler = async (req, res) => {
     });
   } catch (err: any) {
     // Log côté serveur
-    console.error("Email sending error:", err);
+    logger.error("sendContactEmail::failed", {
+      code: "ctrl_contactDataUser_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      message: err?.message ?? String(err),
+    });
 
     // Réponses plus parlantes (sans leak d’infos sensibles)
     res.status(500).json({
       status: "error",
       message: "Email sending error. Please try again later.",
-      details:
-        process.env.NODE_ENV === "development"
-          ? String(err?.message || err)
-          : undefined,
+      code: "ctrl_contactDataUser_err1",
+      requestId: (req as any).requestId,
     });
   }
 };

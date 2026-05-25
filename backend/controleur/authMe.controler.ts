@@ -5,24 +5,40 @@ import {
   getUserByEmail,
 } from "../DB/queriesSQL/queriesSQL.js";
 import { getConversionQuotaSnapshotForUser } from "../DB/queriesSQL/conversionQuota.queries.js";
+import { logger } from "../logger.js";
 
 const authMe = async (req: Request, res: Response) => {
+  const httpRequestId = (req as any).requestId;
   const email = ((req as any).payload as any)?.email ?? (req as any).payload ?? null;
 
   if (!email || typeof email !== "string") {
+    logger.warn("authMe::missing_payload_email", {
+      code: "ctrl_authMe_err1",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(500).json({
       status: "error",
       message: "User unknown",
-      errorCode: "auth1",
+      code: "ctrl_authMe_err1",
+      requestId: httpRequestId,
     });
   }
 
   const userRow = await getUserByEmail(email);
   if (!userRow) {
+    logger.warn("authMe::user_not_found", {
+      code: "ctrl_authMe_err2",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(404).json({
       status: "error",
       message: "User not found",
-      errorCode: "auth2",
+      code: "ctrl_authMe_err2",
+      requestId: httpRequestId,
     });
   }
 

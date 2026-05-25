@@ -17,6 +17,7 @@ import {
   getUserPlanAndCreditsBillingPeriod,
 } from "../DB/queriesSQL/queriesSQL.js";
 import { getConversionQuotaSnapshotForUser } from "../DB/queriesSQL/conversionQuota.queries.js";
+import { logger } from "../logger.js";
 
 //import des types
 import type { RequestHandler } from "express";
@@ -55,13 +56,21 @@ type ObjectResponse = {
 const login: RequestHandler = async (req, res, next) => {
   try {
     const { email, password } = (req as any).userValidated;
+    const httpRequestId = (req as any).requestId;
 
     // Check if email and password exist
     if (!email || !password) {
+      logger.warn("login::missing_email_or_password", {
+        code: "ctrl_loginDataUser_err1",
+        requestId: httpRequestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(400).json({
         status: "error",
         message: "Please provide email and password ",
-        codeErr: "ErrLog:1",
+        code: "ctrl_loginDataUser_err1",
+        requestId: httpRequestId,
       });
     }
 
@@ -70,10 +79,17 @@ const login: RequestHandler = async (req, res, next) => {
 
     if (!user) {
       // Either email wasn't found or password didn't match
+      logger.warn("login::user_not_found", {
+        code: "ctrl_loginDataUser_err2",
+        requestId: httpRequestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(401).json({
         status: "error",
-        message: "Incorrect email or password ErrLog:2",
-        codeErr: "ErrLog:2",
+        message: "Incorrect email or password",
+        code: "ctrl_loginDataUser_err2",
+        requestId: httpRequestId,
       });
     }
 
@@ -85,10 +101,18 @@ const login: RequestHandler = async (req, res, next) => {
       : false;
 
     if (!isValidPassword) {
+      logger.warn("login::invalid_password", {
+        code: "ctrl_loginDataUser_err3",
+        requestId: httpRequestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        userId: user.id,
+      });
       return res.status(401).json({
         status: "error",
         message: "Incorrect email or password ",
-        codeErr: "ErrLog:3",
+        code: "ctrl_loginDataUser_err3",
+        requestId: httpRequestId,
       });
     }
 
@@ -166,10 +190,19 @@ const login: RequestHandler = async (req, res, next) => {
         hint: "",
       };
     } catch (err) {
+      logger.error("login::prepare_response_failed", {
+        code: "ctrl_loginDataUser_err4",
+        requestId: httpRequestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        userId: user.id,
+        message: (err as any)?.message ?? String(err),
+      });
       return res.status(500).json({
         status: "error",
-        message: "serveur error: " + err,
-        codeErr: "ErrLog:4",
+        message: "internal_error",
+        code: "ctrl_loginDataUser_err4",
+        requestId: httpRequestId,
       });
     }
     // If everything ok, send token and cookie to client
@@ -177,9 +210,18 @@ const login: RequestHandler = async (req, res, next) => {
     res.cookie("tokenRefresh", refreshToken, options);
     res.status(200).json(formatedObject);
   } catch (error) {
+    logger.error("login::unhandled_error", {
+      code: "ctrl_loginDataUser_err5",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      message: (error as any)?.message ?? String(error),
+    });
     res.status(400).json({
       status: "error",
-      message: error,
+      message: "internal_error",
+      code: "ctrl_loginDataUser_err5",
+      requestId: (req as any).requestId,
     });
   }
 };
