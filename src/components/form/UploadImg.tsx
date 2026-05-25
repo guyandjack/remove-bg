@@ -1,7 +1,8 @@
 ﻿// UploadImg.tsx
 
 //import des hooks
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
+import { useTranslation } from "react-i18next";
 import { sessionSignal } from "@/stores/session";
 import { planOptionsSignal } from "@/stores/planOptions";
 import { getMaxUploadForUser } from "@/utils/planOptionLimits";
@@ -50,8 +51,10 @@ const UploadImg = ({
   confirmLabel = "Valider",
   actionsDisabled = false,
 }: UploadImgProps) => {
-  const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [clearSignal, setClearSignal] = useState<number>(0);
+  const errorTimerRef = useRef<number | null>(null);
+  const { t } = useTranslation();
   const isLoged = sessionSignal.value?.authentified === true;
   const planUser = sessionSignal.value?.plan?.code || null;
   const { maxBytes, maxMb } = getMaxUploadForUser({
@@ -68,29 +71,53 @@ const UploadImg = ({
     };
   }, [previewUrl]);
 
+  useEffect(() => {
+    return () => {
+      if (errorTimerRef.current !== null) {
+        window.clearTimeout(errorTimerRef.current);
+        errorTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  const clearPendingErrorTimer = () => {
+    if (errorTimerRef.current === null) return;
+    window.clearTimeout(errorTimerRef.current);
+    errorTimerRef.current = null;
+  };
+
+  const revokePreviewUrl = (url: string | null) => {
+    if (!url) return;
+    try {
+      URL.revokeObjectURL(url);
+    } catch {}
+  };
+
   const resetState = () => {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    clearPendingErrorTimer();
+    revokePreviewUrl(previewUrl);
     setPreviewUrl(null);
-    setFileName("");
     setError("");
     onFileReady(null);
   };
 
+  const clearInput = () => setClearSignal((previous) => previous + 1);
+
   const validateFile = (file: File): string | null => {
-    if (!file) return "Aucun fichier selectionne.";
-    if (file.size > maxBytes) return `Image trop volumineuse. Taille max: ${maxMb} MB.`;
+    if (!file) return t("uploadImg.errors.noFile");
+    if (file.size > maxBytes) return t("uploadImg.errors.tooLarge", { maxMb });
 
     const isImageMime = file.type.startsWith("image/");
-    if (!isImageMime) return "Le fichier doit etre une image.";
+    if (!isImageMime) return t("uploadImg.errors.mustBeImage");
     if (!ACCEPTED_MIME.has(file.type))
-      return "Format non supporte (JPEG, PNG, WEBP, GIF).";
+      return t("uploadImg.errors.unsupportedFormat");
 
     const lower = file.name.toLowerCase();
     const hasValidExt = Array.from(ACCEPTED_EXT).some((ext) =>
       lower.endsWith(ext)
     );
     if (!hasValidExt)
-      return "Extension non valide (jpg, jpeg, png, webp, gif).";
+      return t("uploadImg.errors.invalidExtension");
 
     return null;
   };
@@ -100,15 +127,23 @@ const UploadImg = ({
       resetState();
       return;
     }
+
+    clearPendingErrorTimer();
+
     const err = validateFile(file);
     if (err) {
-      resetState();
+      revokePreviewUrl(previewUrl);
+      setPreviewUrl(null);
+      onFileReady(null);
       setError(err);
+      errorTimerRef.current = window.setTimeout(() => {
+        clearInput();
+        resetState();
+      }, 3000);
       return;
     }
 
     setError("");
-    setFileName(file.name);
 
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
@@ -116,14 +151,8 @@ const UploadImg = ({
   };
 
   const onClear = () => {
+    clearInput();
     resetState();
-    const input = document.getElementById(
-      "imageUpload"
-    ) as HTMLInputElement | null;
-    if (input) {
-      input.value = "";
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-    }
   };
 
   return (
@@ -138,8 +167,9 @@ const UploadImg = ({
               accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={onChangeFile}
               className="w-full bg-base-200 file-input-info"
-              //placeholder={content.placeholder}
+              placeholder={content.placeholder}
               buttonText={content.label}
+              clearSignal={clearSignal}
             />
             <div className="label p-0">
               <span className="label-text text-base-content/70">
@@ -161,9 +191,6 @@ const UploadImg = ({
           <div className="mt-6">
             <div className="grid grid-cols-1 gap-4">
               <div className="flex items-center justify-between">
-                {/* <span className="text-sm text-base-content/70 truncate">
-                  {fileName || content.filename}
-                </span> */}
                 {previewUrl ? (
                   <div className="flex items-center gap-2">
                     {onConfirm ? (

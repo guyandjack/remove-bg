@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 type FileInputProps = {
   id?: string;
@@ -8,6 +8,7 @@ type FileInputProps = {
   disabled?: boolean;
   placeholder?: string;
   buttonText?: string;
+  clearSignal?: number;
 };
 
 const InputFile = ({
@@ -18,8 +19,17 @@ const InputFile = ({
   disabled = false,
   placeholder = "",
   buttonText = "Parcourir",
+  clearSignal,
 }: FileInputProps) => {
   const [fileName, setFileName] = useState<string>("");
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (clearSignal === undefined) return;
+    if (!inputRef.current) return;
+    inputRef.current.value = "";
+    setFileName("");
+  }, [clearSignal]);
 
   const handleFileChange = (e: Event & { currentTarget: HTMLInputElement }) => {
     const file = e.currentTarget.files?.[0] ?? null;
@@ -41,6 +51,7 @@ const InputFile = ({
         onChange={(e) => handleFileChange(e as any)}
         className="hidden"
         disabled={disabled}
+        ref={inputRef}
       />
 
       <div className="flex-1 text-left">
