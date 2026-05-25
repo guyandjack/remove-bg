@@ -10,11 +10,15 @@ import { tryConsumeRemoveBgTrial } from "../../DB/queriesSQL/visitorQuota.querie
 import {
   createRemoveBgVisitorJobIdempotent,
   getRemoveBgVisitorJobByVisitorHashAndIdempotencyKey,
+  markRemoveBgVisitorJobFailed,
   setRemoveBgVisitorJobRunning,
 } from "../../DB/queriesSQL/queriesSQL.js";
 import {
   publishRemoveBgJobUpdatedPayloadToChannel,
 } from "../../services/removeBgJobs/removeBgJobEvents.js";
+
+const REPLICATE_TIMEOUT_MS =
+  Number(process.env.REPLICATE_TIMEOUT_MS ?? "120000") || 120000;
 
 const modelType = {
   portrait:
@@ -80,6 +84,35 @@ function setVisitorQuotaHeaders(res: any, snapshot: { used: number; limit: numbe
   res.setHeader("X-Wizpix-Visitor-Quota-Limit", String(snapshot.limit));
 }
 
+function isAbortLikeError(err: any): boolean {
+  if (!err) return false;
+  if (err?.name === "AbortError") return true;
+  if (String(err?.code || "") === "ABORT_ERR") return true;
+  return false;
+}
+
+function upstreamHttpStatus(err: any): number | null {
+  const status = err?.response?.status;
+  return typeof status === "number" ? status : null;
+}
+
+function safeTrimmedString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : String(value ?? "").trim();
+}
+
+function describeFetchFailure(err: any): Record<string, any> {
+  const cause = err?.cause;
+  if (!cause || typeof cause !== "object") return {};
+
+  // Undici/Node fetch errors often expose details on `cause`.
+  const out: Record<string, any> = {};
+  for (const k of ["code", "errno", "syscall", "address", "port", "host", "hostname"] as const) {
+    const v = (cause as any)[k];
+    if (v != null && v !== "") out[`cause_${k}`] = v;
+  }
+  return out;
+}
+
 export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res) => {
   const httpRequestId = (req as any).requestId;
   const requestMeta = {
@@ -121,10 +154,26 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
       return res.status(400).json({
         error: true,
         code: "MISSING_IDEMPOTENCY_KEY",
-        message: "Missing idempotencyKey",
+        message: "Parametre manquant: idempotencyKey",
         requestId: httpRequestId,
       });
     }
+
+    const publicBase = getPublicBackendBaseUrl();
+    if (!publicBase) {
+      logger.error("removeBgVisitorReplicateJob::missing_public_backend_url", requestMeta);
+      return res.status(500).json({
+        error: true,
+        code: "CONFIG_MISSING",
+        message:
+          "Configuration manquante: REPLICATE_WEBHOOK_URL (dev) ou BASE_URL_PROD (prod).",
+        requestId: httpRequestId,
+      });
+    }
+
+    const modelKey = pickModelKey(req);
+    const modelIdentifier = modelType[modelKey];
+    const version = extractVersionFromIdentifier(modelIdentifier);
 
     const { hashedIp, hashSuffix } = getHashedVisitorIp(req);
 
@@ -133,6 +182,8 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
       idempotencyKey,
     });
     if (existing) {
+      // Idempotency contract: for the same visitor + idempotency key, return the same job
+      // and avoid consuming quota again.
       publishRemoveBgJobUpdatedPayloadToChannel(`visitor:${existing.request_id}`, {
         requestId: existing.request_id,
         status: existing.status,
@@ -177,18 +228,6 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
       visitorHashedIp: hashedIp,
     });
 
-    const publicBase = getPublicBackendBaseUrl();
-    if (!publicBase) {
-      logger.error("removeBgVisitorReplicateJob::missing_public_backend_url", requestMeta);
-      return res.status(500).json({
-        error: true,
-        code: "CONFIG_MISSING",
-        message:
-          "Configuration manquante: REPLICATE_WEBHOOK_URL (dev) ou BASE_URL_PROD (prod).",
-        requestId: httpRequestId,
-      });
-    }
-
     const webhookUrl = `${publicBase}/api/replicate/webhook?source=remove_bg_visitor&requestId=${encodeURIComponent(
       job.request_id,
     )}`;
@@ -198,27 +237,117 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
       useFileOutput: true,
     });
 
-    const modelKey = pickModelKey(req);
-    const modelIdentifier = modelType[modelKey];
-    const version = extractVersionFromIdentifier(modelIdentifier);
+    const abortController = new AbortController();
+    const timeout = setTimeout(() => abortController.abort(), REPLICATE_TIMEOUT_MS);
 
+    let prediction: any;
     const replicateCreateStartedAt = Date.now();
-    const prediction = await replicate.predictions.create({
-      version,
-      input: { image: image.buffer },
-      webhook: webhookUrl,
-      webhook_events_filter: ["start", "completed"],
-    } as any);
+    try {
+      prediction = await replicate.predictions.create({
+        version,
+        input: { image: image.buffer },
+        webhook: webhookUrl,
+        webhook_events_filter: ["start", "completed"],
+        signal: abortController.signal,
+      } as any);
+    } catch (error: any) {
+      const isAbort = isAbortLikeError(error) || abortController.signal.aborted;
+      const status = upstreamHttpStatus(error);
+      const message = safeTrimmedString(error?.message || error);
+
+      logger.error("removeBgVisitorReplicateJob::prediction_create_failed", {
+        ...requestMeta,
+        jobRequestId: job.request_id,
+        jobId: job.id,
+        modelKey,
+        isAbort,
+        upstreamStatus: status,
+        message,
+        ...describeFetchFailure(error),
+      });
+
+      const clientMessage = isAbort
+        ? "Timeout: le service de traitement n'a pas repondu a temps."
+        : status && status >= 400 && status < 500
+          ? "Requete invalide pour le service de traitement."
+          : "Le service de suppression de fond est indisponible pour le moment.";
+
+      try {
+        await markRemoveBgVisitorJobFailed({
+          requestId: job.request_id,
+          errorMessage: clientMessage,
+          replicateStatus: isAbort ? "timeout" : null,
+          replicatePayload: { message, upstreamStatus: status },
+          completedAt: new Date(),
+        });
+      } catch (dbErr: any) {
+        logger.warn("removeBgVisitorReplicateJob::mark_failed_db_error", {
+          ...requestMeta,
+          jobRequestId: job.request_id,
+          jobId: job.id,
+          message: dbErr?.message ?? String(dbErr),
+        });
+      }
+
+      publishRemoveBgJobUpdatedPayloadToChannel(`visitor:${job.request_id}`, {
+        requestId: job.request_id,
+        status: "failed",
+        outputImageUrl: null,
+        errorMessage: clientMessage,
+        createdAt: job.created_at,
+        completedAt: new Date(),
+      });
+
+      const httpStatus = isAbort ? 504 : 502;
+      return res.status(httpStatus).json({
+        error: true,
+        code: isAbort ? "UPSTREAM_TIMEOUT" : "UPSTREAM_ERROR",
+        message: clientMessage,
+        requestId: httpRequestId,
+        jobRequestId: job.request_id,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
     const replicateCreateMs = Date.now() - replicateCreateStartedAt;
 
     const predictionId = String((prediction as any)?.id ?? "").trim() || null;
     if (!predictionId) {
-      logger.error("removeBgVisitorReplicateJob::prediction_create_missing_id", requestMeta);
+      logger.error("removeBgVisitorReplicateJob::prediction_create_missing_id", {
+        ...requestMeta,
+        jobRequestId: job.request_id,
+        jobId: job.id,
+        modelKey,
+      });
+
+      const clientMessage =
+        "Le service de traitement a renvoye une reponse invalide (prediction id manquant).";
+
+      try {
+        await markRemoveBgVisitorJobFailed({
+          requestId: job.request_id,
+          errorMessage: clientMessage,
+          replicateStatus: "invalid_response",
+          replicatePayload: prediction as any,
+          completedAt: new Date(),
+        });
+      } catch {}
+
+      publishRemoveBgJobUpdatedPayloadToChannel(`visitor:${job.request_id}`, {
+        requestId: job.request_id,
+        status: "failed",
+        outputImageUrl: null,
+        errorMessage: clientMessage,
+        createdAt: job.created_at,
+        completedAt: new Date(),
+      });
+
       return res.status(502).json({
         error: true,
         code: "UPSTREAM_ERROR",
-        message: "Replicate a renvoye une reponse invalide (prediction id manquant).",
+        message: clientMessage,
         requestId: httpRequestId,
+        jobRequestId: job.request_id,
       });
     }
 
