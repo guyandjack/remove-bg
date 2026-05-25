@@ -125,13 +125,13 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
     const replicateToken =
       process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_KEY_WIZPIX;
     if (!replicateToken) {
-      logger.error(
-        "removeBgVisitorReplicateJob::missing_replicate_token",
-        requestMeta,
-      );
+      logger.error("removeBgVisitorReplicateJob::missing_replicate_token", {
+        code: "ctrl_removeBgVisitorReplicateJobs_err1",
+        ...requestMeta,
+      });
       return res.status(500).json({
         error: true,
-        code: "CONFIG_MISSING",
+        code: "ctrl_removeBgVisitorReplicateJobs_err1",
         message:
           "Configuration manquante: REPLICATE_API_TOKEN (ou REPLICATE_API_KEY_WIZPIX).",
         requestId: httpRequestId,
@@ -140,10 +140,13 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
 
     const image = (req as any).imageValidated as ValidatedImage | undefined;
     if (!image) {
-      logger.warn("removeBgVisitorReplicateJob::missing_validated_image", requestMeta);
+      logger.warn("removeBgVisitorReplicateJob::missing_validated_image", {
+        code: "ctrl_removeBgVisitorReplicateJobs_err2",
+        ...requestMeta,
+      });
       return res.status(400).json({
         error: true,
-        code: "INVALID_IMAGE",
+        code: "ctrl_removeBgVisitorReplicateJobs_err2",
         message: "Aucune image valide n'a ete detectee.",
         requestId: httpRequestId,
       });
@@ -151,9 +154,13 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
 
     const idempotencyKey = getIdempotencyKey(req);
     if (!idempotencyKey) {
+      logger.warn("removeBgVisitorReplicateJob::missing_idempotency_key", {
+        code: "ctrl_removeBgVisitorReplicateJobs_err3",
+        ...requestMeta,
+      });
       return res.status(400).json({
         error: true,
-        code: "MISSING_IDEMPOTENCY_KEY",
+        code: "ctrl_removeBgVisitorReplicateJobs_err3",
         message: "Parametre manquant: idempotencyKey",
         requestId: httpRequestId,
       });
@@ -161,10 +168,13 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
 
     const publicBase = getPublicBackendBaseUrl();
     if (!publicBase) {
-      logger.error("removeBgVisitorReplicateJob::missing_public_backend_url", requestMeta);
+      logger.error("removeBgVisitorReplicateJob::missing_public_backend_url", {
+        code: "ctrl_removeBgVisitorReplicateJobs_err4",
+        ...requestMeta,
+      });
       return res.status(500).json({
         error: true,
-        code: "CONFIG_MISSING",
+        code: "ctrl_removeBgVisitorReplicateJobs_err4",
         message:
           "Configuration manquante: REPLICATE_WEBHOOK_URL (dev) ou BASE_URL_PROD (prod).",
         requestId: httpRequestId,
@@ -206,6 +216,7 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
     setVisitorQuotaHeaders(res, snapshot);
     if (!snapshot.allowed) {
       logger.info("removeBgVisitorReplicateJob::quota_blocked", {
+        code: "ctrl_removeBgVisitorReplicateJobs_err5",
         ...requestMeta,
         visitorHashSuffix: hashSuffix,
         used: snapshot.used,
@@ -213,7 +224,7 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
       });
       return res.status(429).json({
         error: true,
-        code: "VISITOR_QUOTA_EXCEEDED",
+        code: "ctrl_removeBgVisitorReplicateJobs_err5",
         message:
           `Quota visiteur depasse: ${snapshot.limit} suppression d'arriere-plan maximum par mois.`,
         requestId: httpRequestId,
@@ -256,6 +267,7 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
       const message = safeTrimmedString(error?.message || error);
 
       logger.error("removeBgVisitorReplicateJob::prediction_create_failed", {
+        code: "ctrl_removeBgVisitorReplicateJobs_err6",
         ...requestMeta,
         jobRequestId: job.request_id,
         jobId: job.id,
@@ -282,6 +294,7 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
         });
       } catch (dbErr: any) {
         logger.warn("removeBgVisitorReplicateJob::mark_failed_db_error", {
+          code: "ctrl_removeBgVisitorReplicateJobs_err7",
           ...requestMeta,
           jobRequestId: job.request_id,
           jobId: job.id,
@@ -301,7 +314,7 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
       const httpStatus = isAbort ? 504 : 502;
       return res.status(httpStatus).json({
         error: true,
-        code: isAbort ? "UPSTREAM_TIMEOUT" : "UPSTREAM_ERROR",
+        code: "ctrl_removeBgVisitorReplicateJobs_err8",
         message: clientMessage,
         requestId: httpRequestId,
         jobRequestId: job.request_id,
@@ -314,6 +327,7 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
     const predictionId = String((prediction as any)?.id ?? "").trim() || null;
     if (!predictionId) {
       logger.error("removeBgVisitorReplicateJob::prediction_create_missing_id", {
+        code: "ctrl_removeBgVisitorReplicateJobs_err9",
         ...requestMeta,
         jobRequestId: job.request_id,
         jobId: job.id,
@@ -344,7 +358,7 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
 
       return res.status(502).json({
         error: true,
-        code: "UPSTREAM_ERROR",
+        code: "ctrl_removeBgVisitorReplicateJobs_err10",
         message: clientMessage,
         requestId: httpRequestId,
         jobRequestId: job.request_id,
@@ -387,13 +401,14 @@ export const createRemoveBgVisitorReplicateJob: RequestHandler = async (req, res
     });
   } catch (err: any) {
     logger.error("removeBgVisitorReplicateJob::unhandled_error", {
+      code: "ctrl_removeBgVisitorReplicateJobs_err11",
       requestId: (req as any).requestId,
       message: err?.message ?? String(err),
       stack: err?.stack,
     });
     return res.status(500).json({
       error: true,
-      code: "INTERNAL_ERROR",
+      code: "ctrl_removeBgVisitorReplicateJobs_err11",
       message: "Erreur interne du serveur.",
       requestId: (req as any).requestId,
     });

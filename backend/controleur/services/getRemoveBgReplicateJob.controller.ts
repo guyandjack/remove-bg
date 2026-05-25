@@ -39,35 +39,67 @@ export const getRemoveBgReplicateJob: RequestHandler = async (req, res) => {
   const { email } =
     ((req as any).payload as { email?: string } | undefined) || {};
   if (!email) {
+    logger.warn("getRemoveBgReplicateJob::unauthorized_missing_payload", {
+      code: "ctrl_getRemoveBgReplicateJob_err1",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(401).json({
       error: true,
       message: "Unauthorized",
+      code: "ctrl_getRemoveBgReplicateJob_err1",
       requestId: httpRequestId,
     });
   }
 
   const user = await getUserByEmail(email);
   if (!user) {
+    logger.warn("getRemoveBgReplicateJob::unauthorized_user_not_found", {
+      code: "ctrl_getRemoveBgReplicateJob_err2",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(401).json({
       error: true,
       message: "Unauthorized",
+      code: "ctrl_getRemoveBgReplicateJob_err2",
       requestId: httpRequestId,
     });
   }
 
   const job = await getRemoveBgJobByRequestId(requestIdParam);
   if (!job) {
+    logger.warn("getRemoveBgReplicateJob::job_not_found", {
+      code: "ctrl_getRemoveBgReplicateJob_err3",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: requestIdParam,
+      userId: user.id,
+    });
     return res.status(404).json({
       error: true,
       message: "job_not_found",
+      code: "ctrl_getRemoveBgReplicateJob_err3",
       requestId: httpRequestId,
     });
   }
 
   if (!job.user_id || job.user_id !== user.id) {
+    logger.warn("getRemoveBgReplicateJob::forbidden", {
+      code: "ctrl_getRemoveBgReplicateJob_err4",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: job.request_id,
+      userId: user.id,
+    });
     return res.status(403).json({
       error: true,
       message: "forbidden",
+      code: "ctrl_getRemoveBgReplicateJob_err4",
       requestId: httpRequestId,
     });
   }
@@ -104,6 +136,7 @@ export const getRemoveBgReplicateJob: RequestHandler = async (req, res) => {
               }
             } catch (err: any) {
               logger.warn("getRemoveBgReplicateJob::reconcile_optimize_failed", {
+                code: "ctrl_getRemoveBgReplicateJob_err5",
                 requestId: httpRequestId,
                 jobId: job.id,
                 predictionId: job.replicate_prediction_id,
@@ -141,6 +174,7 @@ export const getRemoveBgReplicateJob: RequestHandler = async (req, res) => {
               }
             } catch (err: any) {
               logger.warn("getRemoveBgReplicateJob::reconcile_debit_failed", {
+                code: "ctrl_getRemoveBgReplicateJob_err6",
                 requestId: httpRequestId,
                 jobId: job.id,
                 predictionId: job.replicate_prediction_id,
@@ -188,6 +222,7 @@ export const getRemoveBgReplicateJob: RequestHandler = async (req, res) => {
         }
       } catch (err: any) {
         logger.warn("getRemoveBgReplicateJob::reconcile_failed", {
+          code: "ctrl_getRemoveBgReplicateJob_err7",
           requestId: httpRequestId,
           jobId: job.id,
           predictionId: job.replicate_prediction_id,
@@ -237,14 +272,15 @@ export const getRemoveBgReplicateJob: RequestHandler = async (req, res) => {
                 bytesOptimized: stored.bytesOptimized,
               });
             }
-          } catch (err: any) {
-            logger.warn("getRemoveBgReplicateJob::output_optimize_failed", {
-              requestId: httpRequestId,
-              jobId: job.id,
-              predictionId: job.replicate_prediction_id,
-              message: err?.message ?? String(err),
-            });
-          }
+           } catch (err: any) {
+             logger.warn("getRemoveBgReplicateJob::output_optimize_failed", {
+               code: "ctrl_getRemoveBgReplicateJob_err8",
+               requestId: httpRequestId,
+               jobId: job.id,
+               predictionId: job.replicate_prediction_id,
+               message: err?.message ?? String(err),
+             });
+           }
 
           const updated = await backfillRemoveBgJobOutputIfMissing({
             requestId: job.request_id,
@@ -274,16 +310,17 @@ export const getRemoveBgReplicateJob: RequestHandler = async (req, res) => {
             }
           }
         }
-      } catch (err: any) {
-        logger.warn("getRemoveBgReplicateJob::backfill_failed", {
-          requestId: httpRequestId,
-          jobId: job.id,
-          predictionId: job.replicate_prediction_id,
-          message: err?.message ?? String(err),
-        });
-      }
-    }
-  }
+       } catch (err: any) {
+         logger.warn("getRemoveBgReplicateJob::backfill_failed", {
+           code: "ctrl_getRemoveBgReplicateJob_err9",
+           requestId: httpRequestId,
+           jobId: job.id,
+           predictionId: job.replicate_prediction_id,
+           message: err?.message ?? String(err),
+         });
+       }
+     }
+   }
 
   return res.status(200).json({
     requestId: job.request_id,

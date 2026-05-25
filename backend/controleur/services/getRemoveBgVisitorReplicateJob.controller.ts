@@ -33,26 +33,50 @@ export const getRemoveBgVisitorReplicateJob: RequestHandler = async (req, res) =
   const token = requireToken(req);
 
   if (!requestIdParam || !token) {
+    logger.warn("getRemoveBgVisitorReplicateJob::missing_requestId_or_token", {
+      code: "ctrl_getRemoveBgVisitorReplicateJob_err1",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: requestIdParam,
+    });
     return res.status(400).json({
       error: true,
       message: "missing_requestId_or_token",
+      code: "ctrl_getRemoveBgVisitorReplicateJob_err1",
       requestId: httpRequestId,
     });
   }
 
   const job = await getRemoveBgVisitorJobByRequestId(requestIdParam);
   if (!job) {
+    logger.warn("getRemoveBgVisitorReplicateJob::job_not_found", {
+      code: "ctrl_getRemoveBgVisitorReplicateJob_err2",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: requestIdParam,
+    });
     return res.status(404).json({
       error: true,
       message: "job_not_found",
+      code: "ctrl_getRemoveBgVisitorReplicateJob_err2",
       requestId: httpRequestId,
     });
   }
 
   if (String(job.access_token || "") !== token) {
+    logger.warn("getRemoveBgVisitorReplicateJob::forbidden_invalid_token", {
+      code: "ctrl_getRemoveBgVisitorReplicateJob_err3",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: job.request_id,
+    });
     return res.status(403).json({
       error: true,
       message: "forbidden",
+      code: "ctrl_getRemoveBgVisitorReplicateJob_err3",
       requestId: httpRequestId,
     });
   }
@@ -91,6 +115,7 @@ export const getRemoveBgVisitorReplicateJob: RequestHandler = async (req, res) =
               }
             } catch (err: any) {
               logger.warn("getRemoveBgVisitorReplicateJob::reconcile_optimize_failed", {
+                code: "ctrl_getRemoveBgVisitorReplicateJob_err4",
                 requestId: httpRequestId,
                 jobId: job.id,
                 predictionId: job.replicate_prediction_id,
@@ -146,6 +171,7 @@ export const getRemoveBgVisitorReplicateJob: RequestHandler = async (req, res) =
         }
       } catch (err: any) {
         logger.warn("getRemoveBgVisitorReplicateJob::reconcile_failed", {
+          code: "ctrl_getRemoveBgVisitorReplicateJob_err5",
           requestId: httpRequestId,
           jobId: job.id,
           predictionId: job.replicate_prediction_id,

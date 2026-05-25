@@ -125,10 +125,14 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
     const { email } =
       ((req as any).payload as { email?: string } | undefined) || {};
     if (!email) {
-      logger.warn("removeBgByReplicate::unauthorized_missing_payload", requestMeta);
+      logger.warn("removeBgByReplicate::unauthorized_missing_payload", {
+        code: "ctrl_removeBgByReplicate_err1",
+        ...requestMeta,
+      });
       return res.status(401).json({
         error: true,
         message: "Unauthorized: missing user payload",
+        code: "ctrl_removeBgByReplicate_err1",
         requestId,
       });
     }
@@ -136,21 +140,29 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
     const replicateToken =
       process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_KEY_WIZPIX;
     if (!replicateToken) {
-      logger.error("removeBgByReplicate::missing_replicate_token", requestMeta);
+      logger.error("removeBgByReplicate::missing_replicate_token", {
+        code: "ctrl_removeBgByReplicate_err2",
+        ...requestMeta,
+      });
       return res.status(500).json({
         error: true,
         message:
           "Configuration manquante: REPLICATE_API_TOKEN (ou REPLICATE_API_KEY_WIZPIX).",
+        code: "ctrl_removeBgByReplicate_err2",
         requestId,
       });
     }
 
     const image = (req as any).imageValidated as ValidatedImage | undefined;
     if (!image) {
-      logger.warn("removeBgByReplicate::missing_validated_image", requestMeta);
+      logger.warn("removeBgByReplicate::missing_validated_image", {
+        code: "ctrl_removeBgByReplicate_err3",
+        ...requestMeta,
+      });
       return res.status(400).json({
         error: true,
         message: "Aucune image valide n'a ete detectee.",
+        code: "ctrl_removeBgByReplicate_err3",
         requestId,
       });
     }
@@ -162,29 +174,34 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
     const user = await getUserByEmail(String(email).toLowerCase());
     if (!user) {
       logger.warn("removeBgByReplicate::user_not_found", {
+        code: "ctrl_removeBgByReplicate_err4",
         ...requestMeta,
         email: maskEmail(String(email)),
       });
       return res.status(404).json({
         error: true,
         message: "User not found",
+        code: "ctrl_removeBgByReplicate_err4",
         requestId,
       });
     }
     const usage = await getActiveUsageBillingPeriod(user.id);
     if (!usage) {
       logger.warn("removeBgByReplicate::no_active_plan", {
+        code: "ctrl_removeBgByReplicate_err5",
         ...requestMeta,
         userId: user.id,
       });
       return res.status(403).json({
         error: true,
         message: "No active subscription or plan",
+        code: "ctrl_removeBgByReplicate_err5",
         requestId,
       });
     }
     if (usage.remaining_in_period <= 0) {
       logger.info("removeBgByReplicate::no_credits", {
+        code: "ctrl_removeBgByReplicate_err6",
         ...requestMeta,
         userId: user.id,
         subscriptionId: usage.subscription_id,
@@ -193,6 +210,7 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
       return res.status(429).json({
         error: true,
         message: "No more credits available for this billing period",
+        code: "ctrl_removeBgByReplicate_err6",
         requestId,
         credits: {
           used_last_24h: usage.used_in_period,
@@ -267,6 +285,7 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
       res.on("close", () => {
         if (!res.writableEnded) {
           logger.warn("removeBgByReplicate::client_disconnected", {
+            code: "ctrl_removeBgByReplicate_err7",
             requestId,
             durationMs: Date.now() - sendStartedAt,
             bytesPlanned: optimized.buffer.length,
@@ -318,6 +337,7 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
         }
       } catch (headerErr: any) {
         logger.warn("removeBgByReplicate::credits_header_failed", {
+          code: "ctrl_removeBgByReplicate_err8",
           requestId,
           message: headerErr?.message ?? String(headerErr),
         });
@@ -341,6 +361,7 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
             : undefined;
 
       logger.error("removeBgByReplicate::call_failed", {
+        code: "ctrl_removeBgByReplicate_err9",
         requestId,
         isAbort,
         message: err?.message ?? String(err),
@@ -358,6 +379,7 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
             : status >= 500
               ? "Le service Replicate est indisponible pour le moment."
               : err?.message ?? "Erreur Replicate",
+        code: "ctrl_removeBgByReplicate_err9",
         requestId,
       });
     } finally {
@@ -365,6 +387,7 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
     }
   } catch (unhandledErr: any) {
     logger.error("removeBgByReplicate::unhandled_error", {
+      code: "ctrl_removeBgByReplicate_err10",
       ...requestMeta,
       message: unhandledErr?.message ?? String(unhandledErr),
       stack: unhandledErr?.stack,
@@ -372,6 +395,7 @@ const removeBgByReplicate: RequestHandler = async (req, res) => {
     return res.status(500).json({
       error: true,
       message: "Erreur interne du serveur.",
+      code: "ctrl_removeBgByReplicate_err10",
       requestId,
     });
   }

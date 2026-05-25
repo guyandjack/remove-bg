@@ -125,37 +125,75 @@ const imageConverter: RequestHandler = async (req, res) => {
 
     if (!imageData || !options) {
       logger.warn("Image converter middleware missing sanitized payload", {
+        code: "ctrl_imageConverter_err1",
         hasImage: Boolean(imageData),
         hasOptions: Boolean(options),
+        requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
       });
       return res.status(400).json({
         message: "Requete invalide. Merci de reessayer.",
+        code: "ctrl_imageConverter_err1",
       });
     }
 
     const email =
       ((req as any).payload as any)?.email ?? (req as any).payload ?? null;
     if (!email || typeof email !== "string") {
-      return res.status(401).json({ message: "User unknown", requestId });
+      logger.warn("imageConverter::unauthorized_missing_payload", {
+        code: "ctrl_imageConverter_err2",
+        requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(401).json({
+        message: "Unauthorized",
+        requestId,
+        code: "ctrl_imageConverter_err2",
+      });
     }
 
     const user = await getUserByEmail(String(email).toLowerCase());
     if (!user) {
-      return res.status(404).json({ message: "User not found", requestId });
+      logger.warn("imageConverter::user_not_found", {
+        code: "ctrl_imageConverter_err3",
+        requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
+      return res.status(404).json({
+        message: "Unauthorized",
+        requestId,
+        code: "ctrl_imageConverter_err3",
+      });
     }
 
     // Credits check (monthly billing period)
     const before = await getConversionQuotaSnapshotForUser(user.id);
     if (!before) {
+      logger.warn("imageConverter::no_active_plan", {
+        code: "ctrl_imageConverter_err4",
+        requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        userId: user.id,
+      });
       return res.status(403).json({
         message: "No active subscription or plan",
         requestId,
+        code: "ctrl_imageConverter_err4",
       });
     }
     if (before.remaining !== -1 && before.remaining <= 0) {
+      logger.info("imageConverter::no_conversion_credits", {
+        code: "ctrl_imageConverter_err5",
+        requestId,
+        userId: user.id,
+      });
       return res.status(429).json({
         error: true,
-        code: "NO_CONVERSION_CREDITS",
+        code: "ctrl_imageConverter_err5",
         message: "No more conversion credits available for this billing period",
         requestId,
         creditsConverter: {
@@ -172,9 +210,14 @@ const imageConverter: RequestHandler = async (req, res) => {
     // Decrement conversion credits only on successful output.
     const consumed = await tryConsumeConversionCreditForUser(user.id);
     if (!consumed.allowed) {
+      logger.info("imageConverter::consume_credit_denied", {
+        code: "ctrl_imageConverter_err6",
+        requestId,
+        userId: user.id,
+      });
       return res.status(429).json({
         error: true,
-        code: "NO_CONVERSION_CREDITS",
+        code: "ctrl_imageConverter_err6",
         message: "No more conversion credits available for this billing period",
         requestId,
       });
@@ -206,6 +249,7 @@ const imageConverter: RequestHandler = async (req, res) => {
       }
     } catch (headerErr: any) {
       logger.warn("imageConverter::credits_header_failed", {
+        code: "ctrl_imageConverter_err7",
         requestId,
         message: headerErr?.message ?? String(headerErr),
       });
@@ -214,6 +258,7 @@ const imageConverter: RequestHandler = async (req, res) => {
     return res.status(200).send(buffer);
   } catch (error) {
     logger.error("Image conversion failed", {
+      code: "ctrl_imageConverter_err8",
       error: (error as Error).message,
       stack: (error as Error).stack,
       requestId: (req as any).requestId,
@@ -221,6 +266,7 @@ const imageConverter: RequestHandler = async (req, res) => {
 
     return res.status(500).json({
       message: "Impossible de convertir l'image pour le moment.",
+      code: "ctrl_imageConverter_err8",
     });
   }
 };

@@ -31,26 +31,51 @@ export const downloadRemoveBgReplicateJobOutput: RequestHandler = async (req, re
   const token = String(req.query?.token ?? "").trim();
 
   if (!requestIdParam || !token) {
+    logger.warn("downloadRemoveBgJobOutput::missing_requestId_or_token", {
+      code: "ctrl_downloadRemoveBgReplicateJobOutput_err1",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: requestIdParam,
+    });
     return res.status(400).json({
       error: true,
       message: "missing_requestId_or_token",
+      code: "ctrl_downloadRemoveBgReplicateJobOutput_err1",
       requestId: httpRequestId,
     });
   }
 
   const job = await getRemoveBgJobByRequestId(requestIdParam);
   if (!job) {
+    logger.warn("downloadRemoveBgJobOutput::job_not_found", {
+      code: "ctrl_downloadRemoveBgReplicateJobOutput_err2",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: requestIdParam,
+    });
     return res.status(404).json({
       error: true,
       message: "job_not_found",
+      code: "ctrl_downloadRemoveBgReplicateJobOutput_err2",
       requestId: httpRequestId,
     });
   }
 
   if (!isSucceeded(job.status) || !job.output_image_url) {
+    logger.warn("downloadRemoveBgJobOutput::job_not_ready", {
+      code: "ctrl_downloadRemoveBgReplicateJobOutput_err3",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: job.request_id,
+      status: job.status,
+    });
     return res.status(409).json({
       error: true,
       message: "job_not_ready",
+      code: "ctrl_downloadRemoveBgReplicateJobOutput_err3",
       requestId: httpRequestId,
     });
   }
@@ -59,9 +84,17 @@ export const downloadRemoveBgReplicateJobOutput: RequestHandler = async (req, re
   // only allow download when the presented token matches what we previously issued.
   const expectedToken = extractTokenFromUrl(String(job.output_image_url));
   if (!expectedToken || expectedToken !== token) {
+    logger.warn("downloadRemoveBgJobOutput::forbidden_token_mismatch", {
+      code: "ctrl_downloadRemoveBgReplicateJobOutput_err4",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: job.request_id,
+    });
     return res.status(403).json({
       error: true,
       message: "forbidden",
+      code: "ctrl_downloadRemoveBgReplicateJobOutput_err4",
       requestId: httpRequestId,
     });
   }
@@ -79,9 +112,18 @@ export const downloadRemoveBgReplicateJobOutput: RequestHandler = async (req, re
     } catch (err: any) {
       const code = String(err?.code || "");
       if (code === "ENOENT") {
+        logger.warn("downloadRemoveBgJobOutput::file_gone", {
+          code: "ctrl_downloadRemoveBgReplicateJobOutput_err5",
+          requestId: httpRequestId,
+          method: req.method,
+          path: req.originalUrl || req.url,
+          jobRequestId: job.request_id,
+          filename,
+        });
         return res.status(410).json({
           error: true,
           message: "file_gone",
+          code: "ctrl_downloadRemoveBgReplicateJobOutput_err5",
           requestId: httpRequestId,
         });
       }
@@ -91,13 +133,23 @@ export const downloadRemoveBgReplicateJobOutput: RequestHandler = async (req, re
     stream.on("error", async (err: any) => {
       const code = String(err?.code || "");
       if (code === "ENOENT") {
+        logger.warn("downloadRemoveBgJobOutput::file_gone", {
+          code: "ctrl_downloadRemoveBgReplicateJobOutput_err6",
+          requestId: httpRequestId,
+          method: req.method,
+          path: req.originalUrl || req.url,
+          jobRequestId: job.request_id,
+          filename,
+        });
         return res.status(410).json({
           error: true,
           message: "file_gone",
+          code: "ctrl_downloadRemoveBgReplicateJobOutput_err6",
           requestId: httpRequestId,
         });
       }
       logger.warn("downloadRemoveBgJobOutput::read_failed", {
+        code: "ctrl_downloadRemoveBgReplicateJobOutput_err7",
         requestId: httpRequestId,
         jobRequestId: job.request_id,
         filename,
@@ -106,6 +158,7 @@ export const downloadRemoveBgReplicateJobOutput: RequestHandler = async (req, re
       return res.status(500).json({
         error: true,
         message: "read_failed",
+        code: "ctrl_downloadRemoveBgReplicateJobOutput_err7",
         requestId: httpRequestId,
       });
     });
@@ -118,9 +171,18 @@ export const downloadRemoveBgReplicateJobOutput: RequestHandler = async (req, re
 
     stream.pipe(res);
   } catch (err: any) {
+    logger.error("downloadRemoveBgJobOutput::unexpected_error", {
+      code: "ctrl_downloadRemoveBgReplicateJobOutput_err8",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: requestIdParam,
+      message: err?.message ?? String(err),
+    });
     return res.status(500).json({
       error: true,
       message: "internal_error",
+      code: "ctrl_downloadRemoveBgReplicateJobOutput_err8",
       requestId: httpRequestId,
     });
   }

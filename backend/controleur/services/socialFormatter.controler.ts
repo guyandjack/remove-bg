@@ -72,9 +72,16 @@ const formatSocialPictures: RequestHandler = async (req, res) => {
   try {
     const assets = (req as any).socialAssets as SanitizedSocialAsset[] | undefined;
     if (!assets?.length) {
+      logger.warn("formatSocialPictures::missing_assets", {
+        code: "ctrl_socialFormatter_err1",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(400).json({
         error: true,
         message: "Aucune image n'a ete fournie pour la mise au format.",
+        code: "ctrl_socialFormatter_err1",
       });
     }
 
@@ -124,6 +131,7 @@ const formatSocialPictures: RequestHandler = async (req, res) => {
     return res.status(200).send(archive);
   } catch (error) {
     logger.error("Social picture formatting failed", {
+      code: "ctrl_socialFormatter_err2",
       error: (error as Error).message,
       stack: (error as Error).stack,
       requestId: (req as any).requestId,
@@ -132,6 +140,7 @@ const formatSocialPictures: RequestHandler = async (req, res) => {
       error: true,
       message:
         "Impossible de traiter les images pour les reseaux sociaux pour le moment.",
+      code: "ctrl_socialFormatter_err2",
       requestId: (req as any).requestId,
     });
   }

@@ -122,13 +122,14 @@ const imageConverterVisitor: RequestHandler = async (req, res) => {
 
     if (!imageData || !options) {
       logger.warn("imageConverterVisitor::missing_sanitized_payload", {
+        code: "ctrl_imageConverterVisitor_err1",
         hasImage: Boolean(imageData),
         hasOptions: Boolean(options),
         requestId,
       });
       return res.status(400).json({
         error: true,
-        code: "INVALID_REQUEST",
+        code: "ctrl_imageConverterVisitor_err1",
         message: "Requete invalide. Merci de reessayer.",
         requestId,
       });
@@ -138,6 +139,7 @@ const imageConverterVisitor: RequestHandler = async (req, res) => {
     const quota = await tryConsumeImageConversion(hashedIp);
     if (!quota.allowed) {
       logger.info("imageConverterVisitor::quota_blocked", {
+        code: "ctrl_imageConverterVisitor_err2",
         requestId,
         visitorHashSuffix: hashSuffix,
         used: quota.used,
@@ -146,7 +148,7 @@ const imageConverterVisitor: RequestHandler = async (req, res) => {
       });
       return res.status(429).json({
         error: true,
-        code: "VISITOR_QUOTA_EXCEEDED",
+        code: "ctrl_imageConverterVisitor_err2",
         message: `Quota visiteur depasse: ${quota.limit} conversions d'images maximum par mois.`,
         requestId,
         quota: {
@@ -175,13 +177,14 @@ const imageConverterVisitor: RequestHandler = async (req, res) => {
     return res.status(200).send(buffer);
   } catch (error) {
     logger.error("imageConverterVisitor::failed", {
+      code: "ctrl_imageConverterVisitor_err3",
       error: (error as Error).message,
       stack: (error as Error).stack,
       requestId,
     });
     return res.status(500).json({
       error: true,
-      code: "INTERNAL_ERROR",
+      code: "ctrl_imageConverterVisitor_err3",
       message: "Impossible de convertir l'image pour le moment.",
       requestId,
     });
@@ -189,4 +192,3 @@ const imageConverterVisitor: RequestHandler = async (req, res) => {
 };
 
 export { imageConverterVisitor };
-

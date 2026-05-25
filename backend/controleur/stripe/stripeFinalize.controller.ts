@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 import Stripe from "stripe";
 import jwt from "jsonwebtoken";
+import { logger } from "../../logger.js";
 import {
   getStripeCheckoutSessionState,
   markStripeCheckoutSessionConsumed,
@@ -60,10 +61,11 @@ const tryFinalizeDirectly = async (
     if (err instanceof CheckoutSessionPendingError) {
       return null;
     }
-    console.error(
-      "tryFinalizeDirectly error:",
-      (err as any)?.message || err
-    );
+    logger.error("tryFinalizeDirectly::failed", {
+      code: "ctrl_stripeFinalize_err1",
+      requestId: null,
+      message: (err as any)?.message ?? String(err),
+    });
     return null;
   }
 };
@@ -72,18 +74,32 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
   try {
     const { sessionId } = req.body || {};
     if (!sessionId || typeof sessionId !== "string") {
+      logger.warn("finalizeStripeCheckout::missing_session_id", {
+        code: "ctrl_stripeFinalize_err2",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(400).json({
         status: "error",
         message: "Missing sessionId",
+        code: "ctrl_stripeFinalize_err2",
       });
     }
 
     const normalizedSessionId = sessionId.trim();
     let record = await getStripeCheckoutSessionState(normalizedSessionId);
     if (!record) {
+      logger.warn("finalizeStripeCheckout::unknown_session", {
+        code: "ctrl_stripeFinalize_err3",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(404).json({
         status: "error",
         message: "unknown_session",
+        code: "ctrl_stripeFinalize_err3",
       });
     }
 
@@ -96,9 +112,17 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
       if (retried) {
         record = retried;
       } else {
+        logger.warn("finalizeStripeCheckout::payment_failed", {
+          code: "ctrl_stripeFinalize_err4",
+          requestId: (req as any).requestId,
+          method: req.method,
+          path: req.originalUrl || req.url,
+          sessionId: normalizedSessionId,
+        });
         return res.status(400).json({
           status: "error",
           message: record.last_error || "payment_failed",
+          code: "ctrl_stripeFinalize_err4",
         });
       }
     }
@@ -122,9 +146,17 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
 
     const user = await getUserByEmail(record.email);
     if (!user) {
+      logger.warn("finalizeStripeCheckout::user_not_found", {
+        code: "ctrl_stripeFinalize_err5",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        sessionId: normalizedSessionId,
+      });
       return res.status(404).json({
         status: "error",
         message: "user_not_found",
+        code: "ctrl_stripeFinalize_err5",
       });
     }
 
@@ -194,10 +226,17 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
     res.cookie("tokenRefresh", refreshToken, cookieOptions);
     return res.status(200).json(payload);
   } catch (err: any) {
-    console.error("finalizeStripeCheckout error:", err?.message || err);
+    logger.error("finalizeStripeCheckout::unhandled_error", {
+      code: "ctrl_stripeFinalize_err6",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      message: err?.message ?? String(err),
+    });
     return res.status(500).json({
       status: "error",
       message: err?.message || String(err),
+      code: "ctrl_stripeFinalize_err6",
     });
   }
 };

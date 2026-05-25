@@ -98,10 +98,13 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
     const replicateToken =
       process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_KEY_WIZPIX;
     if (!replicateToken) {
-      logger.error("removeBgVisitorByReplicate::missing_replicate_token", requestMeta);
+      logger.error("removeBgVisitorByReplicate::missing_replicate_token", {
+        code: "ctrl_removeBgVisitorByReplicate_err1",
+        ...requestMeta,
+      });
       return res.status(500).json({
         error: true,
-        code: "CONFIG_MISSING",
+        code: "ctrl_removeBgVisitorByReplicate_err1",
         message:
           "Configuration manquante: REPLICATE_API_TOKEN (ou REPLICATE_API_KEY_WIZPIX).",
         requestId,
@@ -110,10 +113,13 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
 
     const image = (req as any).imageValidated as ValidatedImage | undefined;
     if (!image) {
-      logger.warn("removeBgVisitorByReplicate::missing_validated_image", requestMeta);
+      logger.warn("removeBgVisitorByReplicate::missing_validated_image", {
+        code: "ctrl_removeBgVisitorByReplicate_err2",
+        ...requestMeta,
+      });
       return res.status(400).json({
         error: true,
-        code: "INVALID_IMAGE",
+        code: "ctrl_removeBgVisitorByReplicate_err2",
         message: "Aucune image valide n'a ete detectee.",
         requestId,
       });
@@ -123,6 +129,7 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
     const snapshot = await tryConsumeRemoveBgTrial(hashedIp);
     if (!snapshot.allowed) {
       logger.info("removeBgVisitorByReplicate::quota_blocked", {
+        code: "ctrl_removeBgVisitorByReplicate_err3",
         ...requestMeta,
         visitorHashSuffix: hashSuffix,
         used: snapshot.used,
@@ -130,7 +137,7 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
       });
       return res.status(429).json({
         error: true,
-        code: "VISITOR_QUOTA_EXCEEDED",
+        code: "ctrl_removeBgVisitorByReplicate_err3",
         message:
           `Quota visiteur depasse: ${snapshot.limit} suppression d'arriere-plan maximum par mois.`,
         requestId,
@@ -212,6 +219,7 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
       res.on("close", () => {
         if (!res.writableEnded) {
           logger.warn("removeBgVisitorByReplicate::client_disconnected", {
+            code: "ctrl_removeBgVisitorByReplicate_err4",
             requestId,
             durationMs: Date.now() - sendStartedAt,
             bytesPlanned: optimized.buffer.length,
@@ -238,6 +246,7 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
             : undefined;
 
       logger.error("removeBgVisitorByReplicate::call_failed", {
+        code: "ctrl_removeBgVisitorByReplicate_err5",
         requestId,
         isAbort,
         message: err?.message ?? String(err),
@@ -247,7 +256,7 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
       const status = isAbort ? 504 : upstreamStatus ?? 502;
       return res.status(status).json({
         error: true,
-        code: isAbort ? "UPSTREAM_TIMEOUT" : "UPSTREAM_ERROR",
+        code: "ctrl_removeBgVisitorByReplicate_err5",
         message:
           isAbort
             ? "Timeout: le service de traitement n'a pas repondu a temps."
@@ -261,13 +270,14 @@ const removeBgVisitorByReplicate: RequestHandler = async (req, res) => {
     }
   } catch (unhandledErr: any) {
     logger.error("removeBgVisitorByReplicate::unhandled_error", {
+      code: "ctrl_removeBgVisitorByReplicate_err6",
       ...requestMeta,
       message: unhandledErr?.message ?? String(unhandledErr),
       stack: unhandledErr?.stack,
     });
     return res.status(500).json({
       error: true,
-      code: "INTERNAL_ERROR",
+      code: "ctrl_removeBgVisitorByReplicate_err6",
       message: "Erreur interne du serveur.",
       requestId,
     });

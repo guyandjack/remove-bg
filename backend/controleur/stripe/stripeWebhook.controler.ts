@@ -40,24 +40,44 @@ const stripeWebhook: RequestHandler = async (req, res) => {
 
     // Webhook MUST be verified. Never trust an unverified JSON payload or /success URL.
     if (!whSecret) {
-      logger.error("[stripeWebhook] Missing STRIPE_WEBHOOK_SECRET; refusing unverified webhook");
+      logger.error("[stripeWebhook] Missing STRIPE_WEBHOOK_SECRET; refusing unverified webhook", {
+        code: "ctrl_stripeWebhook_err1",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(500).send("Webhook is not configured on this server");
     }
     if (!secret) {
-      logger.error("[stripeWebhook] Missing Stripe secret key; refusing webhook");
+      logger.error("[stripeWebhook] Missing Stripe secret key; refusing webhook", {
+        code: "ctrl_stripeWebhook_err2",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(500).send("Stripe is not configured on this server");
     }
 
     const sig = req.headers["stripe-signature"] as string | undefined;
     if (!sig) {
-      logger.warn("[stripeWebhook] Missing stripe-signature header; rejecting");
+      logger.warn("[stripeWebhook] Missing stripe-signature header; rejecting", {
+        code: "ctrl_stripeWebhook_err3",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(400).send("Missing stripe-signature header");
     }
 
     // Route uses express.raw({ type: "application/json" }) so req.body is a Buffer.
     const rawPayload = (req as any).body;
     if (!Buffer.isBuffer(rawPayload) || rawPayload.length === 0) {
-      logger.warn("[stripeWebhook] Missing raw payload buffer; rejecting");
+      logger.warn("[stripeWebhook] Missing raw payload buffer; rejecting", {
+        code: "ctrl_stripeWebhook_err4",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(400).send("No webhook payload was provided");
     }
 
@@ -85,6 +105,8 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         }
       } catch (err: any) {
         logger.error("[stripeWebhook] Failed to mark event received", {
+          code: "ctrl_stripeWebhook_err5",
+          requestId: (req as any).requestId,
           eventId,
           type,
           message: err?.message || String(err),
@@ -109,10 +131,21 @@ const stripeWebhook: RequestHandler = async (req, res) => {
       type === "checkout.session.completed" ||
       type === "checkout.session.async_payment_succeeded"
     ) {
-      console.log("check session.completed est lancé");
+      logger.debug("stripeWebhook::checkout_session_completed_received", {
+        requestId: (req as any).requestId,
+        type,
+        eventId,
+      });
       currentCheckoutSessionId = typeof obj?.id === "string" ? obj.id : null; 
       if (!currentCheckoutSessionId) { 
-        logger.warn("[stripeWebhook] Missing session id on checkout.session.completed event"); 
+        logger.warn("[stripeWebhook] Missing session id on checkout.session.completed event", {
+          code: "ctrl_stripeWebhook_err6",
+          requestId: (req as any).requestId,
+          method: req.method,
+          path: req.originalUrl || req.url,
+          type,
+          eventId,
+        });
         return await returnOk(); 
       } 
       try {
@@ -122,9 +155,14 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         });
       } catch (sessionErr) {
         if (sessionErr instanceof CheckoutSessionPendingError) {
-          logger.warn( 
-            `[stripeWebhook] session ${currentCheckoutSessionId} pending: ${sessionErr.message}` 
-          ); 
+          logger.warn("[stripeWebhook] checkout session pending", {
+            code: "ctrl_stripeWebhook_err7",
+            requestId: (req as any).requestId,
+            method: req.method,
+            path: req.originalUrl || req.url,
+            checkoutSessionId: currentCheckoutSessionId,
+            message: sessionErr.message,
+          });
           try {
             await markStripeCheckoutSessionLastError(
               currentCheckoutSessionId,
@@ -136,10 +174,12 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         } 
         throw sessionErr; 
       } 
-      console.log(
-        "[stripeWebhook] checkout.session.completed processed for",
-        obj?.customer_details?.email || obj?.customer_email || "unknown email"
-      );
+      logger.info("stripeWebhook::checkout_session_completed_processed", {
+        requestId: (req as any).requestId,
+        type,
+        eventId,
+        email: obj?.customer_details?.email || obj?.customer_email || "unknown email",
+      });
       return await returnOk(); 
     } 
 
@@ -158,7 +198,11 @@ const stripeWebhook: RequestHandler = async (req, res) => {
 
     // invoice.paid / invoice.payment_succeeded — record invoice, increment customer's total_spent, ensure sub stays active
     if (type === "invoice.paid" || type === "invoice.payment_succeeded") {
-      console.log("check invoice paid est lancé");
+      logger.debug("stripeWebhook::invoice_paid_received", {
+        requestId: (req as any).requestId,
+        type,
+        eventId,
+      });
       const inv = obj;
       const stripeCustomerId: string | undefined = inv.customer as string | undefined;
       const stripeSubscriptionId: string | undefined = inv.subscription as string | undefined;
@@ -205,7 +249,14 @@ const stripeWebhook: RequestHandler = async (req, res) => {
         userId = userId || r?.user_id || null;
       }
       if (!userId) { 
-        console.log("[stripeWebhook] invoice.paid ignored: unable to resolve user"); 
+        logger.info("stripeWebhook::invoice_paid_ignored_no_user", {
+          requestId: (req as any).requestId,
+          type,
+          eventId,
+          stripeCustomerId,
+          stripeSubscriptionId,
+          stripeInvoiceId,
+        });
         return await returnOk(); 
       } 
 
@@ -247,13 +298,23 @@ const stripeWebhook: RequestHandler = async (req, res) => {
           ); 
         } catch (syncErr: any) {
           logger.warn("[stripeWebhook] Failed to sync subscription period", {
+            code: "ctrl_stripeWebhook_err8",
+            requestId: (req as any).requestId,
             stripeSubscriptionId,
             message: syncErr?.message || String(syncErr),
           });
         }
       }
 
-      console.log("[stripeWebhook] invoice.paid stored for user", userId); 
+      logger.info("stripeWebhook::invoice_paid_recorded", {
+        requestId: (req as any).requestId,
+        type,
+        eventId,
+        userId,
+        stripeInvoiceId,
+        stripeCustomerId,
+        stripeSubscriptionId,
+      });
       return await returnOk(); 
     } 
 
@@ -352,6 +413,8 @@ const stripeWebhook: RequestHandler = async (req, res) => {
           }
         } catch (syncErr: any) {
           logger.warn("[stripeWebhook] Failed to sync subscription.updated", {
+            code: "ctrl_stripeWebhook_err9",
+            requestId: (req as any).requestId,
             stripeSubscriptionId,
             message: syncErr?.message || String(syncErr),
           });
@@ -362,7 +425,11 @@ const stripeWebhook: RequestHandler = async (req, res) => {
     } 
 
     if (type === "invoice.payment_failed") {
-      console.log("check invoice payement failed est lancé");
+      logger.debug("stripeWebhook::invoice_payment_failed_received", {
+        requestId: (req as any).requestId,
+        type,
+        eventId,
+      });
       const inv = obj;
       const stripeCustomerId: string | undefined = inv.customer as string | undefined;
       const stripeSubscriptionId: string | undefined = inv.subscription as string | undefined;
@@ -409,13 +476,25 @@ const stripeWebhook: RequestHandler = async (req, res) => {
           [stripeSubscriptionId]
         );
       } 
-      console.log("[stripeWebhook] invoice.payment_failed recorded for user", userId ?? "unknown"); 
+      logger.info("stripeWebhook::invoice_payment_failed_recorded", {
+        requestId: (req as any).requestId,
+        type,
+        eventId,
+        userId: userId ?? "unknown",
+        stripeInvoiceId,
+        stripeCustomerId,
+        stripeSubscriptionId,
+      });
       return await returnOk(); 
     } 
 
     // customer.subscription.deleted — cancel local subscription
     if (type === "customer.subscription.deleted") {
-      console.log("check customer subscribtion deleted est lancé");
+      logger.debug("stripeWebhook::customer_subscription_deleted_received", {
+        requestId: (req as any).requestId,
+        type,
+        eventId,
+      });
       const sub = obj;
       const stripeSubscriptionId: string | undefined = sub.id as string | undefined;
       const canceledAt = unixToDate(sub.canceled_at);
@@ -456,19 +535,36 @@ const stripeWebhook: RequestHandler = async (req, res) => {
           }
         } catch (syncErr: any) {
           logger.warn("[stripeWebhook] Unable to switch to free plan after subscription.deleted", {
+            code: "ctrl_stripeWebhook_err10",
+            requestId: (req as any).requestId,
             stripeSubscriptionId,
             message: syncErr?.message || String(syncErr),
           });
         }
       }  
-      console.log("[stripeWebhook] customer.subscription.deleted processed for Stripe subscription", stripeSubscriptionId); 
+      logger.info("stripeWebhook::customer_subscription_deleted_processed", {
+        requestId: (req as any).requestId,
+        type,
+        eventId,
+        stripeSubscriptionId,
+      });
       return await returnOk(); 
     } 
 
-    console.log("[stripeWebhook] Unhandled event type received:", type); 
+    logger.info("stripeWebhook::unhandled_event_type", {
+      requestId: (req as any).requestId,
+      type,
+      eventId,
+    });
     return await returnOk(); 
   } catch (err: any) { 
-    console.error("stripeWebhook error:", err?.message || err);
+    logger.error("stripeWebhook::unhandled_error", {
+      code: "ctrl_stripeWebhook_err11",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      message: err?.message ?? String(err),
+    });
     if (currentCheckoutSessionId) {
       try {
         await markStripeCheckoutSessionFailed(
@@ -476,14 +572,17 @@ const stripeWebhook: RequestHandler = async (req, res) => {
           err?.message || String(err)
         );
       } catch (hookErr) {
-        console.error(
-          "stripeWebhook state update error:",
-          (hookErr as any)?.message || hookErr
-        );
+        logger.error("stripeWebhook::state_update_failed", {
+          code: "ctrl_stripeWebhook_err12",
+          requestId: (req as any).requestId,
+          method: req.method,
+          path: req.originalUrl || req.url,
+          checkoutSessionId: currentCheckoutSessionId,
+          message: (hookErr as any)?.message ?? String(hookErr),
+        });
       }
     }
     // Prefer Stripe retries: we are idempotent via ProcessedWebhookEvent.
-    console.log("[stripeWebhook] Error handled, responding with 500 to trigger retries");
     return res.status(500).send("error");
   }
 };

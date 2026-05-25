@@ -104,17 +104,22 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
       }
     } catch (err: any) {
       logger.error("replicateWebhook::idempotency_mark_failed", {
+        code: "ctrl_replicateWebhook_err1",
         requestId,
         webhookId: webhookId ?? null,
         message: err?.message ?? String(err),
       });
-      return res.status(500).json({ ok: false });
+      return res.status(500).json({ ok: false, code: "ctrl_replicateWebhook_err1" });
     }
   }
 
   const payload = parseJsonBody(req);
   if (!payload) {
-    logger.warn("replicateWebhook::invalid_json", { requestId, webhookId });
+    logger.warn("replicateWebhook::invalid_json", {
+      code: "ctrl_replicateWebhook_err2",
+      requestId,
+      webhookId,
+    });
     if (eventId) {
       try {
         await markWebhookEventProcessed({ id: eventId });
@@ -127,7 +132,11 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
   const replicateStatus = String(payload?.status ?? "").trim();
 
   if (!predictionId) {
-    logger.warn("replicateWebhook::missing_prediction_id", { requestId, webhookId });
+    logger.warn("replicateWebhook::missing_prediction_id", {
+      code: "ctrl_replicateWebhook_err3",
+      requestId,
+      webhookId,
+    });
     if (eventId) {
       try {
         await markWebhookEventProcessed({ id: eventId });
@@ -159,6 +168,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
 
     if (!jobKind || !job) {
       logger.warn("replicateWebhook::job_not_found", {
+        code: "ctrl_replicateWebhook_err4",
         requestId,
         webhookId,
         predictionId,
@@ -232,6 +242,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
             });
           } else {
             logger.warn("replicateWebhook::output_optimize_skip_no_public_base", {
+              code: "ctrl_replicateWebhook_err5",
               requestId,
               webhookId,
               predictionId,
@@ -241,6 +252,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
           }
         } catch (err: any) {
           logger.warn("replicateWebhook::output_optimize_failed", {
+            code: "ctrl_replicateWebhook_err6",
             requestId,
             webhookId,
             predictionId,
@@ -273,6 +285,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
           // Visitors do not have credits.
         } else if (!job.user_id) {
           logger.warn("replicateWebhook::credits_skip_missing_user", {
+            code: "ctrl_replicateWebhook_err7",
             requestId,
             webhookId,
             predictionId,
@@ -291,6 +304,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
           const usage = await getActiveUsageBillingPeriod(job.user_id);
           if (!usage) {
             logger.error("replicateWebhook::credits_no_active_usage", {
+              code: "ctrl_replicateWebhook_err8",
               requestId,
               webhookId,
               predictionId,
@@ -298,7 +312,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
               userId: job.user_id,
             });
             // Do not mark webhook as processed: allow Replicate retries.
-            return res.status(500).json({ ok: false });
+            return res.status(500).json({ ok: false, code: "ctrl_replicateWebhook_err8" });
           }
 
           // 2) Ledger insert (idempotent by request_id due to unique index on CreditUsage.request_id).
@@ -310,13 +324,14 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
           );
           if (!creditUsageId) {
             logger.error("replicateWebhook::credits_record_failed", {
+              code: "ctrl_replicateWebhook_err9",
               requestId,
               webhookId,
               predictionId,
               jobId: job.id,
               subscriptionId: usage.subscription_id,
             });
-            return res.status(500).json({ ok: false });
+            return res.status(500).json({ ok: false, code: "ctrl_replicateWebhook_err9" });
           }
 
           // 3) Mark job as debited (guarded by credits_debited_at IS NULL).
@@ -569,6 +584,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
     });
   } catch (err: any) {
     logger.error("replicateWebhook::update_failed", {
+      code: "ctrl_replicateWebhook_err10",
       requestId,
       webhookId,
       predictionId,
@@ -577,7 +593,7 @@ export const replicateWebhook: RequestHandler = async (req, res) => {
       totalMs: Date.now() - startedAtMs,
     });
     // Let Replicate retry (we're idempotent by webhook-id).
-    return res.status(500).json({ ok: false });
+    return res.status(500).json({ ok: false, code: "ctrl_replicateWebhook_err10" });
   }
 
   if (webhookId) {

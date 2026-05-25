@@ -34,9 +34,16 @@ const sanitizeFilename = (name: string) =>
 const removeBg: RequestHandler = async (req, res) => {
 
   if (!serviceBaseUrl) {
+    logger.error("removeBg::missing_service_base_url", {
+      code: "ctrl_removeBg_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(500).json({
       "satus": "error",
-      "message": "erreur 500 variable env default"
+      "message": "erreur 500 variable env default",
+      code: "ctrl_removeBg_err1",
     })
   };
 
@@ -44,9 +51,16 @@ const removeBg: RequestHandler = async (req, res) => {
   const quality = (req as any).removeBgOptions?.quality || "pro";
 
   if (!image) {
+    logger.warn("removeBg::missing_validated_image", {
+      code: "ctrl_removeBg_err2",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(400).json({
       error: true,
       message: "Aucune image valide n'a ete detectee.",
+      code: "ctrl_removeBg_err2",
       requestId: (req as any).requestId,
     });
   }
@@ -102,6 +116,7 @@ const removeBg: RequestHandler = async (req, res) => {
       "Service indisponible";
 
     logger.error("removeBg::call_failed", {
+      code: "ctrl_removeBg_err3",
       status,
       detail,
       requestId: (req as any).requestId,
@@ -113,6 +128,7 @@ const removeBg: RequestHandler = async (req, res) => {
         status >= 500
           ? "Le service de suppression de fond est indisponible pour le moment."
           : detail,
+      code: "ctrl_removeBg_err3",
       requestId: (req as any).requestId,
     });
   }

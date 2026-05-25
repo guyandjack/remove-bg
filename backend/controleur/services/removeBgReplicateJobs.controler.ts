@@ -79,10 +79,14 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
     const { email } =
       ((req as any).payload as { email?: string } | undefined) || {};
     if (!email) {
-      logger.warn("removeBgReplicateJob::unauthorized_missing_payload", requestMeta);
+      logger.warn("removeBgReplicateJob::unauthorized_missing_payload", {
+        code: "ctrl_removeBgReplicateJobs_err1",
+        ...requestMeta,
+      });
       return res.status(401).json({
         error: true,
         message: "Unauthorized: missing user payload",
+        code: "ctrl_removeBgReplicateJobs_err1",
         requestId: httpRequestId,
       });
     }
@@ -90,30 +94,44 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
     const user = await getUserByEmail(email);
     if (!user) {
       logger.warn("removeBgReplicateJob::user_not_found", {
+        code: "ctrl_removeBgReplicateJobs_err2",
         ...requestMeta,
         email,
       });
       return res.status(401).json({
         error: true,
         message: "Unauthorized: user not found",
+        code: "ctrl_removeBgReplicateJobs_err2",
         requestId: httpRequestId,
       });
     }
 
     const idempotencyKey = getIdempotencyKey(req);
     if (!idempotencyKey) {
+      logger.warn("removeBgReplicateJob::missing_idempotency_key", {
+        code: "ctrl_removeBgReplicateJobs_err3",
+        ...requestMeta,
+        userId: user.id,
+      });
       return res.status(400).json({
         error: true,
         message: "Missing idempotencyKey",
+        code: "ctrl_removeBgReplicateJobs_err3",
         requestId: httpRequestId,
       });
     }
 
     const image = (req as any).imageValidated as ValidatedImage | undefined;
     if (!image) {
+      logger.warn("removeBgReplicateJob::missing_validated_image", {
+        code: "ctrl_removeBgReplicateJobs_err4",
+        ...requestMeta,
+        userId: user.id,
+      });
       return res.status(400).json({
         error: true,
         message: "Aucune image valide n'a ete detectee.",
+        code: "ctrl_removeBgReplicateJobs_err4",
         requestId: httpRequestId,
       });
     }
@@ -151,22 +169,32 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
     const replicateToken =
       process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_KEY_WIZPIX;
     if (!replicateToken) {
-      logger.error("removeBgReplicateJob::missing_replicate_token", requestMeta);
+      logger.error("removeBgReplicateJob::missing_replicate_token", {
+        code: "ctrl_removeBgReplicateJobs_err5",
+        ...requestMeta,
+        userId: user.id,
+      });
       return res.status(500).json({
         error: true,
         message:
           "Configuration manquante: REPLICATE_API_TOKEN (ou REPLICATE_API_KEY_WIZPIX).",
+        code: "ctrl_removeBgReplicateJobs_err5",
         requestId: httpRequestId,
       });
     }
 
     const publicBase = getPublicBackendBaseUrl();
     if (!publicBase) {
-      logger.error("removeBgReplicateJob::missing_public_backend_url", requestMeta);
+      logger.error("removeBgReplicateJob::missing_public_backend_url", {
+        code: "ctrl_removeBgReplicateJobs_err6",
+        ...requestMeta,
+        userId: user.id,
+      });
       return res.status(500).json({
         error: true,
         message:
           "Configuration manquante: REPLICATE_WEBHOOK_URL (dev) ou BASE_URL_PROD (prod).",
+        code: "ctrl_removeBgReplicateJobs_err6",
         requestId: httpRequestId,
       });
     }
@@ -198,10 +226,17 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
 
     const predictionId = String((prediction as any)?.id ?? "").trim() || null;
     if (!predictionId) {
-      logger.error("removeBgReplicateJob::prediction_create_missing_id", requestMeta);
+      logger.error("removeBgReplicateJob::prediction_create_missing_id", {
+        code: "ctrl_removeBgReplicateJobs_err7",
+        ...requestMeta,
+        userId: user.id,
+        jobRequestId: job.request_id,
+        jobId: job.id,
+      });
       return res.status(502).json({
         error: true,
         message: "Replicate a renvoye une reponse invalide (prediction id manquant).",
+        code: "ctrl_removeBgReplicateJobs_err7",
         requestId: httpRequestId,
       });
     }
@@ -239,6 +274,7 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
     });
   } catch (err: any) {
     logger.error("removeBgReplicateJob::unhandled_error", {
+      code: "ctrl_removeBgReplicateJobs_err8",
       requestId: (req as any).requestId,
       message: err?.message ?? String(err),
       stack: err?.stack,
@@ -246,6 +282,7 @@ export const createRemoveBgReplicateJob: RequestHandler = async (req, res) => {
     return res.status(500).json({
       error: true,
       message: "Erreur interne du serveur.",
+      code: "ctrl_removeBgReplicateJobs_err8",
       requestId: (req as any).requestId,
     });
   }

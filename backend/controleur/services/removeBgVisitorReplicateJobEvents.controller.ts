@@ -56,19 +56,51 @@ export const streamRemoveBgVisitorReplicateJobEvents: RequestHandler = async (re
   const token = requireToken(req);
 
   if (!requestIdParam || !token) {
+    logger.warn("removeBgVisitorJobEvents::missing_requestId_or_token", {
+      code: "ctrl_removeBgVisitorReplicateJobEvents_err1",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: requestIdParam,
+    });
     return res.status(400).json({
       error: true,
       message: "missing_requestId_or_token",
+      code: "ctrl_removeBgVisitorReplicateJobEvents_err1",
       requestId: httpRequestId,
     });
   }
 
   const job = await getRemoveBgVisitorJobByRequestId(requestIdParam);
   if (!job) {
-    return res.status(404).json({ error: true, message: "job_not_found" });
+    logger.warn("removeBgVisitorJobEvents::job_not_found", {
+      code: "ctrl_removeBgVisitorReplicateJobEvents_err2",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: requestIdParam,
+    });
+    return res.status(404).json({
+      error: true,
+      message: "job_not_found",
+      code: "ctrl_removeBgVisitorReplicateJobEvents_err2",
+      requestId: httpRequestId,
+    });
   }
   if (String(job.access_token || "") !== token) {
-    return res.status(403).json({ error: true, message: "forbidden" });
+    logger.warn("removeBgVisitorJobEvents::forbidden_invalid_token", {
+      code: "ctrl_removeBgVisitorReplicateJobEvents_err3",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: job.request_id,
+    });
+    return res.status(403).json({
+      error: true,
+      message: "forbidden",
+      code: "ctrl_removeBgVisitorReplicateJobEvents_err3",
+      requestId: httpRequestId,
+    });
   }
 
   res.status(200);
@@ -135,6 +167,7 @@ export const streamRemoveBgVisitorReplicateJobEvents: RequestHandler = async (re
       }
     } catch (err: any) {
       logger.warn("removeBgVisitorJobEvents::send_failed", {
+        code: "ctrl_removeBgVisitorReplicateJobEvents_err4",
         requestId: httpRequestId,
         jobRequestId: job.request_id,
         message: err?.message ?? String(err),
@@ -168,6 +201,7 @@ export const streamRemoveBgVisitorReplicateJobEvents: RequestHandler = async (re
       }
     } catch (err: any) {
       logger.warn("removeBgVisitorJobEvents::poll_failed", {
+        code: "ctrl_removeBgVisitorReplicateJobEvents_err5",
         requestId: httpRequestId,
         jobRequestId: job.request_id,
         message: err?.message ?? String(err),

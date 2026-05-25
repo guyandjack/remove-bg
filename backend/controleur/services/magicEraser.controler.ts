@@ -102,9 +102,16 @@ function pickNumber(
 const magicEraser: RequestHandler = async (req, res) => {
   const { email } = (req as any).payload as { email?: string } | undefined || {};
   if (!email) {
+    logger.warn("magicEraser::unauthorized_missing_payload", {
+      code: "ctrl_magicEraser_err1",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(401).json({
       error: true,
       message: "Unauthorized: missing user payload",
+      code: "ctrl_magicEraser_err1",
       requestId: (req as any).requestId,
     });
   }
@@ -112,10 +119,17 @@ const magicEraser: RequestHandler = async (req, res) => {
   const replicateToken =
     process.env.REPLICATE_API_TOKEN ?? process.env.REPLICATE_API_KEY_WIZPIX;
   if (!replicateToken) {
+    logger.error("magicEraser::missing_replicate_token", {
+      code: "ctrl_magicEraser_err2",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(500).json({
       error: true,
       message:
         "Configuration manquante: REPLICATE_API_TOKEN (ou REPLICATE_API_KEY_WIZPIX).",
+      code: "ctrl_magicEraser_err2",
       requestId: (req as any).requestId,
     });
   }
@@ -128,9 +142,16 @@ const magicEraser: RequestHandler = async (req, res) => {
     | undefined;
 
   if (!initImage || !maskImage) {
+    logger.warn("magicEraser::missing_validated_images", {
+      code: "ctrl_magicEraser_err3",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(400).json({
       error: true,
       message: "Image ou masque manquant/invalide.",
+      code: "ctrl_magicEraser_err3",
       requestId: (req as any).requestId,
     });
   }
@@ -179,24 +200,47 @@ const magicEraser: RequestHandler = async (req, res) => {
   // Credits check (monthly billing period)
   const user = await getUserByEmail(String(email).toLowerCase());
   if (!user) {
+    logger.warn("magicEraser::user_not_found", {
+      code: "ctrl_magicEraser_err4",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+    });
     return res.status(404).json({
       error: true,
       message: "User not found",
+      code: "ctrl_magicEraser_err4",
       requestId: (req as any).requestId,
     });
   }
   const usage = await getActiveUsageBillingPeriod(user.id);
   if (!usage) {
+    logger.warn("magicEraser::no_active_usage_period", {
+      code: "ctrl_magicEraser_err5",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      userId: user.id,
+    });
     return res.status(403).json({
       error: true,
       message: "No active subscription or plan",
+      code: "ctrl_magicEraser_err5",
       requestId: (req as any).requestId,
     });
   }
   if (usage.remaining_in_period <= 0) {
+    logger.warn("magicEraser::no_credits_remaining", {
+      code: "ctrl_magicEraser_err6",
+      requestId: (req as any).requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      userId: user.id,
+    });
     return res.status(429).json({
       error: true,
       message: "No more credits available for this billing period",
+      code: "ctrl_magicEraser_err6",
       requestId: (req as any).requestId,
       credits: {
         used_last_24h: usage.used_in_period,
@@ -230,9 +274,16 @@ const magicEraser: RequestHandler = async (req, res) => {
     const width = initMeta.width;
     const height = initMeta.height;
     if (!width || !height) {
+      logger.warn("magicEraser::missing_source_dimensions", {
+        code: "ctrl_magicEraser_err7",
+        requestId: (req as any).requestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+      });
       return res.status(400).json({
         error: true,
         message: "Impossible de lire les dimensions de l'image source.",
+        code: "ctrl_magicEraser_err7",
         requestId: (req as any).requestId,
       });
     }
@@ -316,6 +367,7 @@ const magicEraser: RequestHandler = async (req, res) => {
       }
     } catch (headerErr: any) {
       logger.warn("magicEraser::credits_header_failed", {
+        code: "ctrl_magicEraser_err8",
         requestId: (req as any).requestId,
         message: headerErr?.message ?? String(headerErr),
       });
@@ -339,6 +391,7 @@ const magicEraser: RequestHandler = async (req, res) => {
           : undefined;
 
     logger.error("magicEraser::call_failed", {
+      code: "ctrl_magicEraser_err9",
       requestId: (req as any).requestId,
       isAbort,
       message: err?.message ?? String(err),
@@ -354,6 +407,7 @@ const magicEraser: RequestHandler = async (req, res) => {
           : status >= 500
             ? "Le service Replicate est indisponible pour le moment."
             : err?.message ?? "Erreur Replicate",
+      code: "ctrl_magicEraser_err9",
       requestId: (req as any).requestId,
     });
   } finally {

@@ -49,26 +49,50 @@ export const deleteRemoveBgVisitorReplicateJobOutput: RequestHandler = async (
   const accessToken = readAccessToken(req);
 
   if (!requestIdParam || !token || !accessToken) {
+    logger.warn("deleteRemoveBgVisitorJobOutput::missing_requestId_or_token_or_accessToken", {
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err1",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: requestIdParam,
+    });
     return res.status(400).json({
       error: true,
       message: "missing_requestId_or_token_or_accessToken",
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err1",
       requestId: httpRequestId,
     });
   }
 
   const job = await getRemoveBgVisitorJobByRequestId(requestIdParam);
   if (!job) {
+    logger.warn("deleteRemoveBgVisitorJobOutput::job_not_found", {
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err2",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: requestIdParam,
+    });
     return res.status(404).json({
       error: true,
       message: "job_not_found",
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err2",
       requestId: httpRequestId,
     });
   }
 
   if (String(job.access_token || "") !== accessToken) {
+    logger.warn("deleteRemoveBgVisitorJobOutput::forbidden_invalid_access_token", {
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err3",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: job.request_id,
+    });
     return res.status(403).json({
       error: true,
       message: "forbidden",
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err3",
       requestId: httpRequestId,
     });
   }
@@ -77,14 +101,23 @@ export const deleteRemoveBgVisitorReplicateJobOutput: RequestHandler = async (
   try {
     const { hashedIp } = getHashedVisitorIp(req);
     if (hashedIp !== String(job.visitor_hashed_ip || "")) {
+      logger.warn("deleteRemoveBgVisitorJobOutput::forbidden_visitor_hash_mismatch", {
+        code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err4",
+        requestId: httpRequestId,
+        method: req.method,
+        path: req.originalUrl || req.url,
+        jobRequestId: job.request_id,
+      });
       return res.status(403).json({
         error: true,
         message: "forbidden",
+        code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err4",
         requestId: httpRequestId,
       });
     }
   } catch (err: any) {
     logger.warn("deleteRemoveBgVisitorJobOutput::visitor_hash_unavailable", {
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err5",
       requestId: httpRequestId,
       jobRequestId: job.request_id,
       message: err?.message ?? String(err),
@@ -93,23 +126,41 @@ export const deleteRemoveBgVisitorReplicateJobOutput: RequestHandler = async (
     return res.status(403).json({
       error: true,
       message: "forbidden",
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err5",
       requestId: httpRequestId,
     });
   }
 
   if (!isSucceeded(job.status) || !job.output_image_url) {
+    logger.warn("deleteRemoveBgVisitorJobOutput::job_not_ready", {
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err6",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: job.request_id,
+      status: job.status,
+    });
     return res.status(409).json({
       error: true,
       message: "job_not_ready",
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err6",
       requestId: httpRequestId,
     });
   }
 
   const expectedToken = extractTokenFromUrl(String(job.output_image_url));
   if (!expectedToken || expectedToken !== token) {
+    logger.warn("deleteRemoveBgVisitorJobOutput::forbidden_token_mismatch", {
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err7",
+      requestId: httpRequestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      jobRequestId: job.request_id,
+    });
     return res.status(403).json({
       error: true,
       message: "forbidden",
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err7",
       requestId: httpRequestId,
     });
   }
@@ -135,11 +186,17 @@ export const deleteRemoveBgVisitorReplicateJobOutput: RequestHandler = async (
         .json({ ok: true, deleted: false, alreadyDeleted: true });
     }
     logger.warn("deleteRemoveBgVisitorJobOutput::failed", {
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err8",
       requestId: httpRequestId,
       jobRequestId: job.request_id,
       message: err?.message ?? String(err),
     });
-    return res.status(500).json({ ok: false, error: true });
+    return res.status(500).json({
+      ok: false,
+      error: true,
+      message: "internal_error",
+      code: "ctrl_deleteRemoveBgVisitorReplicateJobOutput_err8",
+      requestId: httpRequestId,
+    });
   }
 };
-
