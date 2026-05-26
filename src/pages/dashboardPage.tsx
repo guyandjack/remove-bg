@@ -427,12 +427,9 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         // Toast is displayed only AFTER the post-action modal is closed.
         setPendingDeletionToast({ status: "success", message: msg });
       }
-
-      // Refresh local billing state so the UI is immediately consistent (actions disabled, etc.).
-      try {
-        const st = await api.get("/api/account/billing-account");
-        if (st?.data?.success) setBillingState(st.data as any);
-      } catch {}
+      // Do NOT refresh `/api/account/billing-account` here.
+      // The backend anonymizes the email during deletion, which makes the current access token's email invalid.
+      // Refetching would therefore generate an expected 404 (user not found) and noisy backend logs.
 
       const feedbackToken =
         typeof resp?.data?.deletion_feedback_token === "string"
@@ -633,7 +630,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         </p>
       </div>
 
-      <div className="flex flex-col items-center md:flex-row md:flex-wrap md:justify-center  gap-4 max-w-[992px]">
+      <div className="flex flex-col items-center sm:flex-row sm:flex-wrap sm:justify-center  gap-4 max-w-[992px]">
         <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
           <div className="stat-title">{t("dashboardPage.stats.user")}</div>
           <div className="stat-value text-primary truncate text-base">
@@ -669,7 +666,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
           <p className={"text-sm py-2"}>{t("dashboardPage.stats.removeBgSectionTitle")}</p>
           <div
             className={
-              "flex flex-col justify-start items-center gap-2 md: flex-row"
+              "flex flex-col justify-start items-center gap-2 sm:flex-row"
             }
           >
             <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
@@ -691,7 +688,7 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
            <p className={"text-sm py-2"}>{t("dashboardPage.stats.converterSectionTitle")}</p>
            <div
              className={
-               "flex flex-col justify-start items-center gap-2 md: flex-row"
+               "flex flex-col justify-start items-center gap-2 sm:flex-row"
              }
            >
              <div className="w-[200px] h-[100px] stat bg-component rounded-xl border border-base-300">
