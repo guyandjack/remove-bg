@@ -839,6 +839,26 @@
     "error": "Impossibile prolungare la sessione. Effettua nuovamente l’accesso."
   },
   "billingSuccess": {
+    "messages": {
+      "title": "Conferma del pagamento",
+      "processing": "Stiamo confermando il tuo pagamento\u2026",
+      "paidWaitingDb": "Pagamento confermato. Attivazione in corso\u2026",
+      "paymentFailed": "Non siamo riusciti a convalidare il pagamento. Nessun addebito \u00e8 stato confermato. Puoi riprovare dalla pagina Prezzi.",
+      "paymentExpired": "Questa sessione di pagamento \u00e8 scaduta. Nessun addebito \u00e8 stato confermato. Puoi ricominciare dalla pagina Prezzi.",
+      "provisioningFailed": "Il pagamento \u00e8 confermato, ma l\u2019attivazione dell\u2019account non \u00e8 riuscita. Puoi riprovare l\u2019attivazione o contattare l\u2019assistenza.",
+      "missingSession": "Link di pagamento non valido o incompleto.",
+      "doNotRetry": "Non ripetere il pagamento: questa pagina si aggiorna automaticamente.",
+      "takingLong": "Sta richiedendo pi\u00f9 tempo del previsto. Puoi attendere o contattare l\u2019assistenza.",
+      "technicalIssue": "Stiamo riscontrando un problema tecnico nel verificare il pagamento. Riprova tra poco o contatta l\u2019assistenza.",
+      "fallbackContact": "Se sei stato addebitato ma non riesci a usare il servizio, contattaci tramite il modulo di contatto.",
+      "success": "Pagamento confermato. Reindirizzamento\u2026"
+    },
+    "actions": {
+      "contact": "Contatta assistenza",
+      "pricing": "Torna ai prezzi",
+      "services": "Vai ai servizi",
+      "retryActivation": "Riprova attivazione"
+    },
     "title": "Conferma del pagamento",
     "processing": "Conferma del pagamento in corso.",
     "paidWaitingDb": "Pagamento confermato. Attivazione in corso…",

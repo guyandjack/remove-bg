@@ -133,6 +133,10 @@ img {
   background-color: var(--custom-bg-page);
 }
 
+.page-container--center {
+  justify-content: center;
+}
+
 .bg-page {
   background-color: var(--custom-bg-page);
 }

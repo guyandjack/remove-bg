@@ -856,6 +856,26 @@
     "error": "Unable to extend your session. Please sign in again."
   },
   "billingSuccess": {
+    "messages": {
+      "title": "Payment confirmation",
+      "processing": "We are confirming your payment\u2026",
+      "paidWaitingDb": "Payment confirmed. Activating your account\u2026",
+      "paymentFailed": "We couldn\u2019t validate the payment. No charge has been confirmed. You can try again from the Pricing page.",
+      "paymentExpired": "This payment session has expired. No charge has been confirmed. You can restart from the Pricing page.",
+      "provisioningFailed": "Your payment is confirmed, but account activation failed. You can retry activation or contact support.",
+      "missingSession": "Invalid or incomplete payment link.",
+      "doNotRetry": "Please don\u2019t retry the payment: this page updates automatically.",
+      "takingLong": "This is taking longer than expected. You can wait, or contact support.",
+      "technicalIssue": "We\u2019re having a technical issue verifying your payment. Please try again in a moment or contact support.",
+      "fallbackContact": "If you were charged but can\u2019t use the service, please contact us via the contact form.",
+      "success": "Payment confirmed. Redirecting\u2026"
+    },
+    "actions": {
+      "contact": "Contact support",
+      "pricing": "Back to pricing",
+      "services": "Go to services",
+      "retryActivation": "Retry activation"
+    },
     "title": "Payment confirmation",
     "processing": "Payment confirmation in progress.",
     "paidWaitingDb": "Payment confirmed. Activating your account…",

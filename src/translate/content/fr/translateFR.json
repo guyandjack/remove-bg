@@ -856,14 +856,35 @@
     "error": "Impossible de prolonger la session. Veuillez vous reconnecter."
   },
   "billingSuccess": {
+    "messages": {
+      "title": "Confirmation de paiement",
+      "processing": "Nous confirmons votre paiement\u2026",
+      "paidWaitingDb": "Paiement confirm\u00e9. Activation en cours\u2026",
+      "paymentFailed": "Le paiement n\u2019a pas \u00e9t\u00e9 valid\u00e9. Aucun d\u00e9bit n\u2019a \u00e9t\u00e9 confirm\u00e9. Vous pouvez r\u00e9essayer depuis la page Tarifs.",
+      "paymentExpired": "Cette session de paiement a expir\u00e9. Aucun d\u00e9bit n\u2019a \u00e9t\u00e9 confirm\u00e9. Vous pouvez relancer le paiement depuis la page Tarifs.",
+      "provisioningFailed": "Paiement confirm\u00e9, mais l\u2019activation de votre compte a \u00e9chou\u00e9. Vous pouvez r\u00e9essayer l\u2019activation ou contacter le support.",
+      "missingSession": "Lien de paiement invalide ou incomplet.",
+      "doNotRetry": "Ne relancez pas le paiement : cette page se met \u00e0 jour automatiquement.",
+      "takingLong": "Cela prend plus de temps que pr\u00e9vu. Vous pouvez patienter, ou contacter le support.",
+      "technicalIssue": "Nous rencontrons un probl\u00e8me technique pour v\u00e9rifier votre paiement. Merci de r\u00e9essayer dans quelques instants ou de contacter le support.",
+      "fallbackContact": "Si vous avez \u00e9t\u00e9 d\u00e9bit\u00e9 mais que les services restent indisponibles, contactez-nous via le formulaire de contact.",
+      "success": "Paiement confirm\u00e9. Redirection\u2026"
+    },
+    "actions": {
+      "contact": "Contacter le support",
+      "pricing": "Retour aux tarifs",
+      "services": "Acc\u00e9der aux services",
+      "retryActivation": "R\u00e9essayer l\u2019activation"
+    },
     "title": "Confirmation de paiement",
-    "processing": "Confirmation du paiement en cours.",
+    "processing": "Nous confirmons votre paiement…",
     "paidWaitingDb": "Paiement confirmé. Activation en cours…",
     "failed": "Paiement échoué. Si vous avez été débité, contactez le support.",
     "provisioningFailed": "Paiement reçu, mais la création du compte a échoué. Merci de réessayer ou de contacter le support.",
     "missingSession": "Identifiant de session de paiement manquant.",
     "doNotRetry": "Ne relancez pas le paiement. Cette page se met à jour automatiquement.",
     "success": "Paiement confirmé. Redirection…",
-    "backDashboard": "Continuer"
+    "backDashboard": "Annuler",
+    "retryProvisioning":"Reessayer"
   }
 }

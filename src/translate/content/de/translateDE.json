@@ -811,6 +811,26 @@
         "error": "Sitzung konnte nicht verlängert werden. Bitte melden Sie sich erneut an."
       },
       "billingSuccess": {
+        "messages": {
+          "title": "Zahlungsbest\u00e4tigung",
+          "processing": "Wir best\u00e4tigen Ihre Zahlung\u2026",
+          "paidWaitingDb": "Zahlung best\u00e4tigt. Kontoaktivierung l\u00e4uft\u2026",
+          "paymentFailed": "Die Zahlung konnte nicht best\u00e4tigt werden. Es wurde keine Belastung best\u00e4tigt. Sie k\u00f6nnen es auf der Preisseite erneut versuchen.",
+          "paymentExpired": "Diese Zahlungssitzung ist abgelaufen. Es wurde keine Belastung best\u00e4tigt. Sie k\u00f6nnen den Vorgang auf der Preisseite neu starten.",
+          "provisioningFailed": "Ihre Zahlung ist best\u00e4tigt, aber die Kontoaktivierung ist fehlgeschlagen. Sie k\u00f6nnen die Aktivierung erneut versuchen oder den Support kontaktieren.",
+          "missingSession": "Ung\u00fcltiger oder unvollst\u00e4ndiger Zahlungslink.",
+          "doNotRetry": "Bitte starten Sie die Zahlung nicht erneut: Diese Seite aktualisiert sich automatisch.",
+          "takingLong": "Das dauert l\u00e4nger als erwartet. Sie k\u00f6nnen warten oder den Support kontaktieren.",
+          "technicalIssue": "Beim Pr\u00fcfen Ihrer Zahlung ist ein technisches Problem aufgetreten. Bitte versuchen Sie es in K\u00fcrze erneut oder kontaktieren Sie den Support.",
+          "fallbackContact": "Wenn Sie belastet wurden, aber der Service nicht funktioniert, kontaktieren Sie uns bitte \u00fcber das Kontaktformular.",
+          "success": "Zahlung best\u00e4tigt. Weiterleitung\u2026"
+        },
+        "actions": {
+          "contact": "Support kontaktieren",
+          "pricing": "Zur Preisseite",
+          "services": "Zu den Services",
+          "retryActivation": "Aktivierung erneut versuchen"
+        },
         "title": "Zahlungsbestätigung",
         "processing": "Zahlung wird bestätigt.",
         "paidWaitingDb": "Zahlung bestätigt. Aktivierung läuft…",
