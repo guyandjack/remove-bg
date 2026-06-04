@@ -1,5 +1,6 @@
 //import des hooks
 import { useEffect } from "preact/hooks";
+import { SEO } from "@/components/SEO";
 
 //import des fonctions
 import { setActiveLink } from "@/utils/setActiveLink";
@@ -23,6 +24,13 @@ const Page404 = ({routeKey}: PropsPage) => {
 
   return (
     <div className={"page-container"}>
+      <SEO
+        content={{
+          title: "Page introuvable | WizPix",
+          description: "Page introuvable sur WizPix.",
+          robots: "noindex,follow",
+        }}
+      />
       <div className={"max-w-4xl"}>
         <section className="grid min-h-full place-items-center bg-component px-6 py-24 sm:py-32 lg:px-8">
           <div className="text-center">

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { useLocation } from "preact-iso";
 import { useTranslation } from "react-i18next";
+import { SEO } from "@/components/SEO";
 import { api } from "@/utils/axiosConfig";
 import { setSessionFromApiResponse } from "@/stores/session";
 
@@ -265,6 +266,12 @@ export const BillingSuccessPage = ({ routeKey }: { routeKey: string }) => {
 
   return (
     <div className="page-container page-container--center min-h-[100vh] lg:min-h-[calc(100vh_-_315px)]">
+      <SEO
+        content={{
+          title: `${t("billingSuccess.messages.title")} | WizPix`,
+          description: "Page de confirmation de paiement WizPix.",
+        }}
+      />
       <div className="card bg-component shadow-sm w-full max-w-lg">
         <div className="card-body">
           <h1 className="text-2xl font-bold">{t("billingSuccess.messages.title")}</h1>

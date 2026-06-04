@@ -1,4 +1,5 @@
 import { FormLogin } from "@/components/form/formLogin";
+import { SEO } from "@/components/SEO";
 import { useEffect } from "preact/hooks";
 
 //import des fonctions
@@ -16,6 +17,12 @@ function LoginPage({routeKey}: PropsPage) {
  }, [routeKey]);
   return (
     <div className={"page-container"}>
+      <SEO
+        content={{
+          title: "Connexion | WizPix",
+          description: "Page de connexion WizPix.",
+        }}
+      />
       <FormLogin />
     </div>
   );

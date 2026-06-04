@@ -3,6 +3,7 @@ import { useLocation } from "preact-iso";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { SEO } from "@/components/SEO";
 
 //import des composant enfant
 import { PriceCard } from "@/components/card/priceCard";
@@ -604,6 +605,12 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
 
   return (
     <div className="page-container">
+      <SEO
+        content={{
+          title: "Tableau de bord | WizPix",
+          description: "Espace client WizPix.",
+        }}
+      />
       {actionToast.status !== "idle" ? (
         <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
           <div className="toast toast-top toast-center mt-20">

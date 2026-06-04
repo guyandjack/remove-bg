@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import defaultOgImageUrl from "@/assets/images/logo/logo_9.svg";
 import { localOrProd } from "@/utils/localOrProd";
 
-import { seoRefPage } from "@/data/seoPageIndex/seoPageIndex";
+import { seoNoIndexPaths } from "@/data/seoPageIndex/seoPageIndex";
 
 type SEOContent = {
   title: string;
@@ -49,20 +49,20 @@ function sanitizeMetaText(value: string): string {
   return String(value ?? "").replace(/\s+/g, " ").trim();
 }
 
-const INDEXABLE_PATHS = new Set(seoRefPage.map((p) => normalizePath(p)));
+const NO_INDEX_PATHS = new Set(seoNoIndexPaths.map((path) => normalizePath(path)));
+const NO_INDEX_PREFIXES = new Set(["api", "preprod"]);
 
-function isIndexablePath(path: string): boolean {
-  return INDEXABLE_PATHS.has(normalizePath(path));
+function startsWithNoIndexPrefix(path: string): boolean {
+  const normalizedPath = normalizePath(path);
+  const firstSegment = normalizedPath.split("/").filter(Boolean)[0] || "";
+  return NO_INDEX_PREFIXES.has(firstSegment.toLowerCase());
 }
 
-function findNearestIndexablePath(path: string): string | null {
-  let current = normalizePath(path);
-  while (current && current !== "/") {
-    if (INDEXABLE_PATHS.has(current)) return current;
-    const lastSlash = current.lastIndexOf("/");
-    current = lastSlash > 0 ? current.slice(0, lastSlash) : "/";
-  }
-  return INDEXABLE_PATHS.has("/") ? "/" : null;
+function isNoIndexPath(path: string): boolean {
+  const normalizedPath = normalizePath(path);
+  return (
+    NO_INDEX_PATHS.has(normalizedPath) || startsWithNoIndexPrefix(normalizedPath)
+  );
 }
 
 function SEO({ content }: { content: SEOContent }) {
@@ -75,14 +75,12 @@ function SEO({ content }: { content: SEOContent }) {
   const title = sanitizeMetaText(content.title);
   const description = sanitizeMetaText(content.description);
   const normalizedPath = normalizePath(path);
-  const defaultRobots = isIndexablePath(normalizedPath)
-    ? "index,follow"
-    : "noindex,follow";
+  const defaultRobots = isNoIndexPath(normalizedPath)
+    ? "noindex,follow"
+    : "index,follow";
   const robots = sanitizeMetaText(content.robots || defaultRobots);
 
-  const canonicalPath =
-    findNearestIndexablePath(normalizedPath) ?? normalizedPath;
-  const canonicalUrl = buildCanonicalUrl(baseUrl, canonicalPath);
+  const canonicalUrl = buildCanonicalUrl(baseUrl, normalizedPath);
 
   const ogImage = toAbsoluteUrl(baseUrl, content.imageUrl || defaultOgImageUrl);
 

@@ -1,5 +1,6 @@
 //import des composants enfants
 import { FormSignUp } from "@/components/form/FormSignUp";
+import { SEO } from "@/components/SEO";
 import { setActiveLink } from "@/utils/setActiveLink";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
 import { useEffect } from "preact/hooks";
@@ -15,6 +16,12 @@ function SignUpPage({routeKey}: PropsPage) {
  }, [routeKey]);
   return (
     <div className={"page-container"}>
+      <SEO
+        content={{
+          title: "Inscription | WizPix",
+          description: "Page d'inscription WizPix.",
+        }}
+      />
       <FormSignUp />
     </div>
   );
