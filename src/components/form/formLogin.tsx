@@ -209,7 +209,7 @@ const FormLogin = () => {
 
   return (
     <>
-      <div className="mx-auto max-w-[500px] h-[calc(100svh-70px)] flex flex-col justify-center ">
+      <div className="w-[350px] sm:w-[450px] h-[calc(100svh-70px)] flex flex-col justify-center ">
         <div className="sm:mx-auto sm:w-full sm:max-w-xl">
           <h1 className="text-center text-2xl font-bold tracking-tight text-base-content">
             {t("formLogin.title")}
@@ -457,7 +457,7 @@ const FormLogin = () => {
                   >
                     {t("formForgot.btnCancel")}
                   </button>
-                  
+
                   <div
                     className={`btn w-full transition-all duration-500 transform 
           ${statusForgot === "idle" ? "opacity-0 translate-y-0" : ""}

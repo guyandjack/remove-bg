@@ -20,7 +20,7 @@ type PropsType = {
 
 const StepAction = ( {content} : PropsType) => {
   return (
-    <section class="w-full bg-component lg:h-[500px] ">
+    <section class="bg-component lg:h-[500px] py-5">
       <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="max-w-2xl mx-auto text-center">
           <h2 

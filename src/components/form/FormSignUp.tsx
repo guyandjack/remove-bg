@@ -208,7 +208,7 @@ const FormSignUp = () => {
 
   return (
     <>
-      <div className="mx-auto max-w-[500px] h-[calc(100svh-70px)] flex flex-col justify-center py-15">
+      <div className="w-[350px] sm:w-[450px] h-[calc(100svh-70px)] flex flex-col justify-center py-15">
         <div className="sm:mx-auto sm:w-full sm:max-w-xl">
           <h1 className="text-center text-2xl font-bold">
             {t("formSignUp.title")}

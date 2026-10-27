@@ -296,14 +296,14 @@ function HomePage({ routeKey = "" }: PropsPage) {
         <div className={"w-full mb-[100px] lg:mb-0"}>
           <div
             className={
-              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
+              "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto px-3"
             }
           >
             <Hero content={heroContent} />
           </div>
         </div>
 
-        <div className={"w-full p-10 lg:p-15"}>
+        <div className={"w-full py-10 px-2 lg:p-15"}>
           <div
             className={
               "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"
@@ -327,7 +327,7 @@ function HomePage({ routeKey = "" }: PropsPage) {
             </ul>
           </div>
         </div>
-        <div className={"w-full bg-component p-20"}>
+        <div className={"w-full bg-component"}>
           <div
             className={
               "w-full max-w-[1300px] mx-auto flex flex-col justify-start items-center mx-auto"

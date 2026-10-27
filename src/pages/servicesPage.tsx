@@ -356,7 +356,7 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
       </div>
       <ul
         className={
-          "my-16 w-full max-w-[1200px] flex flex-col justify-start items-center gap-y-10 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-10"
+          "px-5 my-16 w-full max-w-[1200px] flex flex-col justify-start items-center gap-y-10 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-10"
         }
       >
         {contentCardService.map((cardContent) => {

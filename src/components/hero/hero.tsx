@@ -52,7 +52,7 @@ const Hero = ({ content }: ContentProps) => {
             dangerouslySetInnerHTML={{ __html: content.title_h1 }}
           ></h1>
           <h2
-            className="self-center text-center py-[20px] text-xl w-[80%] lg:self-start lg:text-left"
+            className="self-center text-center py-[20px] text-xl lg:w-[80%] lg:self-start lg:text-left"
             dangerouslySetInnerHTML={{ __html: content.title_h2 }}
           ></h2>
           <div className="flex flex-col sm:flex-row gap-4 lg:gap-8 justify-center">

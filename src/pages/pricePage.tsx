@@ -323,7 +323,7 @@ const PricePage = ({ routeKey = "", isSignup = false }: PricePageProps) => {
       <div className={"page-container"}>
         <div
           className={
-            "relative w-full mx-auto max-w-[1300px] py-[20px] px-[10px] flex flex-col justify-start items-center lg:items-start gap-[30px] "
+            "relative w-full mx-auto max-w-[1300px] py-[20px] px-[10px] flex flex-col justify-start items-center lg:items-start gap-[30px]  "
           }
         >
           {finalizeStatus !== "idle" ? (
@@ -348,7 +348,7 @@ const PricePage = ({ routeKey = "", isSignup = false }: PricePageProps) => {
           ) : null}
           <h1
             className={
-              "text-center text-4xl font-bold lg:w-[40%] lg:text-6xl lg:text-left lg:self-start"
+              "text-center text-4xl font-bold lg:w-[70%] lg:text-6xl lg:text-left lg:self-start"
             }
             dangerouslySetInnerHTML={{
               __html: t("pricing.title_h1").replace(/\n/g, "<br/>"),
