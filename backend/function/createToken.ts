@@ -1,19 +1,15 @@
-
-import jwt, { type SignOptions, type Secret, type JwtPayload } from "jsonwebtoken";
+import jwt, { type JwtPayload, type Secret, type SignOptions } from "jsonwebtoken";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-// IMPORTANT: do not import DB modules at top-level.
-// This file is used in contexts (tests, tooling) where DB modules may not be resolvable.
-// DB queries are imported lazily inside the few functions that need them (refresh tokens).
 
-type Option = {
-  domain?: string;
-  httpOnly: boolean;
+type CookieOptions = {
+  httpOnly: true;
   secure: boolean;
-  maxAge: number;
-  sameSite?: boolean | "none" | "lax" | "strict";
+  sameSite: "lax" | "strict";
+  path: string;
+  maxAge?: number;
 };
 
 export type PasswordResetPayload = {
@@ -23,18 +19,31 @@ export type PasswordResetPayload = {
   jti: string;
 };
 
+export type SessionSubject = {
+  userId: string;
+  email: string;
+};
+
+export type RefreshTokenResult = {
+  token: string;
+  jti: string;
+  expiresAt: Date;
+};
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const JWT_ISSUER = process.env.JWT_ISSUER || "wizpix-api";
+const ACCESS_AUDIENCE = process.env.JWT_ACCESS_AUDIENCE || "wizpix-web";
+const REFRESH_AUDIENCE = process.env.JWT_REFRESH_AUDIENCE || "wizpix-web";
+const PASSWORD_RESET_AUDIENCE =
+  process.env.JWT_PASSWORD_RESET_AUDIENCE || "wizpix-password-reset";
 
 function parseExpiresInToMs(input: unknown, fallbackMs: number): number {
   if (typeof input === "number" && Number.isFinite(input)) {
-    // jsonwebtoken numeric expiresIn is in seconds
     return Math.max(0, Math.floor(input * 1000));
   }
 
   const raw = String(input ?? "").trim();
   if (!raw) return fallbackMs;
-
-  // If it's a plain number string, assume seconds (jsonwebtoken convention)
   if (/^\d+$/.test(raw)) {
     const seconds = Number(raw);
     return Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds * 1000)) : fallbackMs;
@@ -56,23 +65,22 @@ function parseExpiresInToMs(input: unknown, fallbackMs: number): number {
           ? 60 * 1000
           : unit === "h"
             ? 60 * 60 * 1000
-            : 24 * 60 * 60 * 1000; // d
+            : 24 * 60 * 60 * 1000;
 
   return Math.max(0, Math.floor(value * multiplier));
 }
 
 function normalizePem(input: string): string {
   const withRealNewlines = input.replace(/\r\n/g, "\n");
-  const withEscapedNewlines = withRealNewlines.includes("\\n")
-    ? withRealNewlines.replace(/\\n/g, "\n")
-    : withRealNewlines;
-  return withEscapedNewlines.trim();
+  return withRealNewlines.includes("\\n")
+    ? withRealNewlines.replace(/\\n/g, "\n").trim()
+    : withRealNewlines.trim();
 }
 
-function tryRead(p?: string): string | null {
-  if (!p) return null;
+function tryRead(filePath?: string): string | null {
+  if (!filePath) return null;
   try {
-    return fs.readFileSync(p, "utf8");
+    return fs.readFileSync(filePath, "utf8");
   } catch {
     return null;
   }
@@ -81,241 +89,302 @@ function tryRead(p?: string): string | null {
 function resolvePemFromEnvOrPath(
   value: string | undefined,
   expectedHeader: RegExp,
-  expectedFooter: RegExp
+  expectedFooter: RegExp,
 ): string | null {
   if (!value) return null;
 
-  // If the env var now directly contains the PEM (your new setup), use it as-is.
   const normalized = normalizePem(value);
   if (expectedHeader.test(normalized) && expectedFooter.test(normalized)) return normalized;
 
-  // Backward-compat: if the env var used to be a path, try to read it.
   const fileContent = tryRead(value);
   if (!fileContent) return null;
   const fileNormalized = normalizePem(fileContent);
-  if (expectedHeader.test(fileNormalized) && expectedFooter.test(fileNormalized)) return fileNormalized;
-
-  return null;
+  return expectedHeader.test(fileNormalized) && expectedFooter.test(fileNormalized)
+    ? fileNormalized
+    : null;
 }
 
 function resolvePrivateKey(): string {
   const header = /BEGIN (RSA )?PRIVATE KEY/;
   const footer = /END (RSA )?PRIVATE KEY/;
-
-  // Support both old and new meanings:
-  // - Previously: *_PATH = file path to a .key
-  // - Now:       *_PATH = actual PEM content inside .env
   const envCandidates = [
     process.env.JWT_PRIVATE_KEY_PATH,
     process.env.PRIVATE_KEY_PATH,
     process.env.JWT_PRIVATE_KEY,
   ];
-  for (const v of envCandidates) {
-    const resolved = resolvePemFromEnvOrPath(v, header, footer);
+
+  for (const candidate of envCandidates) {
+    const resolved = resolvePemFromEnvOrPath(candidate, header, footer);
     if (resolved) return resolved;
   }
 
-  const fallbackPath = path.resolve(__dirname, "..", "keys", "jwt_private_key.key");
-  const fallback = tryRead(fallbackPath);
-  if (fallback) {
-    const resolved = resolvePemFromEnvOrPath(fallback, header, footer);
-    if (resolved) return resolved;
-  }
+  const fallback = tryRead(path.resolve(__dirname, "..", "keys", "jwt_private_key.key"));
+  const resolvedFallback = fallback
+    ? resolvePemFromEnvOrPath(fallback, header, footer)
+    : null;
+  if (resolvedFallback) return resolvedFallback;
 
-  throw new Error(
-    "RSA private key not found. Set JWT_PRIVATE_KEY_PATH (recommended) or JWT_PRIVATE_KEY. Backward-compat: PRIVATE_KEY_PATH can be a path."
-  );
+  throw new Error("RSA private key not found. Set JWT_PRIVATE_KEY_PATH or JWT_PRIVATE_KEY.");
 }
 
 function resolveAccessPublicKey(): string {
   const header = /BEGIN (RSA )?PUBLIC KEY/;
   const footer = /END (RSA )?PUBLIC KEY/;
-
   const envCandidates = [process.env.JWT_PUBLIC_KEY_PATH, process.env.JWT_PUBLIC_KEY];
-  for (const v of envCandidates) {
-    const resolved = resolvePemFromEnvOrPath(v, header, footer);
+
+  for (const candidate of envCandidates) {
+    const resolved = resolvePemFromEnvOrPath(candidate, header, footer);
     if (resolved) return resolved;
   }
 
-  const fallbackPath = path.resolve(__dirname, "..", "keys", "jwt_public_key.key");
-  const fallback = tryRead(fallbackPath);
-  if (fallback) {
-    const resolved = resolvePemFromEnvOrPath(fallback, header, footer);
-    if (resolved) return resolved;
-  }
+  const fallback = tryRead(path.resolve(__dirname, "..", "keys", "jwt_public_key.key"));
+  const resolvedFallback = fallback
+    ? resolvePemFromEnvOrPath(fallback, header, footer)
+    : null;
+  if (resolvedFallback) return resolvedFallback;
 
-  throw new Error("RSA public key (access) not found. Set JWT_PUBLIC_KEY_PATH (recommended) or JWT_PUBLIC_KEY");
+  throw new Error("RSA public key not found. Set JWT_PUBLIC_KEY_PATH or JWT_PUBLIC_KEY.");
 }
 
 function resolveRefreshPublicKey(): string {
   const header = /BEGIN (RSA )?PUBLIC KEY/;
   const footer = /END (RSA )?PUBLIC KEY/;
-
   const envCandidates = [
     process.env.JWT_REFRESH_PUBLIC_KEY_PATH,
     process.env.JWT_PUBLIC_KEY_PATH,
     process.env.JWT_REFRESH_PUBLIC_KEY,
     process.env.JWT_PUBLIC_KEY,
   ];
-  for (const v of envCandidates) {
-    const resolved = resolvePemFromEnvOrPath(v, header, footer);
+
+  for (const candidate of envCandidates) {
+    const resolved = resolvePemFromEnvOrPath(candidate, header, footer);
     if (resolved) return resolved;
   }
 
-  const fallbackPath = path.resolve(__dirname, "..", "keys", "jwt_public_key.key");
-  const fallback = tryRead(fallbackPath);
-  if (fallback) {
-    const resolved = resolvePemFromEnvOrPath(fallback, header, footer);
-    if (resolved) return resolved;
-  }
+  const fallback = tryRead(path.resolve(__dirname, "..", "keys", "jwt_public_key.key"));
+  const resolvedFallback = fallback
+    ? resolvePemFromEnvOrPath(fallback, header, footer)
+    : null;
+  if (resolvedFallback) return resolvedFallback;
 
-  throw new Error(
-    "RSA public key (refresh) not found. Set JWT_REFRESH_PUBLIC_KEY_PATH (recommended) or JWT_REFRESH_PUBLIC_KEY"
-  );
+  throw new Error("RSA public key not found. Set JWT_REFRESH_PUBLIC_KEY_PATH or JWT_REFRESH_PUBLIC_KEY.");
 }
 
-/**
- * Sign JWT access token
- * Accepts either a string email (legacy) or a structured payload.
- */
-const signAccessToken = (payload: string | JwtPayload) => {
-  const privateKey = resolvePrivateKey();
+function decodeRefreshMetadata(token: string): { jti: string; expiresAt: Date; issuedAt: Date } {
+  const decoded = jwt.decode(token) as JwtPayload | null;
+  const jti = typeof decoded?.jti === "string" ? decoded.jti : "";
+  const exp = typeof decoded?.exp === "number" ? decoded.exp : undefined;
+  const iat = typeof decoded?.iat === "number" ? decoded.iat : undefined;
+  if (!jti || !exp) throw new Error("Unable to read generated refresh token metadata");
 
-  const body: JwtPayload | string =
-    typeof payload === "string" ? { email: payload } : (payload as JwtPayload);
-
-  const key: Secret = privateKey as unknown as Secret;
-  const options: SignOptions = {
-    algorithm: "RS256" as SignOptions["algorithm"],
-    expiresIn: (process.env.JWT_ACCESS_EXPIRES_IN || "15m") as SignOptions["expiresIn"],
+  return {
+    jti,
+    expiresAt: new Date(exp * 1000),
+    issuedAt: iat ? new Date(iat * 1000) : new Date(),
   };
+}
 
-  return jwt.sign(body, key, options);
+function buildRefreshToken(subject: SessionSubject): RefreshTokenResult {
+  const privateKey = resolvePrivateKey();
+  const token = jwt.sign(
+    {
+      sub: subject.userId,
+      email: subject.email,
+      typ: "refresh",
+    },
+    privateKey as unknown as Secret,
+    {
+      algorithm: "RS256",
+      expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || "1h") as SignOptions["expiresIn"],
+      jwtid: crypto.randomUUID(),
+      issuer: JWT_ISSUER,
+      audience: REFRESH_AUDIENCE,
+    },
+  );
+  const metadata = decodeRefreshMetadata(token);
+  return { token, jti: metadata.jti, expiresAt: metadata.expiresAt };
+}
+
+/** Creates a short-lived access token bound to the refresh-token session. */
+const signAccessToken = (subject: SessionSubject & { sessionId: string }) => {
+  const privateKey = resolvePrivateKey();
+  return jwt.sign(
+    {
+      sub: subject.userId,
+      email: subject.email,
+      sid: subject.sessionId,
+      typ: "access",
+    },
+    privateKey as unknown as Secret,
+    {
+      algorithm: "RS256",
+      expiresIn: (process.env.JWT_ACCESS_EXPIRES_IN || "15m") as SignOptions["expiresIn"],
+      issuer: JWT_ISSUER,
+      audience: ACCESS_AUDIENCE,
+    },
+  );
 };
 
-/**
- * Password reset tokens must not be tied to short-lived access tokens.
- */
 const signPasswordResetToken = (payload: PasswordResetPayload) => {
   const privateKey = resolvePrivateKey();
-  const key: Secret = privateKey as unknown as Secret;
-  const options: SignOptions = {
-    algorithm: "RS256" as SignOptions["algorithm"],
+  return jwt.sign(payload as JwtPayload, privateKey as unknown as Secret, {
+    algorithm: "RS256",
     expiresIn: (process.env.JWT_PASSWORD_RESET_EXPIRES_IN || "15m") as SignOptions["expiresIn"],
-  };
-  return jwt.sign(payload as unknown as JwtPayload, key, options);
+    issuer: JWT_ISSUER,
+    audience: PASSWORD_RESET_AUDIENCE,
+  });
 };
 
-/**
- * Sign JWT refreshToken
- */
-const signRefreshToken = async (email: string, opts?: { ip?: string | null; userAgent?: string | null }) => {
+const signRefreshToken = async (
+  subject: SessionSubject,
+  opts?: { ip?: string | null; userAgent?: string | null },
+): Promise<RefreshTokenResult> => {
   const { createRefreshTokenRecord, getUserByEmail } = await import("../DB/queriesSQL/queriesSQL.js");
-  const privateKey = resolvePrivateKey();
-  const key: Secret = privateKey as unknown as Secret;
-  const jti = crypto.randomUUID();
-  const user = await getUserByEmail(email);
-  if (!user) {
-    throw new Error("Cannot issue refresh token: user not found for email");
+  const user = await getUserByEmail(subject.email);
+  if (!user || String(user.id) !== String(subject.userId)) {
+    throw new Error("Cannot issue refresh token: user not found or mismatched");
   }
-  const options: SignOptions = {
-    expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || "1h") as SignOptions["expiresIn"],
-    algorithm: "RS256" as SignOptions["algorithm"],
-    jwtid: jti,
-  };
-  // Do NOT duplicate jti in payload when using options.jwtid
-  const payload: JwtPayload = { email, userId: user.id } as any;
-  const token = jwt.sign(payload, key, options);
-  // Decode to get exp/iat for DB persistence
-  const decoded = jwt.decode(token) as JwtPayload | null;
-  const exp = decoded && typeof decoded === "object" ? decoded.exp : undefined;
-  const iat = decoded && typeof decoded === "object" ? decoded.iat : undefined;
-  const expiresAt = exp ? new Date(exp * 1000) : new Date(Date.now() + 60 * 60 * 1000);
-  const issuedAt = iat ? new Date(iat * 1000) : new Date();
+
+  const next = buildRefreshToken(subject);
   await createRefreshTokenRecord({
-    jti,
-    userId: user.id,
-    expiresAt,
-    token,
+    jti: next.jti,
+    userId: subject.userId,
+    expiresAt: next.expiresAt,
+    token: next.token,
     ip: opts?.ip ?? null,
     userAgent: opts?.userAgent ?? null,
-    issuedAt,
   });
-  return token;
+  return next;
 };
 
+/** Atomically consumes a refresh token and creates its replacement. */
+const rotateRefreshToken = async (
+  input: SessionSubject & {
+    previousJti: string;
+    ip?: string | null;
+    userAgent?: string | null;
+  },
+): Promise<RefreshTokenResult> => {
+  const { getUserByEmail, rotateRefreshTokenRecord } = await import("../DB/queriesSQL/queriesSQL.js");
+  const user = await getUserByEmail(input.email);
+  if (!user || String(user.id) !== String(input.userId)) {
+    throw new Error("Cannot rotate refresh token: user not found or mismatched");
+  }
 
-/**
- * Verify JWT access token (RS256)
- */
-const verifyAccessToken = (token: string) => {
-  const publicKey = resolveAccessPublicKey();
-  const decoded = jwt.verify(token, publicKey, { algorithms: ["RS256"] });
-  return decoded as JwtPayload | string;
+  const next = buildRefreshToken(input);
+  const consumed = await rotateRefreshTokenRecord({
+    previousJti: input.previousJti,
+    userId: input.userId,
+    nextJti: next.jti,
+    nextToken: next.token,
+    issuedAt: new Date(),
+    expiresAt: next.expiresAt,
+    ip: input.ip ?? null,
+    userAgent: input.userAgent ?? null,
+  });
+  if (!consumed) throw new Error("Refresh token already used, revoked, or expired");
+  return next;
+};
+
+const verifyAccessToken = async (token: string) => {
+  const { findValidRefreshTokenByJti } = await import("../DB/queriesSQL/queriesSQL.js");
+  const decoded = jwt.verify(token, resolveAccessPublicKey(), {
+    algorithms: ["RS256"],
+    issuer: JWT_ISSUER,
+    audience: ACCESS_AUDIENCE,
+  }) as JwtPayload;
+  const userId = typeof decoded.sub === "string" ? decoded.sub : "";
+  const email = typeof decoded.email === "string" ? decoded.email : "";
+  const sessionId = typeof decoded.sid === "string" ? decoded.sid : "";
+  if (decoded.typ !== "access" || !userId || !email || !sessionId) {
+    throw new Error("Invalid access token claims");
+  }
+
+  const session = await findValidRefreshTokenByJti(sessionId, userId);
+  if (!session) throw new Error("Access token session revoked or expired");
+  return { userId, email, sessionId };
 };
 
 const verifyPasswordResetToken = (token: string) => {
-  return verifyAccessToken(token) as JwtPayload | string;
+  const decoded = jwt.verify(token, resolveAccessPublicKey(), {
+    algorithms: ["RS256"],
+    issuer: JWT_ISSUER,
+    audience: PASSWORD_RESET_AUDIENCE,
+  }) as JwtPayload;
+  if (decoded.typ !== "password_reset") throw new Error("Invalid password reset token claims");
+  return decoded;
 };
 
-
-/**
- * Verify JWT refresh token (RS256)
- */
 const verifyRefreshToken = async (token: string) => {
-  const { findValidRefreshTokenByJti } = await import("../DB/queriesSQL/queriesSQL.js");
-  const publicKey = resolveRefreshPublicKey();
-  const decoded = jwt.verify(token, publicKey, { algorithms: ["RS256"] }) as any;
-  const jti: string | undefined = decoded?.jti || decoded?.jwtid;
-  const userId: string | undefined = decoded?.userId;
-  if (!jti) throw new Error("Invalid refresh token: missing jti");
-  const rec = await findValidRefreshTokenByJti(jti, userId);
-  if (!rec) throw new Error("Refresh token revoked or expired");
-  return decoded as JwtPayload | string;
-};
-
-
-//fonction pour définir les options de cookie
-const setCookieOptionsObject = () => {
-  const mode = process.env.NODE_ENV;
-  const configuredDomain = String(process.env.COOKIE_DOMAIN ?? "").trim() || undefined;
-  // Refresh cookie lifetime must match refresh token lifetime, otherwise users get logged out "randomly"
-  // when the cookie disappears before the token is actually expired.
-  const refreshMaxAgeMs = parseExpiresInToMs(process.env.JWT_REFRESH_EXPIRES_IN, 60 * 60 * 1000);
-  switch (mode) {
-    case "production": {
-      // IMPORTANT:
-      // - Do not hardcode an incorrect Domain (browsers will block Set-Cookie -> refresh breaks).
-      // - Omitting Domain creates a host-only cookie (more secure, and works for api.<domain> setups).
-      // - If you explicitly need cross-subdomain cookies, set COOKIE_DOMAIN (ex: `.wizpix.ch`).
-      const options: Option = {
-        httpOnly: true,
-        secure: true,
-        maxAge: refreshMaxAgeMs,
-        sameSite: "none",
-      };
-      if (configuredDomain) options.domain = configuredDomain;
-      return options;
-    }
-
-    case "development":
-      return {
-        //domain: "undefined",
-        httpOnly: true,
-        secure: false,
-        maxAge: refreshMaxAgeMs,
-        // Explicit is better than implicit (Chrome defaults evolve). For localhost:5173 -> localhost:3000, Lax is fine.
-        sameSite: "lax",
-      } as Option;
-
-    default:
-      return {
-        httpOnly: true,
-        secure: false,
-        maxAge: refreshMaxAgeMs,
-        sameSite: "lax",
-      } as Option;
+  const { findValidRefreshTokenByJti, sha256Buffer } = await import("../DB/queriesSQL/queriesSQL.js");
+  const decoded = jwt.verify(token, resolveRefreshPublicKey(), {
+    algorithms: ["RS256"],
+    issuer: JWT_ISSUER,
+    audience: REFRESH_AUDIENCE,
+  }) as JwtPayload;
+  const jti = typeof decoded.jti === "string" ? decoded.jti : "";
+  const userId = typeof decoded.sub === "string" ? decoded.sub : "";
+  const email = typeof decoded.email === "string" ? decoded.email : "";
+  if (decoded.typ !== "refresh" || !jti || !userId || !email) {
+    throw new Error("Invalid refresh token claims");
   }
+
+  const record = await findValidRefreshTokenByJti(jti, userId);
+  if (!record?.token_hash) throw new Error("Refresh token revoked or expired");
+  const expectedHash = Buffer.from(record.token_hash);
+  const actualHash = sha256Buffer(token);
+  if (
+    expectedHash.length !== actualHash.length ||
+    !crypto.timingSafeEqual(expectedHash, actualHash)
+  ) {
+    throw new Error("Refresh token does not match its session record");
+  }
+
+  return { jti, userId, email };
 };
 
-export { signAccessToken, signPasswordResetToken, signRefreshToken, setCookieOptionsObject, verifyAccessToken, verifyPasswordResetToken, verifyRefreshToken };
+function baseCookieOptions(): Omit<CookieOptions, "path" | "maxAge"> {
+  const isLocalDevelopment = process.env.NODE_ENV === "development";
+  return {
+    httpOnly: true,
+    // Any non-local environment must fail closed: cookies are never sent over HTTP.
+    secure: !isLocalDevelopment,
+    sameSite: isLocalDevelopment ? "lax" : "strict",
+  };
+}
+
+const getAccessCookieOptions = (): CookieOptions => ({
+  ...baseCookieOptions(),
+  path: "/api",
+  maxAge: parseExpiresInToMs(process.env.JWT_ACCESS_EXPIRES_IN, 15 * 60 * 1000),
+});
+
+const getRefreshCookieOptions = (): CookieOptions => ({
+  ...baseCookieOptions(),
+  path: "/api/auth",
+  maxAge: parseExpiresInToMs(process.env.JWT_REFRESH_EXPIRES_IN, 60 * 60 * 1000),
+});
+
+const getAccessCookieClearOptions = (): Omit<CookieOptions, "maxAge"> => ({
+  ...baseCookieOptions(),
+  path: "/api",
+});
+
+const getRefreshCookieClearOptions = (): Omit<CookieOptions, "maxAge"> => ({
+  ...baseCookieOptions(),
+  path: "/api/auth",
+});
+
+export {
+  getAccessCookieClearOptions,
+  getAccessCookieOptions,
+  getRefreshCookieClearOptions,
+  getRefreshCookieOptions,
+  rotateRefreshToken,
+  signAccessToken,
+  signPasswordResetToken,
+  signRefreshToken,
+  verifyAccessToken,
+  verifyPasswordResetToken,
+  verifyRefreshToken,
+};

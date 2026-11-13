@@ -159,18 +159,6 @@ const releaseObjectUrl = (url?: string | null) => {
   }
 };
 
-function readAuthToken(): string | null {
-  const raw =
-    typeof window !== "undefined" ? localStorage.getItem("session") || "" : "";
-  if (!raw) return sessionSignal?.value?.token ?? null;
-  try {
-    const parsed = JSON.parse(raw);
-    return sessionSignal?.value?.token ?? parsed?.token ?? null;
-  } catch {
-    return sessionSignal?.value?.token ?? null;
-  }
-}
-
 const ImageConverter = ({
   converterTextContent,
   fileValidationTextContent,
@@ -575,10 +563,8 @@ const ImageConverter = ({
     }
     if (!file) return;
 
-    // If a token exists, verify auth before starting the conversion request.
-    // This avoids starting a long request that will be rejected by the backend (expired token).
-    const token = readAuthToken();
-    if (token) {
+    // Confirm a cookie-backed session before starting a long authenticated job.
+    if (sessionSignal.value?.authentified) {
       try {
         setStatus({
           state: "loading",
@@ -633,8 +619,7 @@ const ImageConverter = ({
 
       // Credits are decremented server-side only on successful conversion.
       // Refresh session (credits displayed in Dashboard) after success.
-      const sessionToken = sessionSignal?.value?.token ?? null;
-      if (sessionToken) {
+      if (sessionSignal?.value?.authentified) {
         isAuthentified().catch((err) => {
           console.warn(
             "Unable to refresh conversion credits after success",

@@ -656,9 +656,6 @@ const ImgEditor = ({
           credits: { used_last_24h: used, remaining_last_24h: remaining },
         };
         sessionSignal.value = updated;
-        if (typeof window !== "undefined") {
-          localStorage.setItem("session", JSON.stringify(updated));
-        }
       }
 
       const newImage = await blobToDataUrl(response.data);

@@ -3,9 +3,8 @@ import type { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../../function/createToken.js";
 import { logger } from "../../logger.js";
 
-const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
-  const rawAuth = req.headers.authorization;
-  const token = rawAuth?.split(" ")[1]?.trim();
+const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
+  const token = typeof req.cookies?.tokenAccess === "string" ? req.cookies.tokenAccess.trim() : "";
 
   const looksMalformed =
     !token ||
@@ -18,7 +17,7 @@ const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
       requestId: (req as any).requestId,
       method: req.method,
       path: req.originalUrl || req.url,
-      hasAuthHeader: Boolean(rawAuth),
+      hasAccessCookie: Boolean(token),
       code: "mw_verifyAuth_err1",
     });
     return res.status(401).set("Cache-Control", "no-store").json({
@@ -29,15 +28,8 @@ const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    const decoded: any = verifyAccessToken(token);
-    let email: string | undefined;
-    if (decoded && typeof decoded === "object") {
-      if (typeof decoded.email === "string") email = decoded.email;
-      else if (decoded.payload && typeof decoded.payload === "object") email = decoded.payload.email;
-      else if (typeof decoded.payload === "string") email = decoded.payload;
-    }
-    
-    if (!email) {
+    const decoded = await verifyAccessToken(token);
+    if (!decoded.email || !decoded.userId) {
       logger.warn("verifyAuth::invalid_token_payload", {
         requestId: (req as any).requestId,
         method: req.method,
@@ -51,8 +43,13 @@ const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
       });
     }
     
-    (req as any).payload = { ...(req as any).payload, email: email };
-    next();
+    (req as any).payload = {
+      ...(req as any).payload,
+      email: decoded.email,
+      userId: decoded.userId,
+      sessionId: decoded.sessionId,
+    };
+    return next();
   } catch (err: any) {
     logger.warn("verifyAuth::verify_failed", {
       requestId: (req as any).requestId,

@@ -248,6 +248,12 @@
       "src": "",
       "title": "Mise en scène de produits",
       "description": "Met en valeur vos produits en les plaçant dans des mises en scène adaptées pour la vente ou la présentation."
+    },
+    "card_5": {
+      "id": "video",
+      "src": "",
+      "title": "Génération de video",
+      "description": "Présente votre marque ou produit de façon moderne et attractive."
     }
   },
 
@@ -721,6 +727,51 @@
   "servicePageTitle": {
     "title_h1": "Testez la qualité des services",
     "title_h1_loged": "Utilisez nos services"
+  },
+  "videoMaker": {
+    "eyebrow": "Génération vidéo",
+    "title": "Créez votre vidéo motion design",
+    "description": "Décrivez votre idée, choisissez une direction visuelle et préparez votre demande de génération.",
+    "stylesLegend": "Choisissez un style visuel",
+    "previewUnavailable": "Aperçu bientôt disponible",
+    "styles": {
+      "cinematic": { "title": "Cinématique" },
+      "kinetic": { "title": "Typographie cinétique" },
+      "minimal": { "title": "Minimaliste" },
+      "dynamic": { "title": "Dynamique" }
+    },
+    "promptLabel": "Décrivez votre vidéo",
+    "promptPlaceholder": "Ex. Une présentation élégante de notre nouveau produit, avec des formes fluides et un rythme moderne.",
+    "promptHelper": "Précisez le sujet, l'ambiance, les couleurs et les éléments à animer.",
+    "promptRequired": "Décrivez la vidéo à générer.",
+    "promptMinLength": "La description doit contenir au moins {{count}} caractères.",
+    "promptMaxLength": "La description ne peut pas dépasser {{count}} caractères.",
+    "styleRequired": "Choisissez un style visuel.",
+    "durationInvalid": "Choisissez une durée disponible.",
+    "referenceImagesLabel": "Images de référence (facultatif)",
+    "referenceImagesHint": "Ajoutez les images de votre produit ou de votre marque à inclure dans la vidéo. Formats acceptés : PNG et JPEG, 2 Mo maximum par image.",
+    "referenceImagesInvalidType": "Ajoutez uniquement des images PNG ou JPEG.",
+    "referenceImagesTooLarge": "Chaque image doit peser au maximum 2 Mo.",
+    "referenceImagesSelected": "{{count}} image(s) sélectionnée(s)",
+    "characterCount": "{{count}} / {{max}} caractères",
+    "dictationStart": "Démarrer la dictée vocale",
+    "dictationStop": "Arrêter la dictée vocale",
+    "dictationListening": "Dictée en cours…",
+    "dictationUnsupported": "La dictée vocale n'est pas prise en charge par ce navigateur.",
+    "dictationPermissionDenied": "L'accès au microphone est requis pour utiliser la dictée vocale.",
+    "dictationStartError": "Impossible de démarrer la dictée vocale. Vérifiez l'autorisation du microphone.",
+    "durationLabel": "Durée de la vidéo",
+    "durations": {
+      "ten": "10 secondes",
+      "twenty": "20 secondes",
+      "thirty": "30 secondes",
+      "forty": "40 secondes"
+    },
+    "formValidation": "Décrivez votre vidéo et choisissez un style avant de continuer.",
+    "formPendingNotice": "L'interface est prête : la génération sera reliée à l'API lors de la prochaine étape.",
+    "formSubmitError": "La demande n'a pas pu être préparée. Réessayez.",
+    "submit": "Préparer ma vidéo",
+    "submitting": "Préparation…"
   },
 
   "dashboardPage": {

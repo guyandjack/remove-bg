@@ -1,16 +1,14 @@
 //import des librairies nécessaires
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-
 //import des fonctions pour les token et cookies et bdd
 import {
-  setCookieOptionsObject,
+  getAccessCookieOptions,
+  getRefreshCookieOptions,
   signAccessToken,
   signRefreshToken,
 } from "../function/createToken.js";
 import {
   getUserByEmail,
-  withTransaction,
   getCustomerByUserId,
   getPlanByCode,
   getActiveUsageBillingPeriod,
@@ -30,8 +28,7 @@ type ObjectResponse = {
   status: string;
   authentified: boolean;
   redirect: boolean;
-  redirectUrl: string;
-  token: string;
+  redirectUrl: string | null;
   plan: {
     code: string;
     name: string;
@@ -46,14 +43,18 @@ type ObjectResponse = {
   creditRemainingConcerter: number;
   creditUsedConverter: number;
 
-  subscriptionId: string;
-  hint: string;
+  subscriptionId: string | null;
+  hint: string | null;
 } | {};
+
+// Cost 12, like account password hashes. Used only to keep unknown-email and
+// bad-password attempts on comparable code paths.
+const DUMMY_PASSWORD_HASH = "$2b$12$3bh5Ks6TPe36pnIISJEI7e6Lteqx1R5UYEmV83lEWSUNSOn1OZAfC";
 
 /**
  * Login user
  */
-const login: RequestHandler = async (req, res, next) => {
+const login: RequestHandler = async (req, res) => {
   try {
     const { email, password } = (req as any).userValidated;
     const httpRequestId = (req as any).requestId;
@@ -78,6 +79,7 @@ const login: RequestHandler = async (req, res, next) => {
     const user = await getUserByEmail(email);
 
     if (!user) {
+      await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
       // Either email wasn't found or password didn't match
       logger.warn("login::user_not_found", {
         code: "ctrl_loginDataUser_err2",
@@ -116,25 +118,21 @@ const login: RequestHandler = async (req, res, next) => {
       });
     }
 
-    let options = {};
     let refreshToken = "";
+    let accessToken = "";
     let formatedObject: ObjectResponse = {};
 
     try {
-      refreshToken = await signRefreshToken(user.email, {
+      const refresh = await signRefreshToken({ userId: user.id, email: user.email }, {
         ip: req.ip,
         userAgent: req.headers["user-agent"] as string | undefined,
       });
-
-      const decodedRefresh: any = jwt.decode(refreshToken) || {};
-      const rtExp: number | undefined =
-        typeof decodedRefresh?.exp === "number" ? decodedRefresh.exp : undefined;
-
-      const accessToken = signAccessToken(
-        rtExp ? { email: user.email, rtExp } : { email: user.email }
-      );
-
-      options = setCookieOptionsObject();
+      refreshToken = refresh.token;
+      accessToken = signAccessToken({
+        userId: user.id,
+        email: user.email,
+        sessionId: refresh.jti,
+      });
 
       //if ok get plan and credit of user, for send un formated object response
       const userId = user.id;
@@ -172,7 +170,6 @@ const login: RequestHandler = async (req, res, next) => {
         authentified: true,
         redirect: false,
         redirectUrl: null,
-        token: accessToken,
         plan: {
           code: selectedPlanCode,
           name: planName,
@@ -205,10 +202,10 @@ const login: RequestHandler = async (req, res, next) => {
         requestId: httpRequestId,
       });
     }
-    // If everything ok, send token and cookie to client
-
-    res.cookie("tokenRefresh", refreshToken, options);
-    res.status(200).json(formatedObject);
+    // Tokens are only ever returned in HttpOnly cookies, never in JSON.
+    res.cookie("tokenAccess", accessToken, getAccessCookieOptions());
+    res.cookie("tokenRefresh", refreshToken, getRefreshCookieOptions());
+    return res.status(200).json(formatedObject);
   } catch (error) {
     logger.error("login::unhandled_error", {
       code: "ctrl_loginDataUser_err5",
@@ -217,7 +214,7 @@ const login: RequestHandler = async (req, res, next) => {
       path: req.originalUrl || req.url,
       message: (error as any)?.message ?? String(error),
     });
-    res.status(400).json({
+    return res.status(500).json({
       status: "error",
       message: "internal_error",
       code: "ctrl_loginDataUser_err5",
@@ -225,21 +222,5 @@ const login: RequestHandler = async (req, res, next) => {
     });
   }
 };
-
-// Check if user changed password after the token was issued
-/* if (user.changedPasswordAfter(decoded.iat)) {
-    return res.status(401).json({
-      status: "error",
-      message: "User recently changed password. Please log in again.",
-    });
-  }
-
-  // Create and send new access token
-  const accessToken = signAccessToken(user.em);
-  res.status(200).json({
-    status: "success",
-    accessToken,
-    data: user.name,
-  }); */
 
 export { login, ObjectResponse};

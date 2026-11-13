@@ -19,12 +19,12 @@ function clearClientSessionStorage() {
 
 /**
  * Logout côté client.
- * - Best-effort call API `/api/logout` (peut échouer si access token déjà expiré)
- * - Nettoie toujours la session locale
+ * - Sends the HttpOnly access/refresh cookies to `/api/logout`.
+ * - Clears only non-sensitive client UI state and legacy storage.
  * - La redirection (route) est gérée par l'appelant (afin d'être cohérent avec les composants existants)
  *
- * Note: le backend protège `/api/logout` via `verifyAuth` (access token). Si l'access token est expiré
- * et le refresh token aussi, l'appel peut répondre 401: on nettoie quand même côté client.
+ * The server revokes the refresh-token family; failure is still followed by a
+ * local UI cleanup so the browser never displays a stale authenticated state.
  */
 async function logoutClient(callbacks?: LogoutCallbacks) {
   callbacks?.onStart?.();

@@ -15,6 +15,11 @@ import * as m from "motion/react-m";
 import { RemoveBg } from "@/components/services/RemoveBG";
 import { SocialPicture } from "@/components/services/socialPicture";
 import { ImageConverter } from "@/components/services/ImageConverter";
+import {
+  VideoMaker,
+  type VideoGenerationRequest,
+  type VideoGenerationSubmissionResult,
+} from "@/components/services/VideoMaker";
 import { ServiceCard } from "@/components/card/ServiceCard";
 
 //import des images
@@ -22,6 +27,7 @@ import iconBackground from "@/assets/images/icon/icon-arriere-plan-opt.svg";
 import iconSocial from "@/assets/images/icon/icon-reseau-opt.svg";
 import iconProduct from "@/assets/images/icon/icon-projecteurs-opt.svg";
 import iconConvert from "@/assets/images/icon/icon-convertir-opt.svg";
+import iconVideo from "@/assets/images/icon/icon-video.svg";
 
 //import des fonctions
 import { setActiveLink } from "@/utils/setActiveLink";
@@ -54,6 +60,14 @@ type CtaContent = Record<CtaKey, string | boolean>;
 
 type PropsPage = {
   routeKey: string;
+};
+
+type VideoGenerationTestApiResponse = {
+  status: "accepted";
+  message: string;
+  data: {
+    jobId: string;
+  };
 };
 
 const ServicesPage = ({ routeKey }: PropsPage) => {
@@ -296,6 +310,13 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
       title: t("serviceCardContent.card_4.title"),
       description: t("serviceCardContent.card_4.description"),
     },
+    {
+      active: true,
+      id: t("serviceCardContent.card_5.id"),
+      src: iconProduct,
+      title: t("serviceCardContent.card_5.title"),
+      description: t("serviceCardContent.card_5.description"),
+    },
   ];
 
   useEffect(() => {
@@ -334,6 +355,31 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
     }, 500);
   }, [service]);
 
+  const submitVideoGeneration = async (
+    request: VideoGenerationRequest,
+  ): Promise<VideoGenerationSubmissionResult> => {
+    const formData = new FormData();
+    formData.set("prompt", request.prompt);
+    formData.set("style", request.style);
+    formData.set("duration", String(request.duration));
+    request.referenceImages.forEach((image) => {
+      formData.append("referenceImages", image, image.name);
+    });
+
+    const { data } = await api.post<VideoGenerationTestApiResponse>(
+      "/api/services/video/generate",
+      formData,
+    );
+
+    if (data?.status !== "accepted" || !data?.data?.jobId) {
+      throw new Error("Unexpected video generation test response");
+    }
+
+    return {
+      message: `${data.message} (${data.data.jobId})`,
+    };
+  };
+
   return (
     <>
       <SEO
@@ -343,79 +389,91 @@ const ServicesPage = ({ routeKey }: PropsPage) => {
         }}
       />
       <div className="page-container gap-10">
-      <div
-        className={
-          "relative w-full mx-auto max-w-[1300px] py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px]"
-        }
-      >
-        <h1 className={"text-center text-4xl font-bold  lg:text-6xl"}>
-          {userLoged
-            ? t("servicePageTitle.title_h1_loged")
-            : t("servicePageTitle.title_h1")}
-        </h1>
-      </div>
-      <ul
-        className={
-          "px-5 my-16 w-full max-w-[1200px] flex flex-col justify-start items-center gap-y-10 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-10"
-        }
-      >
-        {contentCardService.map((cardContent) => {
-          return (
-            <li key={cardContent.id}>
-              <ServiceCard content={cardContent} selectService={setService} />
-            </li>
-          );
-        })}
-      </ul>
-      <div
-        id="container-service"
-        ref={containerService}
-        className={"w-full max-w-[1300px] mt-8 mg:mt-10 lg:mt-15"}
-      >
-        <AnimatePresence>
-          {service === "remove" ? (
-            <m.div
-              key="background-preview"
-              className=""
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <RemoveBg
-                removeTextContent={removeBgContent}
-                uploadTextContent={textUploadImgComponent}
-                imgEditorTextContent={imgEditorContent}
-                downloadLinkTextContent={downloadLinkContent}
-              />
-            </m.div>
-          ) : null}
-          {service === "social" ? (
-            <m.div
-              key="social-picture"
-              className="w-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <SocialPicture />
-            </m.div>
-          ) : null}
-          {service === "convert" ? (
-            <m.div
-              key="image-converter"
-              className="w-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <ImageConverter
-                converterTextContent={converterContent}
-                fileValidationTextContent={textUploadImgComponent}
-              />
-            </m.div>
-          ) : null}
-        </AnimatePresence>
-      </div>
+        <div
+          className={
+            "relative w-full mx-auto max-w-[1300px] py-[50px] px-[10px] flex flex-col justify-start items-center gap-[30px]"
+          }
+        >
+          <h1 className={"text-center text-4xl font-bold  lg:text-6xl"}>
+            {userLoged
+              ? t("servicePageTitle.title_h1_loged")
+              : t("servicePageTitle.title_h1")}
+          </h1>
+        </div>
+        <ul
+          className={
+            "px-5 my-16 w-full max-w-[1200px] flex flex-col justify-start items-center gap-y-10 lg:flex-row lg:flex-wrap lg:justify-evenly lg:gap-x-10"
+          }
+        >
+          {contentCardService.map((cardContent) => {
+            return (
+              <li key={cardContent.id}>
+                <ServiceCard content={cardContent} selectService={setService} />
+              </li>
+            );
+          })}
+        </ul>
+        <div
+          id="container-service"
+          ref={containerService}
+          className={"w-full max-w-[1300px] mt-8 mg:mt-10 lg:mt-15"}
+        >
+          <AnimatePresence>
+            {service === "remove" ? (
+              <m.div
+                key="background-preview"
+                className=""
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <RemoveBg
+                  removeTextContent={removeBgContent}
+                  uploadTextContent={textUploadImgComponent}
+                  imgEditorTextContent={imgEditorContent}
+                  downloadLinkTextContent={downloadLinkContent}
+                />
+              </m.div>
+            ) : null}
+            {service === "social" ? (
+              <m.div
+                key="social-picture"
+                className="w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <SocialPicture />
+              </m.div>
+            ) : null}
+            {service === "convert" ? (
+              <m.div
+                key="image-converter"
+                className="w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <ImageConverter
+                  converterTextContent={converterContent}
+                  fileValidationTextContent={textUploadImgComponent}
+                />
+              </m.div>
+            ) : null}
+
+            {service === "video" ? (
+              <m.div
+                key="video-maker"
+                className="w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <VideoMaker onSubmit={submitVideoGeneration} />
+              </m.div>
+            ) : null}
+          </AnimatePresence>
+        </div>
       </div>
     </>
   );

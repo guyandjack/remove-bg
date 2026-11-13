@@ -4,6 +4,6 @@ import {authMe} from "../controleur/authMe.controler.js"
 
 const router = express.Router();
 
-router.post("", verifyAuth, authMe);
+router.get("", verifyAuth, authMe);
 
 export default router;

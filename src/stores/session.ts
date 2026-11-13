@@ -32,7 +32,6 @@ export type SessionData = {
   redirect: boolean;
   redirectUrl: string | null;
   plan: PlanAPI ;
-  token: string | null;
   credits: CreditsAPI;
   creditRemainingConcerter: number;
   creditUsedConverter: number;
@@ -51,7 +50,6 @@ const sessionSignal = signal<SessionData>({
   authentified: false,
   redirect: false,
   redirectUrl: null,
-  token: null,
   plan: {
     code: "",
   },
@@ -98,20 +96,25 @@ function setSessionFromApiResponse(data: SessionData) {
   
   sessionSignal.value = {
     user: {
-      first_name: data?.user.first_name,
-      email: data?.user.email || "",
+      first_name: data?.user?.first_name,
+      last_name: data?.user?.last_name,
+      id: data?.user?.id,
+      email: data?.user?.email || "",
     },
     status: data?.status || "",
     authentified: data?.authentified || false,
     redirect: data?.redirect || false,
     redirectUrl: data?.redirectUrl || "",
-    token: data?.token || "",
     plan: {
-      code: data?.plan.code || "",
+      code: data?.plan?.code || "",
+      name: data?.plan?.name,
+      price_cents: data?.plan?.price_cents,
+      currency: data?.plan?.currency,
+      daily_credit_quota: data?.plan?.daily_credit_quota,
     },
     credits: {
-      used_last_24h: data?.credits.used_last_24h || 0,
-      remaining_last_24h: data?.credits.remaining_last_24h || 0,
+      used_last_24h: data?.credits?.used_last_24h || 0,
+      remaining_last_24h: data?.credits?.remaining_last_24h || 0,
     },
     creditRemainingConcerter:
       typeof (data as any)?.creditRemainingConcerter === "number"
@@ -125,32 +128,16 @@ function setSessionFromApiResponse(data: SessionData) {
     hint: data?.hint || "",
   };
   
-  // Optionnel : persister dans localStorage
-  if (typeof window !== "undefined") {
-    localStorage.setItem("session", JSON.stringify(sessionSignal.value));
-  }
-
-  
 }
 
-// =========================
-// 4. Re-hydratation locale au démarrage
-// =========================
-function initSessionFromLocalStorage() {
-  if (typeof window === "undefined") return false;
-  const raw = localStorage.getItem("session");
-  if (!raw) return false;
-
+/** Removes bearer tokens persisted by releases before cookie-only authentication. */
+function clearLegacySessionStorage() {
+  if (typeof window === "undefined") return;
   try {
-    sessionSignal.value = JSON.parse(raw);
-    console.log("session sihnal value dans init seesion: ", sessionSignal.value)
-    return true
-    
-
+    localStorage.removeItem("session");
   } catch {
-    console.error("Impossible de parser la session du localStorage");
-    return false
+    // Storage can be disabled by the browser; no session secret is kept there.
   }
 }
 
-export { setSessionFromApiResponse, privileges, sessionSignal, initSessionFromLocalStorage };
+export { clearLegacySessionStorage, setSessionFromApiResponse, privileges, sessionSignal };

@@ -94,13 +94,13 @@ export function App() {
   
 
   return (
-    <div>
-      <header className="sticky top-0 z-100 ">
-        <NavBar />
-      </header>
+    <LocationProvider>
+      <div>
+        <header className="sticky top-0 z-100 ">
+          <NavBar />
+        </header>
 
-      <main>
-        <LocationProvider>
+        <main>
           <ErrorBoundary onError={(e) => console.log(e)}>
             <Router>
               <Route path="/" component={RoutedHomePage} />
@@ -120,11 +120,11 @@ export function App() {
               <Route path="*/*" component={RoutedPage404} />
             </Router>
           </ErrorBoundary>
-        </LocationProvider>
-      </main>
-      <footer>
-        <Footer />
-      </footer>
-    </div>
+        </main>
+        <footer>
+          <Footer />
+        </footer>
+      </div>
+    </LocationProvider>
   );
 }

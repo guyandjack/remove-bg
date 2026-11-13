@@ -5,8 +5,6 @@ import { themeSignal } from "@/stores/theme";
 //import des signaux de connection
 import {
   sessionSignal,
-  initSessionFromLocalStorage,
-  setSessionFromApiResponse,
 } from "@/stores/session";
 
 //import des composant enfant

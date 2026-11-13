@@ -723,6 +723,51 @@
     "title_h1": "Test the quality of our services",
     "title_h1_loged": "Use our services"
   },
+  "videoMaker": {
+    "eyebrow": "Video generation",
+    "title": "Create your motion-design video",
+    "description": "Describe your idea, choose a visual direction and prepare your generation request.",
+    "stylesLegend": "Choose a visual style",
+    "previewUnavailable": "Preview coming soon",
+    "styles": {
+      "cinematic": { "title": "Cinematic" },
+      "kinetic": { "title": "Kinetic typography" },
+      "minimal": { "title": "Minimal" },
+      "dynamic": { "title": "Dynamic" }
+    },
+    "promptLabel": "Describe your video",
+    "promptPlaceholder": "E.g. An elegant presentation of our new product with fluid shapes and a modern pace.",
+    "promptHelper": "Include the subject, atmosphere, colors and elements to animate.",
+    "promptRequired": "Describe the video to generate.",
+    "promptMinLength": "The description must contain at least {{count}} characters.",
+    "promptMaxLength": "The description cannot exceed {{count}} characters.",
+    "styleRequired": "Choose a visual style.",
+    "durationInvalid": "Choose an available duration.",
+    "referenceImagesLabel": "Reference images (optional)",
+    "referenceImagesHint": "Add images of your product or brand to include in the video. Accepted formats: PNG and JPEG, up to 2 MB per image.",
+    "referenceImagesInvalidType": "Only PNG or JPEG images can be added.",
+    "referenceImagesTooLarge": "Each image must be no larger than 2 MB.",
+    "referenceImagesSelected": "{{count}} image(s) selected",
+    "characterCount": "{{count}} / {{max}} characters",
+    "dictationStart": "Start voice dictation",
+    "dictationStop": "Stop voice dictation",
+    "dictationListening": "Dictation in progress…",
+    "dictationUnsupported": "Voice dictation is not supported by this browser.",
+    "dictationPermissionDenied": "Microphone access is required to use voice dictation.",
+    "dictationStartError": "Voice dictation could not be started. Check microphone permission.",
+    "durationLabel": "Video duration",
+    "durations": {
+      "ten": "10 seconds",
+      "twenty": "20 seconds",
+      "thirty": "30 seconds",
+      "forty": "40 seconds"
+    },
+    "formValidation": "Describe your video and choose a style before continuing.",
+    "formPendingNotice": "The interface is ready: video generation will be connected to the API in the next step.",
+    "formSubmitError": "The request could not be prepared. Please try again.",
+    "submit": "Prepare my video",
+    "submitting": "Preparing…"
+  },
 
   "dashboardPage": {
     "title": "Dashboard",

@@ -1,6 +1,5 @@
 import type { RequestHandler } from "express";
 import Stripe from "stripe";
-import jwt from "jsonwebtoken";
 import { logger } from "../../logger.js";
 import {
   getStripeCheckoutSessionState,
@@ -11,9 +10,10 @@ import {
   getCustomerByUserId,
 } from "../../DB/queriesSQL/queriesSQL.js";
 import {
+  getAccessCookieOptions,
+  getRefreshCookieOptions,
   signAccessToken,
   signRefreshToken,
-  setCookieOptionsObject,
 } from "../../function/createToken.js";
 import type { ObjectResponse } from "../loginDataUser.controler.js";
 import { planOption } from "../../data/planOption.js";
@@ -160,17 +160,13 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
       });
     }
 
-    const refreshToken = await signRefreshToken(user.email, {
+    const refresh = await signRefreshToken({ userId: user.id, email: user.email }, {
       ip: req.ip,
       userAgent: req.headers["user-agent"] as string | undefined,
     });
-    const decodedRefresh: any = jwt.decode(refreshToken) || {};
-    const rtExp: number | undefined =
-      typeof decodedRefresh?.exp === "number" ? decodedRefresh.exp : undefined;
     const accessToken = signAccessToken(
-      rtExp ? { email: user.email, rtExp } : { email: user.email }
+      { userId: user.id, email: user.email, sessionId: refresh.jti },
     );
-    const cookieOptions = setCookieOptionsObject();
 
     const usage = await getActiveUsageBillingPeriod(user.id);
     const planRow = await getPlanByCode(record.plan_code);
@@ -202,7 +198,6 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
       authentified: true,
       redirect: false,
       redirectUrl: null,
-      token: accessToken,
       plan: {
         code: record.plan_code,
         name: planName,
@@ -223,7 +218,8 @@ const finalizeStripeCheckout: RequestHandler = async (req, res) => {
     
 
     await markStripeCheckoutSessionConsumed(record.session_id);
-    res.cookie("tokenRefresh", refreshToken, cookieOptions);
+    res.cookie("tokenAccess", accessToken, getAccessCookieOptions());
+    res.cookie("tokenRefresh", refresh.token, getRefreshCookieOptions());
     return res.status(200).json(payload);
   } catch (err: any) {
     logger.error("finalizeStripeCheckout::unhandled_error", {

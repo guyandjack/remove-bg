@@ -64,34 +64,18 @@ function createUuid(): string {
     .slice(2)}`;
 }
 
-function readAuthToken(): string | null {
-  const raw =
-    typeof window !== "undefined" ? localStorage.getItem("session") || "" : "";
-  if (!raw) return sessionSignal?.value?.token ?? null;
-  try {
-    const parsed = JSON.parse(raw);
-    return sessionSignal?.value?.token ?? parsed?.token ?? null;
-  } catch {
-    return sessionSignal?.value?.token ?? null;
-  }
-}
-
 async function openSseOverFetch(params: {
   url: string;
-  token?: string | null;
   signal: AbortSignal;
   onEvent: (evt: { event: string; data: any }) => void;
 }) {
   const headers: Record<string, string> = {
     Accept: "text/event-stream",
   };
-  if (params.token) {
-    headers.Authorization = `Bearer ${params.token}`;
-  }
-
   const resp = await fetch(params.url, {
     method: "GET",
     headers,
+    credentials: "include",
     signal: params.signal,
   });
 
@@ -238,24 +222,7 @@ const RemoveBg = ({
   const userLoged = sessionSignal?.value?.authentified;
 
   const planChoiceEl = useRef<HTMLUListElement | null>(null);
-  const objectSession: string =
-    typeof window !== "undefined" ? localStorage.getItem("session") || "" : "";
-  const parsedSession =
-    objectSession !== ""
-      ? (() => {
-          try {
-            return JSON.parse(objectSession);
-          } catch {
-            return null;
-          }
-        })()
-      : null;
-  let creditRemaining = 0;
-  if (parsedSession) {
-    const localCredits = parsedSession?.credits?.remaining_last_24h ?? 0;
-    creditRemaining =
-      sessionSignal?.value?.credits?.remaining_last_24h ?? localCredits;
-  }
+  const creditRemaining = sessionSignal?.value?.credits?.remaining_last_24h ?? 0;
 
   const choicePlan = (e?: MouseEvent) => {
     const elementList = planChoiceEl?.current;
@@ -335,13 +302,13 @@ const RemoveBg = ({
     requestId: string;
     token: string;
     accessToken?: string | null;
-    authToken?: string | null;
+    isAuthenticated: boolean;
   }) => {
-    const { requestId, token, accessToken, authToken } = params;
+    const { requestId, token, accessToken, isAuthenticated } = params;
     if (!requestId || !token) return;
 
     // Visitor delete (no auth): requires accessToken.
-    if (!authToken) {
+    if (!isAuthenticated) {
       if (!accessToken) return;
       await api.post(
         `api/services/public/remove-bg/jobs/${encodeURIComponent(requestId)}/output/delete`,
@@ -351,14 +318,11 @@ const RemoveBg = ({
       return;
     }
 
-    // Auth delete: requires Authorization header.
+    // The authenticated route uses the HttpOnly access cookie automatically.
     await api.post(
       `api/services/remove-bg-replicate/jobs/${encodeURIComponent(requestId)}/output/delete`,
       { token },
-      {
-        headers: { Authorization: `Bearer ${authToken}` },
-        timeout: 20000,
-      },
+      { timeout: 20000 },
     );
   };
 
@@ -412,20 +376,19 @@ const RemoveBg = ({
       const formData = new FormData();
       formData.append("file", fileToProcess);
 
-      // On ne base pas la décision uniquement sur `userLoged` (qui peut fluctuer pendant un refresh):
-      // si on a un token, on utilise la route auth; sinon on utilise la route publique.
-      const authToken = sessionSignal?.value?.token ?? parsedSession?.token ?? null;
+      // `/api/auth/me` supplies this UI state; the credential remains HttpOnly.
+      const isAuthenticated = sessionSignal?.value?.authentified === true;
       const endpoint =
-        authToken && USE_ASYNC_AUTH_FLOW
+        isAuthenticated && USE_ASYNC_AUTH_FLOW
           ? "api/services/remove-bg-replicate/jobs"
-          : authToken
+          : isAuthenticated
             ? "api/services/remove-bg-replicate"
             : USE_ASYNC_VISITOR_FLOW
               ? "api/services/public/remove-bg/jobs"
               : "api/services/public/remove-bg";
 
       // Async (auth) flow: create job, then stream SSE updates.
-      if (authToken && USE_ASYNC_AUTH_FLOW) {
+      if (isAuthenticated && USE_ASYNC_AUTH_FLOW) {
         const idempotencyKey = createUuid();
         const requestId = createUuid();
         setJobRequestId(requestId);
@@ -450,7 +413,7 @@ const RemoveBg = ({
           jobRequestIdFromApi,
         )}/events`;
 
-        // Stream updates over fetch to keep Authorization header support.
+        // Fetch carries the HttpOnly cookie with credentials included.
         const sseAbortController = new AbortController();
         let terminalReached = false;
         const forwardAbort = () => {
@@ -462,7 +425,6 @@ const RemoveBg = ({
 
         await openSseOverFetch({
           url: sseUrl,
-          token: authToken,
           signal: sseAbortController.signal,
           onEvent: async ({ event, data }) => {
             if (isCancelled) return;
@@ -502,7 +464,7 @@ const RemoveBg = ({
                   await requestDeleteForProcessedOutput({
                     requestId: jobRequestIdFromApi,
                     token,
-                    authToken,
+                    isAuthenticated: true,
                   });
                 }
               } catch {}
@@ -550,7 +512,7 @@ const RemoveBg = ({
                   await requestDeleteForProcessedOutput({
                     requestId: jobRequestIdFromApi,
                     token,
-                    authToken,
+                    isAuthenticated: true,
                   });
                 }
               } catch {}
@@ -568,7 +530,7 @@ const RemoveBg = ({
       }
 
       // Async (visitor) flow: create job, then stream SSE updates.
-      if (!authToken && USE_ASYNC_VISITOR_FLOW) {
+      if (!isAuthenticated && USE_ASYNC_VISITOR_FLOW) {
         const idempotencyKey = createUuid();
         const requestId = createUuid();
         setJobRequestId(requestId);
@@ -610,7 +572,6 @@ const RemoveBg = ({
 
         await openSseOverFetch({
           url: sseUrl,
-          token: null,
           signal: sseAbortController.signal,
           onEvent: async ({ event, data }) => {
             if (isCancelled) return;
@@ -647,7 +608,7 @@ const RemoveBg = ({
                     requestId: jobRequestIdFromApi,
                     token,
                     accessToken,
-                    authToken: null,
+                    isAuthenticated: false,
                   });
                 }
               } catch {}
@@ -695,7 +656,7 @@ const RemoveBg = ({
                     requestId: jobRequestIdFromApi,
                     token,
                     accessToken,
-                    authToken: null,
+                    isAuthenticated: false,
                   });
                 }
               } catch {}
@@ -742,9 +703,6 @@ const RemoveBg = ({
           credits: { used_last_24h: used, remaining_last_24h: remaining },
         };
         sessionSignal.value = updated;
-        if (typeof window !== "undefined") {
-          localStorage.setItem("session", JSON.stringify(updated));
-        }
       }
 
       return blobToObjectUrl(blob);
@@ -769,10 +727,7 @@ const RemoveBg = ({
 
       // Credits are decremented server-side only if Replicate succeeds.
       // Refresh session (credits displayed in Navbar/Dashboard) after success.
-      // Don't rely on `userLoged` captured at render time: if it was false/stale,
-      // we still want to refresh when a token exists.
-      const token = sessionSignal?.value?.token ?? parsedSession?.token ?? null;
-      if (token) {
+      if (sessionSignal?.value?.authentified) {
         isAuthentified().catch((err) => {
           console.warn("Unable to refresh credits after Replicate success", err);
         });
@@ -808,7 +763,7 @@ const RemoveBg = ({
 
           console.warn("[remove-bg] api error debug", {
             endpoint:
-              (sessionSignal?.value?.token ?? parsedSession?.token ?? null)
+              sessionSignal?.value?.authentified
                 ? "api/services/remove-bg-replicate"
                 : "api/services/public/remove-bg",
             axios: isAxios,
@@ -949,9 +904,7 @@ const RemoveBg = ({
     (async () => {
       if (!selectedFile || isProcessing) return;
 
-      // If we have a token, verify auth before starting the processing request.
-      const token = readAuthToken();
-      if (token) {
+      if (sessionSignal.value?.authentified) {
         try {
           setIsProcessing(true);
           await isAuthentified();
@@ -968,8 +921,7 @@ const RemoveBg = ({
   };
 
   const retrieveJobResult = async () => {
-    const token = readAuthToken();
-    if (!token || !jobRequestId) return;
+    if (!sessionSignal.value?.authentified || !jobRequestId) return;
     setIsProcessing(true);
     setProcessingError(null);
     try {
@@ -991,7 +943,7 @@ const RemoveBg = ({
             await requestDeleteForProcessedOutput({
               requestId: jobRequestId,
               token: tokenFromUrl,
-              authToken: token,
+              isAuthenticated: true,
             });
           }
         } catch {}

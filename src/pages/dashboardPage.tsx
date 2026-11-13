@@ -14,8 +14,11 @@ import { FormDeleteReasonAccount } from "@/components/form/formDeleteReasonAccou
 import { api } from "@/utils/axiosConfig";
 
 //import des fonctions
-import { initSessionFromLocalStorage, sessionSignal } from "@/stores/session";
-import { isAuthentified } from "@/utils/request/isAuthentified";
+import { clearLegacySessionStorage, sessionSignal } from "@/stores/session";
+import {
+  isAuthentified,
+  isAuthenticationRejected,
+} from "@/utils/request/isAuthentified";
 import { setActiveLink } from "@/utils/setActiveLink";
 import { setDocumentTitle } from "@/utils/setDocumentTitle";
 import { langSignal } from "@/utils/langSignal";
@@ -147,18 +150,10 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
     let mounted = true;
 
     const run = async () => {
-      // Rehydrate session first
-      initSessionFromLocalStorage();
+      clearLegacySessionStorage();
 
-      // 1) Early redirect if no token at all (use hydrated signal only)
-      const token = sessionSignal?.value?.token;
-      if (!token) {
-        const redirect = encodeURIComponent("/dashboard");
-        location.route(`/login?redirect=${redirect}`);
-        return;
-      }
-
-      // 2) Verify with API (uses axios interceptors for refresh)
+      // The API is the single source of truth; no client token is used as a
+      // preliminary authorization signal.
       try {
         await isAuthentified();
         if (!mounted) return;
@@ -186,10 +181,19 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
         } finally {
           setTimeout(() => mounted && setBillingSubmitting("idle"), 1200);
         }
-      } catch {
+      } catch (error) {
         if (!mounted) return;
-        const redirect = encodeURIComponent("/dashboard");
-        location.route(`/login?redirect=${redirect}`);
+        // A login redirect is appropriate only after an explicit 401 response.
+        // A temporary network/API/CORS error must not make an authenticated user
+        // appear logged out.
+        if (isAuthenticationRejected(error)) {
+          const redirect = encodeURIComponent("/dashboard");
+          location.route(`/login?redirect=${redirect}`);
+          return;
+        }
+
+        console.error("Unable to verify the dashboard session", error);
+        setBillingSubmitting("error");
       }
     };
 
@@ -477,7 +481,6 @@ const DashboardPage = ({ routeKey }: PropsPage) => {
       try {
         sessionSignal.value = {
           ...(sessionSignal.value as any),
-          token: null,
           authentified: false,
         } as any;
       } catch {}

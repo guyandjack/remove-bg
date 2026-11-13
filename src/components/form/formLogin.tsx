@@ -17,7 +17,7 @@ import { Loader } from "@/components/loader/Loader";
 
 //import des fonctions
 import { axiosError } from "@/utils/axiosError";
-import { sessionSignal, setSessionFromApiResponse } from "@/stores/session";
+import { setSessionFromApiResponse } from "@/stores/session";
 import { REGEX } from "@/shared/validationRegex";
 //import { navigateWithLink } from "@/utils/navigateWithLink";
 
@@ -229,6 +229,7 @@ const FormLogin = () => {
                   <input
                     id="email"
                     type="email"
+                    autoComplete="username"
                     className="input-clean"
                     aria-invalid={!!errors.email || undefined}
                     {...register("email", {
@@ -294,6 +295,7 @@ const FormLogin = () => {
                   <input
                     id="password"
                     type={!eyePass ? "password" : "text"}
+                    autoComplete="current-password"
                     className="input-clean"
                     aria-invalid={!!errors.password || undefined}
                     {...register("password", {

@@ -1034,6 +1034,63 @@ export async function revokeRefreshToken(
   return res.affectedRows === 1;
 }
 
+/**
+ * Consomme un refresh token et persiste son remplaçant dans la même transaction.
+ *
+ * Une seule requête concurrente peut consommer un `jti` donné. Cette garantie est
+ * indispensable pour que la rotation détecte réellement la réutilisation d'un
+ * refresh token volé.
+ */
+export async function rotateRefreshTokenRecord(input: {
+  previousJti: string;
+  userId: ID;
+  nextJti: string;
+  nextToken: string;
+  issuedAt: Date;
+  expiresAt: Date;
+  ip?: string | null;
+  userAgent?: string | null;
+}): Promise<boolean> {
+  return withTransaction(async (conn) => {
+    const [consumeResult] = await conn.execute<ResultSetHeader>(
+      `UPDATE TokenRefresh
+       SET revoked = 1, revoked_at = NOW(), replaced_by_jti = ?
+       WHERE jti = ?
+         AND user_id = ?
+         AND revoked = 0
+         AND expires_at > NOW()`,
+      [input.nextJti, input.previousJti, input.userId],
+    );
+
+    if (consumeResult.affectedRows !== 1) {
+      return false;
+    }
+
+    const tokenHash = sha256Buffer(input.nextToken);
+    const [insertResult] = await conn.execute<ResultSetHeader>(
+      `INSERT INTO TokenRefresh
+        (id, jti, user_id, revoked, revoked_at, replaced_by_jti, token_hash, ip, user_agent, issued_at, expires_at)
+       VALUES (?, ?, ?, 0, NULL, NULL, ?, ?, ?, ?, ?)`,
+      [
+        crypto.randomUUID(),
+        input.nextJti,
+        input.userId,
+        tokenHash,
+        input.ip ?? null,
+        input.userAgent ?? null,
+        input.issuedAt,
+        input.expiresAt,
+      ],
+    );
+
+    if (insertResult.affectedRows !== 1) {
+      throw new Error("Unable to persist rotated refresh token");
+    }
+
+    return true;
+  });
+}
+
 export async function revokeAllRefreshTokensForUser(
   userId: ID,
 ): Promise<number> {

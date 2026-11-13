@@ -8,6 +8,7 @@ import {
   validateConverterOptions,
 } from "../middelware/services/imageConverter.middleware.js";
 import { parseSocialPicturePayload } from "../middelware/services/socialPicture.middleware.js";
+import { validateVideoGenerationRequest } from "../middelware/services/videoGeneration.middleware.js";
 
 //import des controleur
 import { imageConverter } from "../controleur/services/imageConverter.controler.js";
@@ -27,6 +28,7 @@ import { streamRemoveBgVisitorReplicateJobEvents } from "../controleur/services/
 import { downloadRemoveBgVisitorReplicateJobOutput } from "../controleur/services/downloadRemoveBgVisitorReplicateJobOutput.controller.js";
 import { deleteRemoveBgVisitorReplicateJobOutput } from "../controleur/services/deleteRemoveBgVisitorReplicateJobOutput.controller.js";
 import { imageConverterVisitor } from "../controleur/services/imageConverterVisitor.controler.js";
+import { createVideoGenerationTest } from "../controleur/services/videoGenerationTest.controller.js";
 import {
   attachRemoveBgQuality,
   validateRemoveBgUpload,
@@ -157,6 +159,13 @@ router.post(
   verifyAuth,
   validateMagicEraserPayload,
   magicEraser
+);
+
+// Test integration endpoint: validates the multipart payload without rendering or persisting a video.
+router.post(
+  "/video/generate",
+  validateVideoGenerationRequest,
+  createVideoGenerationTest,
 );
 
 

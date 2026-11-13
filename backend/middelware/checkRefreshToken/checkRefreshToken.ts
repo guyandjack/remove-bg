@@ -40,7 +40,7 @@ const checkRefreshToken = async (req: Request, res: Response, next: NextFunction
           authentified: false,
         });
       }
-      (req as any).refresh = { jti, userId, email, token };
+      (req as any).refresh = { jti, userId, email };
       return next();
     } catch (err: any) {
       logger.warn("checkRefreshToken::verify_failed", {

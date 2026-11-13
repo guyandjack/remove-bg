@@ -20,6 +20,8 @@ import { fileURLToPath } from "node:url";
 
 // methode de journalsiation des evenements
 import { logger, httpLoggerStream, requestIdMiddleware } from "./logger.js";
+import { isTrustedOrigin } from "./config/security.js";
+import { requireTrustedOrigin } from "./middelware/csrf/requireTrustedOrigin.js";
 
 //import des types
 import type { CorsOptions } from "cors";
@@ -49,6 +51,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
+const trustProxyHops = Number(process.env.TRUST_PROXY_HOPS || "0");
+if (!Number.isInteger(trustProxyHops) || trustProxyHops < 0) {
+  throw new Error("TRUST_PROXY_HOPS must be a non-negative integer");
+}
+// Keep the default fail-safe value (0). Set the exact number of trusted proxies
+// in production so rate limits and audit logs use the client address correctly.
+app.set("trust proxy", trustProxyHops);
+
 // ----------------------------------------------------
 // 🔒 1️⃣ Sécurité et configuration HTTP
 // ----------------------------------------------------
@@ -70,29 +80,14 @@ const corsOptions: CorsOptions = {
     origin: string | undefined,
     callback: (err: Error | null, allow?: boolean) => void
   ) {
-    const allowedOrigins = [
-      //dev
-      "http://localhost:5173", 
-      "http://localhost:4173", 
-
-      //pre_prod
-      "https://preprod.wizpix.ch",
-      "https://api.preprod.wizpix.ch",
-            
-      
-      //production
-      "https://wizpix.ch", 
-      "https://api.wizpix.ch", 
-    ];
     if (!origin) callback(null, true); // requêtes locales (ex: Postman)
-    else if (allowedOrigins.includes(origin)) callback(null, true);
+    else if (isTrustedOrigin(origin)) callback(null, true);
     else callback(new Error("CORS error: origin not allowed"));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: [
     "Content-Type",
-    "Authorization",
     "Accept",
     "X-Requested-With",
     // Frontend i18next language (used for MJML template selection)
@@ -173,6 +168,9 @@ app.use((req, res, next) => {
 
 // Attribution d’un identifiant unique à chaque requête (utile pour le suivi des logs)
 app.use(requestIdMiddleware);
+// Applies to every browser-initiated state change, including login and refresh.
+// Signed Stripe/Replicate webhooks are explicitly excluded in the middleware.
+app.use("/api", requireTrustedOrigin);
 
 // ----------------------------------------------------
 // 🧠 3️⃣ Journalisation (logs HTTP + Winston)

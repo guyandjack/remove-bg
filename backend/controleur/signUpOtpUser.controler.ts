@@ -1,6 +1,5 @@
 //import des librairies
 import crypto from "node:crypto";
-import jwt from "jsonwebtoken";
 import { logger } from "../logger.js";
 import { computeEmailHmacSha256Hex } from "../utils/emailGuard.js";
 import { renderMjmlTemplate } from "../MJML/functions/renderMjmlTemplate.js";
@@ -27,9 +26,10 @@ import {
 
 //pour gerer les tokens
 import {
+  getAccessCookieOptions,
+  getRefreshCookieOptions,
   signAccessToken,
   signRefreshToken,
-  setCookieOptionsObject,
 } from "../function/createToken.js";
 import { getConversionQuotaSnapshotForUser } from "../DB/queriesSQL/conversionQuota.queries.js";
 
@@ -429,15 +429,13 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
             });
         }
         try {
-          refreshToken = await signRefreshToken(email, {
+          const refresh = await signRefreshToken({ userId: user.id, email }, {
             ip: req.ip,
             userAgent: req.headers["user-agent"] as string | undefined,
           });
-          const decodedRefresh: any = jwt.decode(refreshToken) || {};
-          const rtExp: number | undefined =
-            typeof decodedRefresh?.exp === "number" ? decodedRefresh.exp : undefined;
+          refreshToken = refresh.token;
           accessToken = signAccessToken(
-            rtExp ? { email, rtExp } : { email }
+            { userId: user.id, email, sessionId: refresh.jti },
           );
         } catch (err: any) {
           logger.error("createNewAccountUser::token_generation_failed", {
@@ -459,7 +457,6 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         const usage = await getActiveUsageBillingPeriod(user.id);
         const planRow = await getPlanByCode(planCode);
         const customer = await getCustomerByUserId(user.id);
-        const options = setCookieOptionsObject();
         const planConfig =
           planOption.find((option) => option.name === planCode) ||
           planOption.find((option) => option.name === "free");
@@ -475,7 +472,8 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
         const usedCredits = usage?.used_in_period ?? 0;
         const remainingCredits = usage?.remaining_in_period ?? planQuota;
         const converter = await getConversionQuotaSnapshotForUser(user.id);
-        res.cookie("tokenRefresh", refreshToken, options);
+        res.cookie("tokenAccess", accessToken, getAccessCookieOptions());
+        res.cookie("tokenRefresh", refreshToken, getRefreshCookieOptions());
         const formatedObject: ObjectResponse = {
           user: {
             email: email,
@@ -486,7 +484,6 @@ const createNewAccountUser: RequestHandler = async (req, res) => {
           authentified: true,
           redirect: false,
           redirectUrl: null,
-          token: accessToken,
           plan: {
             code: planCode,
             name: planName,

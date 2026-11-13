@@ -90,6 +90,10 @@ const ProfileDropDown = ({ content }: ProfileDropDownType) => {
           <a
             href="/dashboard"
             className="flex flex-row justify-left items-center gap-4"
+            onClick={(event) => {
+              event.preventDefault();
+              location.route("/dashboard");
+            }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

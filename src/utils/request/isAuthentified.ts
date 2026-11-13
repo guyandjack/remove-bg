@@ -1,88 +1,39 @@
 
 //import des fonctions
-import { sessionSignal } from "@/stores/session";
-import type { SessionData } from "@/stores/session";
+import { setSessionFromApiResponse, sessionSignal } from "@/stores/session";
+import axios from "axios";
 
 //import des instances
 import { api } from "@/utils/axiosConfig"
 
 
 
-const createFallbackSession = (): SessionData => ({
-  user: {
-    email: "",
-  },
-  status: null,
-  authentified: false,
-  redirect: false,
-  redirectUrl: null,
-  plan: {
-    code: "",
-  },
-  token: null,
-  credits: {
-    used_last_24h: 0,
-    remaining_last_24h: 0,
-  },
-  creditRemainingConcerter: 0,
-  creditUsedConverter: 0,
-  subscriptionId: null,
-  hint: null,
-});
+/** True only when the API has explicitly rejected the current session. */
+const isAuthenticationRejected = (error: unknown): boolean =>
+  axios.isAxiosError(error) && error.response?.status === 401;
 
 const isAuthentified = async () => {
   try {
-    const response = await api.post(`/api/auth/me`, {});
+    const response = await api.get(`/api/auth/me`);
 
     if (!response) {
       throw Error("une erreur est survenu lors de la requete. code:1");
     }
 
     const data = response.data;
-    const user = data?.user;
-    const baseSession = sessionSignal.value ?? createFallbackSession();
-    if (!baseSession) {
-      throw Error("Session invalide.");
-    }
-
-    const updatedSession: SessionData = {
-      ...baseSession,
-      status: data?.status ?? baseSession?.status,
-      authentified: user?.authentified ?? baseSession?.authentified ?? false,
-      user: {
-        ...baseSession?.user,
-        ...user,
-      },
-      plan: data?.plan
-        ? {
-            ...baseSession.plan,
-            ...data.plan,
-          }
-        : baseSession.plan,
-      credits: data?.credits
-        ? {
-            used_last_24h: data.credits.used_last_24h ?? 0,
-            remaining_last_24h: data.credits.remaining_last_24h ?? 0,
-          }
-        : baseSession.credits,
-      creditRemainingConcerter:
-        typeof (data as any)?.creditRemainingConcerter === "number"
-          ? (data as any).creditRemainingConcerter
-          : baseSession.creditRemainingConcerter ?? 0,
-      creditUsedConverter:
-        typeof (data as any)?.creditUsedConverter === "number"
-          ? (data as any).creditUsedConverter
-          : baseSession.creditUsedConverter ?? 0,
-      subscriptionId: data?.subscriptionId ?? baseSession.subscriptionId,
-    };
-
-    sessionSignal.value = updatedSession;
-    if (typeof window !== "undefined") {
-      localStorage.setItem("session", JSON.stringify(updatedSession));
-    }
+    setSessionFromApiResponse({
+      ...data,
+      authentified: data?.user?.authentified === true,
+    });
+    return sessionSignal.value;
   } catch (error) {
-    throw Error("une erreur est survenu lors de la requete. code:2 :" + error);
+    // Do not turn a transient API, CORS, or rate-limit failure into a logout.
+    // Only the server can establish that the cookie-based session is invalid.
+    if (isAuthenticationRejected(error)) {
+      sessionSignal.value = null;
+    }
+    throw error;
   }
 };
 
-export {isAuthentified}
+export { isAuthentified, isAuthenticationRejected };

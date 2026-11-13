@@ -30,8 +30,8 @@ import { setActiveLink } from "@/utils/setActiveLink";
 
 //import des signaux de connexion user (signUp, login)
 import {
+  clearLegacySessionStorage,
   sessionSignal,
-  initSessionFromLocalStorage,
   setSessionFromApiResponse,
 } from "@/stores/session";
 
@@ -222,7 +222,7 @@ const NavBar = () => {
     const params = new URLSearchParams(window.location.search);
     const isParam = params.get("userValide") || null;
     if (isParam) return;
-    initSessionFromLocalStorage();
+    clearLegacySessionStorage();
     isAuthentified().catch((e) => {
       console.error("un bug!", e);
     });
